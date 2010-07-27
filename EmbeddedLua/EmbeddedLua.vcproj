@@ -163,6 +163,18 @@
 		<Filter
 			Name="Lua"
 			>
+			<File
+				RelativePath=".\Lua.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Lua.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaInclusions.h"
+				>
+			</File>
 			<Filter
 				Name="UnitTesting"
 				>
@@ -171,6 +183,22 @@
 		<Filter
 			Name="Library"
 			>
+			<File
+				RelativePath=".\LuaExtensibility.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaExtensibility.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaLibraryDeclarations.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaLibraryVector.cpp"
+				>
+			</File>
 			<Filter
 				Name="UnitTesting"
 				>
@@ -182,6 +210,42 @@
 			<Filter
 				Name="UnitTesting"
 				>
+			</Filter>
+			<Filter
+				Name="CoreUtilities"
+				>
+				<File
+					RelativePath="..\LuaFiles\ObjectOrientedParadigm.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\ObjectPool.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\Utilities.lua"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Math"
+				>
+				<File
+					RelativePath="..\LuaFiles\Vector2.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\Vector2PureLua.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\Vector3.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\Vector3PureLua.lua"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>

@@ -164,6 +164,14 @@
 		<Filter
 			Name="3DMath"
 			>
+			<File
+				RelativePath=".\Vector.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Vector.h"
+				>
+			</File>
 			<Filter
 				Name="UnitTesting"
 				>

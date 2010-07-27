@@ -340,75 +340,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="LuaLibrary"
-			>
-			<File
-				RelativePath=".\Lua.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Lua.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaInclusions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaLibraryDeclarations.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaRegistration.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaRegistration.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Math"
-			>
-			<File
-				RelativePath=".\Vector.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Vector.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="LuaApplication"
-			>
-			<Filter
-				Name="Testing"
-				>
-				<File
-					RelativePath="..\..\LuaFiles\Child.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\..\LuaFiles\Grandparent.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\..\LuaFiles\Parent.lua"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="LuaLibraries"
-			>
-			<File
-				RelativePath=".\LuaLibraryVector.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="SandBox"
 			>
 			<File
 				RelativePath=".\TestClasses.cpp"
@@ -420,6 +352,22 @@
 			</File>
 			<File
 				RelativePath=".\TestLibraryDeclarations.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Testing"
+			>
+			<File
+				RelativePath="..\..\LuaFiles\Child.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\..\LuaFiles\Grandparent.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\..\LuaFiles\Parent.lua"
 				>
 			</File>
 		</Filter>
