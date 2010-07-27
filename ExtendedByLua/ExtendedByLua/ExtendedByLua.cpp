@@ -32,12 +32,12 @@ TEST(SucceedReallyWell)
 
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 {
 	UnitTest::RunAllTests();
 #ifdef EXTENDED_BY_LUA /////
 	Lua* lua = new Lua();
-	lua_State* L = lua->getState();
+	// lua_State* L = lua->getState();
 	
 	lua->require("Utilities");
 	lua->require("ObjectOrientedParadigm");
@@ -56,7 +56,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	lua->runConsole();
 	delete lua;
 #endif // EXTENDED_BY_LUA 
-
 
 	return 0;
 }

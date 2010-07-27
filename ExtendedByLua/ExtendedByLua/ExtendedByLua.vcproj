@@ -334,6 +334,10 @@
 				RelativePath=".\ExtendedByLua.cpp"
 				>
 			</File>
+			<Filter
+				Name="UnitTesting"
+				>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="LuaLibrary"

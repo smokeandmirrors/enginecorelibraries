@@ -110,7 +110,6 @@ public:
 	Vector2& 		operator/=(const Vector2& v);
 	// dot product 
 	vec_t 			dot(const Vector2& v) const;
-	vec_t 			operator|(const Vector2& v) const;
 	// equality 
 	bool 			equals(const Vector2& v) const;
 	bool 			equals(vec_t X, vec_t Y) const;
@@ -174,8 +173,6 @@ public:
 	void 			cross(const Vector3& v);
 	void 			cross(const Vector3& a, const Vector3& b);
 	Vector3 		cross(const Vector3& v) const; // @warning may be slow
-	const Vector3 	operator^(const Vector3& v) const; // @warning may be slow
-	Vector3& 		operator^=(const Vector3& v);
 	// distance to another 
 	vec_t			distanceTo(const Vector3& v) const;
 	vec_t 			distanceToSqrd(const Vector3& v) const;
@@ -193,7 +190,6 @@ public:
 	Vector3& 		operator/=(const Vector3& v);
 	// dot product 
 	vec_t 			dot(const Vector3& v) const;
-	vec_t 			operator|(const Vector3& v) const;
 	// equality 
 	bool 			equals(const Vector3& v) const;
 	bool 			equals(vec_t X, vec_t Y, vec_t Z) const;
@@ -347,20 +343,6 @@ inline void Vector3::cross(const Vector3& a, const Vector3& b)
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
 }
-inline const Vector3 Vector3::operator^(const Vector3& v) const
-{	/** @warning abuse can be slow! */
-	return Vector3(y*v.z - z*v.y, z*v.x - x*v.z, x*v.y - y*v.x);
-}
-inline Vector3& Vector3::operator^=(const Vector3& v)
-{	
-	vec_t a = y * v.z - z * v.y;
-	vec_t b = z * v.x - x * v.z;
-	vec_t c = x * v.y - y * v.x;
-	x = a;
-	y = b;
-	z = c;
-	return *this;
-}
 /** @} end Vector_CrossProduct */
 
 /** 
@@ -458,15 +440,7 @@ inline vec_t Vector2::dot(const Vector2& v) const
 {
 	return x * v.x + y * v.y;
 }
-inline vec_t Vector2::operator|(const Vector2& v) const
-{
-	return x * v.x + y * v.y;
-}
 inline vec_t Vector3::dot(const Vector3& v) const
-{
-	return x * v.x + y * v.y + z * v.z;
-}
-inline vec_t Vector3::operator|(const Vector3& v) const
 {
 	return x * v.x + y * v.y + z * v.z;
 }
