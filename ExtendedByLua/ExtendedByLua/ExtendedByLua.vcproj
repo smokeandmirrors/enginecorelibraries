@@ -382,34 +382,6 @@
 		<Filter
 			Name="LuaApplication"
 			>
-			<File
-				RelativePath="..\..\LuaFiles\ObjectOrientedParadigm.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\ObjectPool.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\Utilities.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\Vector2.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\Vector2PureLua.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\Vector3.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\..\LuaFiles\Vector3PureLua.lua"
-				>
-			</File>
 			<Filter
 				Name="Testing"
 				>
