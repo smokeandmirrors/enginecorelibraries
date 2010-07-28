@@ -14,7 +14,7 @@
  */
 
 #include <stdlib.h>
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 
 class Lua 
 {

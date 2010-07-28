@@ -2,7 +2,7 @@
 #ifndef TESTCLASSES_H 
 #define TESTCLASSES_H
 
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 
 /**
 @class

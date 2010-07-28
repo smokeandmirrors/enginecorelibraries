@@ -18,7 +18,7 @@
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				AdditionalIncludeDirectories="I:\enginecorelibraries\Sandbox;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -63,9 +63,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib"
-				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
+				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib EmbeddedLua.lib Mathematics.lib Sandbox.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
@@ -101,7 +101,7 @@
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
@@ -123,12 +123,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\&quot;;&quot;$(SolutionDir)..\Mathematics\&quot;;&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;RELEASE;EXTENDED_BY_LUA"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -142,12 +142,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="LuaLib.lib Lua.lib"
-				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;"
+				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib EmbeddedLua.lib Mathematics.lib Sandbox.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
 				IgnoreAllDefaultLibraries="false"
-				IgnoreDefaultLibraryNames="msvcrtd.lib"
-				GenerateDebugInformation="true"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
+				GenerateDebugInformation="false"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -182,7 +182,7 @@
 		<Configuration
 			Name="NoLuaDebug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="1"
 			UseOfMFC="0"
 			CharacterSet="1"
@@ -205,14 +205,14 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\&quot;;&quot;$(SolutionDir)..\Mathematics\&quot;;&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;DEBUG;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="false"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -226,9 +226,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="LuaLib.lib Lua.lib"
-				LinkIncremental="0"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;"
+				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib EmbeddedLua.lib Mathematics.lib Sandbox.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="true"
@@ -264,7 +264,7 @@
 		<Configuration
 			Name="NoLuaRelease|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="1"
 			>
 			<Tool
@@ -284,7 +284,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\&quot;;&quot;$(SolutionDir)..\Mathematics\&quot;;&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;RELEASE;"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -297,6 +300,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib EmbeddedLua.lib Mathematics.lib Sandbox.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
+				IgnoreDefaultLibraryNames="msvcrt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"

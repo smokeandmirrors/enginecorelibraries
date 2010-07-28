@@ -6,7 +6,7 @@
 
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 
 static int lua_newParent(lua_State* L)
 {

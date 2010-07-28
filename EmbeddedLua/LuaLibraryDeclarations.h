@@ -14,7 +14,7 @@
  * @date 2/24/2010
  */
 
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 
 declare_lua_library(Vector2)
 declare_lua_library(Vector3)

@@ -7,7 +7,7 @@
 #endif // EXTENDED_BY_LUA 
 
 #ifdef EXTENDED_BY_LUA //
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 #include "Lua.h"
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"

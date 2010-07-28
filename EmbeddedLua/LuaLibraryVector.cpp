@@ -4,7 +4,7 @@
 
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 #include "Vector.h"
 
 #include <UnitTest++.h>

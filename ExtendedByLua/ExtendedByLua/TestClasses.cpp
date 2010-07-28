@@ -2,7 +2,7 @@
 #include "TestClasses.h"
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
-#include "LuaRegistration.h"
+#include "LuaExtensibility.h"
 
 /*
 Granparent implementation
