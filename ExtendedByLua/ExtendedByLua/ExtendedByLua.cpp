@@ -14,6 +14,7 @@
 #endif // EXTENDED_BY_LUA
 
 // testing includes:
+#include "CompilerChecks.h"
 #include "Vector.h"
 #include "TestClasses.h"
 #include <UnitTest++.h>
@@ -31,9 +32,10 @@ TEST(SucceedReallyWell)
 // :testing includes
 
 
-
 int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 {
+	Sandbox::Play();
+
 	UnitTest::RunAllTests();
 #ifdef EXTENDED_BY_LUA /////
 	Lua* lua = new Lua();

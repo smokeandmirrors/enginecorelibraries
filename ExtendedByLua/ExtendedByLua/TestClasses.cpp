@@ -55,7 +55,7 @@ end_lua_class(Grandparent, Grandparent)
 Basic implementation
 */
 #ifdef EXTENDED_BY_LUA
-int Basic::setMetatable(lua_State* L)
+int Basic::setMetatable(lua_State* /* L */)
 {
 	// return setDefaultClassMetatable(L);
 	return 0;
