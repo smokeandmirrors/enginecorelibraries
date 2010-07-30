@@ -3,8 +3,9 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="EmbeddedLua"
-	ProjectGUID="{75678B35-6020-4AE9-A8C1-D114E1DBCB2E}"
+	ProjectGUID="{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}"
 	RootNamespace="EmbeddedLua"
+	Keyword="Win32Proj"
 	>
 	<Platforms>
 		<Platform
@@ -19,7 +20,6 @@
 			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
 			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="4"
-			UseOfMFC="0"
 			CharacterSet="1"
 			>
 			<Tool
@@ -40,14 +40,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;DEBUG;EXTENDED_BY_LUA"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
-				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				WarningLevel="3"
+				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -85,6 +84,69 @@
 			IntermediateDirectory="$(OutDir)"
 			ConfigurationType="4"
 			CharacterSet="1"
+			WholeProgramOptimization="0"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				WholeProgramOptimization="false"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;RELEASE;EXTENDED_BY_LUA"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="ReleaseNoLua|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
+			ConfigurationType="4"
+			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
 			<Tool
@@ -104,9 +166,197 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox\&quot;;&quot;$(SolutionDir)..\Mathematics\&quot;;&quot;$(SolutionDir)..\Lua\Lua\&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;RELEASE;EXTENDED_BY_LUA"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;RELEASE"
 				RuntimeLibrary="2"
+				BufferSecurityCheck="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="DebugNoLua|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;DEBUG"
+				MinimalRebuild="true"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="4"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="GoldMaster|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;GOLDMASTER;EXTENDED_BY_LUA"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="true"
+				UsePrecompiledHeader="0"
+				WarningLevel="4"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLibrarianTool"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="GoldMasterNoLua|Win32"
+			OutputDirectory="$(ProjectDir)$(ConfigurationName)"
+			IntermediateDirectory="$(OutDir)"
+			ConfigurationType="4"
+			CharacterSet="1"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
+				PreprocessorDefinitions="WIN32;GOLDMASTER"
+				RuntimeLibrary="2"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -145,22 +395,18 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Lua"
+			Name="Application"
 			>
-			<File
-				RelativePath=".\Lua.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Lua.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaInclusions.h"
-				>
-			</File>
 			<Filter
-				Name="UnitTesting"
+				Name="Lua Utilities"
+				>
+			</Filter>
+			<Filter
+				Name="Lua Math"
+				>
+			</Filter>
+			<Filter
+				Name="Unit Testing"
 				>
 			</Filter>
 		</Filter>
@@ -184,52 +430,28 @@
 				>
 			</File>
 			<Filter
-				Name="UnitTesting"
+				Name="Unit Testing"
 				>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Application"
+			Name="Lua Interface"
 			>
-			<Filter
-				Name="UnitTesting"
+			<File
+				RelativePath=".\Lua.cpp"
 				>
-			</Filter>
-			<Filter
-				Name="CoreUtilities"
+			</File>
+			<File
+				RelativePath=".\Lua.h"
 				>
-				<File
-					RelativePath="..\LuaFiles\ObjectOrientedParadigm.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\ObjectPool.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Utilities.lua"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Math"
+			</File>
+			<File
+				RelativePath=".\LuaInclusions.h"
 				>
-				<File
-					RelativePath="..\LuaFiles\Vector2.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Vector2PureLua.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Vector3.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Vector3PureLua.lua"
-					>
-				</File>
+			</File>
+			<Filter
+				Name="Unit Testing"
+				>
 			</Filter>
 		</Filter>
 	</Files>

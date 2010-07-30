@@ -54,7 +54,7 @@ int __tostringLuaExtendable(lua_State* L)
 }
 
 /** \todo support the super_class name */
-void createGlobalClassMetatable(lua_State* L, const char* class_name, const char* super_class_name)
+void createGlobalClassMetatable(lua_State* L, const char* class_name, const char* /* super_class_name */)
 {
 	lua_pushstring(L, class_name);
 	createGlobalClassMetatable(L);
