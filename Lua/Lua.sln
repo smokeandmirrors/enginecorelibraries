@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "Lua\Lua.vcproj", "{7A1942F9-84FC-4596-9FA7-BDDB4F27E79E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89AB57EE-43FE-4374-8132-048EB72D044A} = {89AB57EE-43FE-4374-8132-048EB72D044A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Luac", "Luac\Luac.vcproj", "{6DFBCB5A-9E40-4BBF-96FF-75E98B3F2B70}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89AB57EE-43FE-4374-8132-048EB72D044A} = {89AB57EE-43FE-4374-8132-048EB72D044A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LuaLib", "LuaLib\LuaLib.vcproj", "{89AB57EE-43FE-4374-8132-048EB72D044A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A1942F9-84FC-4596-9FA7-BDDB4F27E79E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7A1942F9-84FC-4596-9FA7-BDDB4F27E79E}.Debug|Win32.Build.0 = Debug|Win32
+		{7A1942F9-84FC-4596-9FA7-BDDB4F27E79E}.Release|Win32.ActiveCfg = Release|Win32
+		{7A1942F9-84FC-4596-9FA7-BDDB4F27E79E}.Release|Win32.Build.0 = Release|Win32
+		{6DFBCB5A-9E40-4BBF-96FF-75E98B3F2B70}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6DFBCB5A-9E40-4BBF-96FF-75E98B3F2B70}.Debug|Win32.Build.0 = Debug|Win32
+		{6DFBCB5A-9E40-4BBF-96FF-75E98B3F2B70}.Release|Win32.ActiveCfg = Release|Win32
+		{6DFBCB5A-9E40-4BBF-96FF-75E98B3F2B70}.Release|Win32.Build.0 = Release|Win32
+		{89AB57EE-43FE-4374-8132-048EB72D044A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{89AB57EE-43FE-4374-8132-048EB72D044A}.Debug|Win32.Build.0 = Debug|Win32
+		{89AB57EE-43FE-4374-8132-048EB72D044A}.Release|Win32.ActiveCfg = Release|Win32
+		{89AB57EE-43FE-4374-8132-048EB72D044A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
