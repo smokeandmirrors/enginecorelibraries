@@ -309,6 +309,8 @@ and use the default "new", "setmetatable", "__gc" & "__tostring" methods
 /** 
 \def register_lua_library
 register a library with a lua state 
+\note registration MUST be done in dependency order, or the behavior
+is undefined
 \param lua_object is class @link Lua @endlink, not struct lua_State 
 \param name of the library without string delimiters
 */

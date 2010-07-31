@@ -49,7 +49,7 @@ public:
 	/** 
 	require() shortcut 
 	*/
-	void				require(const char* module) const;
+	bool				require(const char* module) const;
 	/** 
 	quick, hack console for fast testing 
 	*/

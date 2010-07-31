@@ -145,6 +145,7 @@
 				AdditionalDependencies="LuaLib.lib Lua.lib UnitTest++.vsnet2005.lib EmbeddedLua.lib Mathematics.lib Sandbox.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
+				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="msvcrt.lib"
 				GenerateDebugInformation="false"
 				AssemblyDebug="2"
@@ -515,18 +516,18 @@
 		<Filter
 			Name="Application"
 			>
-			<Filter
-				Name="Unit Testing"
-				>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Lua Application"
-			>
 			<File
 				RelativePath=".\ExtendedByLua.cpp"
 				>
 			</File>
+			<Filter
+				Name="Unit Testing"
+				>
+				<File
+					RelativePath=".\TestExtendedByLua.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Unit Testing"
