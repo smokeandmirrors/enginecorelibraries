@@ -6,9 +6,10 @@ module('ObjectOrientedParadigm', package.seeall)
 -- characteristics useful in larger scale lua programs,
 -- especially when used as an extension for a native classes.
 -- 
---	@author Smoke and Mirrors Development
---	smokeandmirrorsdevelopment@gmail.com
---	copyright 2010
+--	\author Smoke and Mirrors Development
+--	\email smokeandmirrorsdevelopment@gmail.com
+--	\copyright 2010
+require'Utilities'
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
@@ -35,8 +36,6 @@ local print = print -- declareclasserror...runtimeerror, etc.
 local error = error
 -- conditional halt functionality error reporting
 local assert = assert
-
-require'Utilities'
 
 ----------------------------------------------------------------------
 -- Checks for implemetation of a specified interface on an instance
