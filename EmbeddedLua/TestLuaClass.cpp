@@ -16,8 +16,7 @@ SUITE(LuaClassTesting)
 
 		Lua* args_lua = new Lua("testing", false, false);
 		CHECK(args_lua);
-		CHECK(args_lua);
-		delete ;
+		delete args_lua;
 		
 		{
 			Lua stack_lua;

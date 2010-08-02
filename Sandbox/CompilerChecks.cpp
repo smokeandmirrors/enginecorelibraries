@@ -3,5 +3,5 @@
 
 void Sandbox::Play()
 {
-	printf("Playing in the sandbox!");
+	printf("Playing in the sandbox!\n");
 }

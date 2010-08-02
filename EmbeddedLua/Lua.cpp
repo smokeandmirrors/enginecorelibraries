@@ -140,6 +140,7 @@ void Lua::openStandardLibraries(void) const
 	openLibrary(luaopen_package);
 	openLibrary(luaopen_string);
 	openLibrary(luaopen_table);
+	openLibrary(luaopen_os);
 #if	DEBUG /////
 	openLibrary(luaopen_debug);
 #endif // DEBUG 
@@ -171,7 +172,7 @@ void Lua::runConsole(void) const
 		{
 			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || lua_pcall(L, 0, 0, 0))
 			{
-				fprintf(stderr, "%s", lua_tostring(L, -1));
+				fprintf(stderr, "%s\n", lua_tostring(L, -1));
 				lua_pop(L, 1);
 			}
 		}
