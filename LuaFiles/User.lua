@@ -2,27 +2,30 @@ module(..., package.seeall)
 require'Utilities'
 require'ObjectOrientedParadigm'
 local UT = require'UnitTesting'
-
+print(tostring(UT)..' I broke require!')
 _G.U = function()
 	rerequire'User'
 end
 
-print('finished requiring user')
+print('finished requiring user 1')
 
+-- debug.sethook(function(str, line) print(str..tostring(line)..'\n') end, 'crl')
 
-UT.test('succeed',
+UnitTesting.test('succeed',
 	function() 
-		UT.check(true, 'sweet')
+		UnitTesting.check(true, 'sweet')
 	end
 )
 
-print('finished requiring user')
+print('finished requiring user 2')
 
 
-UT.test('failure',
+UnitTesting.test('failure',
 	function() 
-		UT.check(false, 'awesome')
+		UnitTesting.check(false, 'awesome')
 	end
 )
 
-print('finished requiring user')
+print('finished requiring user 3')
+
+UnitTesting.runAll()
