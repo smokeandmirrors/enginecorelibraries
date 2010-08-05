@@ -9,6 +9,28 @@
 // testing only
 #include "Vector.h"
 
+// \note taken straight from lua.c
+static int traceback (lua_State *L) {
+#if DEBUG
+  // if (!lua_isstring(L, 1))  /* 'message' not a string? */
+  //  return 1;  /* keep it intact */
+  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  if (!lua_istable(L, -1)) {
+    lua_pop(L, 1);
+    return 1;
+  }
+  lua_getfield(L, -1, "traceback");
+  if (!lua_isfunction(L, -1)) {
+    lua_pop(L, 2);
+    return 1;
+  }
+  lua_pushvalue(L, 1);  /* pass error message */
+  lua_pushinteger(L, 2);  /* skip this function and traceback */
+  lua_call(L, 2, 1);  /* call debug.traceback */
+#endif//DEBUG
+  return 1;
+}
+
 Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_storage)
 : m_name(NULL)
 , L(NULL)
@@ -25,7 +47,12 @@ Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_sto
 		initializeUserdataStorage();
 
 	initializeDefaultProxyMetamethods();
+
+#if DEBUG
+	lua_pushcfunction(L, traceback);
+	lua_setglobal(L, "traceback");
 	runSandbox();
+#endif// DEBUG
 }
 
 Lua::~Lua(void)
@@ -33,6 +60,35 @@ Lua::~Lua(void)
 	lua_close(L);
 	L = NULL;
 	delete m_name;
+}
+
+int Lua::callProtected(int num_args, bool no_return_values)
+{	
+	int status;
+	int base = lua_gettop(L) - num_args;/* function index */
+	lua_getglobal(L, "traceback");		/* push traceback function */
+	lua_insert(L, base);				/* put it under chunk and args */
+	status = lua_pcall(L, num_args, (no_return_values ? 0 : LUA_MULTRET), base);
+	lua_remove(L, base);				/* remove traceback function */
+	
+	if (status)
+	{	// force a complete garbage collection in case of errors  
+		lua_gc(L, LUA_GCCOLLECT, 0); 
+	}
+	
+	return report(status);
+}
+
+int Lua::doString(const char* chunk, const char* source)
+{
+	int status = luaL_loadbuffer(L, chunk, strlen(chunk), source);
+	
+	if (status == 0)
+	{
+		status = callProtected();
+	}
+	
+	return report(status);
 }
 
 void Lua::initialize(const char* name)
@@ -144,6 +200,21 @@ void Lua::openStandardLibraries(void) const
 #if	DEBUG /////
 	openLibrary(luaopen_debug);
 #endif // DEBUG 
+}
+
+// \note taken and modified from from lua.c 
+int Lua::report(int status) const
+{
+	if (status && !lua_isnil(L, -1)) 
+	{
+		const char *msg = lua_tostring(L, -1);
+		if (msg == NULL) msg = "(error object is not a string)";
+		// \todo log the error or the msg
+		// l_message(progname, msg);
+		lua_pop(L, 1);
+	}
+	
+	return status;
 }
 
 bool Lua::require(const char* module) const

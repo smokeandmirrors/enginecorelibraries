@@ -30,6 +30,17 @@ public:
 	destroys the lua_State and any memory allocated by this object
 	*/
 	~Lua(void);
+	/**
+	*/
+	int					callProtected(int num_args=0, bool no_return_values=true);
+	/**
+	loads end executes the string as a lua chunk
+	\return the status of the execution
+	*/
+	int					doString(const char* chunk, const char* source="code");
+	/**
+	\return the string ID of this specific %Lua object
+	*/
 	const char*			getName(void) const		{ return m_name; }
 	/**
 	returns the lua_State encapsulated by this class
@@ -79,6 +90,10 @@ protected:
 	in DEBUG builds only, opens the debug library
 	*/
 	void				openStandardLibraries(void) const;
+	/**
+	reports output from the lua_State
+	*/
+	int					report(int status) const;
 	
 private:
 	/** open standard libraries and such */

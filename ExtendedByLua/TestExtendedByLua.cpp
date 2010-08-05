@@ -33,6 +33,7 @@ SUITE(ExtendedByLuaTesting)
 		register_lua_library(lua, Derived);
 		lua->require("Vector3PureLua");
 		lua->require("User");
+		lua->require("UnitTesting");
 		delete lua;
 	}
 #endif//EXTENDED_BY_LUA 

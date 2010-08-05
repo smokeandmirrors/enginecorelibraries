@@ -232,7 +232,6 @@
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
-
 				GenerateDebugInformation="false"
 				AssemblyDebug="2"
 				SubSystem="1"
@@ -476,7 +475,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\UnitTest++\$(ConfigurationName)\&quot;"
 				IgnoreDefaultLibraryNames="msvcrt.lib"
@@ -528,29 +526,21 @@
 				Name="Unit Testing"
 				>
 				<File
+					RelativePath=".\TestClasses.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\TestClasses.h"
+					>
+				</File>
+				<File
 					RelativePath=".\TestExtendedByLua.cpp"
 					>
 				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Unit Testing"
-			>
-			<File
-				RelativePath=".\TestClasses.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TestClasses.h"
-				>
-			</File>
-			<File
-				RelativePath=".\TestLibraryDeclarations.cpp"
-				>
-			</File>
-			<Filter
-				Name="Unit Testing"
-				>
+				<File
+					RelativePath=".\TestLibraryDeclarations.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 	</Files>
