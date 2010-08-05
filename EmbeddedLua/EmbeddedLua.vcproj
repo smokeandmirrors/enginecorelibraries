@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="WIN32;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -168,7 +168,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;RELEASE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -232,7 +232,7 @@
 				PreprocessorDefinitions="WIN32;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -291,9 +291,12 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				Optimization="3"
+				EnableIntrinsicFunctions="true"
+				WholeProgramOptimization="false"
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;&quot;$(SolutionDir)..\UnitTest++\src\Win32&quot;;&quot;$(SolutionDir)..\UnitTest++\src&quot;"
 				PreprocessorDefinitions="WIN32;GOLDMASTER;EXTENDED_BY_LUA"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
@@ -454,6 +457,10 @@
 				</File>
 				<File
 					RelativePath="..\LuaFiles\Parent.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UnitTesting.lua"
 					>
 				</File>
 			</Filter>
