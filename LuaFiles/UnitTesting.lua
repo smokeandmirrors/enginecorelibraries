@@ -21,7 +21,7 @@ require'Utilities'
 ----------------------------------------------------------------------
 -- checks that value of given the expression is true
 check = function(value, fail_message)
-	assert(value, 'check failed: '..tostring(value)..' is not true '..(fail_message ~= nil and tostring(failmessage) or ''))
+	assert(value, 'check failed: '..tostring(value)..' is not true '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 ----------------------------------------------------------------------
@@ -29,7 +29,7 @@ end
 checkEqual = function(lhs, rhs, tolerance, fail_message)
 	if type(tolerance) ~= 'number' then
 		assert(lhs == rhs, 'checkEqual failed: '..tostring(lhs)..
-			' is not equal to '..tostring(rhs)..' '..(fail_message ~= nil and tostring(failmessage) or ''))
+			' is not equal to '..tostring(rhs)..' '..(fail_message ~= nil and tostring(fail_message) or ''))
 	else
 		checkNearEqual(tolerance)
 	end
@@ -41,7 +41,7 @@ checkNearEqual = function(lhs, rhs, tolerance, fail_message)
 	assert((math.abs((lhs - rhs)/rhs)) < tolerance, 
 		'checkEqual failed: '..tostring(lhs)..
 		' is not equal to '..tostring(rhs)..
-		' within '..tostring(tolerance)..' '..(fail_message ~= nil and tostring(failmessage) or ''))
+		' within '..tostring(tolerance)..' '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 ----------------------------------------------------------------------
@@ -51,7 +51,7 @@ checkError = function(test_function, fail_message, ...)
 	--\ todo check test_function called with
 	-- args and report true if it errors
 	local result, output = pcall(test_function, ...)
-	assert(not result, 'the function did not produce an error as expected '..(fail_message ~= nil and tostring(failmessage) or ''))
+	assert(not result, 'the function did not produce an error as expected '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 --[[
