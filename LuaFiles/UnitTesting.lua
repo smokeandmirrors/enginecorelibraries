@@ -21,15 +21,15 @@ require'Utilities'
 ----------------------------------------------------------------------
 -- checks that value of given the expression is true
 check = function(value, fail_message)
-	assert(value, 'check failed: '..tostring(value)..' is not true '..(fail_message ~= nil and tostring(fail_message) or ''))
+	assert(value, 'check failed, '..tostring(value)..' is not true: '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 ----------------------------------------------------------------------
 -- checks the values for equality within the given tolerance
 checkEqual = function(lhs, rhs, tolerance, fail_message)
 	if type(tolerance) ~= 'number' then
-		assert(lhs == rhs, 'checkEqual failed: '..tostring(lhs)..
-			' is not equal to '..tostring(rhs)..' '..(fail_message ~= nil and tostring(fail_message) or ''))
+		assert(lhs == rhs, 'checkEqual failed, '..tostring(lhs)..
+			' is not equal to '..tostring(rhs)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
 	else
 		checkNearEqual(tolerance)
 	end
@@ -39,9 +39,9 @@ end
 -- checks the values for equality within the given tolerance
 checkNearEqual = function(lhs, rhs, tolerance, fail_message)
 	assert((math.abs((lhs - rhs)/rhs)) < tolerance, 
-		'checkEqual failed: '..tostring(lhs)..
+		'checkEqual failed, '..tostring(lhs)..
 		' is not equal to '..tostring(rhs)..
-		' within '..tostring(tolerance)..' '..(fail_message ~= nil and tostring(fail_message) or ''))
+		' within '..tostring(tolerance)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 ----------------------------------------------------------------------
@@ -51,7 +51,7 @@ checkError = function(test_function, fail_message, ...)
 	--\ todo check test_function called with
 	-- args and report true if it errors
 	local result, output = pcall(test_function, ...)
-	assert(not result, 'the function did not produce an error as expected '..(fail_message ~= nil and tostring(fail_message) or ''))
+	assert(not result, 'the function did not produce an error as expected: '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 --[[
@@ -63,7 +63,6 @@ end
 -- the result is returned for manual testing, and will
 -- get exicuted by UnitTesting.runAll()
 test = function(name, test_function)
-	print('got inside test()')
 	createTestFunction(name, test_function)
 end
 
@@ -73,7 +72,6 @@ end
 
 ----------------------------------------------------------------------
 createTestFunction = function(name, test_function)
-	print('got inside createTestFunction()')
 	local tester = function()
 		local success, error_message = pcall(test_function)
 		if not success then
@@ -93,7 +91,7 @@ end
 reportResults = function()
 	local i = 0
 	local start_time = os.clock()
-	
+	print'\n************* Begin Lua Unit Testing *************'
 	for _, failure in pairs(failedTests) do
 		print(tostring(failure.test)..' FAILED!: '..failure.description) 
 		i = i + 1
@@ -102,12 +100,13 @@ reportResults = function()
 	local end_time = os.clock()
 	
 	if i == 0 then
-		print'All unit tests SUCCEEDED!\n'
+		print'\nAll unit tests SUCCEEDED!'
 	else
-		print(tostring(i)..' unit tests FAILED!!!!!!!!\n')
+		print('\n'..tostring(i)..' unit tests FAILED!!!!!!!!\n')
 	end
 	
-	print(tostring(table.count(unitTest))..' run in '..tostring(end_time - start_time)..' seconds\n')
+	print(tostring(table.countslow(unitTests))..' run in '..tostring(end_time - start_time)..' seconds')
+	print'************* Finish Lua Unit Testing ************'
 	return i
 	-- \report status
 	-- \report individual failures

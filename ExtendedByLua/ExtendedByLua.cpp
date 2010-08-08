@@ -15,12 +15,6 @@ Defines the entry point for the console application.
 
 int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 {
-#ifndef GOLDMASTER
-	printf("Finished executing unit tests!\n\n");
-	printf("REQUIRE IS BROKEN; YOU MUST FIX IT!\n");
-	printf("REQUIRE IS BROKEN; YOU MUST FIX IT!\n");
-	printf("REQUIRE IS BROKEN; YOU MUST FIX IT!\n");
-#endif//GOLDMASTER
 #ifdef EXTENDED_BY_LUA 
 	Lua* lua = new Lua();
 	lua->require("Utilities");

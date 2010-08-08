@@ -13,7 +13,7 @@ module("Utilities", package.seeall)
 -- executes the given string as code
 function _G.dostring(s)
 	local func = loadstring(s)
-	if type(func) = 'function' then
+	if type(func) == 'function' then
 		func()
 	else
 		print('do string failed')
@@ -76,10 +76,13 @@ end
 local oldrequire = require
 
 function _G.require(name)
-	if not package.loaded[name] then
+	if package.loaded[name] then
+		return package.loaded[name]
+	else
 		print("requiring:", name)
-		oldrequire(name)
+		return oldrequire(name)
 	end
+	
 end
 end -- package
 

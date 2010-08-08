@@ -7,15 +7,15 @@ _G.U = function()
 	rerequire'User'
 end
 
-UnitTesting.test('succeed',
+UT.test('succeed',
 	function() 
-		UnitTesting.check(true, 'sweet')
+		UT.check(true, 'sweet')
 	end
 )
-UnitTesting.test('failure',
+UT.test('failure',
 	function() 
-		UnitTesting.check(false, 'awesome')
+		UT.check(false, 'awesome')
 	end
 )
 
-UnitTesting.runAll()
+UT.runAll()

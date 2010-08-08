@@ -1,5 +1,4 @@
-#if 0
-// #if EXTENDED_BY_LUA
+#if EXTENDED_BY_LUA
 #include <cfixcc.h>
 #include "Lua.h"
 #include "LuaExtensibility.h"
