@@ -401,10 +401,6 @@
 				RelativePath=".\Vector.h"
 				>
 			</File>
-			<Filter
-				Name="Unit Testing"
-				>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

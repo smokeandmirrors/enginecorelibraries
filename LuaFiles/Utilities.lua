@@ -13,8 +13,11 @@ module("Utilities", package.seeall)
 -- executes the given string as code
 function _G.dostring(s)
 	local func = loadstring(s)
-	assert(func, "dostring failed")
-	func()
+	if type(func) = 'function' then
+		func()
+	else
+		print('do string failed')
+	end
 end
 
 ---------------------------------------------------------------------

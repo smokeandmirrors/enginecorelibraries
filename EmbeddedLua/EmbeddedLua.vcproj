@@ -484,10 +484,6 @@
 				RelativePath=".\LuaLibraryVector.cpp"
 				>
 			</File>
-			<Filter
-				Name="Unit Testing"
-				>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Lua Interface"
@@ -504,14 +500,6 @@
 				RelativePath=".\LuaInclusions.h"
 				>
 			</File>
-			<Filter
-				Name="Unit Testing"
-				>
-				<File
-					RelativePath=".\TestLuaClass.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

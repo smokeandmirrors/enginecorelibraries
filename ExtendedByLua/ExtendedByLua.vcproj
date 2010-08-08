@@ -522,26 +522,6 @@
 				RelativePath=".\ExtendedByLua.cpp"
 				>
 			</File>
-			<Filter
-				Name="Unit Testing"
-				>
-				<File
-					RelativePath=".\TestClasses.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TestClasses.h"
-					>
-				</File>
-				<File
-					RelativePath=".\TestExtendedByLua.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\TestLibraryDeclarations.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
