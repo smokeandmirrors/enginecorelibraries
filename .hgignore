@@ -15,3 +15,17 @@ glob:ExtendedByLuaUnitTesting/Debug/
 glob:ExtendedByLuaUnitTesting/Release/
 glob:*.user
 glob:preprocessor definitions.txt
+glob:*.ncb
+glob:*.suo
+glob:Mathematics/Debug/
+glob:Mathematics/DebugNoLua/
+glob:Mathematics/GoldMaster/
+glob:Mathematics/GoldMasterNoLua/
+glob:Mathematics/Release/
+glob:Mathematics/ReleaseNoLua/
+glob:Sandbox/Debug/
+glob:Sandbox/DebugNoLua/
+glob:Sandbox/GoldMaster/
+glob:Sandbox/GoldMasterNoLua/
+glob:Sandbox/Release/
+glob:Sandbox/ReleaseNoLua/
