@@ -4,7 +4,6 @@ glob:EmbeddedLua/DebugNoLua
 glob:EmbeddedLua/GoldMaster
 glob:EmbeddedLua/GoldMasterNoLua
 glob:EmbeddedLua/Release/
-glob:EmbeddedLua/ReleaseNoLua/TestLuaClass.obj
 glob:EmbeddedLua/ReleaseNoLua
 glob:ExtendedByLua/Debug/
 glob:ExtendedByLua/DebugNoLua/
@@ -15,3 +14,4 @@ glob:ExtendedByLua/ReleaseNoLua/
 glob:ExtendedByLuaUnitTesting/Debug/
 glob:ExtendedByLuaUnitTesting/Release/
 glob:*.user
+glob:preprocessor definitions.txt
