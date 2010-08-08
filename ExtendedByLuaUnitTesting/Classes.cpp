@@ -1,7 +1,7 @@
 #include <cfixcc.h>
-#ifdef EXTENDED_BY_LUA 
 #include <string.h>
-#include <cfixcc.h>
+
+#if 0
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
 #include "LuaExtensibility.h"

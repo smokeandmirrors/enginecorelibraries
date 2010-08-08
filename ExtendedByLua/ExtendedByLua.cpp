@@ -12,14 +12,10 @@ Defines the entry point for the console application.
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
 #endif//EXTENDED_BY_LUA
-#ifndef GOLDMASTER
-#include <UnitTest++.h>
-#endif//GOLDMASTER
 
 int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 {
 #ifndef GOLDMASTER
-	assert(!UnitTest::RunAllTests());
 	printf("Finished executing unit tests!\n\n");
 	printf("REQUIRE IS BROKEN; YOU MUST FIX IT!\n");
 	printf("REQUIRE IS BROKEN; YOU MUST FIX IT!\n");

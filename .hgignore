@@ -1,0 +1,17 @@
+glob:Documentation/
+glob:EmbeddedLua/Debug/
+glob:EmbeddedLua/DebugNoLua
+glob:EmbeddedLua/GoldMaster
+glob:EmbeddedLua/GoldMasterNoLua
+glob:EmbeddedLua/Release/
+glob:EmbeddedLua/ReleaseNoLua/TestLuaClass.obj
+glob:EmbeddedLua/ReleaseNoLua
+glob:ExtendedByLua/Debug/
+glob:ExtendedByLua/DebugNoLua/
+glob:ExtendedByLua/GoldMaster/
+glob:ExtendedByLua/GoldMasterNoLua/
+glob:ExtendedByLua/Release/
+glob:ExtendedByLua/ReleaseNoLua/
+glob:ExtendedByLuaUnitTesting/Debug/
+glob:ExtendedByLuaUnitTesting/Release/
+glob:*.user

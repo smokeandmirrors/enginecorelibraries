@@ -1,3 +1,5 @@
+#if 0
+// #if EXTENDED_BY_LUA
 #include <cfixcc.h>
 #include "Lua.h"
 #include "LuaExtensibility.h"
@@ -61,4 +63,4 @@ CFIXCC_BEGIN_CLASS(LuaClass)
 	CFIXCC_METHOD(doString)
 	CFIXCC_METHOD(luaUnitTesting)
 CFIXCC_END_CLASS()
-
+#endif//EXTENDED_BY_LUA

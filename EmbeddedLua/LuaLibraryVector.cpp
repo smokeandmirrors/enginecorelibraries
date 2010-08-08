@@ -7,8 +7,6 @@
 #include "LuaExtensibility.h"
 #include "Vector.h"
 
-#include <UnitTest++.h>
-
 static int newVector2(lua_State* L)
 {
 	lua_newtable(L);
