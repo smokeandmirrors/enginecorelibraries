@@ -412,6 +412,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\LuaFiles\UnitTestingFramework.lua"
+					>
+				</File>
+				<File
 					RelativePath="..\LuaFiles\User.lua"
 					>
 				</File>

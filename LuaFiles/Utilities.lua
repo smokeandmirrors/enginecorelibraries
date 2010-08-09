@@ -21,11 +21,15 @@ function _G.dostring(s)
 end
 
 ---------------------------------------------------------------------
+-- defines a single, global function that returns false, comes in
+-- handy all over the place
 function _G.falsef()
 	return false
 end
 
 ---------------------------------------------------------------------
+-- defines a single, global function that returns true, comes in
+-- handy all over the place
 function _G.truef()
 	return true
 end	

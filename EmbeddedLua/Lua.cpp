@@ -226,7 +226,7 @@ bool Lua::require(const char* module) const
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
-	return !lua_pcall(L, 1, 0, 0);
+	return !lua_pcall(L, 1, 1, 0);
 }
 
 void Lua::runConsole(void) const

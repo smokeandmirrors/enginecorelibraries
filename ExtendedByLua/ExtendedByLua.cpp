@@ -16,12 +16,17 @@ Defines the entry point for the console application.
 int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 {
 #ifdef EXTENDED_BY_LUA 
-	Lua* lua = new Lua();
-	lua->require("Utilities");
-	lua->require("ObjectOrientedParadigm");
-	lua->require("User");
-	lua->runConsole();
-	delete lua;
+	Lua lua;
+	lua.require("Utilities");
+	lua.require("ObjectOrientedParadigm");
+	// registration must be done in dependency order
+	register_lua_library((&lua), Vector2) 
+	register_lua_library((&lua), Vector3)
+	// performance testing
+	lua.require("Vector3PureLua");
+	// get the user file for easier rapid iteration
+	lua.require("User");
+	lua.runConsole();
 #endif//EXTENDED_BY_LUA 
 
 	return 0;

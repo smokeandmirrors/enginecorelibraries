@@ -30,8 +30,10 @@ public:
 	void luaRequire()
 	{
 		Lua* lua = new Lua();
-		CFIX_ASSERT(lua->require("Utilities"));
-		CFIX_ASSERT(lua->require("ObjectOrientedParadigm"));
+		bool result = lua->require("Utilities"); 
+		CFIX_ASSERT(result);
+		result = lua->require("ObjectOrientedParadigm");
+		CFIX_ASSERT(result);
 		delete lua;
 	}
 
@@ -43,16 +45,8 @@ public:
 		
 	void luaUnitTesting()
 	{
-		Lua* lua = new Lua();
-		lua->require("Utilities");
-		lua->require("ObjectOrientedParadigm");
-		// registration must be done in dependency order
-		register_lua_library(lua, Vector2) 
-		register_lua_library(lua, Vector3)
-		lua->require("Vector3PureLua");
-		lua->require("User");
-		lua->require("UnitTesting");
-		// \todo run all the lua unit tests
+		Lua lua;
+		lua.require("UnitTesting");
 	}
 };
 
