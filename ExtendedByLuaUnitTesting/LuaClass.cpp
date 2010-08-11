@@ -47,6 +47,13 @@ public:
 	{
 		Lua lua;
 		lua.require("UnitTesting");
+		lua_State* L = lua.getState();
+		lua_getglobal(L, "unitTestSuccessful"); //s: unitTestSuccessful
+		int result = lua_toboolean(L, -1);		//s: unitTestSuccessful
+		lua_pop(L, 1);
+		// \todo get the results of the lua unit testing failure string
+		// report it with the message
+		CFIX_ASSERT(result);
 	}
 };
 

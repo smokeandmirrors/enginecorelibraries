@@ -10,13 +10,16 @@ module('UnitTestingFramework', package.seeall)
 --	\copyright 2010
 require'Utilities'
 
---[[ 
-	\todo testSuite function for multiple tests by the same name
---]]
+----------------------------------------------------------------------
+-- PRIVATE
+-- all the unit test descriptions and functions
+unitTests = {}
+-- the list of failed tests after a unit test run
+failedTests = {}
 
---[[
-	result checking functions
---]]
+----------------------------------------------------------------------
+-- PUBLIC
+-- result checking functions
 
 ----------------------------------------------------------------------
 -- checks that value of given the expression is true
@@ -54,21 +57,20 @@ checkError = function(test_function, fail_message, ...)
 	assert(not result, 'the function did not produce an error as expected: '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
---[[
-	test writing functions
---]]
+----------------------------------------------------------------------
+-- test writing functions
 
 ----------------------------------------------------------------------
 -- creates a test out of the passed in function
 -- the result is returned for manual testing, and will
--- get exicuted by UnitTesting.runAll()
+-- get exicuted by runAll()
 test = function(name, test_function)
 	createTestFunction(name, test_function)
 end
 
---[[
-	implementation
---]]
+----------------------------------------------------------------------
+-- PRIVATE
+-- implementation
 
 ----------------------------------------------------------------------
 createTestFunction = function(name, test_function)
@@ -78,7 +80,8 @@ createTestFunction = function(name, test_function)
 			reportFailure(name, error_message)
 		end
 	end
-	table.insert(UnitTesting.unitTests, tester)
+	
+	table.insert(unitTests, tester)
 end
 
 ----------------------------------------------------------------------
@@ -91,25 +94,25 @@ end
 reportResults = function()
 	local i = 0
 	local start_time = os.clock()
-	print'\n************* Begin Lua Unit Testing *************'
+	local results = '\n**************************************************'
+	results = results..'\n************* Begin Lua Unit Testing *************\n'
 	for _, failure in pairs(failedTests) do
-		print(tostring(failure.test)..' FAILED!: '..failure.description) 
+		results = results..tostring(failure.test)..' FAILED!: '..failure.description..'\n' 
 		i = i + 1
 	end
 	
 	local end_time = os.clock()
 	
 	if i == 0 then
-		print'\nAll unit tests SUCCEEDED!'
+		results = results..'\nAll unit tests SUCCEEDED!\n'
 	else
-		print('\n'..tostring(i)..' unit tests FAILED!!!!!!!!\n')
+		results = results..'\n'..tostring(i)..' unit tests FAILED!!!!!!!!\n'
 	end
 	
-	print(tostring(table.countslow(unitTests))..' run in '..tostring(end_time - start_time)..' seconds')
-	print'************* Finish Lua Unit Testing ************'
-	return i
-	-- \report status
-	-- \report individual failures
+	results = results..(tostring(table.countslow(unitTests))..' run in '..tostring(end_time - start_time)..' seconds\n')
+	results = results..'\n************* Finish Lua Unit Testing ************\n'
+	results = results..'**************************************************\n'
+	return i, results
 end
 
 ----------------------------------------------------------------------
@@ -119,10 +122,14 @@ runAll = function()
 	for _, tester in pairs(unitTests) do
 		tester();
 	end
-	
-	return reportResults()
+	-- \clean up after the framework
+	-- \todo nil the loaded status of the unittesting framework
+	-- \todo run a full garbage collect
+	local num_failures, results = reportResults()
+	unitTests = {}
+	failedTests = {}	
+	print(results)
+	collectgarbage'collect'
+	return num_failures, results
 end
-
-unitTests = {}
-failedTests = {}
 

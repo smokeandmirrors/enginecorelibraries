@@ -37,7 +37,7 @@ public:
 	loads end executes the string as a lua chunk
 	\return the status of the execution
 	*/
-	int					doString(const char* chunk, const char* source="code");
+	bool				doString(const char* chunk, const char* source="code");
 	/**
 	\return the string ID of this specific %Lua object
 	*/

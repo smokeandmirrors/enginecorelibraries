@@ -9,6 +9,7 @@ module("Utilities", package.seeall)
 --	smokeandmirrorsdevelopment@gmail.com
 --	copyright 2010
 
+--[[ global (Lua) utilities ]]--
 ----------------------------------------------------------------------
 -- executes the given string as code
 function _G.dostring(s)
@@ -16,7 +17,10 @@ function _G.dostring(s)
 	if type(func) == 'function' then
 		func()
 	else
-		print('do string failed')
+		print('dostring() argument wasn\'t a fuction after running through '..
+			'loadstring')
+		print('argument: '..tostring(s))
+		print('result type: '..type(func))
 	end
 end
 
@@ -86,7 +90,6 @@ function _G.require(name)
 		print("requiring:", name)
 		return oldrequire(name)
 	end
-	
 end
 end -- package
 
@@ -125,16 +128,6 @@ table.findindexslow = function(t, object)
 	end
 end
 
----------------------------------------------------------------------
-table.findremoveslow = function(t, object)
-	for index, value in pairs(t) do
-		if rawequal(value, object) then
-			table.remove(t,index)
-			break
-		end
-	end
-end
-
 ----------------------------------------------------------------------
 -- Create a read-only version of the table
 -- @param t modifiable table
@@ -151,12 +144,21 @@ function table.getreadonly(t)
 	return proxy
 end
 
+---------------------------------------------------------------------
+table.removeindexslow = function(t, object)
+	for index, value in pairs(t) do
+		if rawequal(value, object) then
+			return table.remove(t, index)
+		end
+	end
+end
+
 ----------------------------------------------------------------------
 -- Take single set table and shuffle its members.  
--- @note THIS WILL ONLY WORK ON TABLES W/O NIL VALUES
 -- @param t table to shuffle
-function table.shuffle(t)
-	local n = #t
+-- \param elements a number that MUST be <= the number of elements in the table
+function table.shuffle(t, elements)
+	local n = type(elements) == 'number' and elements or table.countslow(t)
 	-- only shuffle more than 1
 	if n > 1 then
 		local k = 0

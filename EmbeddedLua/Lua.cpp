@@ -84,16 +84,9 @@ int Lua::callProtected(int num_args, bool no_return_values)
 	return report(status);
 }
 
-int Lua::doString(const char* chunk, const char* source)
+bool Lua::doString(const char* chunk, const char*)
 {
-	int status = luaL_loadbuffer(L, chunk, strlen(chunk), source);
-	
-	if (status == 0)
-	{
-		status = callProtected();
-	}
-	
-	return report(status);
+	return !luaL_dostring(L, chunk);
 }
 
 void Lua::initialize(const char* name)
