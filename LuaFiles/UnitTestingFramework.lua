@@ -10,12 +10,16 @@ module('UnitTestingFramework', package.seeall)
 --	\copyright 2010
 require'Utilities'
 
-----------------------------------------------------------------------
--- PRIVATE
--- all the unit test descriptions and functions
-unitTests = {}
--- the list of failed tests after a unit test run
-failedTests = {}
+--[[
+a unuique name isn't madatory, but 
+will be easier for you
+
+UT.test('name', 
+	function()
+	
+	end
+)
+--]]
 
 ----------------------------------------------------------------------
 -- PUBLIC
@@ -69,6 +73,24 @@ test = function(name, test_function)
 end
 
 ----------------------------------------------------------------------
+-- runs all the unit test functions
+-- \return the number of failures
+runAll = function()
+	for _, tester in pairs(unitTests) do
+		tester();
+	end
+	-- \clean up after the framework
+	-- \todo nil the loaded status of the unittesting framework
+	-- \todo run a full garbage collect
+	local num_failures, results = reportResults()
+	unitTests = {}
+	failedTests = {}	
+	print(results)
+	collectgarbage'collect'
+	return num_failures, results
+end
+
+----------------------------------------------------------------------
 -- PRIVATE
 -- implementation
 
@@ -116,20 +138,8 @@ reportResults = function()
 end
 
 ----------------------------------------------------------------------
--- runs all the unit test functions
--- \return the number of failures
-runAll = function()
-	for _, tester in pairs(unitTests) do
-		tester();
-	end
-	-- \clean up after the framework
-	-- \todo nil the loaded status of the unittesting framework
-	-- \todo run a full garbage collect
-	local num_failures, results = reportResults()
-	unitTests = {}
-	failedTests = {}	
-	print(results)
-	collectgarbage'collect'
-	return num_failures, results
-end
-
+-- PRIVATE
+-- all the unit test descriptions and functions
+unitTests = {}
+-- the list of failed tests after a unit test run
+failedTests = {}

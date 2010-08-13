@@ -193,6 +193,7 @@ function _G.sprintf(format_me, ...)
 	return string.format(format_me, ...)
 end
 
+if table then
 ----------------------------------------------------------------------
 -- Recursive deep print 
 -- @todo make correct version
@@ -202,21 +203,19 @@ end
 
 ----------------------------------------------------------------------
 -- sprint()
---
 -- shallow print. essentially just lists the top-level contents (if the object is a table)
-if table then
 function _G.sprint(object)
-	if (type(object) ~= "table" ) then
-		print(tostring(object))
-	else
+	if type(object) == 'table' then
 		local list = {}
-		for key,val in pairs(object) do	
-			table.insert(list, tostring(key)..": "..tostring(val))
+		for key, val in pairs(object) do	
+			table.insert(list, tostring(key)..': '..tostring(val))
 		end
 		table.sort(list)
 		for _,item in pairs(list) do 
-			print (item)
+			print(item)
 		end
+	else
+		print(tostring(object))
 	end
 end
 end -- if table

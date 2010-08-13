@@ -7,11 +7,11 @@ module('UnitTesting', package.seeall)
 --	\author Smoke and Mirrors Development
 --	\email smokeandmirrorsdevelopment@gmail.com
 --	\copyright 2010
-require'Utilities'
+require 'OOPUnitTesting'
 local UT = require'UnitTestingFramework'
+require'Utilities'
 
 --[[ testing Utilities.lua ]]--
-
 UT.test('dostring',
 	function()
 		local i = 1
@@ -46,7 +46,7 @@ UT.test('togset',
 		UT.check(toggle)
 	end
 )
-
+if table then
 UT.test('table.countslow',
 	function()
 		local t = {}
@@ -92,6 +92,7 @@ UT.test('table.findindexslow',
 		UT.checkEqual(table.findindexslow(t, 'bitchin'), 34)
 	end
 )
+
 UT.test('table.removeindexslow',
 	function()
 		local t = {}
@@ -104,6 +105,109 @@ UT.test('table.removeindexslow',
 		UT.checkEqual(table.countslow(t), 99)
 	end
 )
+
+UT.test('table.shuffle',
+	function()
+		local t = {}
+		local shuffled = {}
+		local sum = 0
+		
+		for i=1,100 do
+			table.insert(t, i)
+			table.insert(shuffled, i)
+			sum = sum + i			
+		end
+		
+		table.shuffle(shuffled, 100)
+		local control_sum = 0
+		local shuffle_sum = 0
+			
+		for _, value in pairs(t) do
+			control_sum = control_sum + value
+		end
+		
+		for _, value in pairs(shuffled) do
+			shuffle_sum = shuffle_sum + value
+		end
+		
+		UT.checkEqual(shuffle_sum, control_sum)
+		local is_different = false
+		
+		for i=1,100 do
+			if shuffled[i] ~= t[i] then
+				is_different = true
+				break
+			end		
+		end
+		
+		UT.check(is_different)
+	end
+)
+end -- if table
+
+if string then
+UT.test('cprintf',
+	function()
+		-- mainly, don't throw an error
+		print('you should see \'awesome\' below')
+		cprintf(true, 'awesome')
+		cprintf(false, 'bitchin')
+		print('you should NOT see \'bitchin\' above')
+	end
+)
+
+UT.test('printf',
+	function()
+		printf('The next character should be \'3\': %d', 3)
+	end
+)
+
+UT.test('sprintf',
+	function()
+		local results = sprintf('The next character should be \'3\': %d', 3)
+		UT.checkEqual(results, 'The next character should be \'3\': 3')
+	end
+)
+
+if table then
+UT.test('dprint',
+	function()
+		local t = {a = 'sweet', b = 34, d = function() print'awesome' end}
+		table.insert(t, 43)
+		table.insert(t, 'execellent')
+		t[75] = function() print'wierd' end
+		t[34] = 'bitchin'
+		table.insert(t, 95)
+		dprint(t)
+	end
+)
+
+UT.test('sprint',
+	function()
+		local t = {a = 'sweet', b = 34, d = function() print'awesome' end}
+		table.insert(t, 43)
+		table.insert(t, 'execellent')
+		t[75] = function() print'wierd' end
+		t[34] = 'bitchin'
+		table.insert(t, 95)
+		sprint(t)
+	end
+)
+end -- if table
+
+UT.test('tprint',
+	function()
+		tprint(nil)
+		tprint(function() print'hello' end)
+		tprint{}
+		tprint('string')
+		tprint(9)
+		tprint(true)
+		-- \todo test user data printing
+		coroutine.create(function() print'hello' end)
+	end
+	)
+end -- if string
 
 --[[ call this last ]]--
 _G.unitTestSuccessful = UT.runAll()

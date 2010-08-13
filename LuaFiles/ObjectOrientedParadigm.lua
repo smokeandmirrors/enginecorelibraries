@@ -22,6 +22,7 @@ require'Utilities'
 -- @todo make sure there are no functions/members by name
 -- 		of the default class members, like IS_A, construct, super, etc.
 -- @todo update documentation
+-- \todo if __tostring or __concat are not supplied, supply the defaults
 
 ---------------------------------------------------------------------
 -- change the following values to change compilation, error handling,
@@ -510,9 +511,9 @@ end -- end if DEBUG_INTERPRETATION
 -- adding functionality to the C library
 --
 if DEBUG_INTERPRETATION then
--- function createConstructor(class, metatable, name, parentudata_metamethod_table_name)
--- function createConstructor(class, metatable, name)
-function createConstructor(class, metatable)
+-- function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
+-- function createConstructor_PRIVATE(class, metatable, name)
+function createConstructor_PRIVATE(class, metatable)
 	assert(class and metatable)
 	if class.new then
 		if class.setmetatable then
@@ -544,7 +545,7 @@ function createConstructor(class, metatable)
 	end
 end	
 else
-function createConstructor(class, metatable, name, parentudata_metamethod_table_name)
+function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
 	if class.new then
 		if class.setmetatable then
 			return function(...)
@@ -621,8 +622,8 @@ function declareClass_PRIVATE(definition)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the last function
-	-- local constructor_function = createConstructor(class, metatables_PRIVATE[name], name, super_name)
-	local constructor_function = createConstructor(class, metatables_PRIVATE[name])
+	-- local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name], name, super_name)
+	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
 		constructors_PRIVATE[name] = constructor_function
 	else
@@ -647,8 +648,8 @@ function declareClass_PRIVATE(definition)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the constructor
-	-- local constructor_function = createConstructor(class, metatables_PRIVATE[name], name, super_name)
-	local constructor_function = createConstructor(class, metatables_PRIVATE[name])
+	-- local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name], name, super_name)
+	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
 		constructors_PRIVATE[name] = constructor_function
 	else
