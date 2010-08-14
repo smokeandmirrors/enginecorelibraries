@@ -95,9 +95,10 @@ end
 -- implementation
 
 ----------------------------------------------------------------------
-createTestFunction = function(name, test_function)
+createTestFunction = function(name, f)
 	local tester = function()
-		local success, error_message = pcall(test_function)
+		-- local success, error_message = pcall(f)
+		local success, error_message = xpcall(f, errorHandler)
 		if not success then
 			reportFailure(name, error_message)
 		end
@@ -106,6 +107,10 @@ createTestFunction = function(name, test_function)
 	table.insert(unitTests, tester)
 end
 
+----------------------------------------------------------------------
+errorHandler = function(error_object)
+	return debug.traceback(error_object,4)
+end
 ----------------------------------------------------------------------
 reportFailure = function(name, error_message)
 	table.insert(failedTests, {test = tostring(name), description = error_message})

@@ -12,13 +12,11 @@ local UT = require'UnitTestingFramework'
 require'Utilities'
 
 --[[
-ACTS_AS
 IS_A
 addClassConstructor
 classes
 declareAbstractClass
 declareClass
-declareInterface
 delete
 functions
 getClass
@@ -28,6 +26,10 @@ toStringConcat
 validateObject
 --]]
 
+----------------------------------------------------------------------
+-- ACTS_AS
+-- declareInterface
+-- classes declared as implemented an interface
 UT.test('OOP.interfaces',
 	function()
 		-- convenience for (re)writing the test
@@ -44,10 +46,8 @@ UT.test('OOP.interfaces',
 		};
 		
 		declareClass{
-			declareClass{
-				name = 'CFAIL_ACTS_AS_TEST',
-				only = function() print'I work' end
-			};
+			name = 'CFAIL_ACTS_AS_TEST',
+			only = function() print'I work' end
 		}
 		
 		UT.checkError( 
@@ -64,7 +64,8 @@ UT.test('OOP.interfaces',
 				local f = new'Should not compile' 
 			end,
 			'This class should not exists')
-		
+			
+		UT.check(false)		
 		
 		local p = new'CPASS_ACTS_AS_TEST'
 		UT.check(p:ACTS_AS'IACTS_AS_TEST')

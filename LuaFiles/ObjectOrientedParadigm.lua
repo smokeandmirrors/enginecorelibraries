@@ -968,7 +968,6 @@ end
 function verifyInterfacesImplementation_PRIVATE(class, interfaces)
 	local success = true
 	for key, interface in pairs(interfaces) do
-		print('interface key', key)
 		if not verifyFunctionImplementation_PRIVATE(class, interface) then
 			if not missingInterfaces[key] then
 				missingInterfaces[key] = true
