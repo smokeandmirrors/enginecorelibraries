@@ -149,16 +149,17 @@ if string then
 UT.test('cprintf',
 	function()
 		-- mainly, don't throw an error
-		print('you should see \'awesome\' below')
+		print('L@@K: you should see \'awesome\' below')
 		cprintf(true, 'awesome')
 		cprintf(false, 'bitchin')
-		print('you should NOT see \'bitchin\' above')
+		print('L@@K: you should NOT see \'bitchin\' above')
 	end
 )
 
 UT.test('printf',
 	function()
-		printf('The next character should be \'3\': %d', 3)
+		-- mainly, don't throw an error
+		printf('L@@K: The next character should be \'3\': %d', 3)
 	end
 )
 
@@ -197,6 +198,7 @@ end -- if table
 
 UT.test('tprint',
 	function()
+		-- mainly, don't throw an error
 		tprint(nil)
 		tprint(function() print'hello' end)
 		tprint{}
@@ -204,10 +206,7 @@ UT.test('tprint',
 		tprint(9)
 		tprint(true)
 		-- \todo test user data printing
-		coroutine.create(function() print'hello' end)
+		tprint(coroutine.create(function() print'hello' end))
 	end
 	)
 end -- if string
-
---[[ call this last ]]--
-_G.unitTestSuccessful = UT.runAll()

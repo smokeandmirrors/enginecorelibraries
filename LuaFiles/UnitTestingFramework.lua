@@ -76,17 +76,22 @@ end
 -- runs all the unit test functions
 -- \return the number of failures
 runAll = function()
+	local start_time = os.clock()
 	for _, tester in pairs(unitTests) do
 		tester();
 	end
-	-- \clean up after the framework
+	local end_time = os.clock()
 	-- \todo nil the loaded status of the unittesting framework
 	-- \todo run a full garbage collect
-	local num_failures, results = reportResults()
+	local num_failures, results = reportResults(end_time - start_time)
 	unitTests = {}
 	failedTests = {}	
 	print(results)
 	collectgarbage'collect'
+	if package then
+		package.loaded['UnitTestingFramework'] = nil
+	end
+	_G.lastUnitTestRunSucceeded = num_failures == 0
 	return num_failures, results
 end
 
@@ -118,9 +123,8 @@ end
 
 ----------------------------------------------------------------------
 -- runs all the unit test functions
-reportResults = function()
+reportResults = function(duration)
 	local i = 0
-	local start_time = os.clock()
 	local results = '\n**************************************************'
 	results = results..'\n************* Begin Lua Unit Testing *************\n'
 	for _, failure in pairs(failedTests) do
@@ -128,15 +132,13 @@ reportResults = function()
 		i = i + 1
 	end
 	
-	local end_time = os.clock()
-	
 	if i == 0 then
 		results = results..'\nAll unit tests SUCCEEDED!\n'
 	else
 		results = results..'\n'..tostring(i)..' unit tests FAILED!!!!!!!!\n'
 	end
 	
-	results = results..(tostring(table.countslow(unitTests))..' run in '..tostring(end_time - start_time)..' seconds\n')
+	results = results..(tostring(table.countslow(unitTests))..' run in '..duration..' seconds\n')
 	results = results..'\n************* Finish Lua Unit Testing ************\n'
 	results = results..'**************************************************\n'
 	return i, results
@@ -144,7 +146,10 @@ end
 
 ----------------------------------------------------------------------
 -- PRIVATE
--- all the unit test descriptions and functions
-unitTests = {}
--- the list of failed tests after a unit test run
+----------------------------------------------------------------------
+--- the list of failed tests after a unit test run
 failedTests = {}
+--- the result of the last run of all tests
+lastRunSucceeded = true
+--- all the unit test descriptions and functions
+unitTests = {}

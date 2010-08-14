@@ -65,8 +65,6 @@ UT.test('OOP.interfaces',
 			end,
 			'This class should not exists')
 			
-		UT.check(false)		
-		
 		local p = new'CPASS_ACTS_AS_TEST'
 		UT.check(p:ACTS_AS'IACTS_AS_TEST')
 		local f = new'CFAIL_ACTS_AS_TEST' 	
