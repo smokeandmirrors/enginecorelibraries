@@ -11,7 +11,7 @@ module('UnitTestingFramework', package.seeall)
 require'Utilities'
 
 --[[
-a unuique name isn't madatory, but 
+a unique name isn't madatory, but 
 will be easier for you
 
 UT.test('name', 
@@ -55,8 +55,6 @@ end
 -- checks that the given function called with the passed in 
 -- arguments will throw an error 
 checkError = function(test_function, fail_message, ...)
-	--\ todo check test_function called with
-	-- args and report true if it errors
 	local result, output = pcall(test_function, ...)
 	assert(not result, 'the function did not produce an error as expected: '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
