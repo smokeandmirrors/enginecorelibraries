@@ -342,6 +342,10 @@
 			RelativePath=".\LuaClass.cpp"
 			>
 		</File>
+		<File
+			RelativePath=".\UnitTestingTools.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -8,8 +8,6 @@ end
 
 _G.test = function()
 	local UTF = rerequire'UnitTestingFramework'
-	rerequire'UnitTesting'
-	rerequire'OOPUnitTesting'
-	UTF.runAll()
+	testAll(true)
 end
 

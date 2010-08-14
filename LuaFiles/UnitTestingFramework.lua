@@ -60,17 +60,6 @@ checkError = function(test_function, fail_message, ...)
 end
 
 ----------------------------------------------------------------------
--- test writing functions
-
-----------------------------------------------------------------------
--- creates a test out of the passed in function
--- the result is returned for manual testing, and will
--- get exicuted by runAll()
-test = function(name, test_function)
-	createTestFunction(name, test_function)
-end
-
-----------------------------------------------------------------------
 -- runs all the unit test functions
 -- \return the number of failures
 runAll = function()
@@ -81,17 +70,42 @@ runAll = function()
 	local end_time = os.clock()
 	-- \todo nil the loaded status of the unittesting framework
 	-- \todo run a full garbage collect
-	local num_failures, results = reportResults(end_time - start_time)
+	local num_failures, results = getResultsReport(end_time - start_time)
 	unitTests = {}
 	failedTests = {}	
-	print(results)
 	collectgarbage'collect'
+	
 	if package then
 		package.loaded['UnitTestingFramework'] = nil
 	end
-	_G.lastUnitTestRunSucceeded = num_failures == 0
-	return num_failures, results
+	
+	_G.lastUnitTestNumFailures = num_failures
+	_G.lastUnitTestReport = results
+	
+	return num_failures == 0
 end
+
+----------------------------------------------------------------------
+-- test writing functions
+
+----------------------------------------------------------------------
+-- creates a test out of the passed in function
+-- the result is returned for manual testing, and will
+-- get exicuted by runAll()
+test = function(name, test_function)
+	createTestFunction(name, test_function)
+end
+
+_G.testAll = function(print_out)
+	-- require all the unit test modules here
+	rerequire'UnitTesting'
+	rerequire'OOPUnitTesting'
+	runAll()
+	if print_out then
+		print(_G.lastUnitTestReport)
+	end
+end
+
 
 ----------------------------------------------------------------------
 -- PRIVATE
@@ -114,14 +128,10 @@ end
 errorHandler = function(error_object)
 	return debug.traceback(error_object,4)
 end
-----------------------------------------------------------------------
-reportFailure = function(name, error_message)
-	table.insert(failedTests, {test = tostring(name), description = error_message})
-end
 
 ----------------------------------------------------------------------
 -- runs all the unit test functions
-reportResults = function(duration)
+getResultsReport = function(duration)
 	local i = 0
 	local results = '\n**************************************************'
 	results = results..'\n************* Begin Lua Unit Testing *************\n'
@@ -143,11 +153,14 @@ reportResults = function(duration)
 end
 
 ----------------------------------------------------------------------
+reportFailure = function(name, error_message)
+	table.insert(failedTests, {test = tostring(name), description = error_message})
+end
+
+----------------------------------------------------------------------
 -- PRIVATE
 ----------------------------------------------------------------------
 --- the list of failed tests after a unit test run
 failedTests = {}
---- the result of the last run of all tests
-lastRunSucceeded = true
 --- all the unit test descriptions and functions
 unitTests = {}

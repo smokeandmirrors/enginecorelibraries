@@ -28,7 +28,6 @@ int _tmain(int /* argc */, _TCHAR* /* argv[] */)
 	lua.require("User");
 	lua.runConsole();
 #endif//EXTENDED_BY_LUA 
-
 	return 0;
 }
 

@@ -219,6 +219,7 @@ bool Lua::require(const char* module) const
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
+	// \todo pop the stack? are the values left on the stack?
 	return !lua_pcall(L, 1, 1, 0);
 }
 

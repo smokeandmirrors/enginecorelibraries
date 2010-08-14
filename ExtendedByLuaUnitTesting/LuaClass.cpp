@@ -4,6 +4,10 @@
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
+
+#include <stdlib.h>
+#include <string>
+
 class LuaClass : public cfixcc::TestFixture
 {
 private:
@@ -47,13 +51,38 @@ public:
 	{
 		Lua lua;
 		lua.require("UnitTesting");
+		lua.require("UnitTestingFramework");
 		lua_State* L = lua.getState();
-		lua_getglobal(L, "unitTestSuccessful"); //s: unitTestSuccessful
-		int result = lua_toboolean(L, -1);		//s: unitTestSuccessful
+		//s: ?
+		lua_getglobal(L, "UnitTestingFramework");
+		//s: UnitTestingFramework
+		lua_getfield(L, -1, "testAll");
+		//s: testAll
+		lua_call(L, 0, 1);
+		//s: bool
 		lua_pop(L, 1);
-		// \todo get the results of the lua unit testing failure string
-		// report it with the message
-		CFIX_ASSERT(result);
+		//s:
+		lua_getglobal(L, "lastUnitTestNumFailures");
+		//s: lastUnitTestNumFailures
+		int result = static_cast<int>(lua_tonumber(L, -1));
+		lua_pop(L, 1);
+		//s:
+		lua_getglobal(L,  "lastUnitTestReport");
+		//s: lastUnitTestReport
+		const char* report = lua_tostring(L, -1);
+		lua_pop(L, 1);
+		//s:
+		CFIX_ASSERT(result == 0);
+		// Convert to a wchar_t*
+		size_t origsize = strlen(report) + 1;
+		size_t convertedChars = 0;
+		// wchar_t wcstring[origsize];
+		wchar_t* wcstring = new wchar_t[origsize];
+		mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
+		CFIX_LOG(L"Lua Unit Test Report %s", wcstring);
+		delete[] wcstring;
+		// std::string report_string(report);
+		// CFIX_LOG(L"Lua Unit Test Report %s", report_string);
 	}
 };
 
