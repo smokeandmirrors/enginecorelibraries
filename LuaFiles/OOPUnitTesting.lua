@@ -228,6 +228,7 @@ UT.test('OOP.abstract classes',
 				a = new'AbstractNoFunction'
 			end
 		)
+		
 		d = new'Did override'
 		UT.check(d:concrete() == 2)
 		e = new'son of Did override'
@@ -238,13 +239,52 @@ UT.test('OOP.abstract classes',
 	end
 )
 
+----------------------------------------------------------------------
+UT.test('OOP.classes and functions',
+	function()
+		rerequire'ObjectOrientedParadigm'
+		declareClass{name = 'one'}
+		declareClass{name = 'two'}
+		local i = 0
+		for k, v in classes() do
+			UT.check(type(v) == 'table')
+			if i == 0 then
+				UT.check(v:getClassName() == 'one')
+			elseif i == 1 then
+				UT.check(v:getClassName() == 'two')
+			end
+			i = i + 1
+		end
+		
+		declareClass{name = 'three',
+			one = function() return 1 end,
+			two = function() return 2 end,
+			three = function() return 3 end
+		}
+		
+		c = new'three'
+		
+		for k, v in functions(c) do
+			UT.check(type(v) == 'function')
+			if k == 'one' then
+				UT.check(v(c) == 1)
+			elseif k == 'two' then
+				UT.check(v(c) == 2)
+			elseif k == 'three' then
+				UT.check(v(c) == 3)
+			end			
+		end
+	end
+)
+
 --[[
-addClassConstructor
 classes
 functions
 getClass
 getClassFromObject
-new
+
+
+addClassConstructor
 toStringConcat
 validateObject
 --]]
