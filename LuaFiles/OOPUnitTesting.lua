@@ -277,15 +277,62 @@ UT.test('OOP.classes and functions',
 	end
 )
 
---[[
-classes
-functions
-getClass
-getClassFromObject
+----------------------------------------------------------------------
+UT.test('OOP.common class properties',
+function()
+	rerequire'ObjectOrientedParadigm'
+	declareClass{name = 'Basic'}
+	declareClass{name ='Derived', extends = 'Basic'}
+	
+	b = new'Basic'
+	UT.check(type(b.class) == 'table')
+	UT.check(b.class == getClass'Basic')
+	UT.check(b:getClass() == getClass'Basic')
+	UT.check(b.className == 'Basic')
+	UT.check(b:getClassName() == 'Basic')
+	UT.check(b:getName() == 'Basic')
+	UT.check(b.super == nil)
+	UT.check(b:getSuperclass() == nil)
+	UT.check(b:toString() == 'Basic')
+	
+	d = new'Derived'
+	sprint(d)
+	UT.check(type(d.class) == 'table')
+	UT.check(d.class == getClass'Derived')
+	UT.check(d:getClass() == getClass'Derived')
+	UT.check(d.className == 'Derived')
+	UT.check(d:getClassName() == 'Derived')
+	UT.check(d:getName() == 'Derived')
+	UT.check(d.super == getClass'Basic')
+	UT.check(d:getSuperclass() == getClass'Basic')
+	UT.check(d:toString() == 'Derived')
+	
+	
+end)
 
-
-addClassConstructor
-toStringConcat
-validateObject
---]]
+----------------------------------------------------------------------
+UT.test('OOP.misc',
+function()
+	-- \todo validateObject
+	declareClass{
+		name = 'Easy', 
+		toString = function() return 'simple' end, 
+		__tostring == toString,
+		__concat = OOP.toStringConcat
+	}
+	
+	e = new'Easy'
+	z = new'Easy'
+	UT.check(e..z == 'simplesimple')
+	UT.check(e..'hello' == 'simplehello')
+	UT.check('goodbye'..z == 'goodbyesimple')
+	
+	local ctor = function()
+		return {}
+	end
+	
+	OOP.addClassConstructor('void', ctor)
+	v = new'void'
+	UT.check(v ~= nil)
+end)
 

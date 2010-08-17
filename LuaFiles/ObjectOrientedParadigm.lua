@@ -372,63 +372,44 @@ if DEBUG_INTERPRETATION then
 function beginClassDeclaration_PRIVATE(def)
 	-- hold failure reporting until the very end so that all problems with the class can be reported.
 	local compiled = true
-	
 	local implements = def.implements
-	
 	local name = def.name
-	
 	local extends = def.extends
 	-- there should only be functions left in the definition
-	
 	def.name = nil
-	
 	def.extends = nil
-	
 	def.implements = nil
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
-		
 		classesNeedRefresh = true
 		print('REDEFINING CLASS: '..name)
 	end
 	-- validate the baseclass name
-	
 	local base_class_name = findBaseClassName_PRIVATE(extends)
-	
 	compiled = (base_class_name ~= nil or extends == nil) and compiled
-	
 	if not compiled then
-		
-	local extendstring = extends and extends or ''
+		local extendstring = extends and extends or ''
 		addToErrorMsg_PRIVATE('super class '..extendstring..', extended by '..name..', does not exist!')
 	end
 	-- if we aren't good so far, future messages will be irrelevant
-	
 	assert(compiled, errorMsg)
 	-- assign basic properties
 	local base_class
-	
 	if base_class_name then
 		base_class = classes_PRIVATE[base_class_name]
 	end
-	
 	local base_class = base_class_name and classes_PRIVATE[base_class_name]
-	
 	local class = createClassProperties_PRIVATE(name, base_class)
-	
 	assignMetaMethods_PRIVATE(name, def, base_class_name)
 	-- verify the interfaces_PRIVATE
 	local interfacesGood = true
 	local implemented, interfacesGood = findInterfaces_PRIVATE(implements)
-	
 	compiled = interfacesGood and compiled
 	class.implements = implemented	
 	-- add the defined functions in the file to the class declaration
 	compiled = verifyFunctionTable_PRIVATE(class, def, base_class, name..'.', ' is not a function.  Create this object in the constructor() function.') and compiled
-	
 	-- add methods common to all classes in lieu of an Object base class
 	compiled = addCommonClassProperties_PRIVATE(class, base_class, name)
-	
 	return class, compiled
 end
 else
