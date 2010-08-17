@@ -321,6 +321,17 @@ function()
 		__concat = OOP.toStringConcat
 	}
 	
+	declareInterface{
+		name = 'Hard',
+		never = function() end
+	}
+	
+	declareClass {
+		name = 'Mixed',
+		implements = 'Hard',
+		never = function() end
+	}
+	
 	e = new'Easy'
 	z = new'Easy'
 	UT.check(e..z == 'simplesimple')
@@ -334,5 +345,16 @@ function()
 	OOP.addClassConstructor('void', ctor)
 	v = new'void'
 	UT.check(v ~= nil)
+	
+	m = new'Mixed'
+	OOP.validateObject(m, 'Mixed', {'Hard'})
+	UT.checkError(
+		function()
+			OOP.validateObject(e, 'Easy', {'Hard'})
+		end)
+	UT.checkError(
+		function()
+			OOP.validateObject(z, 'Mixed')
+		end)
 end)
 
