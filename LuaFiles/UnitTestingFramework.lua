@@ -146,7 +146,7 @@ getResultsReport = function(duration)
 		results = results..'\n'..tostring(i)..' unit tests FAILED!!!!!!!!\n'
 	end
 	
-	results = results..(tostring(table.countslow(unitTests))..' run in '..duration..' seconds\n')
+	results = results..(tostring(table.countslow(unitTests))..' run in '..sprintf('%4.2f', duration)..' seconds\n')
 	results = results..'\n************* Finish Lua Unit Testing ************\n'
 	results = results..'**************************************************\n'
 	return i, results
