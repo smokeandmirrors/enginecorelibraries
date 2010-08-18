@@ -37,7 +37,11 @@ public:
 	loads end executes the string as a lua chunk
 	\return the status of the execution
 	*/
-	bool				doString(const char* chunk, const char* source="code");
+	bool				doString(const char* chunk, const char* source="native code");
+	/**
+	\return the number of bytes allocated by the %Lua state
+	*/
+	size_t				getNumAllocatedBytes() const { return m_bytes; }	
 	/**
 	\return the string ID of this specific %Lua object
 	*/
@@ -106,8 +110,6 @@ private:
 	Lua& operator=(const Lua&);
 	/** The use of this could only be a terrible idea. */
 	Lua(const Lua&);
-	/** simple identifier */
-	char*				m_name;
 	/** 
 	the %Lua state which this class encapsulates. 
 	\note on readibility and coding standards this is
@@ -115,6 +117,10 @@ private:
 	for a member variable.
 	*/
 	lua_State*			L; 
+	/** current byte count of lua memory useage */
+	size_t				m_bytes;
+	/** simple identifier */
+	char*				m_name;
 };
 
 #endif//LUA_H

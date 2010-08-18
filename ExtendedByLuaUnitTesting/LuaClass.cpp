@@ -72,7 +72,6 @@ public:
 		const char* report = lua_tostring(L, -1);
 		lua_pop(L, 1);
 		//s:
-		CFIX_ASSERT(result == 0);
 		// Convert to a wchar_t*
 		size_t origsize = strlen(report) + 1;
 		size_t convertedChars = 0;
@@ -80,9 +79,8 @@ public:
 		wchar_t* wcstring = new wchar_t[origsize];
 		mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
 		CFIX_LOG(L"Lua Unit Test Report %s", wcstring);
+		CFIX_ASSERT(result == 0);
 		delete[] wcstring;
-		// std::string report_string(report);
-		// CFIX_LOG(L"Lua Unit Test Report %s", report_string);
 	}
 };
 

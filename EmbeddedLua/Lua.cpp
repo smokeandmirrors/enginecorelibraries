@@ -1,5 +1,5 @@
 #include "Lua.h"
-
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
@@ -37,7 +37,8 @@ static int traceback (lua_State* )
 }
 
 Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_storage)
-: m_name(NULL)
+: m_bytes(0)
+, m_name(NULL)
 , L(NULL)
 {
 	initialize(name);
@@ -148,18 +149,31 @@ void Lua::initializeUserdataStorage(void) const
 }
 
 /** 
- * implementation inspired by:
- * http://www.lua.org/manual/5.1/manual.html#lua_Alloc
- */ 
-void* Lua::luaAlloc(void* /* ud */, void* ptr, size_t /* osize */, size_t nsize)
+implementation inspired by:
+http://www.lua.org/manual/5.1/manual.html#lua_Alloc
+*/ 
+void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 {
+	Lua* lua = reinterpret_cast<Lua*>(ud);
+		
 	if (nsize)
 	{
-		return realloc(ptr, nsize);
+		lua->m_bytes += nsize;
+			
+		if (osize)
+		{
+			lua->m_bytes -= osize;
+			return realloc(ptr, nsize);
+		}
+		else
+		{	assert(!ptr);
+			return malloc(nsize);
+		}
 	}
 	else
 	{ 
 		free(ptr);
+		lua->m_bytes -= osize;
 		return NULL;
 	}
 }

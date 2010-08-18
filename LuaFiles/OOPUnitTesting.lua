@@ -14,7 +14,6 @@ require'Utilities'
 ----------------------------------------------------------------------
 UT.test('OOP.interfaces',
 	function()
-		-- convenience for (re)writing the test
 		rerequire'ObjectOrientedParadigm'
 		declareInterface{
 			name = 'IACTS_AS_TEST',
@@ -56,7 +55,6 @@ UT.test('OOP.interfaces',
 ----------------------------------------------------------------------
 UT.test('OO.polymorphism',
     function()
-		-- convenience for (re)writing the test
 		rerequire'ObjectOrientedParadigm'
         declareClass {
             name = 'grandparent',
@@ -79,14 +77,14 @@ UT.test('OO.polymorphism',
             isYoung = function() return true end
         }        
         
-        gp = new'grandparent'
+        local gp = new'grandparent'
         UT.check(type(gp) == 'table')
         UT.check(IS_A(gp, 'grandparent'))
         UT.check(type(gp.IS_A) == 'function' and gp:IS_A'grandparent');
         UT.check(type(gp.getNickName) == 'function' and gp.getNickName() == 'papa')
         UT.check(type(gp.isOld) == 'function' and gp.isOld())        
         
-        p = new'parent'
+        local p = new'parent'
         UT.check(type(p) == 'table')
         UT.check(IS_A(p, 'grandparent'))
         UT.check(IS_A(p, 'parent'))        
@@ -96,7 +94,7 @@ UT.test('OO.polymorphism',
 		UT.check(type(p.isMiddleAged) == 'function' and p.isMiddleAged())
         UT.check(type(p.isOld) == 'function' and p.isOld())        
         
-        c = new'child'
+        local c = new'child'
         UT.check(type(c) == 'table')
         UT.check(IS_A(c, 'grandparent'))
         UT.check(IS_A(c, 'parent'))
@@ -114,7 +112,6 @@ UT.test('OO.polymorphism',
 ----------------------------------------------------------------------
 UT.test('OO.construction and destruction',
 	function()
-		-- convenience for (re)writing the test
 		rerequire'ObjectOrientedParadigm'
 		declareClass {
             name = 'grandparent',
@@ -166,9 +163,9 @@ UT.test('OO.construction and destruction',
 			end			
         }
 		
-		gp = new'grandparent'
-		p = new'parent'
-		c = new'child'
+		local gp = new'grandparent'
+		local p = new'parent'
+		local c = new'child'
 		delete(gp)
 		delete(p)
 		delete(c)
@@ -181,7 +178,6 @@ UT.test('OO.construction and destruction',
 ----------------------------------------------------------------------
 UT.test('OOP.abstract classes',
 	function()
-		-- convenience for (re)writing the test
 		rerequire'ObjectOrientedParadigm'
 		
 		declareAbstractClass{
@@ -225,13 +221,13 @@ UT.test('OOP.abstract classes',
 		
 		UT.checkError(
 			function()
-				a = new'AbstractNoFunction'
+				local a = new'AbstractNoFunction'
 			end
 		)
 		
-		d = new'Did override'
+		local d = new'Did override'
 		UT.check(d:concrete() == 2)
-		e = new'son of Did override'
+		local e = new'son of Did override'
 		UT.check(e:concrete() == 2)
 		UT.check(e:IS_A'son of Did override')
 		UT.check(e:IS_A'Did override')
@@ -262,7 +258,7 @@ UT.test('OOP.classes and functions',
 			three = function() return 3 end
 		}
 		
-		c = new'three'
+		local c = new'three'
 		
 		for k, v in functions(c) do
 			UT.check(type(v) == 'function')
@@ -284,36 +280,35 @@ function()
 	declareClass{name = 'Basic'}
 	declareClass{name ='Derived', extends = 'Basic'}
 	
-	b = new'Basic'
+	local b = new'Basic'
+	local bname = DEBUG_INTERPRETATION and 'Basic 1' or 'Basic'
 	UT.check(type(b.class) == 'table')
+	UT.check(b:getName() == bname)
+	UT.check(b:toString() == bname)
 	UT.check(b.class == getClass'Basic')
 	UT.check(b:getClass() == getClass'Basic')
 	UT.check(b.className == 'Basic')
 	UT.check(b:getClassName() == 'Basic')
-	UT.check(b:getName() == 'Basic')
 	UT.check(b.super == nil)
 	UT.check(b:getSuperclass() == nil)
-	UT.check(b:toString() == 'Basic')
 	
-	d = new'Derived'
-	sprint(d)
+	local d = new'Derived'
+	local dname = DEBUG_INTERPRETATION and 'Derived 1' or 'Derived'
 	UT.check(type(d.class) == 'table')
+	UT.check(d:toString() == dname)	
+	UT.check(d:getName() == dname)
 	UT.check(d.class == getClass'Derived')
 	UT.check(d:getClass() == getClass'Derived')
 	UT.check(d.className == 'Derived')
 	UT.check(d:getClassName() == 'Derived')
-	UT.check(d:getName() == 'Derived')
 	UT.check(d.super == getClass'Basic')
 	UT.check(d:getSuperclass() == getClass'Basic')
-	UT.check(d:toString() == 'Derived')
-	
-	
 end)
 
 ----------------------------------------------------------------------
 UT.test('OOP.misc',
 function()
-	-- \todo validateObject
+	rerequire'ObjectOrientedParadigm'
 	declareClass{
 		name = 'Easy', 
 		toString = function() return 'simple' end, 

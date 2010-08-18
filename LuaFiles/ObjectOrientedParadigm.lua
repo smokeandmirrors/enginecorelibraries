@@ -224,7 +224,7 @@ end
 if DEBUG_INTERPRETATION then
 getName = function(instance)
 	if type(instance.name) == 'number' then -- apparently, string concats in lua are harsh
-		instance.name = instance:getClassName()..'_'..instance.name
+		instance.name = instance:getClassName()..' '..instance.name
 	end
 	
 	return instance.name
