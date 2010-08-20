@@ -56,7 +56,6 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 
 /**
 @todo make namespaces
-@todo make separate project for lua extension
 @todo make decisions about:
 	when to call:
 		createGlobalClassMetable(), immediately after registering non-extensibles?

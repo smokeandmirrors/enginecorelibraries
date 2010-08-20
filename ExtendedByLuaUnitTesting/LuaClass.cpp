@@ -15,6 +15,10 @@ private:
 public:
 	
 public:
+	/**
+	tests: constructors(), openLibrary(), openStandardLibraries()
+	getState(), getName()
+	*/
 	void luaObjectCreationAndDestruction()
 	{
 		Lua* no_args = new Lua();
@@ -25,6 +29,7 @@ public:
 		Lua* args_lua = new Lua("testing", false, false);
 		CFIX_ASSERT(args_lua);
 		CFIX_ASSERT(args_lua->getState());
+		CFIX_ASSERT(strcmp("testing", args_lua->getName()) == 0);
 		delete args_lua;
 		
 		Lua stack_lua;
@@ -82,6 +87,52 @@ public:
 		CFIX_ASSERT(result == 0);
 		delete[] wcstring;
 	}
+
+	void nilLoadedStatus()
+	{
+		Lua lua;
+		lua.require("UnitTesting");
+		lua.require("UnitTestingFramework");
+		lua_State* L = lua.getState();
+		//s: ?
+		lua_getglobal(L, "package");
+		lua_getfield(L, -1, "loaded");
+		//s: package.loaded
+		lua_getfield(L, -1, "UnitTestingFramework");
+		//s: UnitTestingFramework
+		CFIX_ASSERT(lua_istable(L, -1));
+		lua_pop(L, 1);
+		//s: ?
+		lua.nilLoadedStatus("UnitTestingFramework");
+		lua_getglobal(L, "package");
+		lua_getfield(L, -1, "loaded");
+		//s: package.loaded
+		lua_getfield(L, -1, "UnitTestingFramework");
+		//s: UnitTestingFramework
+		CFIX_ASSERT(lua_isnil(L, -1));
+		lua_pop(L, 1);		
+	}
+
+	void callProtected()
+	{
+		Lua lua;
+		lua_State* L = lua.getState();
+		lua_getglobal(L, "math");
+		CFIX_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, "sqrt");
+		CFIX_ASSERT(lua_isfunction(L, -1));
+		lua_pushnumber(L, 4);
+		lua.callProtected(1, false);
+		CFIX_ASSERT(lua_isnumber(L, -1));
+		int i = static_cast<int>(lua_tonumber(L, -1));
+		CFIX_ASSERT(i == 2);
+		lua_pop(L, 1);
+		lua_getglobal(L, "math");
+		CFIX_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, "sqrt");
+		CFIX_ASSERT(lua_isfunction(L, -1));
+		lua.callProtected(1, false);
+	}
 };
 
 CFIXCC_BEGIN_CLASS(LuaClass)
@@ -89,5 +140,7 @@ CFIXCC_BEGIN_CLASS(LuaClass)
 	CFIXCC_METHOD(luaRequire)
 	CFIXCC_METHOD(doString)
 	CFIXCC_METHOD(luaUnitTesting)
+	CFIXCC_METHOD(nilLoadedStatus)
+	CFIXCC_METHOD(callProtected)
 CFIXCC_END_CLASS()
 #endif//EXTENDED_BY_LUA

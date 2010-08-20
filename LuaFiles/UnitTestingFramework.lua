@@ -96,6 +96,18 @@ test = function(name, test_function)
 	createTestFunction(name, test_function)
 end
 
+testSuite = function(args)
+	local suite_name = args.name
+	if type(suite_name) ~= 'string' then
+		suite_name = 'poorly named suite'	
+	end
+	for func_name, test_func in pairs(args) do
+		if test_func ~= suite_name then
+			createTestFunction(suite_name..'.'..tostring(func_name), test_func)
+		end
+	end
+end
+
 _G.testAll = function(print_out)
 	-- require all the unit test modules here
 	rerequire'UnitTesting'
@@ -136,7 +148,11 @@ getResultsReport = function(duration)
 	local results = '\n**************************************************'
 	results = results..'\n************* Begin Lua Unit Testing *************\n'
 	for _, failure in pairs(failedTests) do
-		results = results..tostring(failure.test)..' FAILED!: '..failure.description..'\n' 
+		local desc = failure.description
+		if desc == nil then
+			desc = 'no description'
+		end
+		results = results..tostring(failure.test)..' FAILED!: '..desc..'\n' 
 		i = i + 1
 	end
 	

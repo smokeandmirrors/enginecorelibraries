@@ -9,14 +9,10 @@
 // testing only
 #include "Vector.h"
 
+#if !GOLDMASTER
 // \note taken straight from lua.c
-#if DEBUG
 static int traceback (lua_State* L)
-#else
-static int traceback (lua_State* ) 
-#endif//DEBUG
 {
-#if DEBUG
   // if (!lua_isstring(L, 1))  /* 'message' not a string? */
   //  return 1;  /* keep it intact */
   lua_getfield(L, LUA_GLOBALSINDEX, "debug");
@@ -32,9 +28,9 @@ static int traceback (lua_State* )
   lua_pushvalue(L, 1);  /* pass error message */
   lua_pushinteger(L, 2);  /* skip this function and traceback */
   lua_call(L, 2, 1);  /* call debug.traceback */
-#endif//DEBUG
   return 1;
 }
+#endif//!GOLDMASTER
 
 Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_storage)
 : m_bytes(0)
@@ -54,11 +50,11 @@ Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_sto
 
 	initializeDefaultProxyMetamethods();
 
-#if DEBUG
+#if !GOLDMASTER
 	lua_pushcfunction(L, traceback);
 	lua_setglobal(L, "traceback");
 	runSandbox();
-#endif// DEBUG
+#endif//!GOLDMASTER
 }
 
 Lua::~Lua(void)
@@ -217,7 +213,7 @@ void Lua::openStandardLibraries(void) const
 // \note taken and modified from from lua.c 
 int Lua::report(int status) const
 {
-	if (status && !lua_isnil(L, -1)) 
+	if (status && lua_isstring(L, -1)) 
 	{
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL) msg = "(error object is not a string)";

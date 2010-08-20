@@ -143,34 +143,7 @@ UT.test('table.shuffle',
 		UT.check(is_different)
 	end
 )
-end -- if table
 
-if string then
-UT.test('cprintf',
-	function()
-		-- mainly, don't throw an error
-		print('L@@K: you should see \'awesome\' below')
-		cprintf(true, 'awesome')
-		cprintf(false, 'bitchin')
-		print('L@@K: you should NOT see \'bitchin\' above')
-	end
-)
-
-UT.test('printf',
-	function()
-		-- mainly, don't throw an error
-		printf('L@@K: The next character should be \'3\': %d', 3)
-	end
-)
-
-UT.test('sprintf',
-	function()
-		local results = sprintf('The next character should be \'3\': %d', 3)
-		UT.checkEqual(results, 'The next character should be \'3\': 3')
-	end
-)
-
-if table then
 UT.test('dprint',
 	function()
 		local t = {a = 'sweet', b = 34, d = function() print'awesome' end}
@@ -196,8 +169,30 @@ UT.test('sprint',
 )
 end -- if table
 
-UT.test('tprint',
-	function()
+if string then
+UT.testSuite
+{
+	name = 'string', 
+
+	cprintf = function()
+		-- mainly, don't throw an error
+		print'L@@K: you should see \'awesome\' below'
+		cprintf(true, 'awesome')
+		cprintf(false, 'bitchin')
+		print'L@@K: you should NOT see \'bitchin\' above'
+	end,
+
+	printf = function()
+		-- mainly, don't throw an error
+		printf('L@@K: The next character should be \'3\': %d', 3)
+	end,
+
+	sprintf = function()
+		local results = sprintf('The next character should be \'3\': %d', 3)
+		UT.checkEqual(results, 'The next character should be \'3\': 3')
+	end,
+
+	tprint = function()
 		-- mainly, don't throw an error
 		tprint(nil)
 		tprint(function() print'hello' end)
@@ -207,6 +202,6 @@ UT.test('tprint',
 		tprint(true)
 		-- \todo test user data printing
 		tprint(coroutine.create(function() print'hello' end))
-	end
-	)
+end
+}
 end -- if string
