@@ -19,8 +19,4 @@
 declare_lua_library(Vector2)
 declare_lua_library(Vector3)
 
-declare_lua_library(Grandparent);
-declare_lua_library(Parent);
-declare_lua_library(Child);
-
 #endif//LUALIBRARYDECLARATIONS_H

@@ -1,56 +1,14 @@
 #include <cfixcc.h>
 #include <string.h>
 
-#if 0
+#if EXTENDED_BY_LUA
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
 #include "LuaExtensibility.h"
+#include "LuaStateInteraction.h"
 
-/**
-@class
+using namespace LuaExtension;
 
-demonstrates full inheritance tree and proxy usesage
-*/
-class Grandparent 
-: public LuaExtendable
-{
-public:
-	virtual ~Grandparent() {}
-	const char*				getFamilyName(void) const { return "Curran"; }
-	virtual const char*		getTitle(void) const { return "Grandparent"; }
-	virtual const char*		toString(void);
-	bool					operator==(const Grandparent& other) const;
-	int						setMetatable(lua_State* L);
-}; // Grandparent
-
-
-/**
-@class
-
-demonstrates full inheritance tree and proxy usesage
-*/
-class Parent 
-: public Grandparent
-{
-public:
-	typedef Grandparent super;
-	const char*				getGrandparentName(void) const { return "Robert Michael Curran, Sr."; }
-	virtual const char*		getTitle(void) const { return "Parent"; }
-}; // Parent
-
-/**
-@class
-
-demonstrates full inheritance tree and proxy usesage
-*/
-class Child 
-	: public Parent
-{
-public:
-	typedef Parent super;
-	const char*				getParentName(void) const { return "Robert Michael Curran, Jr."; }
-	virtual const char*		getTitle(void) const { return "Child"; }
-}; // Child
 
 class Basic
 : public LuaExtendable
@@ -73,51 +31,6 @@ public:
 }; // Derived
 
 declare_lua_library(Derived)
-
-/*
-Granparent implementation
-*/
-bool Grandparent::operator==(const Grandparent& other) const
-{
-	return strcmp(getFamilyName(), other.getFamilyName()) == 0; 
-}
-
-const char* Grandparent::toString()
-{ 
-	return "This is a Grandparent"; 
-}
-
-int Grandparent::setMetatable(lua_State *L)
-{												
-	return setDefaultMetatableProxy(L);
-}
-
-lua_func(__call)
-{
-	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-	printToLua(L, gp->toString());
-	return 0;
-}
-
-lua_func(getFamilyName)
-{
-	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-	lua_pushstring(L, gp->getFamilyName());
-	return 1;
-}
-
-lua_func(getTitle)
-{
-	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-	lua_pushstring(L, gp->getTitle());
-	return 1;
-}
-
-define_lua_class(Grandparent, Grandparent)
-	lua_entry(__call) 
-	lua_entry(getFamilyName)
-	lua_entry(getTitle)
-end_lua_class(Grandparent, Grandparent)
 
 /* 
 Basic implementation
@@ -197,6 +110,111 @@ const char* Derived::toString()
 define_lua_class_by_proxy_defaults(Derived, Basic)
 end_lua_class_by_proxy_defaults(Derived, Basic)
 
+
+/**
+@class
+
+demonstrates full inheritance tree and proxy usesage
+*/
+class Grandparent 
+: public LuaExtendable
+{
+public:
+	Grandparent(const char* name=NULL) : m_name(name)		{ /* empty */ }
+	virtual ~Grandparent(void)								{ /* empty */ }
+	const char*				getFamilyName(void) const		{ return "Curran"; }
+	virtual const char*		getTitle(void) const			{ return "Grandparent"; }
+	virtual const char*		toString(void);
+	bool					operator==(const Grandparent& other) const;
+	int						setMetatable(lua_State* L);
+
+protected:
+	const char*				m_name;
+
+}; // Grandparent
+
+/**
+@class
+
+demonstrates full inheritance tree and proxy usesage
+*/
+class Parent 
+: public Grandparent
+{
+public:
+	typedef Grandparent super;
+	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
+	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
+	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
+	virtual const char*		getTitle(void) const			{ return "Parent"; }
+
+private:
+	Grandparent*			m_grandParent;			
+}; // Parent
+
+/**
+@class
+
+demonstrates full inheritance tree and proxy usesage
+*/
+class Child 
+: public Parent
+{
+public:
+	typedef Parent super;
+	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
+	virtual const char*		getTitle(void) const		{ return "Child"; }
+}; // Child
+
+/*
+Granparent implementation
+*/
+bool Grandparent::operator==(const Grandparent& other) const
+{
+	return strcmp(getFamilyName(), other.getFamilyName()) == 0; 
+}
+
+const char* Grandparent::toString()
+{ 
+	return "This is a Grandparent"; 
+}
+
+int Grandparent::setMetatable(lua_State *L)
+{												
+	return setDefaultMetatableProxy(L);
+}
+
+lua_func(__call)
+{
+	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
+	printToLua(L, gp->toString());
+	return 0;
+}
+
+lua_func(getFamilyName)
+{
+	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
+	lua_pushstring(L, gp->getFamilyName());
+	return 1;
+}
+
+lua_func(getTitle)
+{
+	Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
+	lua_pushstring(L, gp->getTitle());
+	return 1;
+}
+
+declare_lua_extendable(Grandparent);
+declare_lua_extendable(Parent);
+declare_lua_extendable(Child);
+
+define_lua_class(Grandparent, Grandparent)
+	lua_entry(__call) 
+	lua_entry(getFamilyName)
+	lua_entry(getTitle)
+end_lua_class(Grandparent, Grandparent)
+
 static int lua_newParent(lua_State* L)
 {
 	Parent* p = new Parent();
@@ -215,6 +233,7 @@ define_lua_class(Parent, Parent::super)
 // should be able to be automagicked...
 lua_named_entry("new", lua_newParent)
 lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
+//lua_named_entry("getGrandparent", (param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 end_lua_library(Parent)
 
 

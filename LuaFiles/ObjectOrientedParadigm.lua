@@ -191,7 +191,7 @@ function validateObject(instance, class_name, interface_names, nil_message, no_I
 	if interface_names then
 		for each, interface in pairs(interface_names) do
 			if not instance:ACTS_AS(interface) then
-				print(interface_message or 'The instance does not implement the: '..interface)
+				print(interface_message or 'The instance does not implement the: '..interface..' interface')
 				good_instance = false
 			end
 		end

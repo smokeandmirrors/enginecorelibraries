@@ -6,8 +6,8 @@
 
 #include "LuaInclusions.h"
 
-// testing only
-#include "Vector.h"
+namespace LuaExtension 
+{
 
 #if !GOLDMASTER
 // \note taken straight from lua.c
@@ -267,3 +267,5 @@ void Lua::runSandbox(void) const
 {
 	
 }
+
+} // namespace LuaExtension

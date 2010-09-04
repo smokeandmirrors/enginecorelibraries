@@ -12,8 +12,8 @@ smokeandmirrorsdevelopment@gmail.com
 @date 2/23/2010
 */
 #include "lua.hpp"
-#include "lauxlib.h"
-#include "lualib.h"
+#include <lauxlib.h>
+#include <lualib.h>
 
 /******************************************************************************
 * Copyright (C) 1994-2008 Lua.org, PUC-Rio.  All rights reserved.

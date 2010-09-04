@@ -488,6 +488,14 @@
 				RelativePath=".\LuaLibraryVector.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\LuaStateInteraction.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaStateInteraction.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Lua Interface"

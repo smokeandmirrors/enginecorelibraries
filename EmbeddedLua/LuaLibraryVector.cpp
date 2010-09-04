@@ -4,8 +4,14 @@
 
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
+#include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
 #include "Vector.h"
+
+using namespace LuaExtension;
+
+static bool TRUE() { return true; }
+static bool FALSE() { return false; }
 
 static int newVector2(lua_State* L)
 {
@@ -15,6 +21,8 @@ static int newVector2(lua_State* L)
 
 define_lua_library(Vector2)
 lua_named_entry("new", newVector2)
+lua_named_entry("TRUE", (staticParam0<bool, TRUE>))
+lua_named_entry("FALSE", (staticParam0<bool, FALSE>))
 end_lua_library(Vector2)
 
 static int lua_newVector3(lua_State* L);

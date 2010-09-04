@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <string>
 
+using namespace LuaExtension;
+
 class LuaClass : public cfixcc::TestFixture
 {
 private:

@@ -16,6 +16,9 @@
 #include <stdlib.h>
 #include "LuaExtensibility.h"
 
+namespace LuaExtension 
+{
+
 class Lua 
 {
 public:
@@ -122,5 +125,7 @@ private:
 	/** simple identifier */
 	char*				m_name;
 };
+
+} // namespace LuaExtension 
 
 #endif//LUA_H

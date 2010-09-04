@@ -66,20 +66,22 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 	typedef super?  how about the base class?
 	
 **/
-
 struct lua_State;
 struct lua_Debug;
 
 typedef int (*lua_function)(lua_State* L);
 
-enum eLUA_EXPOSURE
+namespace LuaExtension 
 {
-	eLUA_EXPOSURE_CLASS				= 1 << 0,
-	eLUA_EXPOSURE_CREATE_GLOBAL_MT	= 1 << 1,
-	eLUA_EXPOSURE_DERIVED			= 1 << 2,
-	eLUA_EXPOSURE_EXTENSIBLE		= 1 << 3,
-	eLUA_EXPOSURE_LIBRARY			= 1 << 4,
-}; // end eLUA_EXPOSURE
+
+enum LUA_EXPOSURE
+{
+	LUA_EXPOSURE_CLASS				= 1 << 0,
+	LUA_EXPOSURE_CREATE_GLOBAL_MT	= 1 << 1,
+	LUA_EXPOSURE_DERIVED			= 1 << 2,
+	LUA_EXPOSURE_EXTENSIBLE			= 1 << 3,
+	LUA_EXPOSURE_LIBRARY			= 1 << 4,
+}; // end LUA_EXPOSURE
 
 #define NUM_LUA_METAMETHODS (18)
 
@@ -136,6 +138,20 @@ declare a library for shared inclusion
 		int luaopen_##name(lua_State* L); \
 	}; // end namespace lua_library_##name
 // end #define begin_lua_library_declaration
+
+/**
+\def declare_lua_extendable
+*/
+#define declare_lua_extendable(class_name) \
+	declare_lua_library(name) \
+	namespace LuaExtension \
+	{ \
+		inline class_name* to(lua_State* L, int index, Differentiator<class_name>&) \
+		{ \
+			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+		} \
+	}
+// end #define declare_lua_extendable
 
 /** 
 \def lua_entry
@@ -373,7 +389,7 @@ helper function for pushing a class to %Lua an preserving the ability
 to compare userdata and use them as equivalent table keys
 @see comments in the implementation of void Lua::initializeUserdataStorage(void)
 */
-void pushRegisteredClass(lua_State* L, void* pushee);
+int pushRegisteredClass(lua_State* L, void* pushee);
 
 /** 
 helps set a LuaExtendable metatable from script
@@ -386,5 +402,7 @@ helps set a userdata metatable from script
 @warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 */
 int setDefaultMetatableProxy(lua_State* L);
+
+} // namespace LuaExtension 
 
 #endif//LUAREGISTRATION_H

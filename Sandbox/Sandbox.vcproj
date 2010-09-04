@@ -415,6 +415,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Sandbox.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Sandbox.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

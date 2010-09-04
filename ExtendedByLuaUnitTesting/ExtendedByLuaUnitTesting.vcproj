@@ -335,7 +335,7 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\Classes.cpp"
+			RelativePath=".\ClassExtension.cpp"
 			>
 		</File>
 		<File

@@ -3,11 +3,14 @@
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 
+namespace LuaExtension
+{
+
 #define setUserdataMetamethod(L, method)		/*s: userdata, lua_class_mt, proxy/mt				  */\
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
-unsigned int testing = eLUA_EXPOSURE_LIBRARY & eLUA_EXPOSURE_CLASS & eLUA_EXPOSURE_CREATE_GLOBAL_MT;
+unsigned int testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
 
 const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__add",
@@ -139,7 +142,7 @@ void printToLua(lua_State* L, const char* string)
 	lua_call(L, 1, 0);			//s: 
 }
 
-void pushRegisteredClass(lua_State* L, void* pushee)
+int pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable
 	lua_pushlightuserdata(L, pushee);						//s: pusheduserdatatable, pushee* 
@@ -157,6 +160,7 @@ void pushRegisteredClass(lua_State* L, void* pushee)
 	}
 
 	lua_replace(L, -2);										//s: pusheduserdata
+	return 1;
 }
 
 int setmetatableLuaExtendable(lua_State* L)
@@ -215,3 +219,5 @@ int setDefaultMetatableProxy(lua_State* L)
 	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
 }
+
+} // namespace LuaExtension

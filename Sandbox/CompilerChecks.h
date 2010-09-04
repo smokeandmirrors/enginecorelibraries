@@ -2,9 +2,9 @@
 #ifndef COMPILERCHECKS_H
 #define COMPILERCHECKS_H
 
-namespace Sandbox 
+namespace CompilerChecks 
 {
-	void Play();
-}
+	void sizeOfChecks(void);
+} // namespace CompilerChecks
 
 #endif//COMPILERCHECKS_H
