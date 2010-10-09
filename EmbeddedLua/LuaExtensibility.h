@@ -148,7 +148,7 @@ declare a library for shared inclusion
 	{ \
 		inline class_name* to(lua_State* L, int index, Differentiator<class_name>&) \
 		{ \
-			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+				return static_cast<class_name*>(toLuaExtendable(L, index)); /* return static_cast<class_name*>(to<LuaExtendable*>(L, index)); */ \
 		} \
 	}
 // end #define declare_lua_extendable

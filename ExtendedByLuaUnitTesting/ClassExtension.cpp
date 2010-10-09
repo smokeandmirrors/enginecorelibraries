@@ -229,11 +229,26 @@ static int lua_Parent_getGrandparentName(lua_State* L)
 	return 1;
 }
 
+lua_func(lua_Parent_getGrandparent)
+{
+	Grandparent* value;
+	const Differentiator<Parent*> differ; 
+	if (Parent* object = to(L, -1, differ))
+	// if (Parent* object = to<Parent*>(L, -1))
+	{
+		value = object->getGrandparent();
+		return push(L, value);
+	}
+	
+	return 0;
+}
+
 define_lua_class(Parent, Parent::super)
 // should be able to be automagicked...
 lua_named_entry("new", lua_newParent)
 lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
-//lua_named_entry("getGrandparent", (param0const<Parent, Grandparent*, &Parent::getGrandparent>))
+lua_named_entry("getGrandparent", lua_Parent_getGrandparent)
+// lua_named_entry("getGrandparent", (param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 end_lua_library(Parent)
 
 

@@ -8,11 +8,10 @@ This file defines function helpers akin to lua_to<type> and
 lua_push<type> to assist in easily extending interaction with
 the %Lua state to include custom types.
 
-copyright 2010 Smoke and Mirrors Development
-@author Smoke and Mirrors Development
+\copyright 2010 Smoke and Mirrors Development
+\author Smoke and Mirrors Development
 smokeandmirrorsdevelopment@gmail.com
-@date 8/21/2010
-
+\date 8/21/2010
 */
 
 #include "LuaExtensibility.h"
@@ -54,7 +53,7 @@ returns an object from the specified index in the %Lua stack
 */
 template<typename T> T to(lua_State* L, int index)
 {	
-	return static_cast<T>(to(L, index, Differentiator<T>()));
+	return static_cast<T>(to(Differentiator<T>(), L, index));
 }
 
 //inline bool to(lua_State* L, int index, Differentiator<bool>&)
@@ -75,10 +74,10 @@ template<typename T> T to(lua_State* L, int index)
 //	return static_cast<float>(lua_tonumber(L, index));
 //}
 
-inline LuaExtendable* to(lua_State* L, int index, const Differentiator<LuaExtendable*>&)
+LuaExtendable* toLuaExtendable(lua_State* L, int index)
 {
 	CHECK_ARG(lua_isuserdata, "LuaExtendable", L, index);
-	return *static_cast<LuaExtendable**>(lua_touserdata(L, index));
+	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
 }
 
 /**
@@ -117,7 +116,6 @@ int param0const(lua_State* L)
 	if (CLASS* object = to<CLASS*>(L, 1))
 	{
 		value = (object->*function)();
-		value = ((*object).*function)();
 	}
 	return push(L, value);
 }
