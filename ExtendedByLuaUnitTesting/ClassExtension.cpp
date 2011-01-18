@@ -231,14 +231,14 @@ static int lua_Parent_getGrandparentName(lua_State* L)
 
 lua_func(lua_Parent_getGrandparent)
 {
-	Grandparent* value;
-	const Differentiator<Parent*> differ; 
-	if (Parent* object = to(L, -1, differ))
-	// if (Parent* object = to<Parent*>(L, -1))
-	{
-		value = object->getGrandparent();
-		return push(L, value);
-	}
+	//Grandparent* value;
+	//const Differentiator<Parent*> differ; 
+	//if (Parent* object = to(L, -1, differ))
+	//// if (Parent* object = to<Parent*>(L, -1))
+	//{
+	//	value = object->getGrandparent();
+	//	return push(L, value);
+	//}
 	
 	return 0;
 }

@@ -8,7 +8,7 @@ Vector definitions mostly for performance testing on a lua library
 extention.  That is, I want to see if it would be faster to have 
 any or all vector operations implemented in C.  Previously, testing
 has revealed that at least complicated operations benefit, but 
-that simply operations may not be worth it.
+that simple operations may not be worth it.
 
 @author Smoke and Mirrors Development
 copyright 2010 Smoke and Mirrors Development
@@ -95,7 +95,8 @@ public:
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y);
 	void 			add(const Vector2& v);
-	const Vector2 	operator+(const Vector2& v) const; // @warning may be slow
+	/** \warning abuse may be slow! */
+	const Vector2 	operator+(const Vector2& v) const; 
 	Vector2& 		operator+=(const Vector2& v);
 	// distance to another
 	vec_t			distanceTo(const Vector2& v) const;
@@ -106,6 +107,7 @@ public:
 	void 			divide(vec_t scalar);
 	void 			divide(vec_t X, vec_t Y);
 	void 			divide(const Vector2& v);
+	/** \warning abuse may be slow! */
 	const Vector2 	operator/(const Vector2& v) const; 
 	Vector2& 		operator/=(const Vector2& v);
 	// dot product 
@@ -138,6 +140,7 @@ public:
 	void 			substract(vec_t scalar);
 	void 			substract(vec_t X, vec_t Y);
 	void 			substract(const Vector2& v);
+	/** \warning abuse may be slow! */
 	const Vector2 	operator-(const Vector2& v) const; 
 	Vector2& 		operator-=(const Vector2& v);
 	// zero
@@ -160,6 +163,9 @@ public:
 		: x(X), y(Y), z(Z) 					{/* empty */}
 	Vector3(vec_t scalar) 
 		: x(scalar), y(scalar), z(scalar) 	{/* empty */}
+	// \see normalized constructor below
+	// Vector3(const Vector3& v, bool /* IGNORED */);
+	// 	: x(v.x), y(v.y), z(v.z) 			{/* empty */}
 	// access 
 	const vec_t& 	operator[](unsigned int i) const;	
 	vec_t 			operator[](unsigned int i);
@@ -167,12 +173,13 @@ public:
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y, vec_t Z);
 	void 			add(const Vector3& v);	
-	const Vector3 	operator+(const Vector3& v) const; // @warning may be slow
+	/** \warning abuse may be slow! */
+	const Vector3 	operator+(const Vector3& v) const; 
 	Vector3& 		operator+=(const Vector3& v);
 	// cross product 
 	void 			cross(const Vector3& v);
 	void 			cross(const Vector3& a, const Vector3& b);
-	Vector3 		cross(const Vector3& v) const; // @warning may be slow
+	Vector3 		getCross(const Vector3& v) const;
 	// distance to another 
 	vec_t			distanceTo(const Vector3& v) const;
 	vec_t 			distanceToSqrd(const Vector3& v) const;
@@ -186,7 +193,8 @@ public:
 	void 			divide(vec_t scalar);
 	void 			divide(vec_t X, vec_t Y, vec_t Z);
 	void 			divide(const Vector3& v);
-	const Vector3 	operator/(const Vector3& v) const; // @warning may be slow
+	/** \warning abuse may be slow! */
+	const Vector3 	operator/(const Vector3& v) const; 
 	Vector3& 		operator/=(const Vector3& v);
 	// dot product 
 	vec_t 			dot(const Vector3& v) const;
@@ -195,6 +203,8 @@ public:
 	bool 			equals(vec_t X, vec_t Y, vec_t Z) const;
 	bool			nearlyEquals(const Vector3& v, vec_t epsilon=vectorTolerance) const;
 	bool 			operator==(const Vector3& v) const;
+	// perpendicular 
+	Vector3			getPerpendicular(void) const;
 	// magnitude 
 	vec_t 			magnitude(void) const;
 	vec_t 			magnitudeSqrd(void) const;
@@ -203,12 +213,16 @@ public:
 	// normalization
 	vec_t 			normalize(void);
 	bool			isNormal(void) const;
+	// construction (normalized)
+	Vector3(const Vector3& v, bool /* IGNORED */)
+		: x(v.x), y(v.y), z(v.z) { normalize(); }
 	// multiplication & scaling 
 	const Vector3& 	negate(void);
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y, vec_t Z);
 	void 			scale(const Vector3& v);
-	const Vector3 	operator*(const Vector3& v) const; // @warning may be slow
+	/** \warning abuse may be slow! */
+	const Vector3 	operator*(const Vector3& v) const;
 	Vector3& 		operator*=(const Vector3& v);
 	// mutation 
 	void 			set(vec_t scalar);
@@ -220,7 +234,8 @@ public:
 	void 			substract(vec_t scalar);
 	void 			substract(vec_t X, vec_t Y, vec_t Z);
 	void 			substract(const Vector3& v);
-	const Vector3 	operator-(const Vector3& v) const; // @warning may be slow
+	/** \warning abuse may be slow! */
+	const Vector3 	operator-(const Vector3& v) const; 
 	Vector3& 		operator-=(const Vector3& v);
 	// zero
 	bool			isZero(void) const;
@@ -233,6 +248,7 @@ public:
 standard vector operations
 @{
 */
+
 
 /** 
 @defgroup Vector_Accessors Acessors
@@ -342,6 +358,25 @@ inline void Vector3::cross(const Vector3& a, const Vector3& b)
 	x = a.y * b.z - a.z * b.y;
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
+}
+inline Vector3 Vector3::getCross(const Vector3& v) const
+{
+	vec_t a = y * v.z - z * v.y;
+	vec_t b = z * v.x - x * v.z;
+	vec_t c = x * v.y - y * v.x;
+	return Vector3(a,b,c);
+}
+
+inline Vector3 Vector3::getPerpendicular(void) const
+{
+	if ((x != 0.0f || y != 0.0f))
+	{
+		return getCross(up3D);
+	}
+	else 
+	{
+		return getCross(right3D);
+	}
 }
 /** @} end Vector_CrossProduct */
 
@@ -792,7 +827,8 @@ inline void Vector2::set(const Vector2& v)
 }
 inline Vector2& Vector2::operator=(const Vector2& v) 
 {
-	*this = v;
+	x = v.x;
+	y = v.y;
 	return *this;
 }
 inline void Vector2::set(int index, vec_t scalar)
@@ -822,7 +858,9 @@ inline void Vector3::set(const Vector3& v)
 }
 inline Vector3& Vector3::operator=(const Vector3& v) 
 {
-	*this = v;
+	x = v.x;
+	y = v.y;
+	z = v.z;
 	return *this;
 }
 inline void Vector3::set(int index, vec_t scalar)
