@@ -229,7 +229,6 @@ bool Lua::require(const char* module) const
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
-	// \todo pop the stack? are the values left on the stack?
 	return !lua_pcall(L, 1, 1, 0);
 }
 
@@ -248,7 +247,7 @@ void Lua::runConsole(void) const
 			*d++ = *s++;
 		}
 		
-		if (strcmp(quit, "quit_Lua"))
+		if (strcmp(quit, "lua_quit"))
 		{
 			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || lua_pcall(L, 0, 0, 0))
 			{

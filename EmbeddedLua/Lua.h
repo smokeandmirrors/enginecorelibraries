@@ -2,16 +2,20 @@
 #ifndef LUA_H
 #define LUA_H
 /**
- * Lua.h
- * 
- * This class encapsulates a lua_Struct.  It will allow for easier
- * creation of application and library code for %Lua.
- *
- * \author Smoke and Mirrors Development
- * \copyright 2010 Smoke and Mirrors Development
- * \email smokeandmirrorsdevelopment@gmail.com
- * \date 2/18/2010
- */
+\file Lua.h
+This file defines the class Lua
+The Lua class encapsulates a lua_Struct.  It will allow for easier
+creation of application and library code for %Lua.
+
+\author Smoke and Mirrors Development
+\copyright 2010 Smoke and Mirrors Development
+\email smokeandmirrorsdevelopment@gmail.com
+\date 2/18/2010
+
+\todo expose some ability to modify the require path at runtime
+\todo expose some ability to modify the require path at executions start up time
+\todo expose some ability to modify the folders searched by the require function
+*/
 
 #include <stdlib.h>
 #include "LuaExtensibility.h"
@@ -19,6 +23,11 @@
 namespace LuaExtension 
 {
 
+/**
+\class Lua
+\brief The Lua class encapsulates a lua_Struct.  It will allow for easier
+creation of application and library code for %Lua.
+*/
 class Lua 
 {
 public:

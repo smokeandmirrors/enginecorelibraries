@@ -231,6 +231,7 @@ static int lua_Parent_getGrandparentName(lua_State* L)
 
 lua_func(lua_Parent_getGrandparent)
 {
+	(void*)L;
 	//Grandparent* value;
 	//const Differentiator<Parent*> differ; 
 	//if (Parent* object = to(L, -1, differ))
