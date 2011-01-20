@@ -75,18 +75,7 @@ inline float to(lua_State* L, int index, Differentiator<float>&)
 	return static_cast<float>(lua_tonumber(L, index));
 }
 
-// 
-// template<> LuaExtendable* to<LuaExtendable*>(lua_State* L, int index)
-// {
-// 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
-// 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
-// }
-
 LuaExtendable* toLuaExtendable(lua_State* L, int index);
-// {
-// 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
-// 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
-// }
 
 /**
 push<T> functions
@@ -143,26 +132,31 @@ inline int staticReturn2Param0(lua_State* L)
 	return num_pushed;
 }
 
-template <typename RET_1, typename RET_2, typename ARG_1, RET_1(* function)(ARG_1, RET_2&)>
+template <typename RET_1, typename RET_2, typename ARG_1, RET_1(* function)(RET_2&, ARG_1)>
 inline int staticReturn2Param1(lua_State* L)
 {
-	return 0; // \todo finish me
+	RET_2 retval2;
+	ARG_1 argument = to<ARG_1>(L, -1);
+	lua_pop(L, -1);
+	int num_pushed = push(L, (*function)(retval2, argument));
+	num_pushed += push(L, retval2);
+	return num_pushed;
 }
 
-// \todo see how to handle by reference argument functions that don't reuire
-// returning the by reference argument
 
 /**
 class functions
 */
 template<typename CLASS, typename RETURN, RETURN(CLASS::* function)(void) const>
-int param0const(lua_State* L)
+int return1Param0const(lua_State* L)
 {
-	RETURN value = RETURN();
+	RETURN value;
+
 	if (CLASS* object = to<CLASS*>(L, 1))
 	{
 		value = (object->*function)();
 	}
+	
 	return push(L, value);
 }
 

@@ -14,77 +14,79 @@ class Basic
 {
 public:
 	typedef Basic super;
-	int							getValue(void) const { return value; }
-	virtual int					setMetatable(lua_State* L);
-	virtual const char*			toString(void);
-	int							setValue(int new_value) { value = new_value; }
+	
+	int getValue(void) const 
+	{ 
+		return value; 
+	}
+	
+	virtual int setMetatable(lua_State* /* L */ )
+	{
+		// return setDefaultClassMetatable(L);
+		return 0;
+	}
+
+	virtual const char* toString(void)
+	{
+		return "This is a Basic.";
+	}
+
+	int setValue(int new_value) 
+	{ 
+		value = new_value; 
+	}
 
 private:
-	int							value;
+	int value;
 }; // Basic
 
-/* 
-Basic implementation
-*/
-int Basic::setMetatable(lua_State* /* L */)
+static Basic b;
+ 
+declare_lua_extendable(Basic)
+
+lua_func(newBasic)
 {
-	// return setDefaultClassMetatable(L);
-	return 0;
+	pushRegisteredClass(L, new Basic());	//s: ud
+	lua_newtable(L);						//s: ud, ud_mt
+	lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+	lua_setmetatable(L, -2);				//s: ud/mt
+	return 1;
 }
 
-const char* Basic::toString(void)
+lua_func(getBasic)
 {
-	return "This is a Basic.";
+	static Basic* b(NULL);
+
+	if (!b)
+	{
+		b = new Basic();
+		pushRegisteredClass(L,b);	//s: ud
+		lua_newtable(L);						//s: ud, ud_mt
+		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+		lua_setmetatable(L, -2);				//s: ud/mt
+	}
+	else
+	{
+		pushRegisteredClass(L,b);	//s: ud
+	}
+
+	return 1;
 }
 
-static Basic* b(NULL);
-// 
-// declare_lua_library(Basic)
-// 
-// lua_func(newBasic)
-// {
-// 	pushRegisteredClass(L, new Basic());	//s: ud
-// 	lua_newtable(L);						//s: ud, ud_mt
-// 	lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
-// 	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-// 	lua_setmetatable(L, -2);				//s: ud/mt
-// 	return 1;
-// }
-// 
-// lua_func(getBasic)
-// {
-// 	static Basic* b(NULL);
-// 	
-// 	if (!b)
-// 	{
-// 		b = new Basic();
-// 		pushRegisteredClass(L,b);	//s: ud
-// 		lua_newtable(L);						//s: ud, ud_mt
-// 		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
-// 		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-// 		lua_setmetatable(L, -2);				//s: ud/mt
-// 	}
-// 	else
-// 	{
-// 		pushRegisteredClass(L,b);	//s: ud
-// 	}
-// 	
-// 	return 1;
-// }
-// 
-// lua_func(basicFromC)
-// {
-// 	lua_pushstring(L, "This function came from C!");
-// 	return 1;
-// }
+lua_func(basicFromC)
+{
+	lua_pushstring(L, "This function came from C!");
+	return 1;
+}
 
-// 
-// define_lua_class(Basic, Basic)
-// 	lua_named_entry("new", newBasic)
-// 	lua_named_entry("get", getBasic)
-// 	lua_named_entry("fromC", basicFromC)
-// 	lua_named_entry("getValue", (param0const<Basic, int, &Basic::getValue>))
-// end_lua_class(Basic, Basic)
+define_lua_class(Basic, Basic)
+	lua_named_entry("new", newBasic)
+	lua_named_entry("get", getBasic)
+	lua_named_entry("fromC", basicFromC)
+	lua_named_entry("getValue", (return1Param0const<Basic, int, &Basic::getValue>))
+end_lua_class(Basic, Basic)
 
 // class Derived
 // : public Basic

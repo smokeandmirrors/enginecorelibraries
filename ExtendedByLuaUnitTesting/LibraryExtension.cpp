@@ -26,12 +26,19 @@ static float incrementByOne(float number)
 	return number + 1.0f;
 }
 
+static float addAndSubtract(float& subtracted, float operand)
+{
+	subtracted = operand - 1.0f;
+	return operand + 1.0f;
+}
+
 declare_lua_library(UnitTestLibrary)
 
 define_lua_library(UnitTestLibrary)
 	lua_named_entry("getOne",			(staticReturn1Param0<int, getOne>))
 	lua_named_entry("getTwo",			(staticReturn2Param0<int, int, getTwo>))
 	lua_named_entry("incrementByOne",	(staticReturn1Param1<float, float, incrementByOne>))
+	lua_named_entry("addAndSubtract",	(staticReturn2Param1<float, float, float, addAndSubtract>))
 end_lua_library(UnitTestLibrary)
 
 class LibraryExtensionUT : public cfixcc::TestFixture
@@ -109,12 +116,39 @@ public:
 		lua_pop(L, 2);
 		//s: 
 	}
+
+	void test_staticReturn2Param1()
+	{
+		Lua lua;
+		lua_State* L = lua.getState();
+		//s: 
+		register_lua_library((&lua), UnitTestLibrary)
+		//s: 
+		lua_getglobal(L, "UnitTestLibrary");
+		//s: UnitTestLibrary
+		CFIX_ASSERT(lua_istable(L, -1));
+		lua_getfield(L, -1, "addAndSubtract");
+		//s: addAndSubtract
+		CFIX_ASSERT(lua_isfunction(L, -1));
+		lua_pushnumber(L, 3.0f);
+		lua_call(L, 1, 2);
+		//s: 4, 2
+		CFIX_ASSERT(lua_isnumber(L, -1));
+		CFIX_ASSERT(lua_isnumber(L, -2));
+		int four = to<int>(L, -2);
+		CFIX_ASSERT(four == 4);
+		int two = to<int>(L, -1);
+		CFIX_ASSERT(two == 2);
+		lua_pop(L, 2);
+		//s: 
+	}
 };
 
 CFIXCC_BEGIN_CLASS(LibraryExtensionUT)
 	CFIXCC_METHOD(test_staticParam0)
 	CFIXCC_METHOD(test_staticParam1)
 	CFIXCC_METHOD(test_staticReturn2Param0)
+	CFIXCC_METHOD(test_staticReturn2Param1)
 CFIXCC_END_CLASS()
 
 #endif//EXTENDED_BY_LUA
