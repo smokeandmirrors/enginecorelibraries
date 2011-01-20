@@ -135,7 +135,7 @@ declare a library for shared inclusion
 	struct lua_State; \
 	namespace lua_library_##name \
 	{ \
-		int luaopen_##name(lua_State* L); \
+		int key(lua_State* L); \
 	}; // end namespace lua_library_##name
 // end #define begin_lua_library_declaration
 
@@ -148,7 +148,7 @@ declare a library for shared inclusion
 	{ \
 		inline class_name* to(lua_State* L, int index, Differentiator<class_name>&) \
 		{ \
-				return static_cast<class_name*>(toLuaExtendable(L, index)); /* return static_cast<class_name*>(to<LuaExtendable*>(L, index)); */ \
+			return static_cast<class_name*>(toLuaExtendable(L, index)); /* return static_cast<class_name*>(to<LuaExtendable*>(L, index)); */ \
 		} \
 	}
 // end #define declare_lua_extendable
@@ -194,7 +194,7 @@ end a library definition for registration
 #define end_lua_library(name) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int luaopen_##name(lua_State* L) \
+		int key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			return 1; \
@@ -330,7 +330,7 @@ is undefined
 \param name of the library without string delimiters
 */
 #define register_lua_library(lua_object, module) \
-	lua_object->openLibrary(lua_library_##module::luaopen_##module);			
+	lua_object->openLibrary(lua_library_##module::key);			
 // end #define register_lua_library
 
 /**

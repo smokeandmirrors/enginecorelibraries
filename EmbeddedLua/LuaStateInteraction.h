@@ -10,7 +10,7 @@ the %Lua state to include custom types.
 
 \copyright 2010 Smoke and Mirrors Development
 \author Smoke and Mirrors Development
-smokeandmirrorsdevelopment@gmail.com
+\email smokeandmirrorsdevelopment@gmail.com
 \date 8/21/2010
 */
 
@@ -30,7 +30,7 @@ namespace LuaExtension
 This is a define macro and not an inline function due to the 
 average lua_istype function being a macro
 */
-#define CHECK_ARG(lua_istype, type_name, L, index) \
+#define assert_lua_argument(lua_istype, type_name, L, index) \
 	{ \
 		if (index > lua_gettop(L) || index < -lua_gettop(L)) \
 		{ \
@@ -42,7 +42,7 @@ average lua_istype function being a macro
 		} \
 	}
 #else
-#define CHECK_ARG(lua_istype, type_name, L, index) {}
+#define assert_lua_argument(lua_istype, type_name, L, index) {}
 #endif//ARGUMENT_ERRORS
 
 template<typename T> class Differentiator {/* empty */};
@@ -53,32 +53,40 @@ returns an object from the specified index in the %Lua stack
 */
 template<typename T> T to(lua_State* L, int index)
 {	
-	return static_cast<T>(to(Differentiator<T>(), L, index));
+	Differentiator<T> diff;
+	return static_cast<T>(to(L, index, diff));
 }
 
-//inline bool to(lua_State* L, int index, Differentiator<bool>&)
-//{
-//	CHECK_ARG(lua_isboolean, "boolean", L, index);
-//	return lua_toboolean(L, index) != 0;
-//}
-//
-//inline int to(lua_State* L, int index, Differentiator<int>&)
-//{
-//	CHECK_ARG(lua_isnumber, "number", L, index);
-//	return static_cast<int>(lua_tonumber(L, index));
-//}
-//
-//inline float to(lua_State* L, int index, Differentiator<float>&)
-//{
-//	CHECK_ARG(lua_isnumber, "number", L, index);
-//	return static_cast<float>(lua_tonumber(L, index));
-//}
-
-LuaExtendable* toLuaExtendable(lua_State* L, int index)
+inline bool to(lua_State* L, int index, Differentiator<bool>&)
 {
-	CHECK_ARG(lua_isuserdata, "LuaExtendable", L, index);
-	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+	assert_lua_argument(lua_isboolean, "boolean", L, index);
+	return lua_toboolean(L, index) != 0;
 }
+
+inline int to(lua_State* L, int index, Differentiator<int>&)
+{
+	assert_lua_argument(lua_isnumber, "number", L, index);
+	return static_cast<int>(lua_tonumber(L, index));
+}
+
+inline float to(lua_State* L, int index, Differentiator<float>&)
+{
+	assert_lua_argument(lua_isnumber, "number", L, index);
+	return static_cast<float>(lua_tonumber(L, index));
+}
+
+// 
+// template<> LuaExtendable* to<LuaExtendable*>(lua_State* L, int index)
+// {
+// 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
+// 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+// }
+
+LuaExtendable* toLuaExtendable(lua_State* L, int index);
+// {
+// 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
+// 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+// }
 
 /**
 push<T> functions
@@ -92,6 +100,18 @@ inline int push(lua_State* L, bool value)
 	return 1;
 }
 
+inline int push(lua_State* L, int value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+
+inline int push(lua_State* L, float value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+
 inline int push(lua_State* L, LuaExtendable* value)
 {
 	return pushRegisteredClass(L, value);
@@ -100,16 +120,42 @@ inline int push(lua_State* L, LuaExtendable* value)
 /**
 static functions
 */
-template<typename RETURN, RETURN(*function)(void)>
-inline int staticParam0(lua_State* L)
+template<typename RET_1, RET_1(* function)(void)>
+inline int staticReturn1Param0(lua_State* L)
 {
 	return push(L, (*function)());
 }
 
+template<typename RET_1, typename ARG_1, RET_1(* function)(ARG_1)>
+inline int staticReturn1Param1(lua_State* L)
+{
+	ARG_1 argument = to<ARG_1>(L, -1);
+	lua_pop(L, -1);
+	return push(L, (*function)(argument));	
+}
+
+template <typename RET_1, typename RET_2, RET_1(* function)(RET_2&)>
+inline int staticReturn2Param0(lua_State* L)
+{
+	RET_2 retval2;
+	int num_pushed = push(L, (*function)(retval2));
+	num_pushed += push(L, retval2);
+	return num_pushed;
+}
+
+template <typename RET_1, typename RET_2, typename ARG_1, RET_1(* function)(ARG_1, RET_2&)>
+inline int staticReturn2Param1(lua_State* L)
+{
+	return 0; // \todo finish me
+}
+
+// \todo see how to handle by reference argument functions that don't reuire
+// returning the by reference argument
+
 /**
 class functions
 */
-template<typename CLASS, typename RETURN, RETURN(CLASS::*function)(void) const>
+template<typename CLASS, typename RETURN, RETURN(CLASS::* function)(void) const>
 int param0const(lua_State* L)
 {
 	RETURN value = RETURN();

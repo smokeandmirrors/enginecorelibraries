@@ -21,8 +21,8 @@ static int newVector2(lua_State* L)
 
 define_lua_library(Vector2)
 lua_named_entry("new", newVector2)
-lua_named_entry("TRUE", (staticParam0<bool, TRUE>))
-lua_named_entry("FALSE", (staticParam0<bool, FALSE>))
+lua_named_entry("TRUE", (staticReturn1Param0<bool, TRUE>))
+lua_named_entry("FALSE", (staticReturn1Param0<bool, FALSE>))
 end_lua_library(Vector2)
 
 static int lua_newVector3(lua_State* L);

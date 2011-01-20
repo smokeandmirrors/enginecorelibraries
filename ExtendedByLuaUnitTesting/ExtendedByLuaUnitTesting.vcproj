@@ -339,6 +339,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\LibraryExtension.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\LuaClass.cpp"
 			>
 		</File>
