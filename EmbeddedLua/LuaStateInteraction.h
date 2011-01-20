@@ -155,9 +155,12 @@ int return1Param0const(lua_State* L)
 	if (CLASS* object = to<CLASS*>(L, 1))
 	{
 		value = (object->*function)();
+		return push(L, value);
 	}
-	
-	return push(L, value);
+	else
+	{
+		return 0;
+	}	
 }
 
 } // namespace LuaExtension
