@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLuaUnitTesting", 
 		{8A0857CB-869F-4727-9FAA-C80E5A183377} = {8A0857CB-869F-4727-9FAA-C80E5A183377}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildSystem", "..\BuildSystem\BuildSystem.vcproj", "{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -97,6 +99,18 @@ Global
 		{F7C8BDD2-34F6-477F-A93D-DB038F96AEF1}.Release|Win32.Build.0 = Release|Win32
 		{F7C8BDD2-34F6-477F-A93D-DB038F96AEF1}.ReleaseNoLua|Win32.ActiveCfg = Release|Win32
 		{F7C8BDD2-34F6-477F-A93D-DB038F96AEF1}.ReleaseNoLua|Win32.Build.0 = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.Debug|Win32.Build.0 = Debug|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.DebugNoLua|Win32.ActiveCfg = Debug|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.DebugNoLua|Win32.Build.0 = Debug|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.GoldMaster|Win32.ActiveCfg = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.GoldMaster|Win32.Build.0 = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.GoldMasterNoLua|Win32.ActiveCfg = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.GoldMasterNoLua|Win32.Build.0 = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.Release|Win32.ActiveCfg = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.Release|Win32.Build.0 = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.ReleaseNoLua|Win32.ActiveCfg = Release|Win32
+		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}.ReleaseNoLua|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

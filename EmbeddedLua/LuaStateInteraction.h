@@ -14,17 +14,14 @@ the %Lua state to include custom types.
 \date 8/21/2010
 */
 
+#include "Build.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "Vector.h"
 
-#if !GOLDMASTER
-#define ARGUMENT_ERRORS 1
-#endif//!GOLDMASTER
-
 namespace LuaExtension 
 { 
-#if ARGUMENT_ERRORS
+#if 1 // ARGUMENT_ERRORS
 #pragma message("Compiling with Lua stack argument type checking.")
 /**
 This is a define macro and not an inline function due to the 
@@ -45,37 +42,53 @@ average lua_istype function being a macro
 #define assert_lua_argument(lua_istype, type_name, L, index) {}
 #endif//ARGUMENT_ERRORS
 
-template<typename T> class Differentiator {/* empty */};
+#define static_assert(pred) switch(0){case 0:case pred:;}
+#define prevent_compile switch(0){case 0:case 0:;}
 
 /**
 to<T> functions
 returns an object from the specified index in the %Lua stack
 */
-template<typename T> T to(lua_State* L, int index)
+template<typename T> inline T to(lua_State* L, int index)
 {	
-	Differentiator<T> diff;
-	return static_cast<T>(to(L, index, diff));
+	prevent_compile
 }
 
-inline bool to(lua_State* L, int index, Differentiator<bool>&)
+template<> inline bool to<bool>(lua_State* L, int index)
 {
 	assert_lua_argument(lua_isboolean, "boolean", L, index);
 	return lua_toboolean(L, index) != 0;
 }
 
-inline int to(lua_State* L, int index, Differentiator<int>&)
+template<> inline sint to<sint>(lua_State* L, int index)
 {
 	assert_lua_argument(lua_isnumber, "number", L, index);
-	return static_cast<int>(lua_tonumber(L, index));
+	return static_cast<sint>(lua_tonumber(L, index));
 }
 
-inline float to(lua_State* L, int index, Differentiator<float>&)
+template<> inline uint to<uint>(lua_State* L, int index)
+{
+	assert_lua_argument(lua_isnumber, "number", L, index);
+	return static_cast<uint>(lua_tonumber(L, index));
+}
+
+template<> inline float to<float>(lua_State* L, int index)
 {
 	assert_lua_argument(lua_isnumber, "number", L, index);
 	return static_cast<float>(lua_tonumber(L, index));
 }
 
-LuaExtendable* toLuaExtendable(lua_State* L, int index);
+template<> inline double to<double>(lua_State* L, int index)
+{
+	assert_lua_argument(lua_isnumber, "number", L, index);
+	return static_cast<double>(lua_tonumber(L, index));
+}
+
+template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, int index)
+{
+	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
+	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+}
 
 /**
 push<T> functions
@@ -89,7 +102,7 @@ inline int push(lua_State* L, bool value)
 	return 1;
 }
 
-inline int push(lua_State* L, int value)
+inline int push(lua_State* L, sint value)
 {
 	lua_pushnumber(L, static_cast<lua_Number>(value));
 	return 1;

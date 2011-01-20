@@ -518,25 +518,36 @@ function createConstructor_PRIVATE(class, metatable)
 				return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(instance, metatable), ...)) 
 			end	
 		end
+	elseif class.setmetatable then
+		return function(...)
+			class.nextInstanceId = class.nextInstanceId + 1
+			constructHierarchy_PRIVATE(class, class.setmetatable({name = class.nextInstanceId, ...}, metatable), ...)
+		end
 	else
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
-			return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({name = class.nextInstanceId}, metatable), ...))
+			return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({name = class.nextInstanceId, ...}, metatable), ...))
 		end
 	end
 end	
 else
-function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
+-- function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
+function createConstructor_PRIVATE(class, metatable)
 	if class.new then
 		if class.setmetatable then
 			return function(...)
-				return constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable, name, parentudata_metamethod_table_name), ...)
+				-- return constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable, name, parentudata_metamethod_table_name), ...)
+				return constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable), ...)
 			end
 		else
 			return function(...)
 				return constructHierarchy_PRIVATE(class, setmetatable(class.new(...), metatable), ...)
 			end
 		end	
+	elseif class.setmetatable then
+		return function(...)
+			constructHierarchy_PRIVATE(class, class.setmetatable({...}, metatable), ...)
+		end
 	else
 		return function(...)
 			return constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...)

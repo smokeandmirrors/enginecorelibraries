@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Sandbox"
-	ProjectGUID="{6EDEDB49-5A48-4365-B25A-9CF7B2D78583}"
-	RootNamespace="Sandbox"
+	Name="BuildSystem"
+	ProjectGUID="{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
+	RootNamespace="BuildSystem"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,11 +40,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
-				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;EXTENDED_BY_LUA"
+				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -103,9 +103,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
-				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE;EXTENDED_BY_LUA"
+				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
@@ -167,7 +165,6 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -229,11 +226,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -292,7 +289,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -354,7 +350,6 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -395,32 +390,8 @@
 	<References>
 	</References>
 	<Files>
-		<Filter
-			Name="TemplateMetaProgramming"
-			>
-		</Filter>
-		<Filter
-			Name="Templates"
-			>
-		</Filter>
-		<Filter
-			Name="Compiler Standard"
-			>
-			<File
-				RelativePath=".\CompilerChecks.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CompilerChecks.h"
-				>
-			</File>
-		</Filter>
 		<File
-			RelativePath=".\Sandbox.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Sandbox.h"
+			RelativePath=".\Build.h"
 			>
 		</File>
 	</Files>

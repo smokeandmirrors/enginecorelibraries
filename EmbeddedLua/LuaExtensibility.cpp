@@ -6,7 +6,7 @@
 namespace LuaExtension
 {
 
-#define setUserdataMetamethod(L, method)		/*s: userdata, lua_class_mt, proxy/mt				  */\
+#define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt				  */\
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
@@ -199,22 +199,22 @@ int setDefaultMetatableProxy(lua_State* L)
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
 	lua_pushcclosure(L, __newindexProxy, 1);	//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindexProxy
 	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__add")
-	setUserdataMetamethod(L, "__call")
-	setUserdataMetamethod(L, "__concat")
-	setUserdataMetamethod(L, "__div")
-	setUserdataMetamethod(L, "__eq")
-	setUserdataMetamethod(L, "__gc")
-	setUserdataMetamethod(L, "__le")
-	setUserdataMetamethod(L, "__len")
-	setUserdataMetamethod(L, "__lt")
-	setUserdataMetamethod(L, "__metatable")
-	setUserdataMetamethod(L, "__mod")
-	setUserdataMetamethod(L, "__mul")
-	setUserdataMetamethod(L, "__pow")
-	setUserdataMetamethod(L, "__sub")
-	setUserdataMetamethod(L, "__unm")
-	setUserdataMetamethod(L, "__tostring")
+	lua_setUserDataMetamethod(L, "__add")
+	lua_setUserDataMetamethod(L, "__call")
+	lua_setUserDataMetamethod(L, "__concat")
+	lua_setUserDataMetamethod(L, "__div")
+	lua_setUserDataMetamethod(L, "__eq")
+	lua_setUserDataMetamethod(L, "__gc")
+	lua_setUserDataMetamethod(L, "__le")
+	lua_setUserDataMetamethod(L, "__len")
+	lua_setUserDataMetamethod(L, "__lt")
+	lua_setUserDataMetamethod(L, "__metatable")
+	lua_setUserDataMetamethod(L, "__mod")
+	lua_setUserDataMetamethod(L, "__mul")
+	lua_setUserDataMetamethod(L, "__pow")
+	lua_setUserDataMetamethod(L, "__sub")
+	lua_setUserDataMetamethod(L, "__unm")
+	lua_setUserDataMetamethod(L, "__tostring")
 	lua_setmetatable(L, -4);					//s: userdata, lua_class_mt, proxy/mt
 	lua_pop(L, 2);								//s: userdata/mt
 	return 1;

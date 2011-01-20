@@ -2,13 +2,14 @@
 #include <string.h>
 
 #if EXTENDED_BY_LUA
+#include "Lua.h"
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
 using namespace LuaExtension;
-
+/*
 class Basic
 : public LuaExtendable
 {
@@ -20,10 +21,9 @@ public:
 		return value; 
 	}
 	
-	virtual int setMetatable(lua_State* /* L */ )
+	virtual int setMetatable(lua_State* L)
 	{
-		// return setDefaultClassMetatable(L);
-		return 0;
+		return setDefaultMetatableProxy(L);
 	}
 
 	virtual const char* toString(void)
@@ -59,7 +59,7 @@ lua_func(getBasic)
 	if (!b)
 	{
 		b = new Basic();
-		pushRegisteredClass(L,b);	//s: ud
+		pushRegisteredClass(L,b);				//s: ud
 		lua_newtable(L);						//s: ud, ud_mt
 		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
 		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
@@ -91,31 +91,22 @@ end_lua_class(Basic, Basic)
  {
  public:
  	typedef Basic super;
- 	virtual int					setMetatable(lua_State* L);
- 	virtual const char*			toString(void);
+ 	virtual int	setMetatable(lua_State* L)
+	{
+		return setDefaultMetatableProxy(L);
+	}
+
+ 	virtual const char* toString(void)
+	{
+		return "This is a Derived";
+	}
  }; // Derived
  
  declare_lua_library(Derived)
- 
- /*
- Derived implementation
- */
- int Derived::setMetatable(lua_State* L)
- {	/**
- 	\leftoff
- 	*/
- 	return setDefaultMetatableProxy(L);
- 	//return 0;
- }
- 
- const char* Derived::toString()
- {
- 	return "This is a Derived";
- }
- 
+  
  define_lua_class_by_proxy_defaults(Derived, Basic)
  end_lua_class_by_proxy_defaults(Derived, Basic)
-
+*/
 /**
 @class
 
@@ -235,27 +226,11 @@ int Grandparent::setMetatable(lua_State *L)
  	lua_pushstring(L, p->getGrandparentName());
  	return 1;
  }
- 
- lua_func(lua_Parent_getGrandparent)
- {
- 	(void*)L;
- 	//Grandparent* value;
- 	//const Differentiator<Parent*> differ; 
- 	//if (Parent* object = to(L, -1, differ))
- 	//// if (Parent* object = to<Parent*>(L, -1))
- 	//{
- 	//	value = object->getGrandparent();
- 	//	return push(L, value);
- 	//}
- 	
- 	return 0;
- }
- 
+  
  define_lua_class(Parent, Parent::super)
  // should be able to be automagicked...
  lua_named_entry("new", lua_newParent)
  lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
- lua_named_entry("getGrandparent", lua_Parent_getGrandparent)
  lua_named_entry("getGrandparent", (return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
  end_lua_library(Parent)
  
@@ -287,6 +262,25 @@ class Classes : public cfixcc::TestFixture
 private:
 
 public:
+	void TestBasicClassExposition()
+	{
+// 		Lua lua;
+// 		register_lua_library((&lua), Basic);
+// 		// CFIX_ASSERT(lua.doString("_G.b = new'Basic'"));
+// 		lua.runConsole();
+// 		lua_State* L = lua.getState();
+// 		lua_getglobal(L, "b");
+// 		//s: b
+// 		CFIX_ASSERT(lua_isuserdata(L, -1));
+// 		void* b = lua_touserdata(L, -1);
+// 		CFIX_ASSERT(b);
+// 		LuaExtendable* ble = to<LuaExtendable*>(L, -1);
+// 		CFIX_ASSERT(ble);
+// 		Basic* b_from_ble = dynamic_cast<Basic*>(ble);
+// 		CFIX_ASSERT(b_from_ble);
+// 		Basic* basic_from_lua = to<Basic*>(L, -1);
+// 		CFIX_ASSERT(basic_from_lua);
+	}
 	/*
 	void Test()
 	{
@@ -296,6 +290,6 @@ public:
 };
 
 CFIXCC_BEGIN_CLASS(Classes)
-	// CFIXCC_METHOD(Test)
+	CFIXCC_METHOD(TestBasicClassExposition)
 CFIXCC_END_CLASS()
 

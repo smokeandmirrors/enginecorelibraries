@@ -45,7 +45,7 @@ namespace lua_library_example
 }
 
 // to use the library
-register_lua_library(Lua, example)
+register_lua_library(Lua, example);
 // would generate:
 Lua->openLibrary(lua_library_example::luaopen_example);
 @endcode
@@ -85,6 +85,10 @@ enum LUA_EXPOSURE
 
 #define NUM_LUA_METAMETHODS (18)
 
+#if !GOLDMASTER
+#define ARGUMENT_ERRORS 1
+#endif//!GOLDMASTER
+
 extern unsigned int		testing; 
 extern const char*		lua_metamethodNames[NUM_LUA_METAMETHODS];
 
@@ -114,10 +118,13 @@ to be extended in %Lua with the use of the %Lua require function
 // end #define lua_nilLoadedStatus(module)
 
 /** 
-\def lua_func
+\def lua_func 
+
 Declares a (static) lua function.  Declares a function that
 takes a single lua_State argument, and returns an integer,
 the number of arguments it has added to the stack.
+
+compile-time directive
 
 \param name name of the function that will be declared, 
 without string delimiters
@@ -128,7 +135,11 @@ without string delimiters
 
 /** 
 \def declare_lua_library
-declare a library for shared inclusion 
+
+Declares a library for shared inclusion 
+
+compile-time directive
+
 \param name name of the library without string delimiters
 */
 #define declare_lua_library(name) \
@@ -141,21 +152,47 @@ declare a library for shared inclusion
 
 /**
 \def declare_lua_extendable
+
+Declare a %Lua library around a class, so that instances of the 
+class can be created or controlled in %Lua.  Using this method, the 
+programmer is responsible for the whole system of usage of the class in 
+in %Lua.
+
+compile-time directive
 */
+#if ARGUMENT_ERRORS
 #define declare_lua_extendable(class_name) \
-	declare_lua_library(name) \
+	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
-		inline class_name* to(lua_State* L, int index, Differentiator<class_name*>&) \
+		template<> inline class_name* to<class_name*>(lua_State* L, int index) \
 		{ \
-			return static_cast<class_name*>(toLuaExtendable(L, index)); /* return static_cast<class_name*>(to<LuaExtendable*>(L, index)); */ \
+			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
+			class_name* object = dynamic_cast<class_name*>(ud); \
+			if (object) \
+				return object; \
+			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
+			return NULL; \
 		} \
 	}
 // end #define declare_lua_extendable
+#else
+#define declare_lua_extendable(class_name) \
+	declare_lua_library(class_name) \
+	namespace LuaExtension \
+	{ \
+		template<> inline class_name* to<class_name*>(lua_State* L, int index) \
+		{ \
+			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+		} \
+	}
+// end #define declare_lua_extendable
+#endif//ARGUMENT_ERRORS
 
 /** 
 \def lua_entry
 add a lua method to a definition by the same name 
+compile-time directive
 \param function a lua_function
 */
 #define lua_entry(function) \
@@ -165,6 +202,7 @@ add a lua method to a definition by the same name
 /**  
 \def lua_named_entry
 add a lua method to a definition by a different name 
+compile-time directive
 \param name a string delimited name
 \param function a lua_function
 */
@@ -175,6 +213,7 @@ add a lua method to a definition by a different name
 /** 
 \def define_lua_library
 begin a library definition for registration
+compile-time directive
 \note highly recommended to precede end_lua_library
 \param name name of the library without string delimiters
 */
@@ -188,6 +227,7 @@ begin a library definition for registration
 /** 
 \def end_lua_library
 end a library definition for registration
+compile-time directive
 \note highly recommended to follow with define_lua_library
 \param name name of the library without string delimiters
 */
@@ -206,6 +246,7 @@ end a library definition for registration
 \def define_lua_library_extensible
 begin a library definition for registration, and allow
 it to be extended in lua using the %Lua require function
+compile-time directive
 \note highly recommended to precede end_lua_library_extensible
 \param name name of the library without string delimiters
 */
@@ -219,13 +260,14 @@ it to be extended in lua using the %Lua require function
 /** 
 \def end_lua_library_extensible
 end a library definition for registration
-\note highly recommended to follow with define_lua_library_extensible
+compile-time directive
+\note highly recommended to follow define_lua_library_extensible
 \param name name of the library without string delimiters
 */
 #define end_lua_library_extensible(name) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int luaopen_##name(lua_State* L) \
+		int key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			lua_nilLoadedStatus(#name); \
@@ -236,8 +278,13 @@ end a library definition for registration
 
 /**
 \def define_lua_class
-define a lua library around a class, so that instances of the 
-class can be created or controlled in lua
+define a %Lua library around a class, so that instances of the 
+class can be created or controlled in %Lua.  Using this method, the 
+programmer is responsible for the whole system of usage of the class in 
+in lua.
+
+compile-time directive
+
 \param derived_class the class to expose
 \param super_class the parent class of the derived_class, if there is 
 no parent class, simply supply the derived class again
@@ -248,11 +295,12 @@ no parent class, simply supply the derived class again
 
 /**
 \def end_lua_class
+compile-time directive
 */
 #define end_lua_class(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int luaopen_##derived_class(lua_State* L) \
+		int key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
@@ -263,6 +311,7 @@ no parent class, simply supply the derived class again
 
 /**
 \def define_lua_class_defaults
+compile-time directive
 */
 #define define_lua_class_defaults(derived, super) \
 	namespace lua_library_##derived \
@@ -281,11 +330,12 @@ no parent class, simply supply the derived class again
 
 /**
 \def end_lua_class_defaults
+compile-time directive
 */
 #define end_lua_class_defaults(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int luaopen_##derived_class(lua_State* L) \
+		int key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
@@ -298,19 +348,23 @@ no parent class, simply supply the derived class again
 
 /**
 \def define_lua_class_by_proxy_defaults
-begin a library definition for registration via lua proxy table,
+begin a library definition for registration via a %Lua proxy table,
 and use the default "new", "setmetatable", "__gc" & "__tostring" methods
-\note highly recommended to precede end_lua_library
+compile-time directive
+\note highly recommended to precede end_lua_class_by_proxy_defaults
 */
 #define define_lua_class_by_proxy_defaults(derived_class, super_class) \
 	define_lua_class_defaults(derived_class, super_class) \
 		lua_named_entry("setmetatable", setmetatableLuaExtendable)
 // end #define define_lua_class_by_proxy_defaults
 
+/**
+compile-time directive
+*/
 #define end_lua_class_by_proxy_defaults(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int luaopen_##derived_class(lua_State* L) \
+		int key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			lua_require(#derived_class) \
@@ -326,11 +380,12 @@ and use the default "new", "setmetatable", "__gc" & "__tostring" methods
 register a library with a lua state 
 \note registration MUST be done in dependency order, or the behavior
 is undefined
+run-time directive
 \param lua_object is class @link Lua @endlink, not struct lua_State 
 \param name of the library without string delimiters
 */
-#define register_lua_library(lua_object, module) \
-	lua_object->openLibrary(lua_library_##module::key);			
+#define register_lua_library(lua_object_ptr, module) \
+	lua_object_ptr->openLibrary(lua_library_##module::key)		
 // end #define register_lua_library
 
 /**
@@ -365,13 +420,38 @@ Lua class declared with this system
 int __tostringLuaExtendable(lua_State* L);
 
 /**
-the timing of this is critical.  if executed before a %Lua extension file is loaded
-it means that the metamethods redefined in %Lua will not be executed depending
-on what method of exposure to %Lua used on the class
+Creates the %Lua metatable that is used as the index for all the 
+methods/properties shared by the class.
+
+\note The timing of the calls to this function is critical.  if executed 
+before a %Lua extension file is loaded it means that the metamethods 
+redefined in %Lua will not be executed depending on what method of exposure
+to %Lua used on the class.
 */
 void createGlobalClassMetatable(lua_State* L, const char* class_name, const char* super_class_name);
 
 /**
+C++ implementation of the fuction explained below in Lua.  Assumes that
+class_name and super_class name are at the top of the %Lua stack
+
+creates a metatable in %Lua representing the exposed methods from the C++
+class, and adds any metamethods defined in %Lua to the table. 
+
+function createGlobalClassMetatable(class_name, metatable_name)
+	local class = _G[class_name]
+	if class then
+		local class_mt = _G.C_metatables[class_name]
+		if not class_mt then
+			class_mt = {}
+			_G.C_metatables[class_name] = class_mt
+		end
+		for metamethodname, _ in pairs(metamethods) do
+			if class[metamethodname] then
+				class_mt[metamethodname] = class[metamethodname]
+			end
+		end
+	end
+end
 */
 int createGlobalClassMetatable(lua_State* L);
 

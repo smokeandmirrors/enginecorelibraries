@@ -49,7 +49,7 @@ public:
 		Lua lua;
 		lua_State* L = lua.getState();
 		//s: 
-		register_lua_library((&lua), UnitTestLibrary)
+		register_lua_library((&lua), UnitTestLibrary);
 		//s: 
 		lua_getglobal(L, "UnitTestLibrary");
 		//s: UnitTestLibrary
@@ -73,7 +73,7 @@ public:
 		Lua lua;
 		lua_State* L = lua.getState();
 		//s: 
-		register_lua_library((&lua), UnitTestLibrary)
+		register_lua_library((&lua), UnitTestLibrary);
 		//s: 
 		lua_getglobal(L, "UnitTestLibrary");
 		//s: UnitTestLibrary
@@ -97,7 +97,7 @@ public:
 		Lua lua;
 		lua_State* L = lua.getState();
 		//s: 
-		register_lua_library((&lua), UnitTestLibrary)
+		register_lua_library((&lua), UnitTestLibrary);
 		//s: 
 		lua_getglobal(L, "UnitTestLibrary");
 		//s: UnitTestLibrary
@@ -122,7 +122,7 @@ public:
 		Lua lua;
 		lua_State* L = lua.getState();
 		//s: 
-		register_lua_library((&lua), UnitTestLibrary)
+		register_lua_library((&lua), UnitTestLibrary);
 		//s: 
 		lua_getglobal(L, "UnitTestLibrary");
 		//s: UnitTestLibrary

@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"

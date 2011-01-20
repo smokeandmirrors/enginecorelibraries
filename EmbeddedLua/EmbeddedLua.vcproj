@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -104,7 +104,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -166,7 +166,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -228,7 +228,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -294,7 +294,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -356,7 +356,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER"
 				RuntimeLibrary="2"
 				BufferSecurityCheck="true"
@@ -447,10 +447,6 @@
 			<Filter
 				Name="Unit Testing"
 				>
-				<File
-					RelativePath="..\LuaFiles\Basic.lua"
-					>
-				</File>
 				<File
 					RelativePath="..\LuaFiles\Child.lua"
 					>
