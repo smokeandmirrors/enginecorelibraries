@@ -23,7 +23,7 @@ Defines the entry point for the console application.
 #include "Sandbox.h" 
 #endif//SANDBOX
 
-int _tmain(int /* argc */, _TCHAR* /* argv[] */)
+sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
 #if SANDBOX
 	// just plays with C/C++ compile/runtime functionality

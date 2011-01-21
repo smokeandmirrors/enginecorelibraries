@@ -27,7 +27,7 @@ typedef	wchar_t				wchar;
 typedef signed short		sshort;
 typedef unsigned short		ushort;
 typedef signed int			sint;
-typedef unsigned int		uint;
+typedef unsigned			uint;
 typedef signed long			slong;
 typedef unsigned long		ulong;
 // typedef float				float;

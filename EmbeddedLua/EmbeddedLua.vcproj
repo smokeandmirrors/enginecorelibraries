@@ -463,6 +463,10 @@
 					RelativePath="..\LuaFiles\UnitTesting.lua"
 					>
 				</File>
+				<File
+					RelativePath="..\LuaFiles\UTOne.lua"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

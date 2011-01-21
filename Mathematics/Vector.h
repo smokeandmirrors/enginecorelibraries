@@ -31,6 +31,8 @@ Vector classes and operations
 #include <math.h>
 #include <assert.h>
 
+#include "Build.h"
+
 /**
 @ingroup Vectors
 \def sqrtvec_t
@@ -89,8 +91,8 @@ public:
 	Vector2(vec_t scalar) 
 		: x(scalar), y(scalar) 	{/* empty */}
 	// access
-	const vec_t& 	operator[](unsigned int i) const;	
-	vec_t 			operator[](unsigned int i);
+	const vec_t& 	operator[](uint i) const;	
+	vec_t 			operator[](uint i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y);
@@ -134,7 +136,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y);
 	void 			set(const Vector2& v);
-	void			set(int index, vec_t scalar);
+	void			set(sint index, vec_t scalar);
 	Vector2& 		operator=(const Vector2& v);
 	// substraction 
 	void 			substract(vec_t scalar);
@@ -167,8 +169,8 @@ public:
 	// Vector3(const Vector3& v, bool /* IGNORED */);
 	// 	: x(v.x), y(v.y), z(v.z) 			{/* empty */}
 	// access 
-	const vec_t& 	operator[](unsigned int i) const;	
-	vec_t 			operator[](unsigned int i);
+	const vec_t& 	operator[](uint i) const;	
+	vec_t 			operator[](uint i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y, vec_t Z);
@@ -228,7 +230,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y, vec_t Z);
 	void 			set(const Vector3& v);
-	void			set(int index, vec_t scalar);
+	void			set(sint index, vec_t scalar);
 	Vector3& 		operator=(const Vector3& v);
 	// substraction 
 	void 			substract(vec_t scalar);
@@ -255,22 +257,22 @@ standard vector operations
 array and function accessors 
 @{
 */
-inline const vec_t& Vector2::operator[](unsigned int i) const
+inline const vec_t& Vector2::operator[](uint i) const
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline vec_t Vector2::operator[](unsigned int i)
+inline vec_t Vector2::operator[](uint i)
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline const vec_t& Vector3::operator[](unsigned int i) const
+inline const vec_t& Vector3::operator[](uint i) const
 {
 	assert(i < 3);
 	return (&x)[i];
 }
-inline vec_t Vector3::operator[](unsigned int i)
+inline vec_t Vector3::operator[](uint i)
 {
 	assert(i < 3);
 	return (&x)[i];
@@ -831,7 +833,7 @@ inline Vector2& Vector2::operator=(const Vector2& v)
 	y = v.y;
 	return *this;
 }
-inline void Vector2::set(int index, vec_t scalar)
+inline void Vector2::set(sint index, vec_t scalar)
 {
 	switch (index)
 	{
@@ -863,7 +865,7 @@ inline Vector3& Vector3::operator=(const Vector3& v)
 	z = v.z;
 	return *this;
 }
-inline void Vector3::set(int index, vec_t scalar)
+inline void Vector3::set(sint index, vec_t scalar)
 {
 	switch (index)
 	{

@@ -71,7 +71,7 @@ public:
 		//s:
 		lua_getglobal(L, "lastUnitTestNumFailures");
 		//s: lastUnitTestNumFailures
-		int result = static_cast<int>(lua_tonumber(L, -1));
+		sint result = static_cast<sint>(lua_tonumber(L, -1));
 		lua_pop(L, 1);
 		//s:
 		lua_getglobal(L,  "lastUnitTestReport");
@@ -126,7 +126,7 @@ public:
 		lua_pushnumber(L, 4);
 		lua.callProtected(1, false);
 		CFIX_ASSERT(lua_isnumber(L, -1));
-		int i = static_cast<int>(lua_tonumber(L, -1));
+		sint i = static_cast<sint>(lua_tonumber(L, -1));
 		CFIX_ASSERT(i == 2);
 		lua_pop(L, 1);
 		lua_getglobal(L, "math");

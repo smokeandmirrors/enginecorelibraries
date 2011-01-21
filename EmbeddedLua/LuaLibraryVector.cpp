@@ -13,7 +13,7 @@ using namespace LuaExtension;
 static bool TRUE() { return true; }
 static bool FALSE() { return false; }
 
-static int newVector2(lua_State* L)
+static sint newVector2(lua_State* L)
 {
 	lua_newtable(L);
 	return 1;
@@ -25,19 +25,19 @@ lua_named_entry("TRUE", (staticReturn1Param0<bool, TRUE>))
 lua_named_entry("FALSE", (staticReturn1Param0<bool, FALSE>))
 end_lua_library(Vector2)
 
-static int lua_newVector3(lua_State* L);
-static int luamt__gcVector3(lua_State* L);
-static int luamt__indexVector3(lua_State* L); 
-static int luamt__newindexVector3(lua_State* L);
+static sint lua_newVector3(lua_State* L);
+static sint luamt__gcVector3(lua_State* L);
+static sint luamt__indexVector3(lua_State* L); 
+static sint luamt__newindexVector3(lua_State* L);
 
-static int lua_newVector3(lua_State* L)
+static sint lua_newVector3(lua_State* L)
 {
 	Vector3* vector = new Vector3();
 	pushRegisteredClass(L, vector);
 	return 1;
 }
 
-static int luamt__gcVector3(lua_State* L)
+static sint luamt__gcVector3(lua_State* L)
 {
 	Vector3* udata = *static_cast<Vector3**>(lua_touserdata(L, -1));
 	delete udata;
@@ -48,7 +48,7 @@ static int luamt__gcVector3(lua_State* L)
 // this class' proxy table
 // @however, if I do that, this class would have to track
 // wether it set a member to NIL or not...
-static int luamt__indexVector3(lua_State* L)
+static sint luamt__indexVector3(lua_State* L)
 {
 	const char* key = lua_tostring(L, -1);
 	Vector3* udata = *static_cast<Vector3**>(lua_touserdata(L, -2));
@@ -88,7 +88,7 @@ static int luamt__indexVector3(lua_State* L)
 }
 
 // do the same thing with index
-static int luamt__newindexVector3(lua_State* L) 
+static sint luamt__newindexVector3(lua_State* L) 
 {	/** @todo find out how much to pop */	//s: table,	k, v 	
 	float value = static_cast<float>(lua_tonumber(L, -1));
 	const char* key = lua_tostring(L, -2);
@@ -123,7 +123,7 @@ static int luamt__newindexVector3(lua_State* L)
 	*/
 }
 
-int lua_setmetatableVector3(lua_State* L)
+sint lua_setmetatableVector3(lua_State* L)
 {										//s: userdata, lua_class_mt
 	lua_newtable(L);					//s: userdata, lua_class_mt, proxy
 	lua_insert(L, -2);					//s: userdata, proxy, lua_class_mt

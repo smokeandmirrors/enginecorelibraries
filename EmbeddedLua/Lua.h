@@ -43,8 +43,10 @@ public:
 	*/
 	~Lua(void);
 	/**
+	\todo MAKE STATIC, VERY SOON!
+	\param num_return_values defaults to LUA_MULTRET
 	*/
-	int					callProtected(int num_args=0, bool no_return_values=true);
+	sint				callProtected(sint num_args=0, sint num_return_values=-1) const;
 	/**
 	loads end executes the string as a lua chunk
 	\return the status of the execution
@@ -109,7 +111,7 @@ protected:
 	/**
 	reports output from the lua_State
 	*/
-	int					report(int status) const;
+	sint					report(sint status) const;
 	
 private:
 	/** open standard libraries and such */

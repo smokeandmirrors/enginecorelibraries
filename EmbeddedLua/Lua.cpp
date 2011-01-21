@@ -11,7 +11,7 @@ namespace LuaExtension
 
 #if !GOLDMASTER
 // \note taken straight from lua.c
-static int traceback (lua_State* L)
+static sint traceback (lua_State* L)
 {
   // if (!lua_isstring(L, 1))  /* 'message' not a string? */
   //  return 1;  /* keep it intact */
@@ -64,21 +64,20 @@ Lua::~Lua(void)
 	delete m_name;
 }
 
-int Lua::callProtected(int num_args, bool no_return_values)
+sint Lua::callProtected(sint num_args, sint num_return_values) const
 {	
-	int status;
-	int base = lua_gettop(L) - num_args;/* function index */
-	lua_getglobal(L, "traceback");		/* push traceback function */
-	lua_insert(L, base);				/* put it under chunk and args */
-	status = lua_pcall(L, num_args, (no_return_values ? 0 : LUA_MULTRET), base);
-	lua_remove(L, base);				/* remove traceback function */
+	sint errorfunc_index = lua_gettop(L) - num_args;	
+	lua_getglobal(L, "traceback");			
+	lua_insert(L, errorfunc_index);					
+	sint error_code = lua_pcall(L, num_args, num_return_values, errorfunc_index);
+	lua_remove(L, errorfunc_index);					
 	
-	if (status)
-	{	// force a complete garbage collection in case of errors  
+	if (error_code)
+	{	// in case of error, fully collect %Lua garbarge  
 		lua_gc(L, LUA_GCCOLLECT, 0); 
 	}
 	
-	return report(status);
+	return report(error_code);
 }
 
 bool Lua::doString(const char* chunk, const char*)
@@ -191,8 +190,7 @@ void Lua::openLibrary(lua_function opener) const
 	if (opener)
 	{
 		lua_pushcfunction(L, opener);
-		/** \todo, write an error function, for crying out loud */
-		lua_pcall(L, 0, 1, 0);
+		callProtected();
 		lua_pop(L, 1);
 	}
 }
@@ -211,9 +209,9 @@ void Lua::openStandardLibraries(void) const
 }
 
 // \note taken and modified from from lua.c 
-int Lua::report(int status) const
+sint Lua::report(sint error_code) const
 {
-	if (status && lua_isstring(L, -1)) 
+	if (error_code && lua_isstring(L, -1)) 
 	{
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL) msg = "(error object is not a string)";
@@ -222,14 +220,14 @@ int Lua::report(int status) const
 		lua_pop(L, 1);
 	}
 	
-	return status;
+	return error_code;
 }
 
 bool Lua::require(const char* module) const
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
-	return !lua_pcall(L, 1, 1, 0);
+	return !callProtected(1);
 }
 
 void Lua::runConsole(void) const
@@ -242,14 +240,14 @@ void Lua::runConsole(void) const
 		char* d = &quit[0]; 
 		char* s = &buff[0];
 		
-		for (int i=0; i < 8; i++)
+		for (sint i=0; i < 8; i++)
 		{
 			*d++ = *s++;
 		}
 		
 		if (strcmp(quit, "lua_quit"))
 		{
-			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || lua_pcall(L, 0, 0, 0))
+			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || callProtected())
 			{
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
 				lua_pop(L, 1);

@@ -10,12 +10,12 @@
 
 using namespace LuaExtension;
 
-static int getOne(void)
+static sint getOne(void)
 {
 	return 1;
 }
 
-static int getTwo(int& two)
+static sint getTwo(sint& two)
 {
 	two = 2;
 	return 1;
@@ -35,8 +35,8 @@ static float addAndSubtract(float& subtracted, float operand)
 declare_lua_library(UnitTestLibrary)
 
 define_lua_library(UnitTestLibrary)
-	lua_named_entry("getOne",			(staticReturn1Param0<int, getOne>))
-	lua_named_entry("getTwo",			(staticReturn2Param0<int, int, getTwo>))
+	lua_named_entry("getOne",			(staticReturn1Param0<sint, getOne>))
+	lua_named_entry("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
 	lua_named_entry("incrementByOne",	(staticReturn1Param1<float, float, incrementByOne>))
 	lua_named_entry("addAndSubtract",	(staticReturn2Param1<float, float, float, addAndSubtract>))
 end_lua_library(UnitTestLibrary)
@@ -60,7 +60,7 @@ public:
 		lua_call(L, 0, 1);
 		//s: 1
 		CFIX_ASSERT(lua_isnumber(L, -1));
-		int one = to<int>(L, -1);
+		sint one = to<sint>(L, -1);
 		CFIX_ASSERT(one == 1);
 		lua_Number one_l = lua_tonumber(L, -1);
 		CFIX_ASSERT(one_l == 1);
@@ -109,9 +109,9 @@ public:
 		//s: 1, 2
 		CFIX_ASSERT(lua_isnumber(L, -1));
 		CFIX_ASSERT(lua_isnumber(L, -2));
-		int one = to<int>(L, -2);
+		sint one = to<sint>(L, -2);
 		CFIX_ASSERT(one == 1);
-		int two = to<int>(L, -1);
+		sint two = to<sint>(L, -1);
 		CFIX_ASSERT(two == 2);
 		lua_pop(L, 2);
 		//s: 
@@ -135,9 +135,9 @@ public:
 		//s: 4, 2
 		CFIX_ASSERT(lua_isnumber(L, -1));
 		CFIX_ASSERT(lua_isnumber(L, -2));
-		int four = to<int>(L, -2);
+		sint four = to<sint>(L, -2);
 		CFIX_ASSERT(four == 4);
-		int two = to<int>(L, -1);
+		sint two = to<sint>(L, -1);
 		CFIX_ASSERT(two == 2);
 		lua_pop(L, 2);
 		//s: 

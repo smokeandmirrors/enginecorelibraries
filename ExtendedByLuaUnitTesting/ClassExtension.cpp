@@ -72,68 +72,6 @@ define_lua_class(One, One)
 	lua_named_entry("increment", incrementOne)
 end_lua_class(One, One)
 
-class Two
-{
-public:
-	typedef Two super;
-	sint getValue(void) const		{ return 2; }
-	sint increment(sint i) const	{ return i + getValue(); }
-}; // Basic
-
-declare_lua_library(Two)
-
-lua_func(newTwo)
-{
-	pushRegisteredClass(L, new Two());		//s: ud
-	lua_newtable(L);						//s: ud, ud_mt
-	lua_getglobal(L, "Two");				//s: ud, ud_mt, Basic
-	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-	lua_setmetatable(L, -2);				//s: ud/mt
-	return 1;
-}
-
-lua_func(getTwo)
-{
-	static Two* singleTwo(NULL);
-
-	if (!singleTwo)
-	{
-		singleTwo = new Two();
-		pushRegisteredClass(L,singleTwo);		//s: ud
-		lua_newtable(L);						//s: ud, ud_mt
-		lua_getglobal(L, "Two");				//s: ud, ud_mt, Basic
-		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-		lua_setmetatable(L, -2);				//s: ud/mt
-	}
-	else
-	{
-		pushRegisteredClass(L,singleTwo);	//s: ud
-	}
-
-	return 1;
-}
-
-lua_func(getValueTwo)
-{
-	Two* one = static_cast<Two*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->getValue());						//s: ud, value
-}
-
-lua_func(incrementTwo)
-{
-	sint argument = to<sint>(L, -1);						//s: ud, arg
-	lua_pop(L, 1);											//s: ud
-	Two* one = static_cast<Two*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
-}
-
-define_lua_class(Two, Two)
-lua_named_entry("new", newTwo)
-lua_named_entry("get", getTwo)
-lua_named_entry("getValue", getValueTwo)
-lua_named_entry("increment", incrementTwo)
-end_lua_class(Two, Two)
-
 class Classes : public cfixcc::TestFixture
 {
 public:
@@ -159,8 +97,39 @@ public:
 		lua_call(L, 1, 1);
 		//s: one 1
 		CFIX_ASSERT(lua_isnumber(L, -1));
-
-		register_lua_library((&lua), Two);
+		sint one_value = to<sint>(L, -1);
+		//s: one 1
+		CFIX_ASSERT(one_value == 1);
+		lua_pop(L, 1);
+		//s: one
+		lua_getfield(L, -1, "increment");
+		//s: one increment
+		CFIX_ASSERT(lua_iscfunction(L, -1));
+		lua_pushvalue(L, -2);
+		//s: one increment one
+		CFIX_ASSERT(lua_isuserdata(L, -1));
+		push(L, 2);
+		//s: one increment one 2
+		lua_call(L, 2, 1);
+		//s: one 3
+		sint three_value = to<sint>(L, -1);
+		//s: one 1
+		CFIX_ASSERT(three_value == 3);
+		lua_pop(L, 2);
+		lua.require("UTOne");
+		CFIX_ASSERT(lua.doString("_G.one2 = One.new()"));
+		CFIX_ASSERT(lua.doString("_G.there = type(one2.decrement) == 'function'"));
+		lua_getglobal(L, "there");
+		bool there = to<bool>(L, -1);
+		//s: _G.there
+		CFIX_ASSERT(there);
+		CFIX_ASSERT(lua.doString("_G.zero = one2.decrement(one2:getValue())"));
+		lua_getglobal(L, "zero");
+		//s: _G.there _G.zero
+		CFIX_ASSERT(lua_isnumber(L, -1));
+		sint zero = to<sint>(L, -1);
+		CFIX_ASSERT(zero == 0);
+		lua_pop(L, 2);
 	}
 };
 
@@ -188,7 +157,7 @@ public:
 	virtual const char*		getTitle(void) const			{ return "Grandparent"; }
 	virtual const char*		toString(void);
 	bool					operator==(const Grandparent& other) const;
-	int						setMetatable(lua_State* L);
+	sint						setMetatable(lua_State* L);
 
 protected:
 	const char*				m_name;
@@ -241,7 +210,7 @@ const char* Grandparent::toString()
 	return "This is a Grandparent"; 
 }
 
-int Grandparent::setMetatable(lua_State *L)
+sint Grandparent::setMetatable(lua_State *L)
 {												
 	return setDefaultMetatableProxy(L);
 }
@@ -279,14 +248,14 @@ int Grandparent::setMetatable(lua_State *L)
  	lua_entry(getTitle)
  end_lua_class(Grandparent, Grandparent)
  
- static int lua_newParent(lua_State* L)
+ static sint lua_newParent(lua_State* L)
  {
  	Parent* p = new Parent();
  	pushRegisteredClass(L, p);
  	return 1;
  }
  
- static int lua_Parent_getGrandparentName(lua_State* L)
+ static sint lua_Parent_getGrandparentName(lua_State* L)
  {
  	Parent* p = *static_cast<Parent**>(lua_touserdata(L, -1));
  	lua_pushstring(L, p->getGrandparentName());
@@ -294,21 +263,21 @@ int Grandparent::setMetatable(lua_State *L)
  }
   
  define_lua_class(Parent, Parent::super)
- // should be able to be automagicked...
- lua_named_entry("new", lua_newParent)
- lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
- lua_named_entry("getGrandparent", (return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
+	 // should be able to be automagicked...
+	 lua_named_entry("new", lua_newParent)
+	 lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
+	 lua_named_entry("getGrandparent", (return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
  end_lua_library(Parent)
  
  
- static int lua_newChild(lua_State* L)
+ static sint lua_newChild(lua_State* L)
  {
  	Child* c = new Child();
  	pushRegisteredClass(L, c);
  	return 1;
  }
  
- static int lua_Child_getParentName(lua_State* L)
+ static sint lua_Child_getParentName(lua_State* L)
  {
  	Child* c = *static_cast<Child**>(lua_touserdata(L, -1));
  	lua_pushstring(L, c->getParentName());
@@ -316,9 +285,9 @@ int Grandparent::setMetatable(lua_State *L)
  }
  
  define_lua_class(Child, Child::super)
- // should be able to be automagicked...
- lua_named_entry("new", lua_newChild)
- lua_named_entry("getParentName", lua_Child_getParentName)
+	 // should be able to be automagicked...
+	 lua_named_entry("new", lua_newChild)
+	 lua_named_entry("getParentName", lua_Child_getParentName)
  end_lua_library(Child)
 
 #endif//EXTENDED_BY_LUA

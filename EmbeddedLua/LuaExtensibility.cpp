@@ -10,7 +10,7 @@ namespace LuaExtension
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
-unsigned int testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
+uint testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
 
 const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__add",
@@ -33,14 +33,14 @@ const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__tostring",
 };
 
-int __gcLuaExtendable(lua_State* L)
+sint __gcLuaExtendable(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
 	delete udata;
 	return 0;
 }
 
-int __newindexProxy(lua_State* L) 
+sint __newindexProxy(lua_State* L) 
 {											//s: table,	k, v 	
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: table, k, v, proxy
 	lua_replace(L, -4);						//s: proxy, k, v
@@ -49,7 +49,7 @@ int __newindexProxy(lua_State* L)
 	return 0;
 }
 
-int __tostringLuaExtendable(lua_State* L)
+sint __tostringLuaExtendable(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
 	lua_pushstring(L, udata->toString());
@@ -63,7 +63,7 @@ void createGlobalClassMetatable(lua_State* L, const char* class_name, const char
 	createGlobalClassMetatable(L);
 }
 
-int createGlobalClassMetatable(lua_State* L)
+sint createGlobalClassMetatable(lua_State* L)
 {	/*
 	function createGlobalClassMetatable(class_name, metatable_name)
 		local class = _G[class_name]
@@ -101,7 +101,7 @@ int createGlobalClassMetatable(lua_State* L)
 															//s: class, C_metatables, class_mt
 	lua_replace(L, -2);										//s: class, class_mt
 	
-	int index = NUM_LUA_METAMETHODS;
+	sint index = NUM_LUA_METAMETHODS;
 	do 
 	{
 		--index;
@@ -142,7 +142,7 @@ void printToLua(lua_State* L, const char* string)
 	lua_call(L, 1, 0);			//s: 
 }
 
-int pushRegisteredClass(lua_State* L, void* pushee)
+sint pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable
 	lua_pushlightuserdata(L, pushee);						//s: pusheduserdatatable, pushee* 
@@ -163,13 +163,13 @@ int pushRegisteredClass(lua_State* L, void* pushee)
 	return 1;
 }
 
-int setmetatableLuaExtendable(lua_State* L)
+sint setmetatableLuaExtendable(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
 	return udata->setMetatable(L);
 }
 
-int setDefaultMetatableProxy(lua_State* L)
+sint setDefaultMetatableProxy(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
 	function(userdata, class_mt)

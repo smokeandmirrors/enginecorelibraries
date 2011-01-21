@@ -19,7 +19,7 @@ declare_lua_library(example)
 struct lua_State;
 namespace lua_library_example
 {
-	int luaopen_example(lua_State* L);
+	sint luaopen_example(lua_State* L);
 }
 
 // for the .cpp file 
@@ -37,7 +37,7 @@ namespace lua_library_example
 		{NULL, NULL}
 	};
 
-	int luaopen_example(lua_State* L)
+	sint luaopen_example(lua_State* L)
 	{
 		luaL_register(L, "example", example_library);
 		return 1;
@@ -52,7 +52,7 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 
 \note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
 */
-
+#include "Build.h"
 
 /**
 @todo make namespaces
@@ -69,7 +69,7 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 struct lua_State;
 struct lua_Debug;
 
-typedef int (*lua_function)(lua_State* L);
+typedef sint (*lua_function)(lua_State* L);
 
 namespace LuaExtension 
 {
@@ -89,7 +89,7 @@ enum LUA_EXPOSURE
 #define ARGUMENT_ERRORS 1
 #endif//!GOLDMASTER
 
-extern unsigned int		testing; 
+extern uint		testing; 
 extern const char*		lua_metamethodNames[NUM_LUA_METAMETHODS];
 
 /**
@@ -130,7 +130,7 @@ compile-time directive
 without string delimiters
 */
 #define lua_func(name) \
-	static int name##(lua_State* L)
+	static sint name##(lua_State* L)
 // end #define lua_func
 
 /** 
@@ -150,7 +150,7 @@ compile-time directive
 	struct lua_State; \
 	namespace lua_library_##name \
 	{ \
-		int key(lua_State* L); \
+		sint key(lua_State* L); \
 	}; // end namespace lua_library_##name
 // end #define begin_lua_library_declaration
 
@@ -167,7 +167,7 @@ compile-time directive
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, int index) \
+		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
 			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
 			class_name* object = dynamic_cast<class_name*>(ud); \
@@ -183,7 +183,7 @@ compile-time directive
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, int index) \
+		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
 			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
 		} \
@@ -236,7 +236,7 @@ compile-time directive
 #define end_lua_library(name) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int key(lua_State* L) \
+		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			return 1; \
@@ -269,7 +269,7 @@ compile-time directive
 #define end_lua_library_extensible(name) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int key(lua_State* L) \
+		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			lua_nilLoadedStatus(#name); \
@@ -302,7 +302,7 @@ compile-time directive
 #define end_lua_class(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int key(lua_State* L) \
+		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
@@ -318,7 +318,7 @@ compile-time directive
 #define define_lua_class_defaults(derived, super) \
 	namespace lua_library_##derived \
 	{ \
-		int lua_new##derived(lua_State* L) \
+		sint lua_new##derived(lua_State* L) \
 		{ \
 			pushRegisteredClass(L, new derived()); \
 			return 1; \
@@ -337,7 +337,7 @@ compile-time directive
 #define end_lua_class_defaults(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int key(lua_State* L) \
+		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
@@ -366,7 +366,7 @@ compile-time directive
 #define end_lua_class_by_proxy_defaults(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
-		int key(lua_State* L) \
+		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			lua_require(#derived_class) \
@@ -399,7 +399,7 @@ class LuaExtendable
 public:
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
-	virtual int				setMetatable(lua_State* L)=0;
+	virtual sint				setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
 
@@ -407,19 +407,19 @@ public:
 __gc method for the metatable of a class exposed to %Lua by and extending a 
 Lua class declared with this system
 */
-int __gcLuaExtendable(lua_State* L);
+sint __gcLuaExtendable(lua_State* L);
 
 /**
 __newindex method for the metatable of a class exposed to %Lua by and extending a 
 Lua class declared with this system
 */
-int __newindexProxy(lua_State* L);
+sint __newindexProxy(lua_State* L);
 
 /**
 __tostring method for the metatable of a class exposed to %Lua by and extending a 
 Lua class declared with this system
 */
-int __tostringLuaExtendable(lua_State* L);
+sint __tostringLuaExtendable(lua_State* L);
 
 /**
 Creates the %Lua metatable that is used as the index for all the 
@@ -455,10 +455,10 @@ function createGlobalClassMetatable(class_name, metatable_name)
 	end
 end
 */
-int createGlobalClassMetatable(lua_State* L);
+sint createGlobalClassMetatable(lua_State* L);
 
 /**
-@todo follow up for direct wraps: int setmetatableFromGlobalClass(lua_State* L);
+@todo follow up for direct wraps: sint setmetatableFromGlobalClass(lua_State* L);
 */
 
 /**
@@ -471,19 +471,19 @@ helper function for pushing a class to %Lua an preserving the ability
 to compare userdata and use them as equivalent table keys
 @see comments in the implementation of void Lua::initializeUserdataStorage(void)
 */
-int pushRegisteredClass(lua_State* L, void* pushee);
+sint pushRegisteredClass(lua_State* L, void* pushee);
 
 /** 
 helps set a LuaExtendable metatable from script
 @warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 */
-int setmetatableLuaExtendable(lua_State* L);
+sint setmetatableLuaExtendable(lua_State* L);
 
 /** 
 helps set a userdata metatable from script
 @warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 */
-int setDefaultMetatableProxy(lua_State* L);
+sint setDefaultMetatableProxy(lua_State* L);
 
 } // namespace LuaExtension 
 
