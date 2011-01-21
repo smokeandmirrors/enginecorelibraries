@@ -136,7 +136,11 @@ without string delimiters
 /** 
 \def declare_lua_library
 
-Declares a library for shared inclusion 
+Declares a %Lua library for shared inclusion.  If used for a class,
+instances of the class can be created or controlled in %Lua.  Using this 
+method, the programmer is responsible for the whole system of usage of the 
+class in %Lua, including memory management.  This method does not interact 
+with the module ObjectOrientedParadigm.
 
 compile-time directive
 
@@ -153,10 +157,8 @@ compile-time directive
 /**
 \def declare_lua_extendable
 
-Declare a %Lua library around a class, so that instances of the 
-class can be created or controlled in %Lua.  Using this method, the 
-programmer is responsible for the whole system of usage of the class in 
-in %Lua.
+Declares a library around a class that implements
+the LuaExtendable interface.
 
 compile-time directive
 */

@@ -9,104 +9,170 @@
 #include "LuaStateInteraction.h"
 
 using namespace LuaExtension;
-/*
-class Basic
-: public LuaExtendable
+
+class One
 {
 public:
-	typedef Basic super;
-	
-	int getValue(void) const 
-	{ 
-		return value; 
-	}
-	
-	virtual int setMetatable(lua_State* L)
-	{
-		return setDefaultMetatableProxy(L);
-	}
-
-	virtual const char* toString(void)
-	{
-		return "This is a Basic.";
-	}
-
-	int setValue(int new_value) 
-	{ 
-		value = new_value; 
-	}
-
-private:
-	int value;
+	typedef One super;
+	sint getValue(void) const		{ return 1; }
+	sint increment(sint i) const	{ return i + getValue(); }
 }; // Basic
 
-declare_lua_extendable(Basic)
+declare_lua_library(One)
 
-lua_func(newBasic)
+lua_func(newOne)
 {
-	pushRegisteredClass(L, new Basic());	//s: ud
+	pushRegisteredClass(L, new One());		//s: ud
 	lua_newtable(L);						//s: ud, ud_mt
-	lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+	lua_getglobal(L, "One");				//s: ud, ud_mt, Basic
 	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
 	lua_setmetatable(L, -2);				//s: ud/mt
 	return 1;
 }
 
-lua_func(getBasic)
+lua_func(getOne)
 {
-	static Basic* b(NULL);
+	static One* singleOne(NULL);
 
-	if (!b)
+	if (!singleOne)
 	{
-		b = new Basic();
-		pushRegisteredClass(L,b);				//s: ud
+		singleOne = new One();
+		pushRegisteredClass(L,singleOne);		//s: ud
 		lua_newtable(L);						//s: ud, ud_mt
-		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+		lua_getglobal(L, "One");				//s: ud, ud_mt, Basic
 		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
 		lua_setmetatable(L, -2);				//s: ud/mt
 	}
 	else
 	{
-		pushRegisteredClass(L,b);	//s: ud
+		pushRegisteredClass(L,singleOne);		//s: ud
 	}
 
 	return 1;
 }
 
-lua_func(basicFromC)
+lua_func(getValueOne)
 {
-	lua_pushstring(L, "This function came from C!");
+	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->getValue());						//s: ud, value
+}
+
+lua_func(incrementOne)
+{
+	sint argument = to<sint>(L, -1);						//s: ud, arg
+	lua_pop(L, 1);											//s: ud
+	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
+}
+
+define_lua_class(One, One)
+	lua_named_entry("new", newOne)
+	lua_named_entry("get", getOne)
+	lua_named_entry("getValue", getValueOne)
+	lua_named_entry("increment", incrementOne)
+end_lua_class(One, One)
+
+class Two
+{
+public:
+	typedef Two super;
+	sint getValue(void) const		{ return 2; }
+	sint increment(sint i) const	{ return i + getValue(); }
+}; // Basic
+
+declare_lua_library(Two)
+
+lua_func(newTwo)
+{
+	pushRegisteredClass(L, new Two());		//s: ud
+	lua_newtable(L);						//s: ud, ud_mt
+	lua_getglobal(L, "Two");				//s: ud, ud_mt, Basic
+	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+	lua_setmetatable(L, -2);				//s: ud/mt
 	return 1;
 }
 
-define_lua_class(Basic, Basic)
-	lua_named_entry("new", newBasic)
-	lua_named_entry("get", getBasic)
-	lua_named_entry("fromC", basicFromC)
-	lua_named_entry("getValue", (return1Param0const<Basic, int, &Basic::getValue>))
-end_lua_class(Basic, Basic)
+lua_func(getTwo)
+{
+	static Two* singleTwo(NULL);
 
- class Derived
- : public Basic
- {
- public:
- 	typedef Basic super;
- 	virtual int	setMetatable(lua_State* L)
+	if (!singleTwo)
 	{
-		return setDefaultMetatableProxy(L);
+		singleTwo = new Two();
+		pushRegisteredClass(L,singleTwo);		//s: ud
+		lua_newtable(L);						//s: ud, ud_mt
+		lua_getglobal(L, "Two");				//s: ud, ud_mt, Basic
+		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+		lua_setmetatable(L, -2);				//s: ud/mt
+	}
+	else
+	{
+		pushRegisteredClass(L,singleTwo);	//s: ud
 	}
 
- 	virtual const char* toString(void)
+	return 1;
+}
+
+lua_func(getValueTwo)
+{
+	Two* one = static_cast<Two*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->getValue());						//s: ud, value
+}
+
+lua_func(incrementTwo)
+{
+	sint argument = to<sint>(L, -1);						//s: ud, arg
+	lua_pop(L, 1);											//s: ud
+	Two* one = static_cast<Two*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
+}
+
+define_lua_class(Two, Two)
+lua_named_entry("new", newTwo)
+lua_named_entry("get", getTwo)
+lua_named_entry("getValue", getValueTwo)
+lua_named_entry("increment", incrementTwo)
+end_lua_class(Two, Two)
+
+class Classes : public cfixcc::TestFixture
+{
+public:
+	void Test_declare_lua_library_withClasses()
 	{
-		return "This is a Derived";
+		Lua lua;
+		register_lua_library((&lua), One);
+		CFIX_ASSERT(lua.doString("_G.one = One.new()"));
+		lua_State* L = lua.getState();
+		lua_getglobal(L, "one");
+		//s: one
+		CFIX_ASSERT(lua_isuserdata(L, -1));
+		void* ud = lua_touserdata(L, -1);
+		CFIX_ASSERT(ud);
+		One* one = static_cast<One*>(lua_touserdata(L, -1));
+		CFIX_ASSERT(one);
+		lua_getfield(L, -1, "getValue");
+		//s: one getValue
+		CFIX_ASSERT(lua_iscfunction(L, -1));
+		lua_pushvalue(L, -2);
+		//s: one getValue one
+		CFIX_ASSERT(lua_isuserdata(L, -1));
+		lua_call(L, 1, 1);
+		//s: one 1
+		CFIX_ASSERT(lua_isnumber(L, -1));
+
+		register_lua_library((&lua), Two);
 	}
- }; // Derived
- 
- declare_lua_library(Derived)
-  
- define_lua_class_by_proxy_defaults(Derived, Basic)
- end_lua_class_by_proxy_defaults(Derived, Basic)
-*/
+};
+
+CFIXCC_BEGIN_CLASS(Classes)
+	CFIXCC_METHOD(Test_declare_lua_library_withClasses)
+CFIXCC_END_CLASS()
+
+//  declare_lua_library(Derived)
+//   
+//  define_lua_class_by_proxy_defaults(Derived, Basic)
+//  end_lua_class_by_proxy_defaults(Derived, Basic)
+
 /**
 @class
 
@@ -256,40 +322,4 @@ int Grandparent::setMetatable(lua_State *L)
  end_lua_library(Child)
 
 #endif//EXTENDED_BY_LUA
-
-class Classes : public cfixcc::TestFixture
-{
-private:
-
-public:
-	void TestBasicClassExposition()
-	{
-// 		Lua lua;
-// 		register_lua_library((&lua), Basic);
-// 		// CFIX_ASSERT(lua.doString("_G.b = new'Basic'"));
-// 		lua.runConsole();
-// 		lua_State* L = lua.getState();
-// 		lua_getglobal(L, "b");
-// 		//s: b
-// 		CFIX_ASSERT(lua_isuserdata(L, -1));
-// 		void* b = lua_touserdata(L, -1);
-// 		CFIX_ASSERT(b);
-// 		LuaExtendable* ble = to<LuaExtendable*>(L, -1);
-// 		CFIX_ASSERT(ble);
-// 		Basic* b_from_ble = dynamic_cast<Basic*>(ble);
-// 		CFIX_ASSERT(b_from_ble);
-// 		Basic* basic_from_lua = to<Basic*>(L, -1);
-// 		CFIX_ASSERT(basic_from_lua);
-	}
-	/*
-	void Test()
-	{
-		CFIX_INCONCLUSIVE(__TEXT("Not implemented"));
-	}
-	*/
-};
-
-CFIXCC_BEGIN_CLASS(Classes)
-	CFIXCC_METHOD(TestBasicClassExposition)
-CFIXCC_END_CLASS()
 
