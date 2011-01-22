@@ -21,7 +21,8 @@ the %Lua state to include custom types.
 
 namespace LuaExtension 
 { 
-#if 1 // ARGUMENT_ERRORS
+#if ARGUMENT_ERRORS 
+// \todo numeric range warnings for converting to/from lua_Numbers
 #pragma message("Compiling with Lua stack argument type checking.")
 /**
 This is a define macro and not an inline function due to the 
@@ -88,6 +89,18 @@ template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint index)
 {
 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+}
+
+template<> inline char* to<char*>(lua_State* L, sint index)
+{
+	assert_lua_argument(lua_isstring, "string", L, index);
+	return const_cast<char*>(lua_tostring(L, index));
+}
+
+template<> inline const char* to<const char*>(lua_State* L, sint index)
+{
+	assert_lua_argument(lua_isstring, "string", L, index);
+	return lua_tostring(L, index);
 }
 
 /**

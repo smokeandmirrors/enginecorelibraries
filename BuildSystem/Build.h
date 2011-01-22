@@ -34,4 +34,6 @@ typedef unsigned long		ulong;
 // typedef double				double;
 typedef long double			ldouble;
 
+// \todo number types, and NULL
+
 #endif//BUILD_H

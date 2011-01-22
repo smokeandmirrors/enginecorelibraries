@@ -138,7 +138,7 @@ sint lua_setmetatableVector3(lua_State* L)
 	lua_pushcfunction(L, luamt__gcVector3);
 	lua_setfield(L, -2, "__gc");		//s: userdata, proxy/mt
 	lua_pushcfunction(L, luamt__indexVector3);	
-										//s: userdata, proxy/mt, __gcLuaExtendable
+										//s: userdata, proxy/mt, __gcmetamethod
 	lua_setfield(L, -2, "__index");	
 	lua_setmetatable(L, -3);			//s: userdata/mt, proxy/mt
 	lua_pop(L, 1);						//s: userdata/mt

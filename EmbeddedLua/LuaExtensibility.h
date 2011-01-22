@@ -89,8 +89,7 @@ enum LUA_EXPOSURE
 #define ARGUMENT_ERRORS 1
 #endif//!GOLDMASTER
 
-extern uint		testing; 
-extern const char*		lua_metamethodNames[NUM_LUA_METAMETHODS];
+// extern uint testing; 
 
 /**
 \def lua_require 
@@ -100,7 +99,7 @@ other macros
 #define lua_require(module) \
 	lua_getglobal(L, "require"); \
 	lua_pushstring(L, #module); \
-	lua_pcall(L, 1, 0, 0); 
+	Lua::callProtected(L, 1);
 // end #define lua_require(module)
 
 /**
@@ -124,7 +123,7 @@ Declares a (static) lua function.  Declares a function that
 takes a single lua_State argument, and returns an integer,
 the number of arguments it has added to the stack.
 
-compile-time directive
+\note compile-time directive
 
 \param name name of the function that will be declared, 
 without string delimiters
@@ -142,7 +141,7 @@ method, the programmer is responsible for the whole system of usage of the
 class in %Lua, including memory management.  This method does not interact 
 with the module ObjectOrientedParadigm.
 
-compile-time directive
+\note compile-time directive
 
 \param name name of the library without string delimiters
 */
@@ -160,7 +159,7 @@ compile-time directive
 Declares a library around a class that implements
 the LuaExtendable interface.
 
-compile-time directive
+\note compile-time directive
 */
 #if ARGUMENT_ERRORS
 #define declare_lua_extendable(class_name) \
@@ -194,7 +193,7 @@ compile-time directive
 /** 
 \def lua_entry
 add a lua method to a definition by the same name 
-compile-time directive
+\note compile-time directive
 \param function a lua_function
 */
 #define lua_entry(function) \
@@ -204,7 +203,7 @@ compile-time directive
 /**  
 \def lua_named_entry
 add a lua method to a definition by a different name 
-compile-time directive
+\note compile-time directive
 \param name a string delimited name
 \param function a lua_function
 */
@@ -215,7 +214,7 @@ compile-time directive
 /** 
 \def define_lua_library
 begin a library definition for registration
-compile-time directive
+\note compile-time directive
 \note highly recommended to precede end_lua_library
 \param name name of the library without string delimiters
 */
@@ -229,7 +228,7 @@ compile-time directive
 /** 
 \def end_lua_library
 end a library definition for registration
-compile-time directive
+\note compile-time directive
 \note highly recommended to follow with define_lua_library
 \param name name of the library without string delimiters
 */
@@ -245,24 +244,9 @@ compile-time directive
 // end #define end_lua_library
 
 /** 
-\def define_lua_library_extensible
-begin a library definition for registration, and allow
-it to be extended in lua using the %Lua require function
-compile-time directive
-\note highly recommended to precede end_lua_library_extensible
-\param name name of the library without string delimiters
-*/
-#define define_lua_library_extensible(name) \
-	namespace lua_library_##name \
-	{ \
-		static const luaL_reg name##_library[] = \
-		{	/* begin function list */						
-// end #define define_lua_library_extensible
-
-/** 
 \def end_lua_library_extensible
 end a library definition for registration
-compile-time directive
+\note compile-time directive
 \note highly recommended to follow define_lua_library_extensible
 \param name name of the library without string delimiters
 */
@@ -283,9 +267,9 @@ compile-time directive
 define a %Lua library around a class, so that instances of the 
 class can be created or controlled in %Lua.  Using this method, the 
 programmer is responsible for the whole system of usage of the class in 
-in lua.
+in %Lua.
 
-compile-time directive
+\note compile-time directive
 
 \param derived_class the class to expose
 \param super_class the parent class of the derived_class, if there is 
@@ -293,11 +277,11 @@ no parent class, simply supply the derived class again
 */
 #define define_lua_class(derived_class, super_class) \
 	define_lua_library(derived_class)
-// end #define define_lua_class_defaults
+// end #define define_lua_LuaExtendable
 
 /**
 \def end_lua_class
-compile-time directive
+\note compile-time directive
 */
 #define end_lua_class(derived_class, super_class) \
 			{NULL,		NULL} \
@@ -312,10 +296,14 @@ compile-time directive
 // end #define end_lua_class(derived_class, super_class) 
 
 /**
-\def define_lua_class_defaults
-compile-time directive
+\def define_lua_LuaExtendable
+
+\todo, figure out what is missing from this method, and what it does
+for class exposition
+
+\note compile-time directive
 */
-#define define_lua_class_defaults(derived, super) \
+#define define_lua_LuaExtendable(derived, super) \
 	namespace lua_library_##derived \
 	{ \
 		sint lua_new##derived(lua_State* L) \
@@ -326,15 +314,15 @@ compile-time directive
 		static const luaL_reg derived##_library[] = \
 		{ \
 			lua_named_entry("new", lua_new##derived) \
-			lua_named_entry("__gc", __gcLuaExtendable) \
+			lua_named_entry("__gc", __gcmetamethod) \
 			lua_named_entry("__tostring", __tostringLuaExtendable)	
-// end #define_lua_class_defaults
+// end #define_lua_LuaExtendable
 
 /**
-\def end_lua_class_defaults
-compile-time directive
+\def end_lua_LuaExtendable
+\note compile-time directive
 */
-#define end_lua_class_defaults(derived_class, super_class) \
+#define end_lua_LuaExtendable(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -346,24 +334,30 @@ compile-time directive
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
-// end #define end_lua_class_defaults(derived_class, super_class) 
+// end #define end_lua_LuaExtendable(derived_class, super_class) 
 
 /**
-\def define_lua_class_by_proxy_defaults
+\def define_lua_LuaExtendable_by_proxy
 begin a library definition for registration via a %Lua proxy table,
 and use the default "new", "setmetatable", "__gc" & "__tostring" methods
-compile-time directive
-\note highly recommended to precede end_lua_class_by_proxy_defaults
+
+The "by proxy" method is desirable because it allows a userdata type in lua
+to be treated exactly like a table, an ObjectOrientedParadigm class instance, and 
+a C++ class instance.  It is an arguably more expensive version of a %Lua
+exposed class.
+
+\note compile-time directive
+\note highly recommended to precede end_lua_LuaExtendable_by_proxy
 */
-#define define_lua_class_by_proxy_defaults(derived_class, super_class) \
-	define_lua_class_defaults(derived_class, super_class) \
-		lua_named_entry("setmetatable", setmetatableLuaExtendable)
-// end #define define_lua_class_by_proxy_defaults
+#define define_lua_LuaExtendable_by_proxy(derived_class, super_class) \
+	define_lua_LuaExtendable(derived_class, super_class) \
+		lua_named_entry("setmetatable", setMetatable)
+// end #define define_lua_LuaExtendable_by_proxy
 
 /**
-compile-time directive
+\note compile-time directive
 */
-#define end_lua_class_by_proxy_defaults(derived_class, super_class) \
+#define end_lua_LuaExtendable_by_proxy(derived_class, super_class) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -374,8 +368,7 @@ compile-time directive
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
-// end #define end_lua_class_by_proxy_defaults
-	
+// end #define end_lua_LuaExtendable_by_proxy	
 
 /** 
 \def register_lua_library
@@ -397,36 +390,43 @@ Makes it easier to define metamethods on exposed C++ classes.
 class LuaExtendable 
 {
 public:
+	/**
+	__gc method for the metatable of a class exposed to %Lua.
+	Using this will cause the C++ object get destroyed when all references to it
+	in a lua_State are destroyed.
+	*/
+	static sint				__gcmetamethod(lua_State* L);
+	/**
+	__newindex method for the metatable of a class exposed to %Lua.
+	*/
+	static sint				__newindex(lua_State* L);
+	/**
+	__tostring method for the metatable of a class exposed to %Lua.
+	*/
+	static sint				__tostring(lua_State* L);
+	/** 
+	helps set a LuaExtendable metatable from script
+	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
+	*/
+	static sint				callSetMetatable(lua_State* L);
+	/** 
+	helps set a userdata metatable from script
+	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
+	*/
+	static sint				setProxyMetatable(lua_State* L);
+
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
-	virtual sint				setMetatable(lua_State* L)=0;
+	virtual sint			setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
-
-/**
-__gc method for the metatable of a class exposed to %Lua by and extending a 
-Lua class declared with this system
-*/
-sint __gcLuaExtendable(lua_State* L);
-
-/**
-__newindex method for the metatable of a class exposed to %Lua by and extending a 
-Lua class declared with this system
-*/
-sint __newindexProxy(lua_State* L);
-
-/**
-__tostring method for the metatable of a class exposed to %Lua by and extending a 
-Lua class declared with this system
-*/
-sint __tostringLuaExtendable(lua_State* L);
 
 /**
 Creates the %Lua metatable that is used as the index for all the 
 methods/properties shared by the class.
 
 \note The timing of the calls to this function is critical.  if executed 
-before a %Lua extension file is loaded it means that the metamethods 
+after a %Lua extension file is loaded it means that the metamethods 
 redefined in %Lua will not be executed depending on what method of exposure
 to %Lua used on the class.
 */
@@ -472,18 +472,6 @@ to compare userdata and use them as equivalent table keys
 @see comments in the implementation of void Lua::initializeUserdataStorage(void)
 */
 sint pushRegisteredClass(lua_State* L, void* pushee);
-
-/** 
-helps set a LuaExtendable metatable from script
-@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
-*/
-sint setmetatableLuaExtendable(lua_State* L);
-
-/** 
-helps set a userdata metatable from script
-@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
-*/
-sint setDefaultMetatableProxy(lua_State* L);
 
 } // namespace LuaExtension 
 

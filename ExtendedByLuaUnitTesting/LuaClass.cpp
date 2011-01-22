@@ -124,7 +124,7 @@ public:
 		lua_getfield(L, -1, "sqrt");
 		CFIX_ASSERT(lua_isfunction(L, -1));
 		lua_pushnumber(L, 4);
-		lua.callProtected(1, false);
+		Lua::callProtected(L, 1);
 		CFIX_ASSERT(lua_isnumber(L, -1));
 		sint i = static_cast<sint>(lua_tonumber(L, -1));
 		CFIX_ASSERT(i == 2);
@@ -133,7 +133,7 @@ public:
 		CFIX_ASSERT(lua_istable(L, -1));
 		lua_getfield(L, -1, "sqrt");
 		CFIX_ASSERT(lua_isfunction(L, -1));
-		lua.callProtected(1, false);
+		Lua::callProtected(L, 1);
 	}
 };
 

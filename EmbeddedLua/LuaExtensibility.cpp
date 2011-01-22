@@ -10,7 +10,7 @@ namespace LuaExtension
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
-uint testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
+// uint testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
 
 const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__add",
@@ -33,14 +33,14 @@ const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__tostring",
 };
 
-sint __gcLuaExtendable(lua_State* L)
+sint LuaExtendable::__gcmetamethod(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
 	delete udata;
 	return 0;
 }
 
-sint __newindexProxy(lua_State* L) 
+sint LuaExtendable::__newindex(lua_State* L) 
 {											//s: table,	k, v 	
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: table, k, v, proxy
 	lua_replace(L, -4);						//s: proxy, k, v
@@ -49,10 +49,67 @@ sint __newindexProxy(lua_State* L)
 	return 0;
 }
 
-sint __tostringLuaExtendable(lua_State* L)
+sint LuaExtendable::__tostring(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
 	lua_pushstring(L, udata->toString());
+	return 1;
+}
+
+sint LuaExtendable::callSetMetatable(lua_State* L)
+{
+	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
+	return udata->setMetatable(L);
+}
+
+sint LuaExtendable::setProxyMetatable(lua_State* L)
+{	/**
+	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
+	function(userdata, class_mt)
+		local proxy = setmetatable({}, class_mt) -- class_mt is from ObjectOrientedParadigm
+		local instance_mt = {
+			__index = proxy,
+			__newindex = function(t, k, v)
+				proxy[k] = v
+			end,
+		}
+		for name, method in pairs(metamethods) do
+			if name ~= '__index' and name ~= '__newindex' do
+				instance_mt[name] = method
+			end
+		end
+		return setmetatable(userdata, instance_mt) -- can't be done from Lua
+	end
+	*/
+												//s: userdata, lua_class_mt
+	lua_pushvalue(L, -1);						//s: userdata, lua_class_mt, lua_class_mt
+	lua_newtable(L);							//s: userdata, lua_class_mt, lua_class_mt, proxy
+	lua_insert(L, -2);							//s: userdata, lua_class_mt, proxy, lua_class_mt
+	lua_setmetatable(L, -2);					//s: userdata, lua_class_mt, proxy/mt
+	lua_newtable(L);							//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
+	lua_setfield(L, -2, "__index");				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
+	lua_pushcclosure(L, LuaExtendable::__newindex, 1); //s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindex
+	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__add")
+	lua_setUserDataMetamethod(L, "__call")
+	lua_setUserDataMetamethod(L, "__concat")
+	lua_setUserDataMetamethod(L, "__div")
+	lua_setUserDataMetamethod(L, "__eq")
+	lua_setUserDataMetamethod(L, "__gc")
+	lua_setUserDataMetamethod(L, "__le")
+	lua_setUserDataMetamethod(L, "__len")
+	lua_setUserDataMetamethod(L, "__lt")
+	lua_setUserDataMetamethod(L, "__metatable")
+	lua_setUserDataMetamethod(L, "__mod")
+	lua_setUserDataMetamethod(L, "__mul")
+	lua_setUserDataMetamethod(L, "__pow")
+	lua_setUserDataMetamethod(L, "__sub")
+	lua_setUserDataMetamethod(L, "__unm")
+	lua_setUserDataMetamethod(L, "__tostring")
+	lua_setmetatable(L, -4);					//s: userdata, lua_class_mt, proxy/mt
+	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
 }
 
@@ -160,63 +217,6 @@ sint pushRegisteredClass(lua_State* L, void* pushee)
 	}
 
 	lua_replace(L, -2);										//s: pusheduserdata
-	return 1;
-}
-
-sint setmetatableLuaExtendable(lua_State* L)
-{
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
-	return udata->setMetatable(L);
-}
-
-sint setDefaultMetatableProxy(lua_State* L)
-{	/**
-	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
-	function(userdata, class_mt)
-		local proxy = setmetatable({}, class_mt) -- class_mt is from ObjectOrientedParadigm
-		local instance_mt = {
-			__index = proxy,
-			__newindex = function(t, k, v)
-				proxy[k] = v
-			end,
-		}
-		for name, method in pairs(metamethods) do
-			if name ~= '__index' and name ~= '__newindex' do
-				instance_mt[name] = method
-			end
-		end
-		return setmetatable(userdata, instance_mt) -- can't be done from Lua
-	end
-	*/
-												//s: userdata, lua_class_mt
-	lua_pushvalue(L, -1);						//s: userdata, lua_class_mt, lua_class_mt
-	lua_newtable(L);							//s: userdata, lua_class_mt, lua_class_mt, proxy
-	lua_insert(L, -2);							//s: userdata, lua_class_mt, proxy, lua_class_mt
-	lua_setmetatable(L, -2);					//s: userdata, lua_class_mt, proxy/mt
-	lua_newtable(L);							//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_setfield(L, -2, "__index");				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_pushcclosure(L, __newindexProxy, 1);	//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindexProxy
-	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_setUserDataMetamethod(L, "__add")
-	lua_setUserDataMetamethod(L, "__call")
-	lua_setUserDataMetamethod(L, "__concat")
-	lua_setUserDataMetamethod(L, "__div")
-	lua_setUserDataMetamethod(L, "__eq")
-	lua_setUserDataMetamethod(L, "__gc")
-	lua_setUserDataMetamethod(L, "__le")
-	lua_setUserDataMetamethod(L, "__len")
-	lua_setUserDataMetamethod(L, "__lt")
-	lua_setUserDataMetamethod(L, "__metatable")
-	lua_setUserDataMetamethod(L, "__mod")
-	lua_setUserDataMetamethod(L, "__mul")
-	lua_setUserDataMetamethod(L, "__pow")
-	lua_setUserDataMetamethod(L, "__sub")
-	lua_setUserDataMetamethod(L, "__unm")
-	lua_setUserDataMetamethod(L, "__tostring")
-	lua_setmetatable(L, -4);					//s: userdata, lua_class_mt, proxy/mt
-	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
 }
 

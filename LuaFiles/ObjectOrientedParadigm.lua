@@ -770,10 +770,9 @@ end
 -- @param class the class in question
 function introspect_PRIVATE(instance_class, class)
 	return instance_class == class 
-		or
-			(instance_class and 
-			instance_class.super and 
-			introspect_PRIVATE(instance_class.super, class))
+		or (instance_class 
+			and instance_class.super 
+			and introspect_PRIVATE(instance_class.super, class))
 end
 	
 ----------------------------------------------------------------------

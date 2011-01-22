@@ -64,7 +64,7 @@ Lua::~Lua(void)
 	delete m_name;
 }
 
-sint Lua::callProtected(sint num_args, sint num_return_values) const
+sint Lua::callProtected(lua_State* L, sint num_args, sint num_return_values)
 {	
 	sint errorfunc_index = lua_gettop(L) - num_args;	
 	lua_getglobal(L, "traceback");			
@@ -77,7 +77,7 @@ sint Lua::callProtected(sint num_args, sint num_return_values) const
 		lua_gc(L, LUA_GCCOLLECT, 0); 
 	}
 	
-	return report(error_code);
+	return report(L, error_code);
 }
 
 bool Lua::doString(const char* chunk, const char*)
@@ -96,9 +96,9 @@ void Lua::initialize(const char* name)
 void Lua::initializeDefaultProxyMetamethods(void) const
 {
 	lua_newtable(L);										//s: table
-	lua_pushcfunction(L, __gcLuaExtendable);				//s: table, __gcLuaExtendable
+	lua_pushcfunction(L, LuaExtendable::__gcmetamethod);	//s: table, __gcmetamethod
 	lua_setfield(L, -2, "__gc");							//s: table
-	lua_pushcfunction(L, __tostringLuaExtendable);			//s: table, __tostringLuaExtendable
+	lua_pushcfunction(L, LuaExtendable::__tostring);		//s: table, __tostring
 	lua_setfield(L, -2, "__tostring");						//s: table
 	lua_setfield(L, LUA_REGISTRYINDEX, "proxymetamethods");	//s: 
 }
@@ -190,7 +190,7 @@ void Lua::openLibrary(lua_function opener) const
 	if (opener)
 	{
 		lua_pushcfunction(L, opener);
-		callProtected();
+		callProtected(L);
 		lua_pop(L, 1);
 	}
 }
@@ -209,14 +209,17 @@ void Lua::openStandardLibraries(void) const
 }
 
 // \note taken and modified from from lua.c 
-sint Lua::report(sint error_code) const
+sint Lua::report(lua_State* L, sint error_code)
 {
 	if (error_code && lua_isstring(L, -1)) 
 	{
 		const char *msg = lua_tostring(L, -1);
-		if (msg == NULL) msg = "(error object is not a string)";
+		if (msg == NULL) 
+			msg = "(error object is not a string)";
+		
 		// \todo log the error or the msg
 		// l_message(progname, msg);
+		printf(msg);
 		lua_pop(L, 1);
 	}
 	
@@ -227,7 +230,7 @@ bool Lua::require(const char* module) const
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
-	return !callProtected(1);
+	return !callProtected(L, 1);
 }
 
 void Lua::runConsole(void) const
@@ -247,7 +250,7 @@ void Lua::runConsole(void) const
 		
 		if (strcmp(quit, "lua_quit"))
 		{
-			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || callProtected())
+			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || callProtected(L))
 			{
 				fprintf(stderr, "%s\n", lua_tostring(L, -1));
 				lua_pop(L, 1);

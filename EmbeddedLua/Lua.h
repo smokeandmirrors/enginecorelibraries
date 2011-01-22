@@ -31,6 +31,15 @@ creation of application and library code for %Lua.
 class Lua 
 {
 public:
+	/**
+	\param num_return_values defaults to LUA_MULTRET
+	*/
+	static sint			callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
+	/**
+	reports output from the lua_State
+	*/
+	static sint			report(lua_State* L, sint status);
+
 	/** 
 	public [no-args] constructor.
 	\param name a string identifier
@@ -42,11 +51,6 @@ public:
 	destroys the lua_State and any memory allocated by this object
 	*/
 	~Lua(void);
-	/**
-	\todo MAKE STATIC, VERY SOON!
-	\param num_return_values defaults to LUA_MULTRET
-	*/
-	sint				callProtected(sint num_args=0, sint num_return_values=-1) const;
 	/**
 	loads end executes the string as a lua chunk
 	\return the status of the execution
@@ -108,10 +112,7 @@ protected:
 	in DEBUG builds only, opens the debug library
 	*/
 	void				openStandardLibraries(void) const;
-	/**
-	reports output from the lua_State
-	*/
-	sint					report(sint status) const;
+	
 	
 private:
 	/** open standard libraries and such */
