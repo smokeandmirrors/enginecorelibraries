@@ -91,6 +91,12 @@ template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint index)
 	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
 }
 
+template<> inline LuaExtendable& to<LuaExtendable&>(lua_State* L, sint index)
+{
+	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
+	return *static_cast<LuaExtendable*>(lua_touserdata(L, index));
+}
+
 template<> inline char* to<char*>(lua_State* L, sint index)
 {
 	assert_lua_argument(lua_isstring, "string", L, index);
@@ -108,6 +114,8 @@ push<T> functions
 pushes the object on top of the stack, and returns the
 number of actual %Lua type objects that were placed
 on top of the stack
+
+\todo check these arguments, especially the numerical ones
 */
 inline sint push(lua_State* L, bool value)
 {
@@ -117,7 +125,13 @@ inline sint push(lua_State* L, bool value)
 
 inline sint push(lua_State* L, sint value)
 {
-	lua_pushnumber(L, static_cast<lua_Number>(value));
+	lua_pushinteger (L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, uint value)
+{
+	lua_pushinteger (L, static_cast<lua_Integer>(value));
 	return 1;
 }
 
@@ -127,9 +141,21 @@ inline sint push(lua_State* L, float value)
 	return 1;
 }
 
+inline sint push(lua_State* L, double value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+
 inline sint push(lua_State* L, LuaExtendable* value)
 {
 	return pushRegisteredClass(L, value);
+}
+
+inline sint push(lua_State* L, const char* value)
+{
+	lua_pushstring(L, value);
+	return 1;
 }
 
 /**
@@ -144,9 +170,9 @@ inline sint staticReturn1Param0(lua_State* L)
 template<typename RET_1, typename ARG_1, RET_1(* function)(ARG_1)>
 inline sint staticReturn1Param1(lua_State* L)
 {
-	ARG_1 argument = to<ARG_1>(L, -1);
+	ARG_1 arg1 = to<ARG_1>(L, -1);
 	lua_pop(L, -1);
-	return push(L, (*function)(argument));	
+	return push(L, (*function)(arg1));	
 }
 
 template <typename RET_1, typename RET_2, RET_1(* function)(RET_2&)>
@@ -173,14 +199,29 @@ inline sint staticReturn2Param1(lua_State* L)
 /**
 class functions
 */
-template<typename CLASS, typename RETURN, RETURN(CLASS::* function)(void) const>
-sint return1Param0const(lua_State* L)
+template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void) const>
+inline sint return1Param0const(lua_State* L)
 {
-	RETURN value;
-
-	if (CLASS* object = to<CLASS*>(L, 1))
+	if (CLASS* object = to<CLASS*>(L, -1))
 	{
-		value = (object->*function)();
+		RET_1 value = (object->*function)();
+		return push(L, value);
+	}
+	else
+	{
+		return 0;
+	}	
+}
+
+template<typename CLASS, typename RET_1, typename ARG_1,  RET_1(CLASS::* function)(ARG_1) const>
+inline sint return1Param1const(lua_State* L)
+{
+	ARG_1 argument = to<ARG_1>(L, -1);
+	lua_pop(L, -1);
+
+	if (CLASS* object = to<CLASS*>(L, -1))
+	{
+		RET_1 value = (object->*function)(argument);
 		return push(L, value);
 	}
 	else

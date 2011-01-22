@@ -10,6 +10,10 @@
 
 using namespace LuaExtension;
 
+/** 
+\todo unit test __gc and garbage collection
+*/
+
 class One
 {
 public:
@@ -137,14 +141,8 @@ CFIXCC_BEGIN_CLASS(Classes)
 	CFIXCC_METHOD(Test_declare_lua_library_withClasses)
 CFIXCC_END_CLASS()
 
-//  declare_lua_library(Derived)
-//   
-//  define_lua_LuaExtendable_by_proxy(Derived, Basic)
-//  end_lua_LuaExtendable_by_proxy(Derived, Basic)
-
 /**
 @class
-
 demonstrates full inheritance tree and proxy usesage
 */
 class Grandparent 
@@ -168,55 +166,40 @@ public:
 		return "Grandparent"; 
 	}
 	
-	virtual const char*	toString(void)
-	{ 
-		return "This is a Grandparent"; 
-	}
-	
 	bool operator==(const Grandparent& other) const
 	{
 		return strcmp(getFamilyName(), other.getFamilyName()) == 0; 
 	}
-	
+
 	sint setMetatable(lua_State* L)
 	{
 		return setProxyMetatable(L);
 	}
 
+	virtual const char*	toString(void)
+	{ 
+		return "This is a Grandparent"; 
+	}
+	
 protected:
 	const char*				m_name;
 }; // Grandparent
- /*
+
+declare_lua_LuaExtendable(Grandparent);
+
 lua_func(__call)
 {
-Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-printToLua(L, gp->toString());
-return 0;
-}
-
-lua_func(getFamilyName)
-{
-Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-lua_pushstring(L, gp->getFamilyName());
-return 1;
-}
-
-lua_func(getTitle)
-{
-Grandparent* gp = *static_cast<Grandparent**>(lua_touserdata(L, -1));
-lua_pushstring(L, gp->getTitle());
-return 1;
+	Grandparent& gp = to<Grandparent&>(L, -1);
+	printToLua(L, gp.toString());
+	return 0;
 }
  
-declare_lua_extendable(Grandparent);
-declare_lua_extendable(Parent);
-declare_lua_extendable(Child);
-
-define_lua_class(Grandparent, Grandparent)
+define_lua_LuaExtendable(Grandparent, Grandparent)
 	lua_entry(__call) 
-	lua_entry(getFamilyName)
-	lua_entry(getTitle)
-end_lua_class(Grandparent, Grandparent)*/
+	lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
+	lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
+	lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+end_lua_LuaExtendable(Grandparent, Grandparent)
 
 /**
 @class
@@ -237,6 +220,29 @@ private:
 	Grandparent*			m_grandParent;			
 }; // Parent
 
+declare_lua_LuaExtendable(Parent);
+
+static sint lua_newParent(lua_State* L)
+{
+	Parent* p = new Parent();
+	pushRegisteredClass(L, p);
+	return 1;
+}
+
+static sint lua_Parent_getGrandparentName(lua_State* L)
+{
+	Parent* p = *static_cast<Parent**>(lua_touserdata(L, -1));
+	lua_pushstring(L, p->getGrandparentName());
+	return 1;
+}
+
+define_lua_class(Parent, Parent::super)
+	// should be able to be automagicked...
+	lua_named_entry("new", lua_newParent)
+	lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
+	// lua_named_entry("getGrandparent", (return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
+end_lua_library(Parent) 
+
 /**
 @class
 
@@ -251,48 +257,27 @@ public:
 	virtual const char*		getTitle(void) const		{ return "Child"; }
 }; // Child
 
- 
- static sint lua_newParent(lua_State* L)
- {
- 	Parent* p = new Parent();
- 	pushRegisteredClass(L, p);
- 	return 1;
- }
- 
- static sint lua_Parent_getGrandparentName(lua_State* L)
- {
- 	Parent* p = *static_cast<Parent**>(lua_touserdata(L, -1));
- 	lua_pushstring(L, p->getGrandparentName());
- 	return 1;
- }
-  
- define_lua_class(Parent, Parent::super)
-	 // should be able to be automagicked...
-	 lua_named_entry("new", lua_newParent)
-	 lua_named_entry("getGrandparentName", lua_Parent_getGrandparentName)
-	 // lua_named_entry("getGrandparent", (return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
- end_lua_library(Parent)
- 
- 
- static sint lua_newChild(lua_State* L)
- {
- 	Child* c = new Child();
- 	pushRegisteredClass(L, c);
- 	return 1;
- }
- 
- static sint lua_Child_getParentName(lua_State* L)
- {
- 	Child* c = *static_cast<Child**>(lua_touserdata(L, -1));
- 	lua_pushstring(L, c->getParentName());
- 	return 1;
- }
- 
- define_lua_class(Child, Child::super)
-	 // should be able to be automagicked...
-	 lua_named_entry("new", lua_newChild)
-	 lua_named_entry("getParentName", lua_Child_getParentName)
- end_lua_library(Child)
+declare_lua_LuaExtendable(Child);
+
+static sint lua_newChild(lua_State* L)
+{
+	Child* c = new Child();
+	pushRegisteredClass(L, c);
+	return 1;
+}
+
+static sint lua_Child_getParentName(lua_State* L)
+{
+	Child* c = *static_cast<Child**>(lua_touserdata(L, -1));
+	lua_pushstring(L, c->getParentName());
+	return 1;
+}
+
+define_lua_class(Child, Child::super)
+	// should be able to be automagicked...
+	lua_named_entry("new", lua_newChild)
+	lua_named_entry("getParentName", lua_Child_getParentName)
+end_lua_library(Child)
 
 #endif//EXTENDED_BY_LUA
 

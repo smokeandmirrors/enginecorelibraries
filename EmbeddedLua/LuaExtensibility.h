@@ -154,7 +154,7 @@ with the module ObjectOrientedParadigm.
 // end #define begin_lua_library_declaration
 
 /**
-\def declare_lua_extendable
+\def declare_lua_LuaExtendable
 
 Declares a library around a class that implements
 the LuaExtendable interface.
@@ -162,7 +162,7 @@ the LuaExtendable interface.
 \note compile-time directive
 */
 #if ARGUMENT_ERRORS
-#define declare_lua_extendable(class_name) \
+#define declare_lua_LuaExtendable(class_name) \
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
@@ -171,14 +171,30 @@ the LuaExtendable interface.
 			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
 			class_name* object = dynamic_cast<class_name*>(ud); \
 			if (object) \
-				return object; \
+			return object; \
 			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
 			return NULL; \
 		} \
+		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		{ \
+			return to<class_name*>(L, index); \
+		} \
+		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		{ \
+			class_name* object = to<class_name*>(L, index); \
+			assert(object); \
+			return *object; \
+		} \
+		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		{ \
+			class_name* object = to<class_name*>(L, index); \
+			assert(object); \
+			return *object; \
+		} \
 	}
-// end #define declare_lua_extendable
+// end #define declare_lua_LuaExtendable
 #else
-#define declare_lua_extendable(class_name) \
+#define declare_lua_LuaExtendable(class_name) \
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
@@ -186,8 +202,20 @@ the LuaExtendable interface.
 		{ \
 			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
 		} \
+		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		{ \
+			return to<class_name*>(L, index); \
+		} \
+		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		{ \
+			return *to<class_name*>(L, index); \
+		} \
+		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		{ \
+			return *to<class_name*>(L, index); \
+		} \
 	}
-// end #define declare_lua_extendable
+// end #define declare_lua_LuaExtendable
 #endif//ARGUMENT_ERRORS
 
 /** 
@@ -314,8 +342,8 @@ for class exposition
 		static const luaL_reg derived##_library[] = \
 		{ \
 			lua_named_entry("new", lua_new##derived) \
-			lua_named_entry("__gc", __gcmetamethod) \
-			lua_named_entry("__tostring", __tostringLuaExtendable)	
+			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring)	
 // end #define_lua_LuaExtendable
 
 /**
