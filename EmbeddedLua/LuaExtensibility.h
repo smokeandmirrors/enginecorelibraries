@@ -92,31 +92,6 @@ enum LUA_EXPOSURE
 
 // extern uint testing; 
 
-/**
-\def lua_require 
-a macro fuction to call require from C, mostly for use in 
-other macros
-*/
-#define lua_require(module) \
-	lua_getglobal(L, "require"); \
-	lua_pushstring(L, #module); \
-	Lua::callProtected(L, 1);
-// end #define lua_require(module)
-
-/**
-\def lua_nilLoadedStatus
-macro to help nil the loaded status of a module, mostly 
-for use in allowing libraries registered with luaL_register
-to be extended in %Lua with the use of the %Lua require function
-*/
-#define lua_nilLoadedStatus(module) \
-	lua_getglobal(L, "package"); \
-	lua_getfield(L, -1, "loaded"); \
-	lua_pushnil(L); \
-	lua_setfield(L, -2, module); \
-	lua_pop(L, 1); \
-// end #define lua_nilLoadedStatus(module)
-
 /** 
 \def lua_func 
 
@@ -285,7 +260,7 @@ end a library definition for registration
 		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
-			lua_nilLoadedStatus(#name); \
+			Lua::nilLoadedStatus(L, #name); \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
@@ -358,8 +333,8 @@ for class exposition
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
-			lua_require(#derived_class) \
-			lua_nilLoadedStatus(#derived_class) \
+			Lua::nilLoadedStatus(L, #derived_class); \
+			Lua::require(L, #derived_class); \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
@@ -380,7 +355,7 @@ exposed class.
 */
 #define define_lua_LuaExtendable_by_proxy(derived_class, super_class) \
 	define_lua_LuaExtendable(derived_class, super_class) \
-		lua_named_entry("setmetatable", setMetatable)
+		lua_named_entry("setmetatable", LuaExtendable::callSetMetatable)
 // end #define define_lua_LuaExtendable_by_proxy
 
 /**
@@ -392,9 +367,9 @@ exposed class.
 		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived, derived##_library); \
-			lua_require(#derived) \
-			lua_nilLoadedStatus(#derived) \
-			LuaExtendable::declareLuaClass(L, #derived, #super) \
+			Lua::nilLoadedStatus(L, #derived); \
+			Lua::require(L, #derived); \
+			LuaExtendable::declareLuaClass(L, #derived, #super); \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name

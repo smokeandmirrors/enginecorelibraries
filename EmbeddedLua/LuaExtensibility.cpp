@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
@@ -60,7 +61,17 @@ sint LuaExtendable::__tostring(lua_State* L)
 
 sint LuaExtendable::callSetMetatable(lua_State* L)
 {
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
+	int i=-1;
+	do
+	{
+		bool is_user = lua_isuserdata(L, i) || lua_islightuserdata(L, i);
+		bool is_function = lua_isfunction(L, i);
+		int type= lua_type(L, i);
+		bool breakpoint = false;		
+	}
+	while (--i > -10);
+
+	LuaExtendable* udata = to<LuaExtendable*>(L, -2);
 	return udata->setMetatable(L);
 }
 
@@ -72,8 +83,13 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 		return;
 	//s: OOP
 	lua_getfield(L, -1, "declareClass");
+	assert(lua_isfunction(L, -1));
 	//s: declareClass
-
+	lua_getglobal(L, derived);
+	assert(lua_istable(L, -1));
+	//s: declareClass derived
+	Lua::callProtected(L, 1, 0);
+	//s: 
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)
@@ -165,7 +181,7 @@ void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* 
 		lua_pop(L, 1);
 		//s: class_def
 	}
-	else
+	else if (super && (strcmp(super, derived) != 0))
 	{	//s: class_def nil	
 		assert(lua_isnil(L, -1));
 		lua_pop(L, 1);

@@ -71,12 +71,12 @@ lua_func(__call)
 	return 0;
 }
 
-define_lua_LuaExtendable(Grandparent, Grandparent)
+define_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
 	lua_entry(__call) 
 	lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
 	lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
 	lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
-end_lua_LuaExtendable(Grandparent, Grandparent)
+end_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
 
 /**
 @class
@@ -99,10 +99,10 @@ private:
 
 declare_lua_LuaExtendable(Parent);
 
-define_lua_LuaExtendable(Parent, Parent::super)
+define_lua_LuaExtendable_by_proxy(Parent, Grandparent)
 	lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 	lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
-end_lua_LuaExtendable(Parent, Parent::super) 
+end_lua_LuaExtendable_by_proxy(Parent, Grandparent) 
 
 /**
 @class
@@ -125,10 +125,10 @@ private:
 
 declare_lua_LuaExtendable(Child);
 
-define_lua_LuaExtendable(Child, Child::super)
+define_lua_LuaExtendable_by_proxy(Child, Parent)
 	lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
 	lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
-end_lua_LuaExtendable(Child, Child::super)
+end_lua_LuaExtendable_by_proxy(Child, Parent)
 
 #endif//EXTENDED_BY_LUA
 

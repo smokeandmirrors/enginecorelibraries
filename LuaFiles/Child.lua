@@ -2,9 +2,6 @@ module(..., package.seeall)
 require 'Parent'
 require 'ObjectOrientedParadigm'
 
-name = 'Child'
-extends = 'Parent'
-
 construct = function(self, ...)
 	self.numberOfKids = 0
 	self.numberOfGrandKids = 0
@@ -16,5 +13,3 @@ end
 getNumberOfGrandparents = function(self)
 	return numberOfGrandparents
 end
-
-declareClass(Child)

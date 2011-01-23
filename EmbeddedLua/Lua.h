@@ -35,11 +35,22 @@ public:
 	\param num_return_values defaults to LUA_MULTRET
 	*/
 	static sint			callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
+	/** 
+	sets package.loaded[module] = nil 
+	allows for extending of C declared libraries by %Lua files in packages
+	by the same name using require.
+	This needs to be done because luaL_register modifies the package.loaded table.
+	\param module the name of the (loaded) module
+	*/
+	static void			nilLoadedStatus(lua_State* L, const char* module);
 	/**
 	reports output from the lua_State
 	*/
 	static sint			report(lua_State* L, sint status);
-
+	/**
+	call require from C++
+	*/
+	static bool			require(lua_State* L, const char* module);
 	/** 
 	public [no-args] constructor.
 	\param name a string identifier
@@ -70,8 +81,8 @@ public:
 	lua_State*			getState(void) const	{ return L; }
 	/** 
 	sets package.loaded[module] = nil 
-	allows for extending of C declared modules by %Lua files in packages
-	by the same name
+	allows for extending of C declared libraries by %Lua files in packages
+	by the same name using require
 	\param module the name of the (loaded) module
 	*/
 	void				nilLoadedStatus(const char* module) const;
@@ -79,10 +90,10 @@ public:
 	Opens %Lua library using the lua_function provided
 	*/
 	void				openLibrary(lua_function key) const;
-	/** 
-	require() shortcut 
+	/**
+	require() shortcut
 	*/
-	bool				require(const char* module) const;
+	bool				require(const char* module);
 	/** 
 	quick, hack console for fast testing 
 	*/

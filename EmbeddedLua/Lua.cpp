@@ -173,7 +173,7 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 	}
 }
 
-void Lua::nilLoadedStatus(const char* module) const
+void Lua::nilLoadedStatus(lua_State* L, const char* module)
 {
 	if (module)
 	{
@@ -183,6 +183,11 @@ void Lua::nilLoadedStatus(const char* module) const
 		lua_setfield(L, -2, module);
 		lua_pop(L, 1);
 	}
+}
+
+void Lua::nilLoadedStatus(const char* module) const
+{
+	nilLoadedStatus(L, module);
 }
 
 void Lua::openLibrary(lua_function opener) const
@@ -226,11 +231,16 @@ sint Lua::report(lua_State* L, sint error_code)
 	return error_code;
 }
 
-bool Lua::require(const char* module) const
+bool Lua::require(lua_State* L, const char* module)
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
 	return !callProtected(L, 1);
+}
+
+bool Lua::require(const char* module)
+{
+	return require(L, module);
 }
 
 void Lua::runConsole(void) const

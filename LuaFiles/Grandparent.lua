@@ -17,4 +17,4 @@ getNumberOfGrandKids = function(self)
 	return self.numberOfGrandKids
 end
 
-declareClass(Grandparent)
+-- declareClass(Grandparent)
