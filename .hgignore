@@ -29,3 +29,4 @@ glob:Sandbox/GoldMaster/
 glob:Sandbox/GoldMasterNoLua/
 glob:Sandbox/Release/
 glob:Sandbox/ReleaseNoLua/
+glob:BuildSystem/Debug/BuildLog.htm
