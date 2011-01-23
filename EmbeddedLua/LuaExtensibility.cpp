@@ -1,7 +1,9 @@
 #include <assert.h>
+#include <string.h>
 
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
+#include "LuaStateInteraction.h"
 
 namespace LuaExtension
 {
@@ -62,6 +64,18 @@ sint LuaExtendable::callSetMetatable(lua_State* L)
 	return udata->setMetatable(L);
 }
 
+void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const char* super)
+{
+	completeLuaClassDeclaration(L, derived, super);
+	lua_getglobal(L, "ObjectOrientedParadigm");
+	if (!lua_istable(L, -1))
+		return;
+	//s: OOP
+	lua_getfield(L, -1, "declareClass");
+	//s: declareClass
+
+}
+
 sint LuaExtendable::setProxyMetatable(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
@@ -111,6 +125,59 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 	lua_setmetatable(L, -4);					//s: userdata, lua_class_mt, proxy/mt
 	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
+}
+
+/** 
+\todo interfaces?
+\todo interfaces via var args?
+*/
+void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super)
+{
+	lua_getglobal(L, derived);
+	//s: class_def
+	assert(lua_istable(L, -1));
+	/* ensure a proper 'name' field */
+	lua_getfield(L, -1, "name");
+	//s: class_def ?
+	if (lua_isstring(L, -1))
+	{	//s: class_def class_def.name
+		assert(!strcmp(lua_tostring(L, -1), derived));
+		lua_pop(L, 1);
+		//s: class_def
+	}
+	else
+	{	//s: class_def nil	
+		assert(lua_isnil(L, -1));
+		lua_pop(L, 1);
+		//s: class_def
+		push(L, derived);
+		//s: class_def derived
+		lua_setfield(L, -2, "name");
+		//s: class_def
+	}
+	//s: class_def
+	/* ensure a proper 'extends' field */
+	lua_getfield(L, -1, "extends");
+	//s: class_def ?
+	if (lua_isstring(L, -1))
+	{	//s: class_def class_def.extends
+		assert(!strcmp(lua_tostring(L, -1), super));
+		lua_pop(L, 1);
+		//s: class_def
+	}
+	else
+	{	//s: class_def nil	
+		assert(lua_isnil(L, -1));
+		lua_pop(L, 1);
+		//s: class_def
+		push(L, super);
+		//s: class_def derived
+		lua_setfield(L, -2, "extends");
+		//s: class_def
+	}
+	//s: class_def
+	lua_pop(L, 1);
+	//s:
 }
 
 /** \todo support the super_class name */
@@ -170,7 +237,7 @@ sint createGlobalClassMetatable(lua_State* L)
 		}
 		else
 		{													//s: class, class_mt, metamethod
-			lua_setfield(L, -1, method_name);				//s: class, class_mt
+			lua_setfield(L, -2, method_name);				//s: class, class_mt
 		}
 	} 
 	while (index);

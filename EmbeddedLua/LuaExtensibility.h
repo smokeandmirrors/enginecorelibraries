@@ -55,13 +55,14 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 #include "Build.h"
 
 /**
+\todo handle interface exposure to lua
 @todo make namespaces
 @todo make decisions about:
 	when to call:
 		createGlobalClassMetable(), immediately after registering non-extensibles?
 	how to do inheritance? 
 		through the declaration, or the registration?
-	using flags to destinguish between what types exposition methods we would use
+	using flags to distinguish between what types exposition methods we would use
 	and then using those flags in the namespace?
 	typedef super?  how about the base class?
 	
@@ -385,14 +386,15 @@ exposed class.
 /**
 \note compile-time directive
 */
-#define end_lua_LuaExtendable_by_proxy(derived_class, super_class) \
+#define end_lua_LuaExtendable_by_proxy(derived, super) \
 			{NULL,		NULL} \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
-			luaL_register(L, #derived_class, derived_class##_library); \
-			lua_require(#derived_class) \
-			lua_nilLoadedStatus(#derived_class) \
+			luaL_register(L, #derived, derived##_library); \
+			lua_require(#derived) \
+			lua_nilLoadedStatus(#derived) \
+			LuaExtendable::declareLuaClass(L, #derived, #super) \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
@@ -437,17 +439,28 @@ public:
 	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
 	static sint				callSetMetatable(lua_State* L);
+	/**
+	makes sure that the class is declared declared in the lua OOP system.
+	*/
+	static void				declareLuaClass(lua_State* L, const char* derived, const char* super);
 	/** 
 	helps set a userdata metatable from script
 	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
 	static sint				setProxyMetatable(lua_State* L);
-
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
 	virtual sint			setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
+
+/**
+completes a %Lua class declaration in case no script accompanied
+the class in %Lua.
+\todo interfaces
+\todo var-arg? for interfaces?
+*/
+void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super);
 
 /**
 Creates the %Lua metatable that is used as the index for all the 
