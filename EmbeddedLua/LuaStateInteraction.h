@@ -32,11 +32,11 @@ average lua_istype function being a macro
 	{ \
 		if (index > lua_gettop(L) || index < -lua_gettop(L)) \
 		{ \
-			luaL_error(L, "argument type error! argument # %d not found", index); \
+			luaL_error(L, "argument type error! argument at index %d not found", index); \
 		} \
 		if (!lua_istype(L, index)) \
 		{ \
-			luaL_error(L, "argument type error! #: %d expected: %s actual: %s ", index, type_name, luaL_typename(L, index)); \
+			luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, type_name, luaL_typename(L, index)); \
 		} \
 	}
 #else
@@ -88,13 +88,13 @@ template<> inline double to<double>(lua_State* L, sint index)
 template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint index)
 {
 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
-	return static_cast<LuaExtendable*>(lua_touserdata(L, index));
+	return *static_cast<LuaExtendable**>(lua_touserdata(L, index));
 }
 
 template<> inline LuaExtendable& to<LuaExtendable&>(lua_State* L, sint index)
 {
 	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
-	return *static_cast<LuaExtendable*>(lua_touserdata(L, index));
+	return **static_cast<LuaExtendable**>(lua_touserdata(L, index));
 }
 
 template<> inline char* to<char*>(lua_State* L, sint index)

@@ -61,7 +61,7 @@ sint LuaExtendable::__tostring(lua_State* L)
 
 sint LuaExtendable::callSetMetatable(lua_State* L)
 {
-	int i=-1;
+	/*int i=-1;
 	do
 	{
 		bool is_user = lua_isuserdata(L, i) || lua_islightuserdata(L, i);
@@ -69,9 +69,9 @@ sint LuaExtendable::callSetMetatable(lua_State* L)
 		int type= lua_type(L, i);
 		bool breakpoint = false;		
 	}
-	while (--i > -10);
+	while (--i > -10);*/
 
-	LuaExtendable* udata = to<LuaExtendable*>(L, -2);
+	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
 	return udata->setMetatable(L);
 }
 
@@ -282,6 +282,9 @@ void printToLua(lua_State* L, const char* string)
 	lua_call(L, 1, 0);			//s: 
 }
 
+/**
+\todo nil the entry when the class is deleted?
+*/
 sint pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable
