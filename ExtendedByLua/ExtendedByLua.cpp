@@ -15,6 +15,70 @@ Defines the entry point for the console application.
 #include "LuaLibraryDeclarations.h"
 
 using namespace LuaExtension;
+
+class Basic
+{
+public:
+	typedef Basic super;
+	sint getValue(void) const		{ return 1; }
+	sint increment(sint i) const	{ return i + getValue(); }
+}; // Basic
+
+declare_lua_library(Basic)
+
+lua_func(newBasic)
+{
+	pushRegisteredClass(L, new Basic());		//s: ud
+	lua_newtable(L);						//s: ud, ud_mt
+	lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+	lua_setmetatable(L, -2);				//s: ud/mt
+	return 1;
+}
+
+lua_func(getBasic)
+{
+	static Basic* singleBasic(NULL);
+
+	if (!singleBasic)
+	{
+		singleBasic = new Basic();
+		pushRegisteredClass(L,singleBasic);		//s: ud
+		lua_newtable(L);						//s: ud, ud_mt
+		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
+		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
+		lua_setmetatable(L, -2);				//s: ud/mt
+	}
+	else
+	{
+		pushRegisteredClass(L,singleBasic);		//s: ud
+	}
+
+	return 1;
+}
+
+lua_func(getValueBasic)
+{
+	Basic* one = static_cast<Basic*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->getValue());						//s: ud, value
+}
+
+lua_func(incrementBasic)
+{
+	sint argument = to<sint>(L, -1);						//s: ud, arg
+	lua_pop(L, 1);											//s: ud
+	Basic* one = static_cast<Basic*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
+}
+
+define_lua_class(Basic, Basic)
+lua_named_entry("new", newBasic)
+lua_named_entry("get", getBasic)
+lua_named_entry("getValue", getValueBasic)
+lua_named_entry("increment", incrementBasic)
+end_lua_class(Basic, Basic)
+
+
 /**
 @class
 demonstrates full inheritance tree and proxy useage
@@ -30,7 +94,7 @@ public:
 	{ /* empty */ }
 
 	virtual ~Grandparent(void) 
-	{ /* empty */ }
+	{ printf("Grandparent destroyed!");/* empty */ }
 
 	const char* getFamilyName(void) const 
 	{ 
@@ -89,6 +153,7 @@ class Parent
 public:
 	typedef Grandparent super;
 	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
+	virtual ~Parent(void)									{ printf("Parent destroyed!"); }
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
@@ -115,6 +180,8 @@ class Child
 public:
 	typedef Parent super;
 
+	static Child*			get(void)					{ static Child c; return &c; }
+	
 	Parent*					getParent(void) const		{ return m_parent; }
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
@@ -126,6 +193,7 @@ private:
 declare_lua_LuaExtendable(Child);
 
 define_lua_LuaExtendable_by_proxy(Child, Parent)
+	lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
 	lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
 	lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
@@ -148,20 +216,23 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//SANDBOX
 
 #ifdef EXTENDED_BY_LUA 
-	LuaExtension::Lua lua;
-	assert(lua.require("Utilities"));
-	lua.require("ObjectOrientedParadigm");
-	// registration must be done in dependency order
-	register_lua_library((&lua), Vector2); 
-	register_lua_library((&lua), Vector3);
-	register_lua_library((&lua), Grandparent);
-	register_lua_library((&lua), Parent);
-	register_lua_library((&lua), Child);
-	// performance testing
-	// lua.require("Vector3PureLua");
-	// get the user file for easier rapid iteration
-	lua.require("User");
-	lua.runConsole();
+	{
+		LuaExtension::Lua lua;
+		assert(lua.require("Utilities"));
+		lua.require("ObjectOrientedParadigm");
+		// registration must be done in dependency order
+		register_lua_library((&lua), Vector2); 
+		register_lua_library((&lua), Vector3);
+		register_lua_library((&lua), Grandparent);
+		register_lua_library((&lua), Parent);
+		register_lua_library((&lua), Child);
+		register_lua_library((&lua), Basic);
+		// performance testing
+		// lua.require("Vector3PureLua");
+		// get the user file for easier rapid iteration
+		lua.require("User");
+		lua.runConsole();
+	}
 #endif//EXTENDED_BY_LUA
 	return 0;
 }

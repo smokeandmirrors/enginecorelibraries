@@ -1,4 +1,4 @@
-module("Utilities", package.seeall)
+module(..., package.seeall)
 ----------------------------------------------------------------------
 --	Utilities.lua
 --	
@@ -95,6 +95,29 @@ end -- package
 
 --[[ table extensions]]--
 if table then
+---------------------------------------------------------------------
+table.copy = function(original, copy)
+	for k, v in pairs(original) do
+		copy[k] = v
+	end
+end
+
+---------------------------------------------------------------------
+-- \param predicate_book_key_value is a function that takes a key, 
+-- and a value from the original table and returns a boolean expression
+table.copyif = function(original, copy, predicate)
+	for key, val in pairs(original) do
+		if predicate(key, val) then
+			copy[key] = val
+		end
+	end
+end
+
+---------------------------------------------------------------------
+isValueFunction = function(key, value)
+	return type(value) == 'function'
+end
+
 ---------------------------------------------------------------------
 -- @todo test this
 table.countslow = function(t)

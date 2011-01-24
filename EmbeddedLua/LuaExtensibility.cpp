@@ -9,7 +9,7 @@
 namespace LuaExtension
 {
 
-#define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt				  */\
+#define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */\
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
@@ -36,11 +36,30 @@ const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
 	"__tostring",
 };
 
+inline bool isInstanceBeingRefreshed(lua_State* L)
+{	//s: userdata, lua_class_mt
+	if (lua_getmetatable(L, -2))
+	{
+		lua_pop(L, 1);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 sint LuaExtendable::__gcmetamethod(lua_State* L)
 {
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
 	delete udata;
 	return 0;
+}
+
+sint LuaExtendable::__getProxy(lua_State* L)
+{
+	lua_pushvalue(L, lua_upvalueindex(1));	//s: proxy/nil
+	return 1;
 }
 
 sint LuaExtendable::__newindex(lua_State* L) 
@@ -61,16 +80,6 @@ sint LuaExtendable::__tostring(lua_State* L)
 
 sint LuaExtendable::callSetMetatable(lua_State* L)
 {
-	/*int i=-1;
-	do
-	{
-		bool is_user = lua_isuserdata(L, i) || lua_islightuserdata(L, i);
-		bool is_function = lua_isfunction(L, i);
-		int type= lua_type(L, i);
-		bool breakpoint = false;		
-	}
-	while (--i > -10);*/
-
 	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
 	return udata->setMetatable(L);
 }
@@ -111,37 +120,65 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 		return setmetatable(userdata, instance_mt) -- can't be done from Lua
 	end
 	*/
-												//s: userdata, lua_class_mt
-	lua_pushvalue(L, -1);						//s: userdata, lua_class_mt, lua_class_mt
-	lua_newtable(L);							//s: userdata, lua_class_mt, lua_class_mt, proxy
-	lua_insert(L, -2);							//s: userdata, lua_class_mt, proxy, lua_class_mt
-	lua_setmetatable(L, -2);					//s: userdata, lua_class_mt, proxy/mt
-	lua_newtable(L);							//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+													//s: userdata, lua_class_mt
+	if (isInstanceBeingRefreshed(L)) 
+	{	
+		// the class is being redefined			//s: userdata, lua_class_mt
+		lua_pushvalue(L, -1);					//s: userdata, lua_class_mt, lua_class_mt
+		lua_getmetatable(L, -3);				//s: userdata, lua_class_mt, lua_class_mt, userdata_mt
+		lua_getfield(L, -1, "__getProxy");		//s: userdata, lua_class_mt, lua_class_mt, userdata_mt, __getProxy
+		lua_call(L, 0, 1);						//s: userdata, lua_class_mt, lua_class_mt, userdata_mt, proxy
+		lua_replace(L, -2);						//s: userdata, lua_class_mt, lua_class_mt, proxy
+		
+		// initialize proxy
+		lua_insert(L, -2);						//s: userdata, lua_class_mt, proxy, lua_class_mt
+		lua_setmetatable(L, -2);				//s: userdata, lua_class_mt, proxy/mt
+		lua_getmetatable(L, -3);				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	}
+	else
+	{	// the class is being defined			//s: userdata, lua_class_mt
+		lua_pushvalue(L, -1);					//s: userdata, lua_class_mt, lua_class_mt
+		lua_newtable(L);						//s: userdata, lua_class_mt, lua_class_mt, proxy
+		
+		// initialize proxy
+		lua_insert(L, -2);						//s: userdata, lua_class_mt, proxy, lua_class_mt
+		lua_setmetatable(L, -2);				//s: userdata, lua_class_mt, proxy/mt
+		lua_newtable(L);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	}
+	
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
 	lua_setfield(L, -2, "__index");				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_pushcclosure(L, LuaExtendable::__newindex, 1); //s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindex
+	lua_pushcclosure(L, LuaExtendable::__newindex, 1); 
+												//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindex
 	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_setUserDataMetamethod(L, "__add")
-	lua_setUserDataMetamethod(L, "__call")
-	lua_setUserDataMetamethod(L, "__concat")
-	lua_setUserDataMetamethod(L, "__div")
-	lua_setUserDataMetamethod(L, "__eq")
-	lua_setUserDataMetamethod(L, "__gc")
-	lua_setUserDataMetamethod(L, "__le")
-	lua_setUserDataMetamethod(L, "__len")
-	lua_setUserDataMetamethod(L, "__lt")
-	lua_setUserDataMetamethod(L, "__metatable")
-	lua_setUserDataMetamethod(L, "__mod")
-	lua_setUserDataMetamethod(L, "__mul")
-	lua_setUserDataMetamethod(L, "__pow")
-	lua_setUserDataMetamethod(L, "__sub")
-	lua_setUserDataMetamethod(L, "__unm")
-	lua_setUserDataMetamethod(L, "__tostring")
-	lua_setmetatable(L, -4);					//s: userdata, lua_class_mt, proxy/mt
+	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
+	lua_pushcclosure(L, LuaExtendable::__getProxy, 1); 
+												//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __getProxy
+	lua_setfield(L, -2, "__getProxy");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	
+	// define/redefine every other metamethod
+	lua_setUserDataMetamethod(L, "__add");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__call");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__concat");	//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__div");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__eq");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__gc");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__le");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__len");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__lt");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__metatable");//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__mod");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__mul");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__pow");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__sub");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__unm");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setUserDataMetamethod(L, "__tostring");	//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_setmetatable(L, -4);					//s: userdata/mt, lua_class_mt, proxy/mt
 	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
 }
+
 
 /** 
 \todo interfaces?

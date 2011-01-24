@@ -95,7 +95,7 @@ end
 -- functions = (table of functions) -- the concrete methods for this class
 function _G.declareAbstractClass(definition)
 	declareAbstractClass_PRIVATE(definition)
-	collectgarbage('collect')
+	collectgarbage'collect'
 end
 
 ----------------------------------------------------------------------
@@ -107,6 +107,7 @@ end
 -- Implements = (table of interface names) -- the interfaces_PRIVATE this class implements
 function _G.declareClass(definition)
 	declareClass_PRIVATE(definition)
+	collectgarbage'collect'
 end
 
 ----------------------------------------------------------------------
@@ -114,6 +115,7 @@ end
 -- @param definition.name, otherwise functions the interface name
 function _G.declareInterface(definition)
 	declareInterface_PRIVATE(definition)
+	collectgarbage'collect'
 end
 
 ----------------------------------------------------------------------
@@ -369,16 +371,15 @@ end
 -- @param def definition table in the same format as 
 -- declareClass() and declareClass_PRIVATE()
 if DEBUG_INTERPRETATION then
-function beginClassDeclaration_PRIVATE(def)
+function beginClassDeclaration_PRIVATE(definition)
 	-- hold failure reporting until the very end so that all problems with the class can be reported.
 	local compiled = true
-	local implements = def.implements
-	local name = def.name
-	local extends = def.extends
+	local implements = definition.implements
+	local name = definition.name
+	local extends = definition.extends
 	-- there should only be functions left in the definition
-	def.name = nil
-	def.extends = nil
-	def.implements = nil
+	local def = {}
+	table.copyif(definition, def, Utilities.isValueFunction)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		classesNeedRefresh = true
@@ -413,16 +414,15 @@ function beginClassDeclaration_PRIVATE(def)
 	return class, compiled
 end
 else
-function beginClassDeclaration_PRIVATE(def)
+function beginClassDeclaration_PRIVATE(definition)
 	-- hold failure reporting until the very end so that all problems with the class can be reported.
 	local compiled = true
-	local implements = def.implements
-	local name = def.name
-	local extends = def.extends
+	local implements = definition.implements
+	local name = definition.name
+	local extends = definition.extends
 	-- there should only be functions left in the definition
-	def.name = nil
-	def.extends = nil
-	def.implements = nil
+	local def = {}
+	table.copyif(definition, def, Utilities.isValueFunction)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		-- warn(false, 'Class '..name..' already exists!')
@@ -794,7 +794,11 @@ function refreshClasses_PRIVATE()
 		end
     end
     for _, instance in pairs(refreshInstances_PRIVATE) do
-        setmetatable(instance, metatables_PRIVATE[instance.className])
+		if instance.setmetatable then
+			instance.setmetatable(instance, metatables_PRIVATE[instance.className])
+		elseif type(instance) == 'table' then
+			setmetatable(instance, metatables_PRIVATE[instance.className])
+    	end
     end
 	classesNeedRefresh = false
 end

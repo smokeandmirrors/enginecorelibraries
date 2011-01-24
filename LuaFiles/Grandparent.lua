@@ -17,4 +17,11 @@ getNumberOfGrandKids = function(self)
 	return self.numberOfGrandKids
 end
 
--- declareClass(Grandparent)
+--[[
+favoriteMusic = function(self)
+	return "The Beatles"
+end
+
+declareClass(Grandparent)
+
+--]]

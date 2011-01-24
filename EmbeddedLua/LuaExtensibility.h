@@ -271,7 +271,9 @@ end a library definition for registration
 define a %Lua library around a class, so that instances of the 
 class can be created or controlled in %Lua.  Using this method, the 
 programmer is responsible for the whole system of usage of the class in 
-in %Lua.
+in %Lua.  This also exposes simple userdata pointers with all 
+associated C++ and Lua methods, it doesn't create any ability
+to added new lua fields.  But, this is often never needed.
 
 \note compile-time directive
 
@@ -348,7 +350,12 @@ and use the default "new", "setmetatable", "__gc" & "__tostring" methods
 The "by proxy" method is desirable because it allows a userdata type in lua
 to be treated exactly like a table, an ObjectOrientedParadigm class instance, and 
 a C++ class instance.  It is an arguably more expensive version of a %Lua
-exposed class.
+exposed class.  It requires each exposed object to have its own userdata
+pointer, proxy table for new values, and metatable to reference the proxy 
+table.  That's a lot of storage, and it comes with all the associated
+extra table indexing and function calls.  But, it results in ZERO distinction
+between all %Lua classes, and partly C++ classes when operating with them 
+in %Lua.  That makes it worth it to me.
 
 \note compile-time directive
 \note highly recommended to precede end_lua_LuaExtendable_by_proxy
@@ -401,6 +408,11 @@ public:
 	in a lua_State are destroyed.
 	*/
 	static sint				__gcmetamethod(lua_State* L);
+	/**
+	experimental, trying to get the local proxy table on the top of the 
+	stack
+	*/
+	static sint				__getProxy(lua_State* L);
 	/**
 	__newindex method for the metatable of a class exposed to %Lua.
 	*/

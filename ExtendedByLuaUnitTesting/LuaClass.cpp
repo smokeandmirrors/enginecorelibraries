@@ -82,7 +82,6 @@ public:
 		// Convert to a wchar_t*
 		size_t origsize = strlen(report) + 1;
 		size_t convertedChars = 0;
-		// wchar_t wcstring[origsize];
 		wchar_t* wcstring = new wchar_t[origsize];
 		mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
 		CFIX_LOG(L"Lua Unit Test Report %s", wcstring);
