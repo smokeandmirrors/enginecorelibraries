@@ -319,7 +319,7 @@ for class exposition
 		} \
 		static const luaL_reg derived##_library[] = \
 		{ \
-			lua_named_entry("new", lua_new##derived) \
+			lua_named_entry("__new", lua_new##derived) \
 			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
 			lua_named_entry("__tostring", LuaExtendable::__tostring)	
 // end #define_lua_LuaExtendable
@@ -345,7 +345,7 @@ for class exposition
 /**
 \def define_lua_LuaExtendable_by_proxy
 begin a library definition for registration via a %Lua proxy table,
-and use the default "new", "setmetatable", "__gc" & "__tostring" methods
+and use the default "__new", "__setmetatable", "__gc" & "__tostring" methods
 
 The "by proxy" method is desirable because it allows a userdata type in lua
 to be treated exactly like a table, an ObjectOrientedParadigm class instance, and 
@@ -362,7 +362,7 @@ in %Lua.  That makes it worth it to me.
 */
 #define define_lua_LuaExtendable_by_proxy(derived_class, super_class) \
 	define_lua_LuaExtendable(derived_class, super_class) \
-		lua_named_entry("setmetatable", LuaExtendable::callSetMetatable)
+		lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable)
 // end #define define_lua_LuaExtendable_by_proxy
 
 /**

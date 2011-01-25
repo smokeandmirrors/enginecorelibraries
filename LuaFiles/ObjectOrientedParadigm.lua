@@ -21,6 +21,7 @@ require'Utilities'
 -- @todo make the c++ wrapping do private/protected? FREAKING HARD (friend declaration + privacy placement?)
 -- @todo make sure there are no functions/members by name
 -- 		of the default class members, like IS_A, construct, super, etc.
+--		new, setmetatable, and so on
 -- @todo update documentation
 -- \todo if __tostring or __concat are not supplied, supply the defaults
 
@@ -496,13 +497,11 @@ if DEBUG_INTERPRETATION then
 -- function createConstructor_PRIVATE(class, metatable, name)
 function createConstructor_PRIVATE(class, metatable)
 	assert(class and metatable)
-	if class.new then
-		if class.setmetatable then
+	if class.__new then
+		if class.__setmetatable then
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
-				-- local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable, name, parentudata_metamethod_table_name), ...)) 
-				-- local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable, name), ...)) 
-				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable), ...)) 
+				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)) 
 				if not instance.name then
 					instance.name = nextInstanceId
 				end
@@ -511,17 +510,17 @@ function createConstructor_PRIVATE(class, metatable)
 		else
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
-				local instance = class.new(...)
+				local instance = class.__new(...)
 				if not instance.name then
 					instance.name = nextInstanceId
 				end
 				return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(instance, metatable), ...)) 
 			end	
 		end
-	elseif class.setmetatable then
+	elseif class.__setmetatable then
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
-			constructHierarchy_PRIVATE(class, class.setmetatable({name = class.nextInstanceId, ...}, metatable), ...)
+			constructHierarchy_PRIVATE(class, class.__setmetatable({name = class.nextInstanceId, ...}, metatable), ...)
 		end
 	else
 		return function(...)
@@ -531,22 +530,20 @@ function createConstructor_PRIVATE(class, metatable)
 	end
 end	
 else
--- function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
 function createConstructor_PRIVATE(class, metatable)
-	if class.new then
-		if class.setmetatable then
+	if class.__new then
+		if class.__setmetatable then
 			return function(...)
-				-- return constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable, name, parentudata_metamethod_table_name), ...)
-				return constructHierarchy_PRIVATE(class, class.setmetatable(class.new(...), metatable), ...)
+				return constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)
 			end
 		else
 			return function(...)
-				return constructHierarchy_PRIVATE(class, setmetatable(class.new(...), metatable), ...)
+				return constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...)
 			end
 		end	
-	elseif class.setmetatable then
+	elseif class.__setmetatable then
 		return function(...)
-			constructHierarchy_PRIVATE(class, class.setmetatable({...}, metatable), ...)
+			constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...)
 		end
 	else
 		return function(...)
@@ -794,8 +791,8 @@ function refreshClasses_PRIVATE()
 		end
     end
     for _, instance in pairs(refreshInstances_PRIVATE) do
-		if instance.setmetatable then
-			instance.setmetatable(instance, metatables_PRIVATE[instance.className])
+		if instance.__setmetatable then
+			instance.__setmetatable(instance, metatables_PRIVATE[instance.className])
 		elseif type(instance) == 'table' then
 			setmetatable(instance, metatables_PRIVATE[instance.className])
     	end
@@ -889,9 +886,9 @@ function getEnvironment_PRIVATE(functions)
 end
 
 ----------------------------------------------------------------------
--- checks to see if everything in functionTable is a function, if it is it adds it to Table.  If not, it prints the problem_message, + the !function name + messageCorrection
+-- checks to see if everything in functionTable is a function, if it is it 
+-- adds it to Table.  If not, it prints the problem_message, + the !function name + messageCorrection
 function verifyFunctionTable_PRIVATE(t, functions, base_class, problem_message, correction_message) 
-	
 	local success = true
 	if functions then
 		

@@ -147,7 +147,7 @@ sint lua_setmetatableVector3(lua_State* L)
 
 
 define_lua_library(Vector3)
-lua_named_entry("new", lua_newVector3)
-lua_named_entry("setmetatable", lua_setmetatableVector3)
+lua_named_entry("__new", lua_newVector3)
+lua_named_entry("__setmetatable", lua_setmetatableVector3)
 end_lua_library(Vector3)
 #endif//EXTENDED_BY_LUA
