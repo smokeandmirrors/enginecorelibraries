@@ -1,12 +1,13 @@
 #if EXTENDED_BY_LUA
 #include <cfixcc.h>
+#include <stdlib.h>
+#include <string>
+
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaLibraryDeclarations.h"
-
-#include <stdlib.h>
-#include <string>
+#include "UnitTestingTools.h"
 
 using namespace LuaExtension;
 
@@ -56,43 +57,13 @@ public:
 		
 	void luaUnitTesting()
 	{
-		Lua lua;
-		lua.require("UnitTesting");
-		lua.require("UnitTestingFramework");
-		lua_State* L = lua.getState();
-		//s: ?
-		lua_getglobal(L, "UnitTestingFramework");
-		//s: UnitTestingFramework
-		lua_getfield(L, -1, "testAll");
-		//s: testAll
-		lua_call(L, 0, 1);
-		//s: bool
-		lua_pop(L, 1);
-		//s:
-		lua_getglobal(L, "lastUnitTestNumFailures");
-		//s: lastUnitTestNumFailures
-		sint result = static_cast<sint>(lua_tonumber(L, -1));
-		lua_pop(L, 1);
-		//s:
-		lua_getglobal(L,  "lastUnitTestReport");
-		//s: lastUnitTestReport
-		const char* report = lua_tostring(L, -1);
-		lua_pop(L, 1);
-		//s:
-		// Convert to a wchar_t*
-		size_t origsize = strlen(report) + 1;
-		size_t convertedChars = 0;
-		wchar_t* wcstring = new wchar_t[origsize];
-		mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
-		CFIX_LOG(L"Lua Unit Test Report %s", wcstring);
-		CFIX_ASSERT(result == 0);
-		delete[] wcstring;
+
+		UnitTestingTools::executeLuaUnitTest("UnitTesting");
 	}
 
 	void nilLoadedStatus()
 	{
 		Lua lua;
-		lua.require("UnitTesting");
 		lua.require("UnitTestingFramework");
 		lua_State* L = lua.getState();
 		//s: ?

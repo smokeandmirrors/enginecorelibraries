@@ -97,8 +97,15 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	lua_getglobal(L, derived);
 	assert(lua_istable(L, -1));
 	//s: declareClass derived
-	Lua::callProtected(L, 1, 0);
+	assert(Lua::callProtected(L, 1, 0) == 0);
 	//s: 
+	if (strcmp(derived, "Grandparent") == 0)
+	{
+		luaL_dostring(L, "_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
+		lua_getglobal(L, "wtf");
+		bool is_table = lua_istable(L, -1);
+		is_table = false;
+	}
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)

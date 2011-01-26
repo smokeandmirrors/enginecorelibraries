@@ -17,6 +17,8 @@ UT.test('dostring',
 		local i = 1
 		dostring('f = function() return 3 end')
 		i = i + f()
+		print('f(): '..f())
+		print('i: ', i)
 		UT.checkEqual(i,4)
 	end
 )

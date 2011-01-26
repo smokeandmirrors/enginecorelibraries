@@ -456,6 +456,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\LuaFiles\OOPUnitTesting.lua"
+					>
+				</File>
+				<File
 					RelativePath="..\LuaFiles\Parent.lua"
 					>
 				</File>
@@ -465,6 +469,10 @@
 				</File>
 				<File
 					RelativePath="..\LuaFiles\UTOne.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UTProxyClasses.lua"
 					>
 				</File>
 			</Filter>

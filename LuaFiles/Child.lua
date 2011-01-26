@@ -16,6 +16,10 @@ getNumberOfGrandparents = function(self)
 	return numberOfGrandparents
 end
 
+__eq = function(self, other)
+	return self.favoritePark == other.favoritePark
+end
+
 --[[
 onRefresh = function(self)
 	return 'Wes knows awesome when he sees it'

@@ -16,68 +16,6 @@ Defines the entry point for the console application.
 
 using namespace LuaExtension;
 
-class Basic
-{
-public:
-	typedef Basic super;
-	sint getValue(void) const		{ return 1; }
-	sint increment(sint i) const	{ return i + getValue(); }
-}; // Basic
-
-declare_lua_library(Basic)
-
-lua_func(newBasic)
-{
-	pushRegisteredClass(L, new Basic());		//s: ud
-	lua_newtable(L);						//s: ud, ud_mt
-	lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
-	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-	lua_setmetatable(L, -2);				//s: ud/mt
-	return 1;
-}
-
-lua_func(getBasic)
-{
-	static Basic* singleBasic(NULL);
-
-	if (!singleBasic)
-	{
-		singleBasic = new Basic();
-		pushRegisteredClass(L,singleBasic);		//s: ud
-		lua_newtable(L);						//s: ud, ud_mt
-		lua_getglobal(L, "Basic");				//s: ud, ud_mt, Basic
-		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
-		lua_setmetatable(L, -2);				//s: ud/mt
-	}
-	else
-	{
-		pushRegisteredClass(L,singleBasic);		//s: ud
-	}
-
-	return 1;
-}
-
-lua_func(getValueBasic)
-{
-	Basic* one = static_cast<Basic*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->getValue());						//s: ud, value
-}
-
-lua_func(incrementBasic)
-{
-	sint argument = to<sint>(L, -1);						//s: ud, arg
-	lua_pop(L, 1);											//s: ud
-	Basic* one = static_cast<Basic*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
-}
-
-define_lua_class(Basic, Basic)
-lua_named_entry("new", newBasic)
-lua_named_entry("get", getBasic)
-lua_named_entry("getValue", getValueBasic)
-lua_named_entry("increment", incrementBasic)
-end_lua_class(Basic, Basic)
-
 
 /**
 @class
@@ -94,7 +32,7 @@ public:
 	{ /* empty */ }
 
 	virtual ~Grandparent(void) 
-	{ printf("Grandparent destroyed!");/* empty */ }
+	{ /* empty */ }
 
 	const char* getFamilyName(void) const 
 	{ 
@@ -108,7 +46,7 @@ public:
 
 	bool operator==(const Grandparent& other) const
 	{
-		// return strcmp(getFamilyName(), other.getFamilyName()) == 0; 
+		printf("op equals!");
 		return this == &other; 
 	}
 
@@ -136,10 +74,10 @@ lua_func(__call)
 }
 
 define_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
-	lua_entry(__call) 
-	lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
-	lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
-	lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+lua_entry(__call) 
+lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
+lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
+lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 end_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
 
 /**
@@ -165,8 +103,8 @@ private:
 declare_lua_LuaExtendable(Parent);
 
 define_lua_LuaExtendable_by_proxy(Parent, Grandparent)
-	lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
-	lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
+lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
+lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
 end_lua_LuaExtendable_by_proxy(Parent, Grandparent) 
 
 /**
@@ -181,7 +119,7 @@ public:
 	typedef Parent super;
 
 	static Child*			get(void)					{ static Child c; return &c; }
-	
+
 	Parent*					getParent(void) const		{ return m_parent; }
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
@@ -193,9 +131,9 @@ private:
 declare_lua_LuaExtendable(Child);
 
 define_lua_LuaExtendable_by_proxy(Child, Parent)
-	lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
-	lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-	lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
+lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
+lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
+lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
 
 #endif//EXTENDED_BY_LUA
@@ -226,7 +164,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		register_lua_library((&lua), Grandparent);
 		register_lua_library((&lua), Parent);
 		register_lua_library((&lua), Child);
-		register_lua_library((&lua), Basic);
 		// performance testing
 		// lua.require("Vector3PureLua");
 		// get the user file for easier rapid iteration

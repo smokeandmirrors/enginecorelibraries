@@ -28,15 +28,17 @@ namespace LuaExtension
 This is a define macro and not an inline function due to the 
 average lua_istype function being a macro
 */
-#define assert_lua_argument(lua_istype, type_name, L, index) \
+#define assert_lua_argument(lua_istype, expected, L, index) \
 	{ \
-		if (index > lua_gettop(L) || index < -lua_gettop(L)) \
+		sint stack_size = lua_gettop(L); \
+		if (index > stack_size || index < -stack_size) \
 		{ \
-			luaL_error(L, "argument type error! argument at index %d not found", index); \
+			luaL_error(L, "argument type error! argument at index %d not found, stack size: %d", index, stack_size); \
 		} \
 		if (!lua_istype(L, index)) \
 		{ \
-			luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, type_name, luaL_typename(L, index)); \
+			const char* actual = luaL_typename(L, index); \
+			luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, expected, actual); \
 		} \
 	}
 #else
@@ -217,9 +219,9 @@ template<typename CLASS, typename RET_1, typename ARG_1,  RET_1(CLASS::* functio
 inline sint return1Param1const(lua_State* L)
 {
 	ARG_1 argument = to<ARG_1>(L, -1);
-	lua_pop(L, -1);
+	// lua_pop(L, -1);
 
-	if (CLASS* object = to<CLASS*>(L, -1))
+	if (CLASS* object = to<CLASS*>(L, -2))
 	{
 		RET_1 value = (object->*function)(argument);
 		return push(L, value);

@@ -55,6 +55,7 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 #include "Build.h"
 
 /**
+\todo require ObjectOrientedParadigm.lua when necessary
 \todo handle interface exposure to lua
 @todo make namespaces
 @todo make decisions about:
@@ -274,6 +275,7 @@ programmer is responsible for the whole system of usage of the class in
 in %Lua.  This also exposes simple userdata pointers with all 
 associated C++ and Lua methods, it doesn't create any ability
 to added new lua fields.  But, this is often never needed.
+This method would be preferable for objects like vectors.
 
 \note compile-time directive
 
@@ -465,7 +467,7 @@ C++ implementation of the fuction explained below in Lua.  Assumes that
 class_name and super_class name are at the top of the %Lua stack
 
 creates a metatable in %Lua representing the exposed methods from the C++
-class, and adds any metamethods defined in %Lua to the table. 
+class, and adds any metamethods defined in %Lua to the table.
 
 function createGlobalClassMetatable(class_name, metatable_name)
 	local class = _G[class_name]
@@ -482,6 +484,10 @@ function createGlobalClassMetatable(class_name, metatable_name)
 		end
 	end
 end
+
+\note this function cannot be used for the proxy class version because
+each instance requires it's own metatable
+
 */
 sint createGlobalClassMetatable(lua_State* L);
 

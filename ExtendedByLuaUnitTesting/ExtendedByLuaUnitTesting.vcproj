@@ -347,6 +347,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\UnitTestingTools.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\UnitTestingTools.h"
 			>
 		</File>

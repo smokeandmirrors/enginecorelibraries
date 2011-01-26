@@ -19,6 +19,12 @@ UT.test('name',
 	
 	end
 )
+available functions:
+check(value, fail_message)
+checkError(test_function, fail_message, ...)
+checkEqual(lhs, rhs, fail_message)
+checkNearEqual(lhs, rhs, tolerance, fail_message)
+checkT(value, tupos)
 --]]
 
 ----------------------------------------------------------------------
@@ -33,13 +39,18 @@ end
 
 ----------------------------------------------------------------------
 -- checks the values for equality within the given tolerance
-checkEqual = function(lhs, rhs, tolerance, fail_message)
-	if type(tolerance) ~= 'number' then
-		assert(lhs == rhs, 'checkEqual failed, '..tostring(lhs)..
-			' is not equal to '..tostring(rhs)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
-	else
-		checkNearEqual(tolerance)
-	end
+checkEqual = function(lhs, rhs, fail_message)
+	assert(lhs == rhs, 'checkEqual failed, '..tostring(lhs)..
+		' is not equal to '..tostring(rhs)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
+	
+end
+
+----------------------------------------------------------------------
+-- checks that the given function called with the passed in 
+-- arguments will throw an error 
+checkError = function(test_function, fail_message, ...)
+	local result, output = pcall(test_function, ...)
+	assert(not result, 'the function did not produce an error as expected: '..(fail_message ~= nil and tostring(fail_message) or ''))
 end
 
 ----------------------------------------------------------------------
@@ -52,11 +63,19 @@ checkNearEqual = function(lhs, rhs, tolerance, fail_message)
 end
 
 ----------------------------------------------------------------------
--- checks that the given function called with the passed in 
--- arguments will throw an error 
-checkError = function(test_function, fail_message, ...)
-	local result, output = pcall(test_function, ...)
-	assert(not result, 'the function did not produce an error as expected: '..(fail_message ~= nil and tostring(fail_message) or ''))
+-- checks that the values is of the appropriate type
+checkT = function(value, tupos)
+	assert(tupos == 'function'
+		or tupos == 'userdata'
+		or tupos == 'number'
+		or tupos == 'boolean'
+		or tupos == 'string'
+		or tupos == 'nil'
+		or tupos == 'thread'
+		or tupos == 'table', 
+		'checkT called with invalid type parameter: '..tupos)
+	assert(tupos == type(value), 
+		'checkT failed, expected type: '..tupos..' actual type: '..type(value))
 end
 
 ----------------------------------------------------------------------
@@ -152,7 +171,7 @@ getResultsReport = function(duration)
 		if desc == nil then
 			desc = 'no description'
 		end
-		results = results..tostring(failure.test)..' FAILED!: '..desc..'\n' 
+		results = results..'function: '..tostring(failure.test)..' FAILED!: '..desc..'\n' 
 		i = i + 1
 	end
 	

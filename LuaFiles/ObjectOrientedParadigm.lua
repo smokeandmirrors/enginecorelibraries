@@ -72,7 +72,6 @@ function _G.addClassConstructor(class_name, constructor)
 	constructors_PRIVATE[class_name] = constructor
 end
 
-
 ----------------------------------------------------------------------
 -- returns an iterator which progresses over all non-metatable classes
 -- registered in the system.
@@ -159,7 +158,7 @@ end
 ----------------------------------------------------------------------
 -- Create a new instance of a class
 function _G.new(class_name, ...)
-	assert(classes_PRIVATE[class_name], 'No such class: '..class_name..'!')
+	assert(classes_PRIVATE[class_name], 'No such class: '..class_name..' !')
 	return constructors_PRIVATE[class_name](...)
 end
 
@@ -326,7 +325,8 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.getName = class.getName or getName
 	class.getSuperclass = getSuperclass
 	class.IS_A = IS_A
-	class.toString = class.toString or toString
+	class.toString = class.__tostring or class.toString or toString
+	class.__concat = class.__concat or toStringConcat
 	class.super = super
 	return true
 end
