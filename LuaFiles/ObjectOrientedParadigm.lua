@@ -326,7 +326,7 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.getSuperclass = getSuperclass
 	class.IS_A = IS_A
 	class.toString = class.__tostring or class.toString or toString
-	class.__concat = class.__concat or toStringConcat
+	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or toStringConcat
 	class.super = super
 	return true
 end

@@ -3,15 +3,13 @@ local OOP = require'ObjectOrientedParadigm'
 local UT = require'UnitTestingFramework'
 require 'Utilities'
 --[[
-require'Grandparent'
 require'Parent'
 require'Child'
 --]]
 ----------------------------------------------------------------------
 UT.test('simple declaration',
 	function()
-		UT.checkT(OOP.classes_PRIVATE['Grandparent'], 'table')
-		UT.check(getClass('Grandparent'))
+		require'Grandparent'
 		local g = new('Grandparent')
 		-- C++ functions
 		UT.check(type(g.getFamilyName) == 'function')
