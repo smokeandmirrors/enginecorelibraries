@@ -228,6 +228,7 @@ public:
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
+	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
 
 private:
 	Grandparent*			m_grandParent;			
@@ -238,6 +239,7 @@ declare_lua_LuaExtendable(Parent);
 define_lua_LuaExtendable_by_proxy(Parent, Grandparent)
 lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
+lua_named_entry("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
 end_lua_LuaExtendable_by_proxy(Parent, Grandparent) 
 
 /**
@@ -256,9 +258,10 @@ public:
 	Parent*					getParent(void) const		{ return m_parent; }
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
+	void					setParent(Parent* gp)		{ m_parent = gp; }
 
 private:
-	Child*					m_parent;
+	Parent*					m_parent;
 }; // Child
 
 declare_lua_LuaExtendable(Child);
@@ -267,6 +270,7 @@ define_lua_LuaExtendable_by_proxy(Child, Parent)
 lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
 lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
 lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
+lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
 
 void Classes::test_define_lua_LuaExtendable_by_proxy()
@@ -277,9 +281,6 @@ void Classes::test_define_lua_LuaExtendable_by_proxy()
 	register_lua_library((&lua), Grandparent);
 	register_lua_library((&lua), Parent);
 	register_lua_library((&lua), Child);
-	lua.doString("_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-	lua_getglobal(lua.getState(), "wtf");
-	CFIX_ASSERT(lua_istable(lua.getState(), -1));
 	UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
 }
 

@@ -201,6 +201,17 @@ inline sint staticReturn2Param1(lua_State* L)
 /**
 class functions
 */
+template<typename CLASS, typename ARG_1, void(CLASS::* function)(ARG_1)>
+inline sint return0Param1(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -2))
+	{
+		(object->*function)( to<ARG_1>(L, -1));
+	}
+
+	return 0;	
+}
+
 template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void) const>
 inline sint return1Param0const(lua_State* L)
 {

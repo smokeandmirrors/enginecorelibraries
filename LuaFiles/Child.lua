@@ -7,13 +7,13 @@ construct = function(self, ...)
 	self.numberOfGrandKids = 0
 	self.numberOfParents = 2
 	self.numberOfGrandparents = 4
-	self.favoritePark = 'Central Park, NYC'
+	self.favoritePark = 'Central Park'
 	self.mom = new'Parent'
 	self.dad = new'Parent'
 end
 
 getNumberOfGrandparents = function(self)
-	return numberOfGrandparents
+	return self.numberOfGrandparents
 end
 
 __eq = function(self, other)

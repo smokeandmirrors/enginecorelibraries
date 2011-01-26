@@ -334,6 +334,38 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="Lua"
+			>
+			<File
+				RelativePath="..\LuaFiles\Child.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\Grandparent.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\OOPUnitTesting.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\Parent.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\UnitTesting.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\UTOne.lua"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\UTProxyClasses.lua"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\ClassExtension.cpp"
 			>

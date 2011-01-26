@@ -26,42 +26,11 @@ void executeLuaUnitTest(char* module, Lua* lua)
 		delete_lua = true;
 	}
 
-	if (strcmp(module, "Grandparent") == 0)
-	{
-		lua->doString("_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-		lua_getglobal(lua->getState(), "wtf");
-		CFIX_ASSERT(lua_istable(lua->getState(), -1));
-	}
-
 	lua->require("UnitTestingFramework");
-	
-	if (strcmp(module, "Grandparent") == 0)
-	{
-		lua->doString("_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-		lua_getglobal(lua->getState(), "wtf");
-		CFIX_ASSERT(lua_istable(lua->getState(), -1));
-	}
-
 	CFIX_ASSERT(lua->require(module));
-	
-	if (strcmp(module, "Grandparent") == 0)
-	{
-		lua->doString("_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-		lua_getglobal(lua->getState(), "wtf");
-		CFIX_ASSERT(lua_istable(lua->getState(), -1));
-	}
-
 	lua_State* L = lua->getState();
 	//s: ?
 	lua_getglobal(L, "UnitTestingFramework");
-	
-	if (strcmp(module, "Grandparent") == 0)
-	{
-		lua->doString("_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-		lua_getglobal(lua->getState(), "wtf");
-		CFIX_ASSERT(lua_istable(lua->getState(), -1));
-	}
-
 	//s: UnitTestingFramework
 	lua_getfield(L, -1, "testAll");
 	//s: testAll
@@ -90,8 +59,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	if (delete_lua)
 		delete lua;
 
-	CFIX_ASSERT(result == 0);
-
+	CFIX_ASSERT(!result);
 }
 #endif
 
