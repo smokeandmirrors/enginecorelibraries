@@ -86,7 +86,11 @@ sint LuaExtendable::callSetMetatable(lua_State* L)
 
 void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const char* super)
 {
+	Lua::nilLoadedStatus(L, derived);
+	Lua::require(L, "ObjectOrientedParadigm"); 
+	Lua::require(L, derived); 
 	completeLuaClassDeclaration(L, derived, super);
+	
 	lua_getglobal(L, "ObjectOrientedParadigm");
 	if (!lua_istable(L, -1))
 		return;
@@ -99,13 +103,6 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	//s: declareClass derived
 	assert(Lua::callProtected(L, 1, 0) == 0);
 	//s: 
-	if (strcmp(derived, "Grandparent") == 0)
-	{
-		luaL_dostring(L, "_G.wtf = ObjectOrientedParadigm.classes_PRIVATE['Grandparent']");
-		lua_getglobal(L, "wtf");
-		bool is_table = lua_istable(L, -1);
-		is_table = false;
-	}
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)
@@ -326,9 +323,6 @@ void printToLua(lua_State* L, const char* string)
 	lua_call(L, 1, 0);			//s: 
 }
 
-/**
-\todo nil the entry when the class is deleted?
-*/
 sint pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable

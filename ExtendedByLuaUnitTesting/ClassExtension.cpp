@@ -150,6 +150,8 @@ void Classes::test_define_lua_LuaExtendable()
 	
 }
 
+
+// BEGIN PROXY
 /**
 @class
 demonstrates full inheritance tree and proxy useage
@@ -179,7 +181,6 @@ public:
 
 	bool operator==(const Grandparent& other) const
 	{
-		printf("op equals!");
 		return this == &other; 
 	}
 
@@ -224,7 +225,7 @@ class Parent
 public:
 	typedef Grandparent super;
 	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
-	virtual ~Parent(void)									{ printf("Parent destroyed!"); }
+	virtual ~Parent(void)									{ /* empty */ }
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
@@ -273,11 +274,11 @@ lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child:
 lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
 
+// END PROXY
+
 void Classes::test_define_lua_LuaExtendable_by_proxy()
 {
 	LuaExtension::Lua lua;
-	CFIX_ASSERT(lua.require("Utilities"));
-	CFIX_ASSERT(lua.require("ObjectOrientedParadigm"));
 	register_lua_library((&lua), Grandparent);
 	register_lua_library((&lua), Parent);
 	register_lua_library((&lua), Child);

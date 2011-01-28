@@ -55,18 +55,7 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 #include "Build.h"
 
 /**
-\todo require ObjectOrientedParadigm.lua when necessary
 \todo handle interface exposure to lua
-@todo make namespaces
-@todo make decisions about:
-	when to call:
-		createGlobalClassMetable(), immediately after registering non-extensibles?
-	how to do inheritance? 
-		through the declaration, or the registration?
-	using flags to distinguish between what types exposition methods we would use
-	and then using those flags in the namespace?
-	typedef super?  how about the base class?
-	
 **/
 struct lua_State;
 struct lua_Debug;
@@ -130,71 +119,6 @@ with the module ObjectOrientedParadigm.
 	}; // end namespace lua_library_##name
 // end #define begin_lua_library_declaration
 
-/**
-\def declare_lua_LuaExtendable
-
-Declares a library around a class that implements
-the LuaExtendable interface.
-
-\note compile-time directive
-*/
-#if ARGUMENT_ERRORS
-#define declare_lua_LuaExtendable(class_name) \
-	declare_lua_library(class_name) \
-	namespace LuaExtension \
-	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
-		{ \
-			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
-			class_name* object = dynamic_cast<class_name*>(ud); \
-			if (object) \
-			return object; \
-			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
-			return NULL; \
-		} \
-		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
-		{ \
-			return to<class_name*>(L, index); \
-		} \
-		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
-		{ \
-			class_name* object = to<class_name*>(L, index); \
-			assert(object); \
-			return *object; \
-		} \
-		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
-		{ \
-			class_name* object = to<class_name*>(L, index); \
-			assert(object); \
-			return *object; \
-		} \
-	}
-// end #define declare_lua_LuaExtendable
-#else
-#define declare_lua_LuaExtendable(class_name) \
-	declare_lua_library(class_name) \
-	namespace LuaExtension \
-	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
-		{ \
-			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
-		} \
-		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
-		{ \
-			return to<class_name*>(L, index); \
-		} \
-		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
-		{ \
-			return *to<class_name*>(L, index); \
-		} \
-		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
-		{ \
-			return *to<class_name*>(L, index); \
-		} \
-	}
-// end #define declare_lua_LuaExtendable
-#endif//ARGUMENT_ERRORS
-
 /** 
 \def lua_entry
 add a lua method to a definition by the same name 
@@ -218,7 +142,10 @@ add a lua method to a definition by a different name
 
 /** 
 \def define_lua_library
-begin a library definition for registration
+
+Begin a library definition for registration
+This method is ideal for static classes or libraries.
+
 \note compile-time directive
 \note highly recommended to precede end_lua_library
 \param name name of the library without string delimiters
@@ -232,7 +159,9 @@ begin a library definition for registration
 
 /** 
 \def end_lua_library
+
 end a library definition for registration
+
 \note compile-time directive
 \note highly recommended to follow with define_lua_library
 \param name name of the library without string delimiters
@@ -250,7 +179,11 @@ end a library definition for registration
 
 /** 
 \def end_lua_library_extensible
-end a library definition for registration
+
+end a library definition for registration,
+addes shortcut to allow extending the library in %Lua with 
+the require() function.
+
 \note compile-time directive
 \note highly recommended to follow define_lua_library_extensible
 \param name name of the library without string delimiters
@@ -274,8 +207,8 @@ class can be created or controlled in %Lua.  Using this method, the
 programmer is responsible for the whole system of usage of the class in 
 in %Lua.  This also exposes simple userdata pointers with all 
 associated C++ and Lua methods, it doesn't create any ability
-to added new lua fields.  But, this is often never needed.
-This method would be preferable for objects like vectors.
+to added new %Lua fields.  But, this is often never needed.
+This method is can be ideal for singletons.
 
 \note compile-time directive
 
@@ -303,11 +236,80 @@ no parent class, simply supply the derived class again
 	}; // end namespace lua_library_##name
 // end #define end_lua_class(derived_class, super_class) 
 
+
+/**
+\def declare_lua_LuaExtendable
+
+Declares a library around a class that implements
+the LuaExtendable interface.
+
+\note compile-time directive
+*/
+#if ARGUMENT_ERRORS
+#define declare_lua_LuaExtendable(class_name) \
+	declare_lua_library(class_name) \
+	namespace LuaExtension \
+	{ \
+	template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		{ \
+		LuaExtendable* ud = to<LuaExtendable*>(L, index); \
+		class_name* object = dynamic_cast<class_name*>(ud); \
+		if (object) \
+		return object; \
+		luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
+		return NULL; \
+		} \
+		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		{ \
+		return to<class_name*>(L, index); \
+		} \
+		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		{ \
+		class_name* object = to<class_name*>(L, index); \
+		assert(object); \
+		return *object; \
+		} \
+		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		{ \
+		class_name* object = to<class_name*>(L, index); \
+		assert(object); \
+		return *object; \
+		} \
+	}
+// end #define declare_lua_LuaExtendable
+#else
+#define declare_lua_LuaExtendable(class_name) \
+	declare_lua_library(class_name) \
+	namespace LuaExtension \
+	{ \
+	template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		{ \
+		return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+		} \
+		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		{ \
+		return to<class_name*>(L, index); \
+		} \
+		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		{ \
+		return *to<class_name*>(L, index); \
+		} \
+		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		{ \
+		return *to<class_name*>(L, index); \
+		} \
+	}
+// end #define declare_lua_LuaExtendable
+#endif//ARGUMENT_ERRORS
+
 /**
 \def define_lua_LuaExtendable
 
-\todo, figure out what is missing from this method, and what it does
-for class exposition
+Define a %Lua library around a class, so that instances of the 
+class can be created or controlled in %Lua. This also exposes simple 
+userdata pointers with all associated C++ and Lua methods, but it doesn't 
+create any ability to added new %Lua fields.  But, this is often never needed.
+This method would be preferable for objects like vectors.
 
 \note compile-time directive
 */
@@ -337,8 +339,7 @@ for class exposition
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
 			createGlobalClassMetatable(L, #derived_class, #super_class); \
-			Lua::nilLoadedStatus(L, #derived_class); \
-			Lua::require(L, #derived_class); \
+			LuaExtendable::declareLuaClass(L, #derived_class, #super_class); \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
@@ -357,7 +358,7 @@ pointer, proxy table for new values, and metatable to reference the proxy
 table.  That's a lot of storage, and it comes with all the associated
 extra table indexing and function calls.  But, it results in ZERO distinction
 between all %Lua classes, and partly C++ classes when operating with them 
-in %Lua.  That makes it worth it to me.
+in %Lua.  The extra simplicity and power makes it worth it very valuable.
 
 \note compile-time directive
 \note highly recommended to precede end_lua_LuaExtendable_by_proxy
@@ -376,8 +377,6 @@ in %Lua.  That makes it worth it to me.
 		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived, derived##_library); \
-			Lua::nilLoadedStatus(L, #derived); \
-			Lua::require(L, #derived); \
 			LuaExtendable::declareLuaClass(L, #derived, #super); \
 			return 1; \
 		} \

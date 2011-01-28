@@ -44,10 +44,10 @@ static sint luamt__gcVector3(lua_State* L)
 	return 0;
 }
 
-//@ todo, if this vector ever goes live, get rid of
-// this class' proxy table
-// @however, if I do that, this class would have to track
-// wether it set a member to NIL or not...
+/**
+\todo expose this class with the no proxy lua extendable
+which will among other things, verify __index usage
+*/
 static sint luamt__indexVector3(lua_State* L)
 {
 	const char* key = lua_tostring(L, -1);

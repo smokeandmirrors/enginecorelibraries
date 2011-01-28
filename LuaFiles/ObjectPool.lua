@@ -3,7 +3,8 @@ module("ObjectPool", package.seeall)
 -- ObjectPool.lua 
 --	
 -- This class allows us to reduce the amount of memory allocations in lua for table instantiations that are only used locally
--- \todo, rewrite using actual privacy	
+-- \todo write the private methods with lua proxy privacy 
+--
 -- @author Smoke and Mirrors Development
 -- @email smokeandmirrorsdevelopment@gmail.com	
 -- @copyright 2010 Smoke and Mirrors Development

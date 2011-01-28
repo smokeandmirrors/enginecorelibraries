@@ -4,7 +4,7 @@ local UT = require'UnitTestingFramework'
 require 'Utilities'
 
 ----------------------------------------------------------------------
-UT.test('simple declaration',
+UT.test('inheritance',
 	function()
 		require'Grandparent'
 		require'Parent'
@@ -110,5 +110,41 @@ UT.test('simple declaration',
 		UT.checkEqual(g:getNumberOfParents(), 2)		
 		UT.checkT(g.getNumberOfGrandparents, 'function')
 		UT.checkEqual(g:getNumberOfGrandparents(), 4)		
+	end
+)
+
+----------------------------------------------------------------------
+UT.test('proxy useage',
+	function()
+		require'Child'
+		local c = new'Child'
+		UT.checkT(c, 'userdata')
+		UT.check(c.newThing == nil)
+		c.newThing = 2;
+		UT.checkEqual(c.newThing, 2)
+	end
+)
+
+----------------------------------------------------------------------
+UT.test('proxy OOP friendliness',
+	function()
+		UT.testClassProperties('Grandparent')
+		UT.testClassProperties('Parent', 'Grandparent')
+		UT.testClassProperties('Child', 'Parent')
+	end
+)
+
+----------------------------------------------------------------------
+UT.test('proxy class redefinition',
+	function()
+		require'Child'
+		c = new'Child'
+		Parent.onRefresh = function() return 'refreshed' end
+		declareClass(Parent)
+		UT.checkT(c.onRefresh, 'function')
+		UT.checkEqual(c:onRefresh(), 'refreshed')
+		Child.__add = function(lhs, rhs) return 2 end
+		declareClass(Child)
+		UT.checkEqual(c + new'Child', 2)
 	end
 )

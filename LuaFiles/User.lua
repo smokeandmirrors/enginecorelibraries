@@ -1,12 +1,13 @@
 module(..., package.seeall)
+_G.DEBUG_INTERPRETATION = true
+
 require'Utilities'
 require'ObjectOrientedParadigm'
 
-_G.U = function()
+_G.u = function()
 	rerequire'User'
 end
-_G.test = function()
-	local UTF = rerequire'UnitTestingFramework'
-	testAll(true)
-end
 
+_G.test = function()
+	
+end

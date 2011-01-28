@@ -87,20 +87,18 @@ runAll = function()
 		tester();
 	end
 	local end_time = os.clock()
-	-- \todo nil the loaded status of the unittesting framework
-	-- \todo run a full garbage collect
 	local num_failures, results = getResultsReport(end_time - start_time)
 	unitTests = {}
 	failedTests = {}	
 	collectgarbage'collect'
-	
 	if package then
 		package.loaded['UnitTestingFramework'] = nil
 	end
-	
 	_G.lastUnitTestNumFailures = num_failures
 	_G.lastUnitTestReport = results
-	
+	if print_out == nil or print_out then
+		print(_G.lastUnitTestReport)
+	end
 	return num_failures == 0
 end
 
@@ -131,10 +129,7 @@ _G.testAll = function(print_out)
 	-- require all the unit test modules here
 	rerequire'UnitTesting'
 	rerequire'OOPUnitTesting'
-	runAll()
-	if print_out then
-		print(_G.lastUnitTestReport)
-	end
+	runAll(print_out)
 end
 
 
@@ -191,6 +186,59 @@ end
 reportFailure = function(name, error_message)
 	table.insert(failedTests, {test = tostring(name), description = error_message})
 end
+
+----------------------------------------------------------------------
+-- module specific testing functions
+function testClassProperties(class_name, super_name, interfaces)
+	local OOP = require'ObjectOrientedParadigm';
+	
+	if type(class_name) == 'string' then
+		if not _G.getClass(class_name) then
+			require(class_name)
+			OOP.declareClass(_G[class_name])
+		end
+	end
+			
+	local b = new(class_name)
+	
+	check(b.ACTS_AS == _G.ACTS_AS)
+	check(b.class == _G.getClass(class_name))
+	check(b.className == class_name)
+	check(b.getClass == OOP.getClass)
+	check(b:getClass() == _G.getClass(class_name))
+	check(b.getClassName == OOP.getClassName)
+	check(b:getClassName() == class_name)
+	checkT(b.getName, 'function')
+	checkT(b:getName(), 'string')
+	checkT(b.getSuperclass, 'function')
+	check(b.getSuperclass == OOP.getSuperclass)
+	check(b.IS_A == _G.IS_A)
+	check(b:IS_A(class_name))
+	check(b.IS_EXACTLY_A == _G.IS_EXACTLY_A)
+	check(b:IS_EXACTLY_A(class_name))
+	checkT(b.toString, 'function')
+	checkT(b:toString(), 'string')
+	check(getmetatable(b) ~= nil and type(getmetatable(b).__concat) == 'function')
+	local no_error = b..new(class_name)..'no error'
+	local error_no = 'error on'..new(class_name)..b
+
+	if super_name == nil then
+		check(b.super == nil)
+		check(b:getSuperclass() == nil)
+	else
+		check(b:IS_A(super_name))
+		check(not b:IS_EXACTLY_A(super_name))
+		check(b:getSuperclass() == getClass(super_name))
+		check(b.super == getClass(super_name))
+	end
+	
+	if type(interfaces) == 'table' then
+		for _, interface in pairs(interfaces) do
+			check(b:ACTS_AS(interface))
+		end
+	end
+end
+
 
 ----------------------------------------------------------------------
 -- PRIVATE

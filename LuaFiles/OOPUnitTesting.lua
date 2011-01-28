@@ -81,15 +81,21 @@ UT.test('OO.polymorphism',
         UT.check(type(gp) == 'table')
         UT.check(IS_A(gp, 'grandparent'))
         UT.check(type(gp.IS_A) == 'function' and gp:IS_A'grandparent');
+        UT.check(IS_EXACTLY_A(gp, 'grandparent'))
+        UT.check(type(gp.IS_EXACTLY_A) == 'function' and gp:IS_EXACTLY_A'grandparent');
         UT.check(type(gp.getNickName) == 'function' and gp.getNickName() == 'papa')
         UT.check(type(gp.isOld) == 'function' and gp.isOld())        
         
         local p = new'parent'
         UT.check(type(p) == 'table')
         UT.check(IS_A(p, 'grandparent'))
+        UT.check(not IS_EXACTLY_A(p, 'grandparent'))
         UT.check(IS_A(p, 'parent'))        
+        UT.check(IS_EXACTLY_A(p, 'parent'))
         UT.check(type(p.IS_A) == 'function' and p:IS_A'grandparent')
+        UT.check(type(p.IS_EXACTLY_A) == 'function' and (not p:IS_EXACTLY_A'grandparent'))
         UT.check(type(p.IS_A) == 'function' and p:IS_A'parent')
+        UT.check(type(p.IS_EXACTLY_A) == 'function' and (p:IS_EXACTLY_A'parent'))
         UT.check(type(p.getNickName) == 'function' and p.getNickName() == 'daddy')
 		UT.check(type(p.isMiddleAged) == 'function' and p.isMiddleAged())
         UT.check(type(p.isOld) == 'function' and p.isOld())        
@@ -98,10 +104,16 @@ UT.test('OO.polymorphism',
         UT.check(type(c) == 'table')
         UT.check(IS_A(c, 'grandparent'))
         UT.check(IS_A(c, 'parent'))
+		UT.check(not IS_EXACTLY_A(c, 'grandparent'))
+        UT.check(not IS_EXACTLY_A(c, 'parent'))
 		UT.check(IS_A(c, 'child'))
+		UT.check(IS_EXACTLY_A(c, 'child'))
 		UT.check(type(c.IS_A) == 'function' and c:IS_A'grandparent')
         UT.check(type(c.IS_A) == 'function' and c:IS_A'parent')
+        UT.check(type(c.IS_EXACTLY_A) == 'function' and not c:IS_EXACTLY_A'grandparent')
+        UT.check(type(c.IS_EXACTLY_A) == 'function' and not c:IS_EXACTLY_A'parent')
         UT.check(type(c.IS_A) == 'function' and c:IS_A'child')
+		UT.check(type(c.IS_EXACTLY_A) == 'function' and c:IS_EXACTLY_A'child')
 		UT.check(type(c.getNickName) == 'function' and c.getNickName() == 'buggaboo')
 		UT.check(type(c.isMiddleAged) == 'function' and c.isMiddleAged())
         UT.check(type(c.isOld) == 'function' and c.isOld())  
@@ -143,7 +155,7 @@ UT.test('OO.construction and destruction',
         }
 
         declareClass {
-            name = 'child',
+			name = 'child',
             extends = 'parent',
              construct = function(self) 
 				UT.check(self.one == 2)
@@ -231,7 +243,9 @@ UT.test('OOP.abstract classes',
 		UT.check(e:concrete() == 2)
 		UT.check(e:IS_A'son of Did override')
 		UT.check(e:IS_A'Did override')
-		UT.check(e:IS_A'AbstractMixedMethods')		
+		UT.check(not e:IS_EXACTLY_A'Did override')
+		UT.check(e:IS_A'AbstractMixedMethods')	
+		UT.check(not e:IS_EXACTLY_A'AbstractMixedMethods')	
 	end
 )
 
@@ -305,6 +319,31 @@ function()
 	UT.check(d:getSuperclass() == getClass'Basic')
 end)
 
+----------------------------------------------------------------------
+UT.test('OOP reserved words',
+function()
+	rerequire'ObjectOrientedParadigm'
+	
+	local declareBadClass = function(reservedWord)
+		return function()
+			local ErrorProne = {}
+			ErrorProne.name = 'ErrorProne'
+			ErrorProne[reservedWord] = function() print'I should not compile' end
+			declareClass(ErrorProne)
+		end	
+	end
+	
+	UT.checkError(declareBadClass'ACTS_AS')
+	UT.checkError(declareBadClass'class')
+	UT.checkError(declareBadClass'className')
+	UT.checkError(declareBadClass'getClass')
+	UT.checkError(declareBadClass'getClassName')
+	UT.checkError(declareBadClass'getSuperclass')
+	UT.checkError(declareBadClass'IS_A')
+	UT.checkError(declareBadClass'IS_EXACTLY_A')
+	UT.checkError(declareBadClass'super')
+			
+end)
 ----------------------------------------------------------------------
 UT.test('OOP.misc',
 function()

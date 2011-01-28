@@ -17,13 +17,8 @@ require'Utilities'
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
--- @todo c++ metamethods && metamethods inheritance
--- @todo make the c++ wrapping do private/protected? FREAKING HARD (friend declaration + privacy placement?)
--- @todo make sure there are no functions/members by name
--- 		of the default class members, like IS_A, construct, super, etc.
---		new, setmetatable, and so on
 -- @todo update documentation
--- \todo if __tostring or __concat are not supplied, supply the defaults
+-- \todo write the private methods with lua proxy privacy
 
 ---------------------------------------------------------------------
 -- change the following values to change compilation, error handling,
@@ -51,17 +46,29 @@ function _G.ACTS_AS(instance, interface_name)
 end
 
 ----------------------------------------------------------------------
--- Checks for inheritance on an object created by declareClass() calls
--- or for inheritance on an object that is extended from native
+-- Checks for class type match on an object of a class declared with
+-- this system, including iheritance
 -- @param instance the runtime object
 -- @param class_name the class type in question
--- @todo finish is_subclass version
 function _G.IS_A(instance, class_name)
 	local tupos = type(instance)
 	return (tupos == 'table' or (tupos == 'userdata' and getmetatable(instance) and getmetatable(instance).__index)) 
 		and instance.getClass 
 		and classes_PRIVATE[class_name]
 		and introspect_PRIVATE(instance:getClass(), classes_PRIVATE[class_name])
+end
+
+----------------------------------------------------------------------
+-- Checks for class type match on an object of a class declared with
+-- this system, returns true if most derived type of instance is class_name
+-- @param instance the runtime object
+-- @param class_name the class type in question
+function _G.IS_EXACTLY_A(instance, class_name)
+	local tupos = type(instance)
+	return (tupos == 'table' or (tupos == 'userdata' and getmetatable(instance) and getmetatable(instance).__index)) 
+		and instance.getClass
+		and classes_PRIVATE[class_name]
+		and rawequal(instance:getClass(), classes_PRIVATE[class_name])
 end
 
 ----------------------------------------------------------------------
@@ -222,13 +229,15 @@ end
 
 ----------------------------------------------------------------------
 -- @return get the name of the instance 
--- @todo get this out of the constructor, or in debug mode only
 if DEBUG_INTERPRETATION then
 getName = function(instance)
-	if type(instance.name) == 'number' then -- apparently, string concats in lua are harsh
+	if type(instance.name) == 'number' then 
 		instance.name = instance:getClassName()..' '..instance.name
-	end
-	
+		instance.getName = getName2
+	end	
+	return instance.name
+end
+getName2 = function(instance)
 	return instance.name
 end
 else
@@ -293,9 +302,16 @@ metamethods = {
 -- to refresh a class definition on instances at runtime
 }
 
--- @todo finish these and warn about them
-reservedOOwords = {
-
+reservedWords = {
+	'ACTS_AS',
+	'class',
+	'className',
+	'getClass',
+	'getClassName',
+	'getSuperclass',
+	'IS_A',
+	'IS_EXACTLY_A',
+	'super'
 }
 -- used to keep track if an inner/private class is being created
 declarationInProgress		= false
@@ -317,16 +333,18 @@ end --- DEBUG_INTERPRETATION
 -- this replaces having a base class of 'object', saving an index 
 -- lookup for every class read of these values
 function addCommonClassProperties_PRIVATE(class, super, class_name)
-	class.ACTS_AS = ACTS_AS
-	class.class = class
-	class.className = class_name
-	class.getClass = getClass
-	class.getClassName = getClassName
-	class.getName = class.getName or getName
-	class.getSuperclass = getSuperclass
-	class.IS_A = IS_A
-	class.toString = class.__tostring or class.toString or toString
-	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or toStringConcat
+	local OOP = ObjectOrientedParadigm 
+	class.ACTS_AS		= _G.ACTS_AS
+	class.class			= class
+	class.className		= class_name
+	class.getClass		= OOP.getClass
+	class.getClassName	= OOP.getClassName
+	class.getName		= class.getName or getName
+	class.getSuperclass = OOP.getSuperclass
+	class.IS_A			= _G.IS_A
+	class.IS_EXACTLY_A	= _G.IS_EXACTLY_A
+	class.toString		= class.__tostring or class.toString or OOP.toString
+	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
 	class.super = super
 	return true
 end
@@ -347,8 +365,6 @@ end
 
 ----------------------------------------------------------------------
 -- assign the metamethods to the metatable for this class
--- @todo make this use inheritance
--- @and then pull them over from the library declaration
 function assignMetaMethods_PRIVATE(name, def, super_class_name)
 	local metatable = metatables_PRIVATE[name]
 	for key, method in pairs(def) do
@@ -395,6 +411,8 @@ function beginClassDeclaration_PRIVATE(definition)
 	end
 	-- if we aren't good so far, future messages will be irrelevant
 	assert(compiled, errorMsg)
+	-- verify no use of ObjectOrientedParadigm keywords
+	compiled = verifyKeywords_PRIVATE(def, name)
 	-- assign basic properties
 	local base_class
 	if base_class_name then
@@ -411,7 +429,7 @@ function beginClassDeclaration_PRIVATE(definition)
 	-- add the defined functions in the file to the class declaration
 	compiled = verifyFunctionTable_PRIVATE(class, def, base_class, name..'.', ' is not a function.  Create this object in the constructor() function.') and compiled
 	-- add methods common to all classes in lieu of an Object base class
-	compiled = addCommonClassProperties_PRIVATE(class, base_class, name)
+	compiled = addCommonClassProperties_PRIVATE(class, base_class, name) and compiled
 	return class, compiled
 end
 else
@@ -438,6 +456,8 @@ function beginClassDeclaration_PRIVATE(definition)
 	end
 	-- if we aren't good so far, future messages will be irrelevant
 	assert(compiled, errorMsg)
+	-- verify no use of ObjectOrientedParadigm keywords
+	compiled = verifyKeywords_PRIVATE(def, name)
 	-- assign basic properties
 	local base_class = base_class_name and classes_PRIVATE[base_class_name]
 	local class = createClassProperties_PRIVATE(name, base_class)
@@ -450,14 +470,13 @@ function beginClassDeclaration_PRIVATE(definition)
 	-- add the defined functions in the file to the class declaration
 	compiled = verifyFunctionTable_PRIVATE(class, def, base_class, name..'.', ' is not a function.  Create this object in the constructor() function.') and compiled
 	-- add methods common to all classes in lieu of an Object base class
-	compiled = addCommonClassProperties_PRIVATE(class, base_class, name)
+	compiled = addCommonClassProperties_PRIVATE(class, base_class, name) and compiled
 	return class, compiled
 end
 end -- end if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 -- assign the basics, implement inheritance
--- @todo add the functions common to all classes
 if DEBUG_INTERPRETATION then
 function createClassProperties_PRIVATE(name, superclass)
 	-- define the class
@@ -483,49 +502,50 @@ end -- end if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 -- create the creation function for the object
--- @todo in the old version, we included a check for function New() which
--- was used as a hook for classes in C to allow themselves to hook into
--- this system, this version will have to include that
 --
--- Another question will have to be answered:
--- does the class get declared first, or does the C library register first?
--- Answer:  the C library registers first.  Then, the lua class gets declared,
--- adding functionality to the C library
---
+-- The C library registers first.  Then, the lua class gets (required and 
+-- then both are) declared, adding functionality to the C library
 if DEBUG_INTERPRETATION then
--- function createConstructor_PRIVATE(class, metatable, name, parentudata_metamethod_table_name)
--- function createConstructor_PRIVATE(class, metatable, name)
 function createConstructor_PRIVATE(class, metatable)
 	assert(class and metatable)
+	-- \todo test all 4 methods
 	if class.__new then
 		if class.__setmetatable then
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
 				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)) 
 				if not instance.name then
-					instance.name = nextInstanceId
+					instance.name = class.nextInstanceId
 				end
 				return instance
 			end
 		else
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
-				local instance = class.__new(...)
+				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...))
 				if not instance.name then
-					instance.name = nextInstanceId
+					instance.name = class.nextInstanceId
 				end
-				return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(instance, metatable), ...)) 
+				return instance
 			end	
 		end
 	elseif class.__setmetatable then
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
-			constructHierarchy_PRIVATE(class, class.__setmetatable({name = class.nextInstanceId, ...}, metatable), ...)
+			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...))
+			if not instance.name then
+				instance.name = class.nextInstanceId
+			end
+			return instance
 		end
 	else
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
-			return addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({name = class.nextInstanceId, ...}, metatable), ...))
+			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...))
+			if not instance.name then
+				instance.name = class.nextInstanceId
+			end
+			return instance
 		end
 	end
 end	
@@ -543,7 +563,7 @@ function createConstructor_PRIVATE(class, metatable)
 		end	
 	elseif class.__setmetatable then
 		return function(...)
-			constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...)
+			return constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...)
 		end
 	else
 		return function(...)
@@ -583,15 +603,14 @@ function declareAbstractClass_PRIVATE(definition)
 	assert(compiled, errorMsg)
 	-- add to the list
 	classes_PRIVATE[name] = abstract_class
-	constructors_PRIVATE[name] = getAbstractConstructor('Cannot instantiate abstract class: '..name)
+	constructors_PRIVATE[name] = getAbstractConstructor(name)
 end
 
 ----------------------------------------------------------------------
--- @todo, there doesn't really need to be a constructor
--- for every abstract classes, just an easy error message
-function getAbstractConstructor(error_message)
+-- create a crashing message for abstract classes
+function getAbstractConstructor(name)
 	return function()
-		assert(false, error_message)
+		assert(false, 'Cannot instantiate abstract class: '..name)
 	end
 end
 
@@ -611,12 +630,11 @@ function declareClass_PRIVATE(definition)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the last function
-	-- local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name], name, super_name)
 	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
 		constructors_PRIVATE[name] = constructor_function
 	else
-		-- @todo finish protected classes
+		-- @todo finish protected classes, setfenv on the constructor
 	end
 	if classesNeedRefresh then
 		refreshClasses_PRIVATE()
@@ -637,12 +655,11 @@ function declareClass_PRIVATE(definition)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the constructor
-	-- local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name], name, super_name)
 	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
 		constructors_PRIVATE[name] = constructor_function
 	else
-		-- @todo finish protected classes
+		-- @todo finish protected classes, setfenv on the constructor
 	end
 end
 end -- end if DEBUG_INTERPRETATION
@@ -661,8 +678,6 @@ function declareInterface_PRIVATE(definition)
 	end
 	
 	interfaces_PRIVATE[name] = {}
-	-- @todo, make sure this next line is needed...I can't imagine why it would be
-	interfaces_PRIVATE[name..'_mt'] = { __index = interfaces_PRIVATE[name] }
 	interface = interfaces_PRIVATE[name]
 		
 	compiled = verifyFunctionTable_PRIVATE(interface, funcs, nil, 'Everything in the interface, '..name..', function list must be a function.  ', ' is not.') and compiled 
@@ -783,6 +798,7 @@ function rawNilKeys_PRIVATE(t)
 end
 
 ----------------------------------------------------------------------
+-- \todo this should only be required for proxy classes
 if DEBUG_INTERPRETATION then
 function refreshClasses_PRIVATE()
     for _, classdef in pairs(classes_PRIVATE) do
@@ -969,5 +985,21 @@ function verifyInterfacesImplementation_PRIVATE(class, interfaces)
 		end
 	end
 	return success
+end
+
+----------------------------------------------------------------------
+-- makes sure the class definition use no keywords used by this 
+-- system
+function verifyKeywords_PRIVATE(class, name)
+	local verified = true
+	print'I got called!'
+	for _, reserved_word in pairs(reservedWords) do
+		if class[reserved_word] then
+			print('reserved word: '..reserved_word)
+			addToErrorMsg_PRIVATE(name..' has a member: '..reserved_word..' which will interfere with class declaration\n')
+			verified = false
+		end
+	end
+	return verified
 end
 

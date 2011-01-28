@@ -202,7 +202,6 @@ UT.testSuite
 		tprint('string')
 		tprint(9)
 		tprint(true)
-		-- \todo test user data printing
 		tprint(coroutine.create(function() print'hello' end))
 end
 }
