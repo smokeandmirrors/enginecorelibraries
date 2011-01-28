@@ -30,3 +30,5 @@ glob:Sandbox/GoldMasterNoLua/
 glob:Sandbox/Release/
 glob:Sandbox/ReleaseNoLua/
 glob:BuildSystem/Debug/BuildLog.htm
+glob:BuildSystem/Release/BuildLog.htm
+glob:LuaFiles/vsluaplugin_log.txt
