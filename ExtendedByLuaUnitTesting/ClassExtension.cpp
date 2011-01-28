@@ -202,9 +202,7 @@ declare_lua_LuaExtendable(Grandparent);
 
 lua_func(__call)
 {
-	Grandparent& gp = to<Grandparent&>(L, -1);
-	printToLua(L, gp.toString());
-	return 0;
+	return push(L, 7);
 }
 
 define_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
@@ -274,15 +272,82 @@ lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child:
 lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
 
+/**
+test garbage collection
+*/
+class GarbageCollected 
+	: public LuaExtendable
+{
+private: 
+	
+
+public:
+	typedef GarbageCollected super;
+
+	static bool isReady();
+	static GarbageCollected* get();
+	virtual ~GarbageCollected(void);
+
+	sint setMetatable(lua_State* L)
+	{
+		return setProxyMetatable(L);
+	}
+	
+	virtual const char*	toString(void)
+	{ 
+		return "garbage"; 
+	}
+}; // Grandparent
+
+GarbageCollected* singleton(NULL);
+
+GarbageCollected::~GarbageCollected() 
+{  
+	singleton = NULL;
+}
+
+GarbageCollected* GarbageCollected::get()
+{
+	if (!singleton)
+		singleton = new GarbageCollected();
+
+	return singleton;
+}
+
+bool GarbageCollected::isReady()
+{ 
+	return singleton != NULL; 
+}
+
+declare_lua_LuaExtendable(GarbageCollected);
+
+define_lua_LuaExtendable_by_proxy(GarbageCollected, GarbageCollected)
+lua_named_entry("get",	(staticReturn1Param0<GarbageCollected*, &GarbageCollected::get>))
+end_lua_LuaExtendable_by_proxy(GarbageCollected, GarbageCollected)
+
 // END PROXY
 
 void Classes::test_define_lua_LuaExtendable_by_proxy()
 {
-	LuaExtension::Lua lua;
-	register_lua_library((&lua), Grandparent);
-	register_lua_library((&lua), Parent);
-	register_lua_library((&lua), Child);
-	UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
+	{
+		LuaExtension::Lua* pLua = new Lua();
+		LuaExtension::Lua& lua = *pLua;
+		register_lua_library((&lua), Grandparent);
+		register_lua_library((&lua), Parent);
+		register_lua_library((&lua), Child);
+		register_lua_library((&lua), GarbageCollected);
+		UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
+		lua_State* L = lua.getState();
+		lua_getglobal(L, "GarbageCollected");
+		lua_getfield(L, -1, "get");
+		CFIX_ASSERT(lua_isfunction(L, -1));
+		lua_call(L, 0, 1);
+		CFIX_ASSERT(lua_isuserdata(L, -1));
+		lua_setglobal(L, "gcobject");
+		delete pLua;
+	}
+
+	CFIX_ASSERT(!GarbageCollected::isReady());
 }
 
 CFIXCC_BEGIN_CLASS(Classes)
