@@ -160,8 +160,6 @@ inline sint push(lua_State* L, const char* value)
 	return 1;
 }
 
-/** \todo FIND OUT WHAT TO POP!! */
-
 /**
 static functions
 */
@@ -193,12 +191,10 @@ inline sint staticReturn2Param1(lua_State* L)
 {
 	RET_2 retval2;
 	ARG_1 argument = to<ARG_1>(L, -1);
-	lua_pop(L, -1);
 	sint num_pushed = push(L, (*function)(retval2, argument));
 	num_pushed += push(L, retval2);
 	return num_pushed;
 }
-
 
 /**
 class functions
@@ -231,11 +227,9 @@ inline sint return1Param0const(lua_State* L)
 template<typename CLASS, typename RET_1, typename ARG_1,  RET_1(CLASS::* function)(ARG_1) const>
 inline sint return1Param1const(lua_State* L)
 {
-	ARG_1 argument = to<ARG_1>(L, -1);
-	// lua_pop(L, -1);
-
 	if (CLASS* object = to<CLASS*>(L, -2))
 	{
+		ARG_1 argument = to<ARG_1>(L, -1);
 		RET_1 value = (object->*function)(argument);
 		return push(L, value);
 	}
