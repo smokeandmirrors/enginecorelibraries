@@ -358,6 +358,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\LuaFiles\UTLuaExtendableClasses.lua"
+				>
+			</File>
+			<File
 				RelativePath="..\LuaFiles\UTOne.lua"
 				>
 			</File>

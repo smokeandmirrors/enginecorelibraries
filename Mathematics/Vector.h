@@ -1,7 +1,6 @@
 #pragma once
 #ifndef VECTOR_H
 #define VECTOR_H
-
 /**
 @file Vector.h
 Vector definitions mostly for performance testing on a lua library
@@ -15,6 +14,8 @@ copyright 2010 Smoke and Mirrors Development
 smokeandmirrorsdevelopment@gmail.com
 
 @date 2/18/2010
+
+\todo Math namespaces
 */
 
 /** 
@@ -32,6 +33,10 @@ Vector classes and operations
 #include <assert.h>
 
 #include "Build.h"
+
+#if EXTENDED_BY_LUA
+#include "LuaExtensibility.h"
+#endif
 
 /**
 @ingroup Vectors
@@ -77,6 +82,9 @@ extern const Vector3	up3D;
 a 2D Vector class with vec_t elements
 */
 class Vector2 
+#if EXTENDED_BY_LUA
+	: public LuaExtension::LuaExtendable
+#endif//EXTENDED_BY_LUA
 {
 public:
 	// data
@@ -90,6 +98,11 @@ public:
 		: x(X), y(Y)  			{/* empty */}
 	Vector2(vec_t scalar) 
 		: x(scalar), y(scalar) 	{/* empty */}
+#if EXTENDED_BY_LUA
+	virtual ~Vector2(void)		{ /* empty */ };
+	lua_defaultToString(Vector2);
+	sint			setMetatable(lua_State* /* L */) { return 0; }
+#endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
 	vec_t 			operator[](uint i);
@@ -149,6 +162,10 @@ public:
 	bool			isZero(void) const;
 	void			zero(void);
 }; // class Vector2
+
+#if EXTENDED_BY_LUA
+//declare_lua_LuaExtendable(Vector2);
+#endif//EXTENDED_BY_LUA
 
 class Vector3 
 {
@@ -492,7 +509,7 @@ scalar and per element division
 inline void Vector2::divide(vec_t scalar)
 {
 	assert(scalar != 0.0f);
-	scalar = 1.0f / scalar; //@ todo performance test
+	scalar = 1.0f / scalar; // \todo performance test
 	x *= scalar;
 	y *= scalar;
 }
@@ -523,7 +540,7 @@ inline Vector2& Vector2::operator/=(const Vector2& v)
 inline void Vector3::divide(vec_t scalar)
 {
 	assert(scalar != 0.0f);
-	scalar = 1.0f / scalar; // @todo performance test
+	scalar = 1.0f / scalar; // \todo performance test
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;

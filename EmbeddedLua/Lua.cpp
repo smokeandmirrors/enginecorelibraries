@@ -235,7 +235,7 @@ bool Lua::require(lua_State* L, const char* module)
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
-	return !callProtected(L, 1);
+	return callProtected(L, 1, 1) == 0;
 }
 
 bool Lua::require(const char* module)

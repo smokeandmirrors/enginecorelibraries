@@ -16,7 +16,6 @@ Defines the entry point for the console application.
 
 using namespace LuaExtension;
 
-
 #endif//EXTENDED_BY_LUA
 
 #if !GOLDMASTER
@@ -39,12 +38,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		LuaExtension::Lua lua;
 		assert(lua.require("Utilities"));
 		lua.require("ObjectOrientedParadigm");
-		// registration must be done in dependency order
-		register_lua_library((&lua), Vector2); 
-		register_lua_library((&lua), Vector3);
-		
-		// performance testing
-		// lua.require("Vector3PureLua");
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		lua.runConsole();

@@ -56,7 +56,10 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 
 /**
 \todo handle interface exposure to lua
-**/
+\todo handle singleton exposure to lua with auto written functions, 
+	don't forget inheritance!
+*/
+
 struct lua_State;
 struct lua_Debug;
 
@@ -250,30 +253,30 @@ the LuaExtendable interface.
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
-	template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
-		LuaExtendable* ud = to<LuaExtendable*>(L, index); \
-		class_name* object = dynamic_cast<class_name*>(ud); \
-		if (object) \
-		return object; \
-		luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
-		return NULL; \
+			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
+			class_name* object = dynamic_cast<class_name*>(ud); \
+			if (object) \
+				return object; \
+			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
+			return NULL; \
 		} \
 		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
 		{ \
-		return to<class_name*>(L, index); \
+			return to<class_name*>(L, index); \
 		} \
 		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
 		{ \
-		class_name* object = to<class_name*>(L, index); \
-		assert(object); \
-		return *object; \
+			class_name* object = to<class_name*>(L, index); \
+			assert(object); \
+			return *object; \
 		} \
 		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
 		{ \
-		class_name* object = to<class_name*>(L, index); \
-		assert(object); \
-		return *object; \
+			class_name* object = to<class_name*>(L, index); \
+			assert(object); \
+			return *object; \
 		} \
 	}
 // end #define declare_lua_LuaExtendable
@@ -282,21 +285,21 @@ the LuaExtendable interface.
 	declare_lua_library(class_name) \
 	namespace LuaExtension \
 	{ \
-	template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
-		return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
 		} \
 		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
 		{ \
-		return to<class_name*>(L, index); \
+			return to<class_name*>(L, index); \
 		} \
 		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
 		{ \
-		return *to<class_name*>(L, index); \
+			return *to<class_name*>(L, index); \
 		} \
 		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
 		{ \
-		return *to<class_name*>(L, index); \
+			return *to<class_name*>(L, index); \
 		} \
 	}
 // end #define declare_lua_LuaExtendable
@@ -396,6 +399,22 @@ run-time directive
 	lua_object_ptr->openLibrary(lua_library_##module::key)		
 // end #define register_lua_library
 
+#define lua_defaultToString(Class) \
+	virtual const char* toString(void) \
+	{ \
+		return "This is a " #Class; \
+	} \
+
+#define lua_proxySetMetatableFunction(Class) \
+	virtual sint setMetatable(lua_State* L) \
+	{ \
+		return setProxyMetatable(L); \
+	}
+
+#define lua_proxyDefaultFunctions(Class) \
+	lua_defaultToString(Class) \
+	lua_proxySetMetatableFunction(Class) \
+	
 /**
 @interface LuaExtendable
 Makes it easier to define metamethods on exposed C++ classes.

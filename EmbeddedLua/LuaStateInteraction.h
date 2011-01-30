@@ -22,7 +22,6 @@ the %Lua state to include custom types.
 namespace LuaExtension 
 { 
 #if ARGUMENT_ERRORS 
-// \todo numeric range warnings for converting to/from lua_Numbers
 #pragma message("Compiling with Lua stack argument type checking.")
 /**
 This is a define macro and not an inline function due to the 

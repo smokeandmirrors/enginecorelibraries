@@ -22,10 +22,6 @@ public:
 	void test_define_lua_LuaExtendable_by_proxy();
 };
 
-/** 
-\todo unit test __gc and garbage collection
-*/
-
 class One
 {
 public:
@@ -145,9 +141,32 @@ void Classes::test_define_lua_class()
 	lua_pop(L, 2);
 }
 
+class Simple : public LuaExtendable
+{
+	bool isSimple() const { return true; }
+	Simple* reproduce() const { return new Simple(); }
+
+	sint setMetatable(lua_State* L)
+	{
+		return setProxyMetatable(L);
+	}
+
+	virtual const char* toString(void)
+	{ 
+		return "This is a Grandparent"; 
+	}
+};
+
+declare_lua_LuaExtendable(Simple);
+
+define_lua_LuaExtendable(Simple, Simple)
+end_lua_LuaExtendable(Simple, Simple)
+
 void Classes::test_define_lua_LuaExtendable()
 {
-	
+	// LuaExtension::Lua lua; 
+	// register_lua_library((&lua), Simple);
+	// UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
 
@@ -159,15 +178,27 @@ demonstrates full inheritance tree and proxy useage
 class Grandparent 
 	: public LuaExtendable
 {
+private:
+	static bool everCreated;
+	static uint numAllocatedGrandparents;
+	
 public:
 	typedef Grandparent super;
 
+	static uint getNumAllocated(void)	{ return numAllocatedGrandparents; }
+	static bool wasEverCreated(void)	{ return everCreated; }
+
 	Grandparent(const char* name=NULL) 
 		: m_name(name) 
-	{ /* empty */ }
+	{
+		everCreated = true;
+		numAllocatedGrandparents++;
+	}
 
 	virtual ~Grandparent(void) 
-	{ /* empty */ }
+	{ 
+		numAllocatedGrandparents--;
+	}
 
 	const char* getFamilyName(void) const 
 	{ 
@@ -189,7 +220,7 @@ public:
 		return setProxyMetatable(L);
 	}
 
-	virtual const char*	toString(void)
+	virtual const char* toString(void)
 	{ 
 		return "This is a Grandparent"; 
 	}
@@ -197,6 +228,9 @@ public:
 protected:
 	const char*				m_name;
 }; // Grandparent
+
+uint Grandparent::numAllocatedGrandparents = 0;
+bool Grandparent::everCreated = false;
 
 declare_lua_LuaExtendable(Grandparent);
 
@@ -272,82 +306,22 @@ lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child:
 lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 end_lua_LuaExtendable_by_proxy(Child, Parent)
 
-/**
-test garbage collection
-*/
-class GarbageCollected 
-	: public LuaExtendable
-{
-private: 
-	
-
-public:
-	typedef GarbageCollected super;
-
-	static bool isReady();
-	static GarbageCollected* get();
-	virtual ~GarbageCollected(void);
-
-	sint setMetatable(lua_State* L)
-	{
-		return setProxyMetatable(L);
-	}
-	
-	virtual const char*	toString(void)
-	{ 
-		return "garbage"; 
-	}
-}; // Grandparent
-
-GarbageCollected* singleton(NULL);
-
-GarbageCollected::~GarbageCollected() 
-{  
-	singleton = NULL;
-}
-
-GarbageCollected* GarbageCollected::get()
-{
-	if (!singleton)
-		singleton = new GarbageCollected();
-
-	return singleton;
-}
-
-bool GarbageCollected::isReady()
-{ 
-	return singleton != NULL; 
-}
-
-declare_lua_LuaExtendable(GarbageCollected);
-
-define_lua_LuaExtendable_by_proxy(GarbageCollected, GarbageCollected)
-lua_named_entry("get",	(staticReturn1Param0<GarbageCollected*, &GarbageCollected::get>))
-end_lua_LuaExtendable_by_proxy(GarbageCollected, GarbageCollected)
-
 // END PROXY
+
+void supportProxyTesting(void)
+{
+	LuaExtension::Lua lua; 
+	register_lua_library((&lua), Grandparent);
+	register_lua_library((&lua), Parent);
+	register_lua_library((&lua), Child);
+	UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
+}
 
 void Classes::test_define_lua_LuaExtendable_by_proxy()
 {
-	{
-		LuaExtension::Lua* pLua = new Lua();
-		LuaExtension::Lua& lua = *pLua;
-		register_lua_library((&lua), Grandparent);
-		register_lua_library((&lua), Parent);
-		register_lua_library((&lua), Child);
-		register_lua_library((&lua), GarbageCollected);
-		UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
-		lua_State* L = lua.getState();
-		lua_getglobal(L, "GarbageCollected");
-		lua_getfield(L, -1, "get");
-		CFIX_ASSERT(lua_isfunction(L, -1));
-		lua_call(L, 0, 1);
-		CFIX_ASSERT(lua_isuserdata(L, -1));
-		lua_setglobal(L, "gcobject");
-		delete pLua;
-	}
-
-	CFIX_ASSERT(!GarbageCollected::isReady());
+	supportProxyTesting();
+	CFIX_ASSERT(Grandparent::getNumAllocated() == 0);
+	CFIX_ASSERT(Grandparent::wasEverCreated());
 }
 
 CFIXCC_BEGIN_CLASS(Classes)

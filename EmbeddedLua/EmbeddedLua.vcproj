@@ -485,6 +485,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LuaExtensionInclusions.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaInclusions.h"
 				>
 			</File>
