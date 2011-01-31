@@ -36,6 +36,7 @@ Vector classes and operations
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensibility.h"
+#include "LuaStateInteraction.h"
 #endif
 
 /**
@@ -98,10 +99,13 @@ public:
 		: x(X), y(Y)  			{/* empty */}
 	Vector2(vec_t scalar) 
 		: x(scalar), y(scalar) 	{/* empty */}
+	// \see normalized constructor below
+	// Vector2(const Vector2& v, bool /* IGNORED */);
+	// 	: x(v.x), y(v.y) 		{/* empty */}
 #if EXTENDED_BY_LUA
 	virtual ~Vector2(void)		{ /* empty */ };
 	lua_defaultToString(Vector2);
-	sint			setMetatable(lua_State* /* L */) { return 0; }
+	sint			setMetatable(lua_State* L) { return setUserdataMetatable(L); }
 #endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
@@ -138,6 +142,9 @@ public:
 	// normalization 
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
+	// construction (normalized)
+	Vector2(const Vector2& v, bool /* IGNORED */)
+		: x(v.x), y(v.y) { normalize(); }
 	// multiplication & scaling 
 	const Vector2& 	negate(void);
 	void 			scale(vec_t scalar);
@@ -164,10 +171,13 @@ public:
 }; // class Vector2
 
 #if EXTENDED_BY_LUA
-// declare_lua_LuaExtendable(Vector2);
+declare_lua_LuaExtendable(Vector2);
 #endif//EXTENDED_BY_LUA
 
 class Vector3 
+#if EXTENDED_BY_LUA
+	: public LuaExtension::LuaExtendable
+#endif//EXTENDED_BY_LUA
 {
 public:
 	// data 
@@ -185,6 +195,12 @@ public:
 	// \see normalized constructor below
 	// Vector3(const Vector3& v, bool /* IGNORED */);
 	// 	: x(v.x), y(v.y), z(v.z) 			{/* empty */}
+#if EXTENDED_BY_LUA
+	virtual ~Vector3(void)		{ /* empty */ };
+	lua_defaultToString(Vector3);
+	sint			setMetatable(lua_State* L) { return setUserdataMetatable(L); }
+#endif//EXTENDED_BY_LUA
+	
 	// access 
 	const vec_t& 	operator[](uint i) const;	
 	vec_t 			operator[](uint i);
@@ -230,8 +246,8 @@ public:
 	vec_t 			magnitudeXY(void) const;
 	vec_t 			magnitudeXYSqrd(void) const;
 	// normalization
-	vec_t 			normalize(void);
 	bool			isNormal(void) const;
+	vec_t 			normalize(void);
 	// construction (normalized)
 	Vector3(const Vector3& v, bool /* IGNORED */)
 		: x(v.x), y(v.y), z(v.z) { normalize(); }
@@ -261,13 +277,16 @@ public:
 	void			zero(void);
 }; // class Vector3
 
+#if EXTENDED_BY_LUA
+declare_lua_LuaExtendable(Vector3);
+#endif//EXTENDED_BY_LUA
+
 /** 
 @defgroup Vector_Operations Operations
 @ingroup Vectors
 standard vector operations
 @{
 */
-
 
 /** 
 @defgroup Vector_Accessors Acessors

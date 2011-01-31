@@ -8,7 +8,6 @@
 
 #include "Lua.h"
 #include "LuaInclusions.h"
-#include "LuaLibraryDeclarations.h"
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
@@ -156,21 +155,10 @@ public:
 	{ 
 		return "Simple"; 
 	}
-
-	float wtf(void) const
-	{
-		return 3.14f;
-	}
 };
 
 
 declare_lua_LuaExtendable(Simple);
-
-lua_func(wtf)
-{
-	Simple* s = to<Simple*>(L, -1);
-	return push(L, s->wtf());
-}
 
 define_lua_LuaExtendable(Simple, Simple)
 end_lua_LuaExtendable(Simple, Simple)

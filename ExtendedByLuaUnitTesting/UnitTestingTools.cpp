@@ -8,7 +8,6 @@
 #include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-#include "LuaLibraryDeclarations.h"
 #endif
 
 namespace UnitTestingTools

@@ -457,14 +457,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\LuaLibraryDeclarations.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaLibraryVector.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\LuaStateInteraction.cpp"
 				>
 			</File>

@@ -119,13 +119,13 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	//s: 
 }
 
-sint LuaExtendable::isNewIndexableFalse(lua_State* L)
+sint LuaExtendable::__newindexableFalse(lua_State* L)
 {	//s: ud
 	lua_pop(L, 1);
 	return push(L, false);
 }
 
-sint LuaExtendable::isNewIndexableTrue(lua_State* L)
+sint LuaExtendable::__newindexableTrue(lua_State* L)
 {	//s: ud
 	lua_pop(L, 1);
 	return push(L, true);

@@ -232,7 +232,7 @@ end
 if DEBUG_INTERPRETATION then
 getName = function(instance)
 	local tupos = type(instance.name)
-	if tupos == 'number' and instance:isNewIndexable() then 
+	if tupos == 'number' and instance:__newindexable() then 
 		instance.name = instance:getClassName()..' '..instance.name
 		instance.getName = getName2
 	elseif tupos == 'nil' then
@@ -347,7 +347,7 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.getSuperclass = OOP.getSuperclass
 	class.IS_A			= _G.IS_A
 	class.IS_EXACTLY_A	= _G.IS_EXACTLY_A
-	class.isNewIndexable = class.isNewIndexable or _G.truef
+	class.__newindexable = class.__newindexable or _G.truef
 	class.toString		= class.__tostring or class.toString or OOP.toString
 	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
 	class.super = super
@@ -424,7 +424,7 @@ function beginClassDeclaration_PRIVATE(definition)
 		base_class = classes_PRIVATE[base_class_name]
 	end
 	local base_class = base_class_name and classes_PRIVATE[base_class_name]
-	local class = createClassProperties_PRIVATE(name, base_class)
+	local class = createClassProperties_PRIVATE(name, base_class, def.__index)
 	assignMetaMethods_PRIVATE(name, def, base_class_name)
 	-- verify the interfaces_PRIVATE
 	local interfacesGood = true
@@ -465,7 +465,7 @@ function beginClassDeclaration_PRIVATE(definition)
 	compiled = verifyKeywords_PRIVATE(def, name)
 	-- assign basic properties
 	local base_class = base_class_name and classes_PRIVATE[base_class_name]
-	local class = createClassProperties_PRIVATE(name, base_class)
+	local class = createClassProperties_PRIVATE(name, base_class, def.__index)
 	assignMetaMethods_PRIVATE(name, def, base_class_name)
 	-- verify the interfaces_PRIVATE
 	local interfaces_good = true
@@ -483,23 +483,27 @@ end -- end if DEBUG_INTERPRETATION
 ----------------------------------------------------------------------
 -- assign the basics, implement inheritance
 if DEBUG_INTERPRETATION then
-function createClassProperties_PRIVATE(name, superclass)
+function createClassProperties_PRIVATE(name, superclass, custom__index)
 	-- define the class
 	local class = {className = name, nextInstanceId = 0}
 	-- implement inheritance from super classes
+	if (name == 'Vector2' or name == 'Vector3') then
+		print'***************************************'
+		print(custom__index)
+	end
 	setmetatable(class, {__index = superclass}) 
 	-- implement inheritance for instantiated objects
-	metatables_PRIVATE[name] = {__index = class} 
+	metatables_PRIVATE[name] = {__index = custom__index or class} 
 	-- return the class definition
 	return class
 end
 else
-function createClassProperties_PRIVATE(name, superclass)
+function createClassProperties_PRIVATE(name, superclass, custom__index)
 	-- define the class
 	-- implement inheritance from super classes
 	local class = setmetatable({className = name}, {__index = superclass}) 
 	-- implement inheritance for instantiated objects
-	metatables_PRIVATE[name] = {__index = class} 
+	metatables_PRIVATE[name] = {__index = custom__index or class} 
 	-- return the class definition
 	return class
 end
@@ -519,7 +523,7 @@ function createConstructor_PRIVATE(class, metatable)
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
 				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)) 
-				if (not instance.name) and instance:isNewIndexable() then
+				if (not instance.name) and class.__newindexable() then
 					instance.name = class.nextInstanceId
 				end
 				return instance
@@ -528,7 +532,7 @@ function createConstructor_PRIVATE(class, metatable)
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
 				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...))
-				if (not instance.name) and instance:isNewIndexable() then
+				if (not instance.name) and class.__newindexable() then
 					instance.name = class.nextInstanceId
 				end
 				return instance
@@ -538,7 +542,7 @@ function createConstructor_PRIVATE(class, metatable)
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
 			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...))
-			if (not instance.name) and instance:isNewIndexable() then
+			if (not instance.name) and class.__newindexable() then
 				instance.name = class.nextInstanceId
 			end
 			return instance
@@ -547,7 +551,7 @@ function createConstructor_PRIVATE(class, metatable)
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
 			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...))
-			if (not instance.name) and instance:isNewIndexable() then
+			if (not instance.name) and class.__newindexable() then
 				instance.name = class.nextInstanceId
 			end
 			return instance
@@ -768,6 +772,11 @@ function findInterfaces_PRIVATE(interface_names)
 		end
 	end
 	return interfaces, success
+end
+
+----------------------------------------------------------------------
+function getMetatable(class_name)
+	return metatables_PRIVATE[class_name]
 end
 
 ----------------------------------------------------------------------
@@ -997,10 +1006,8 @@ end
 -- system
 function verifyKeywords_PRIVATE(class, name)
 	local verified = true
-	print'I got called!'
 	for _, reserved_word in pairs(reservedWords) do
 		if class[reserved_word] then
-			print('reserved word: '..reserved_word)
 			addToErrorMsg_PRIVATE(name..' has a member: '..reserved_word..' which will interfere with class declaration\n')
 			verified = false
 		end

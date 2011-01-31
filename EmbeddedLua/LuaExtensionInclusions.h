@@ -4,7 +4,6 @@
 
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-#include "LuaLibraryDeclarations.h"
 #include "LuaStateInteraction.h"
 
 #endif//LUAEXTENSIONINCLUSIONS_H

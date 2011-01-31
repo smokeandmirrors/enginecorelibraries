@@ -6,7 +6,6 @@
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-#include "LuaLibraryDeclarations.h"
 #include "UnitTestingTools.h"
 
 using namespace LuaExtension;
