@@ -148,12 +148,12 @@ class Simple : public LuaExtendable
 
 	sint setMetatable(lua_State* L)
 	{
-		return setProxyMetatable(L);
+		return setUserdataMetatable(L);
 	}
 
 	virtual const char* toString(void)
 	{ 
-		return "This is a Grandparent"; 
+		return "Simple"; 
 	}
 };
 
@@ -164,9 +164,9 @@ end_lua_LuaExtendable(Simple, Simple)
 
 void Classes::test_define_lua_LuaExtendable()
 {
-	// LuaExtension::Lua lua; 
-	// register_lua_library((&lua), Simple);
-	// UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
+	LuaExtension::Lua lua; 
+	register_lua_library((&lua), Simple);
+	UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
 

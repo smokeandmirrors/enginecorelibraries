@@ -62,9 +62,23 @@ sint LuaExtendable::__getProxy(lua_State* L)
 	return 1;
 }
 
-sint LuaExtendable::__newindex(lua_State* L) 
-{											//s: table,	k, v 	
-	lua_pushvalue(L, lua_upvalueindex(1));	//s: table, k, v, proxy
+sint LuaExtendable::__newindexError(lua_State* L)
+{											//: t, k, v
+	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -3));
+#if 0 // \todo make this better with the LuaExtensibility functionality
+	// pop values off the stack?
+	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
+		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
+#else
+	// \todo warn about the problem
+	lua_pop(L, 3);
+	return 0;
+#endif//DEBUG
+}
+
+sint LuaExtendable::__newindexProxy(lua_State* L) 
+{											//s: ud, k, v 	
+	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
 	lua_replace(L, -4);						//s: proxy, k, v
 	lua_rawset(L, -3);						//s: proxy
 	lua_pop(L, 1);							//s: 
@@ -153,7 +167,7 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
 	lua_setfield(L, -2, "__index");				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_pushcclosure(L, LuaExtendable::__newindex, 1); 
+	lua_pushcclosure(L, LuaExtendable::__newindexProxy, 1); 
 												//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindex
 	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
 	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
@@ -183,6 +197,11 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 	return 1;
 }
 
+sint LuaExtendable::setUserdataMetatable(lua_State* L)
+{								//s: userdata, lua_class_mt
+	lua_setmetatable(L, -2);	//s: userdata/mt
+	return 1;
+}
 
 /** 
 \todo interfaces?
@@ -244,9 +263,20 @@ void createGlobalClassMetatable(lua_State* L, const char* class_name, const char
 	createGlobalClassMetatable(L);
 }
 
+
+/**
+used to appear here:		
+	luaL_register(L, #derived_class, derived_class##_library); \
+	createGlobalClassMetatable(L, #derived_class, #super_class); \
+	LuaExtendable::declareLuaClass(L, #derived_class, #super_class); \
+
+in #define end_lua_LuaExtendable(derived_class, super_class) but,
+I can't imagine what good this thing was going to do me.
+
+*/
 sint createGlobalClassMetatable(lua_State* L)
 {	/*
-	function createGlobalClassMetatable(class_name, metatable_name)
+	function createGlobalClassMetatable(derived, super)
 		local class = _G[class_name]
 		if class then
 			local class_mt = _G.C_metatables[class_name]

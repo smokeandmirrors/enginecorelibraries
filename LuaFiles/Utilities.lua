@@ -152,6 +152,11 @@ table.findindexslow = function(t, object)
 end
 
 ----------------------------------------------------------------------
+local readOnlySupport = function(t, k, v)
+	error("Cannot update read-only table!")
+end
+
+----------------------------------------------------------------------
 -- Create a read-only version of the table
 -- @param t modifiable table
 -- @return a read-only version of t
@@ -159,9 +164,7 @@ function table.getreadonly(t)
 	local proxy = {}
 	local mt = {
 		__index = t,
-		__newindex = function(t, k, v)
-			error("Cannot update read-only table!")
-		end
+		__newindex = readOnlySupport
 	}
 	setmetatable(proxy, mt)
 	return proxy

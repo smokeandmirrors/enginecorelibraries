@@ -143,6 +143,8 @@ add a lua method to a definition by a different name
 			{(name),	(function)}, \
 // end #define lua_named_entry
 
+#define lua_final_entry {NULL, NULL}
+
 /** 
 \def define_lua_library
 
@@ -170,7 +172,7 @@ end a library definition for registration
 \param name name of the library without string delimiters
 */
 #define end_lua_library(name) \
-			{NULL,		NULL} \
+			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
@@ -192,7 +194,7 @@ the require() function.
 \param name name of the library without string delimiters
 */
 #define end_lua_library_extensible(name) \
-			{NULL,		NULL} \
+			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
@@ -228,7 +230,7 @@ no parent class, simply supply the derived class again
 \note compile-time directive
 */
 #define end_lua_class(derived_class, super_class) \
-			{NULL,		NULL} \
+			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
@@ -326,22 +328,26 @@ This method would be preferable for objects like vectors.
 		} \
 		static const luaL_reg derived##_library[] = \
 		{ \
-			lua_named_entry("__new", lua_new##derived) \
 			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
-			lua_named_entry("__tostring", LuaExtendable::__tostring)	
+			lua_named_entry("__new", lua_new##derived) \
+			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define_lua_LuaExtendable
 
 /**
+
+lua_named_entry("__newindex", LuaExtendable::__newindexError) \
+			
+
 \def end_lua_LuaExtendable
 \note compile-time directive
 */
 #define end_lua_LuaExtendable(derived_class, super_class) \
-			{NULL,		NULL} \
+			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
 			luaL_register(L, #derived_class, derived_class##_library); \
-			createGlobalClassMetatable(L, #derived_class, #super_class); \
 			LuaExtendable::declareLuaClass(L, #derived_class, #super_class); \
 			return 1; \
 		} \
@@ -367,15 +373,14 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 \note highly recommended to precede end_lua_LuaExtendable_by_proxy
 */
 #define define_lua_LuaExtendable_by_proxy(derived_class, super_class) \
-	define_lua_LuaExtendable(derived_class, super_class) \
-		lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable)
+	define_lua_LuaExtendable(derived_class, super_class) 
 // end #define define_lua_LuaExtendable_by_proxy
 
 /**
 \note compile-time directive
 */
 #define end_lua_LuaExtendable_by_proxy(derived, super) \
-			{NULL,		NULL} \
+			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
@@ -434,13 +439,29 @@ public:
 	*/
 	static sint				__getProxy(lua_State* L);
 	/**
-	__newindex method for the metatable of a class exposed to %Lua.
+	__newindex method for the metatable of a class exposed to %Lua that 
+	should be configured to the desired error level for the build.
+	e.g.: throw errors in a debug build, warn in a release build, etc.
 	*/
-	static sint				__newindex(lua_State* L);
+	static sint				__newindexError(lua_State* L);
+	/**
+	__newindex method for the metatable of a class exposed to %Lua that will
+	allow it to be assigned new fields
+	*/
+	static sint				__newindexProxy(lua_State* L);
 	/**
 	__tostring method for the metatable of a class exposed to %Lua.
 	*/
 	static sint				__tostring(lua_State* L);
+	/**
+	returns true if %Lua code like userdata[k] = v will operate correctly 
+	(without errors, and with the expected results) on the userdata pointer
+	\warning IT IS UP TO YOU TO MAKE SURE THIS IS CORRECT. If userdat[k] = v will 
+	work, make sure that your userdata:acceptsNewIndices() returns true, otherwise
+	make sure userdata:acceptsNewIndices() returns false in %Lua (and C/C++).
+	\note using the given LuaExtendable definitions will make this a lot easier.
+	*/
+	static sint				acceptsNewIndices(lua_State* L);
 	/** 
 	helps set a LuaExtendable metatable from script
 	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
@@ -452,11 +473,18 @@ public:
 	static void				declareLuaClass(lua_State* L, const char* derived, const char* super);
 	/** 
 	helps set a userdata metatable from script
-	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
+	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
 	static sint				setProxyMetatable(lua_State* L);
+	/**
+	helps set a userdata metatable from script, this is a exact C version of the function in %Lua,
+	since you can't call setmetatable on a userdata value in %Lua.
+	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua.
+	*/
+	static sint				setUserdataMetatable(lua_State* L); 
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
+	/** \todo get rid of these function requirements, do this through the class declaration?*/
 	virtual sint			setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
