@@ -164,7 +164,7 @@ public:
 }; // class Vector2
 
 #if EXTENDED_BY_LUA
-//declare_lua_LuaExtendable(Vector2);
+// declare_lua_LuaExtendable(Vector2);
 #endif//EXTENDED_BY_LUA
 
 class Vector3 

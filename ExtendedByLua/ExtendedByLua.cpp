@@ -38,6 +38,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		LuaExtension::Lua lua;
 		assert(lua.require("Utilities"));
 		lua.require("ObjectOrientedParadigm");
+		register_lua_library((&lua), Vector2);
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		lua.runConsole();

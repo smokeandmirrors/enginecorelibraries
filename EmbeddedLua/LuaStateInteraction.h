@@ -17,7 +17,7 @@ the %Lua state to include custom types.
 #include "Build.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-#include "Vector.h"
+// #include "Vector.h"
 
 namespace LuaExtension 
 { 

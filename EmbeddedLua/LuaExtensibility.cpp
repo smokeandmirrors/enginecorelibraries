@@ -64,8 +64,8 @@ sint LuaExtendable::__getProxy(lua_State* L)
 
 sint LuaExtendable::__newindexError(lua_State* L)
 {											//: t, k, v
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -3));
 #if 0 // \todo make this better with the LuaExtensibility functionality
+	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -3));
 	// pop values off the stack?
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
 		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
@@ -117,6 +117,18 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	//s: declareClass derived
 	assert(Lua::callProtected(L, 1, 0) == 0);
 	//s: 
+}
+
+sint LuaExtendable::isNewIndexableFalse(lua_State* L)
+{	//s: ud
+	lua_pop(L, 1);
+	return push(L, false);
+}
+
+sint LuaExtendable::isNewIndexableTrue(lua_State* L)
+{	//s: ud
+	lua_pop(L, 1);
+	return push(L, true);
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)

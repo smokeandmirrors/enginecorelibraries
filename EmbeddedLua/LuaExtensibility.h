@@ -336,13 +336,14 @@ This method would be preferable for objects like vectors.
 
 /**
 
-lua_named_entry("__newindex", LuaExtendable::__newindexError) \
 			
 
 \def end_lua_LuaExtendable
 \note compile-time directive
 */
 #define end_lua_LuaExtendable(derived_class, super_class) \
+			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
+			lua_named_entry("isNewIndexable", LuaExtendable::isNewIndexableFalse) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -380,6 +381,7 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 \note compile-time directive
 */
 #define end_lua_LuaExtendable_by_proxy(derived, super) \
+			lua_named_entry("isNewIndexable", LuaExtendable::isNewIndexableTrue) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -453,15 +455,7 @@ public:
 	__tostring method for the metatable of a class exposed to %Lua.
 	*/
 	static sint				__tostring(lua_State* L);
-	/**
-	returns true if %Lua code like userdata[k] = v will operate correctly 
-	(without errors, and with the expected results) on the userdata pointer
-	\warning IT IS UP TO YOU TO MAKE SURE THIS IS CORRECT. If userdat[k] = v will 
-	work, make sure that your userdata:acceptsNewIndices() returns true, otherwise
-	make sure userdata:acceptsNewIndices() returns false in %Lua (and C/C++).
-	\note using the given LuaExtendable definitions will make this a lot easier.
-	*/
-	static sint				acceptsNewIndices(lua_State* L);
+	
 	/** 
 	helps set a LuaExtendable metatable from script
 	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
@@ -471,7 +465,21 @@ public:
 	makes sure that the class is declared declared in the lua OOP system.
 	*/
 	static void				declareLuaClass(lua_State* L, const char* derived, const char* super);
-	/** 
+	/**
+	returns true if %Lua code like userdata[k] = v will operate correctly 
+	(without errors, and with the expected results) on the userdata pointer
+	
+	\warning IT IS UP TO YOU TO MAKE SURE THIS IS CORRECT. If userdata[k] = v will 
+	work, make sure that your userdata:isNewIndexable() returns true, otherwise
+	make sure userdata:isNewIndexable() returns false in %Lua (and C/C++). This
+	only needs to be true for if userdata[k] = v must work for any non-nil k, and 
+	any v.  Vectors for example, which only allow userdata[x,y,z] = v, return
+	userdata:isNewIndexable() returns false
+
+	\note using the given LuaExtendable definitions will make this a lot easier.
+	*/
+	static sint				isNewIndexableFalse(lua_State* L);
+	static sint				isNewIndexableTrue(lua_State* L);/** 
 	helps set a userdata metatable from script
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/

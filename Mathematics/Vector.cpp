@@ -26,16 +26,18 @@ const Vector3	left3D		(-1.0f,  0.0f,  0.0f);
 const Vector3	origin3D	( 0.0f,  0.0f,  0.0f);
 const Vector3	right3D		( 1.0f,  0.0f,  0.0f);
 const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
-// 
-// lua_func(__index)
-// {
-// 	const char* key = lua_tostring(L, -1);
-// 	Vector2& v = to<Vector2&>(L, -2);
-// 	return push(L, v[*key - 'x']);	
-// }
-// 
-// define_lua_LuaExtendable(Vector2, Vector2)
-// end_lua_LuaExtendable(Vector2, Vector2)
+
+declare_lua_LuaExtendable(Vector2)
+
+lua_func(__index)
+{
+	const char* key = lua_tostring(L, -1);
+	Vector2* v = to<Vector2*>(L, -2);
+	return push(L, (*v)[*key - 'x']);
+}
+
+define_lua_LuaExtendable(Vector2, Vector2)
+end_lua_LuaExtendable(Vector2, Vector2)
 
 // 
 // static sint lua_newVector3(lua_State* L);
@@ -163,4 +165,4 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 // lua_named_entry("__new", lua_newVector3)
 // lua_named_entry("__setmetatable", lua_setmetatableVector3)
 // end_lua_library(Vector3)
-// #endif//EXTENDED_BY_LUA
+//#endif//EXTENDED_BY_LUA

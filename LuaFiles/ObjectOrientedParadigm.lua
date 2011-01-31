@@ -231,9 +231,13 @@ end
 -- @return get the name of the instance 
 if DEBUG_INTERPRETATION then
 getName = function(instance)
-	if type(instance.name) == 'number' then 
+	local tupos = type(instance.name)
+	if tupos == 'number' and instance:isNewIndexable() then 
 		instance.name = instance:getClassName()..' '..instance.name
 		instance.getName = getName2
+	elseif tupos == 'nil' then
+		-- \todo move this to the constructor
+		return instance:getClassName()
 	end	
 	return instance.name
 end
@@ -343,6 +347,7 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.getSuperclass = OOP.getSuperclass
 	class.IS_A			= _G.IS_A
 	class.IS_EXACTLY_A	= _G.IS_EXACTLY_A
+	class.isNewIndexable = class.isNewIndexable or _G.truef
 	class.toString		= class.__tostring or class.toString or OOP.toString
 	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
 	class.super = super
@@ -514,7 +519,7 @@ function createConstructor_PRIVATE(class, metatable)
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
 				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)) 
-				if not instance.name then
+				if (not instance.name) and instance:isNewIndexable() then
 					instance.name = class.nextInstanceId
 				end
 				return instance
@@ -523,7 +528,7 @@ function createConstructor_PRIVATE(class, metatable)
 			return function(...)
 				class.nextInstanceId = class.nextInstanceId + 1
 				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...))
-				if not instance.name then
+				if (not instance.name) and instance:isNewIndexable() then
 					instance.name = class.nextInstanceId
 				end
 				return instance
@@ -533,7 +538,7 @@ function createConstructor_PRIVATE(class, metatable)
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
 			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...))
-			if not instance.name then
+			if (not instance.name) and instance:isNewIndexable() then
 				instance.name = class.nextInstanceId
 			end
 			return instance
@@ -542,7 +547,7 @@ function createConstructor_PRIVATE(class, metatable)
 		return function(...)
 			class.nextInstanceId = class.nextInstanceId + 1
 			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...))
-			if not instance.name then
+			if (not instance.name) and instance:isNewIndexable() then
 				instance.name = class.nextInstanceId
 			end
 			return instance

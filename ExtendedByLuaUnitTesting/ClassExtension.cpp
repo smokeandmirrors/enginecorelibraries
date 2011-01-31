@@ -143,6 +143,7 @@ void Classes::test_define_lua_class()
 
 class Simple : public LuaExtendable
 {
+public:
 	bool isSimple() const { return true; }
 	Simple* reproduce() const { return new Simple(); }
 
@@ -155,9 +156,21 @@ class Simple : public LuaExtendable
 	{ 
 		return "Simple"; 
 	}
+
+	float wtf(void) const
+	{
+		return 3.14f;
+	}
 };
 
+
 declare_lua_LuaExtendable(Simple);
+
+lua_func(wtf)
+{
+	Simple* s = to<Simple*>(L, -1);
+	return push(L, s->wtf());
+}
 
 define_lua_LuaExtendable(Simple, Simple)
 end_lua_LuaExtendable(Simple, Simple)

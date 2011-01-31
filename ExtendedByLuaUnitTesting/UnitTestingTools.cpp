@@ -53,7 +53,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	size_t convertedChars = 0;
 	wchar_t* wcstring = new wchar_t[origsize];
 	mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
-	CFIX_LOG(L"Lua Unit Test Report %s", wcstring);
+	CFIX_LOG(L"\nLua Unit Test Report: %s", wcstring);
 	
 	delete[] wcstring;
 	if (delete_lua)

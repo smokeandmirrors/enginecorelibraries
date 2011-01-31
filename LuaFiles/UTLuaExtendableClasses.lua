@@ -7,6 +7,7 @@ require 'Utilities'
 UT.test('simple declaration',
 	function()
 		pcall(function() require'Simple' end)
+		UT.testClassProperties('Simple')
 		s = new'Simple'
 		UT.checkT(s.__tostring, 'function')
 		UT.checkT(s:__tostring(), 'string')

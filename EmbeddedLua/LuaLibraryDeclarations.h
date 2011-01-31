@@ -14,9 +14,10 @@
  * @date 2/24/2010
  */
 
+#include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
 
-declare_lua_library(Vector2)
-declare_lua_library(Vector3)
+// declare_lua_LuaExtendable(Vector2)
+// declare_lua_library(Vector3)
 
 #endif//LUALIBRARYDECLARATIONS_H
