@@ -225,8 +225,8 @@ function testClassProperties(class_name, super_name, interfaces)
 	local error_no = 'error on'..new(class_name)..b
 
 	if super_name == nil then
-		check(b.super == nil)
-		check(b:getSuperclass() == nil)
+		checkT(b.super, 'nil')
+		checkT(b:getSuperclass(), 'nil')
 	else
 		check(b:IS_A(super_name))
 		check(not b:IS_EXACTLY_A(super_name))

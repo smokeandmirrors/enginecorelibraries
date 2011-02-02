@@ -279,6 +279,7 @@ end --- DEBUG_INTERPRETATION
 classes_PRIVATE 		= {}
 constructors_PRIVATE	= {}
 destructors_PRIVATE		= {}
+initializers_PRIVATE	= {}
 interfaces_PRIVATE 		= {}
 metatables_PRIVATE 		= {}
 -- helper table
@@ -480,6 +481,10 @@ function beginClassDeclaration_PRIVATE(definition)
 end
 end -- end if DEBUG_INTERPRETATION
 
+function constructTable(...)
+	return {...}
+end
+
 ----------------------------------------------------------------------
 -- assign the basics, implement inheritance
 if DEBUG_INTERPRETATION then
@@ -516,8 +521,36 @@ end -- end if DEBUG_INTERPRETATION
 -- then both are) declared, adding functionality to the C library
 if DEBUG_INTERPRETATION then
 function createConstructor_PRIVATE(class, metatable)
-	assert(class and metatable)
-	-- \todo test all 4 methods
+	local allocator
+	local setMetatable
+	-- \todo test all constructor methods
+	if type(class.__new) == 'function' then
+		allocator = class.__new
+	else
+		allocator = constructTable
+	end
+	
+	if type(class.__setmetatable) == 'function' then
+		setMetatable = class.__setmetatable
+	else
+		setMetatable = setmetatable
+	end
+	-- an initializer for push() calls from native
+	local initializer = function(instance, ...)
+		class.nextInstanceId = class.nextInstanceId + 1
+		addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setMetatable(instance, metatable), ...))
+		if (not instance.name) and class.__newindexable() then
+			instance.name = class.nextInstanceId
+		end
+		return instance
+	end
+	-- a full constructor for new() calls from Lua
+	local constructor = function(...)
+		return initializer(allocator(), ...)
+	end
+			
+	return constructor, initializer
+--[[	
 	if class.__new then
 		if class.__setmetatable then
 			return function(...)
@@ -557,9 +590,37 @@ function createConstructor_PRIVATE(class, metatable)
 			return instance
 		end
 	end
+--]]
 end	
 else
 function createConstructor_PRIVATE(class, metatable)
+	assert(class and metatable)
+	local allocator
+	local setMetatable
+	
+	if type(class.__new) == 'function' then
+		allocator = class.__new
+	else
+		allocator = constructTable
+	end
+	
+	if type(class.__setmetatable) == 'function' then
+		setMetatable = class.__setmetatable
+	else
+		setMetatable = setmetatable
+	end
+	-- an initializer for push() calls from native
+	local initializer = function(instance, ...)
+		return constructHierarchy_PRIVATE(class, setMetatable(instance, metatable), ...)
+	end
+	-- a full constructor for new() calls from Lua
+	local constructor = function(...)
+		return initializer(allocator(), ...)
+	end
+			
+	return constructor, initializer
+	
+--[[	
 	if class.__new then
 		if class.__setmetatable then
 			return function(...)
@@ -579,6 +640,7 @@ function createConstructor_PRIVATE(class, metatable)
 			return constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...)
 		end
 	end
+--]]	
 end 	
 end -- if DEBUG_INTERPRETATION
 
@@ -634,14 +696,25 @@ function declareClass_PRIVATE(definition)
 	-- if the class implements all interface methods and abstract methods, allow instantiation
 	compiled = verifyAbstractImplementation_PRIVATE(class, class.super) and compiled
 	compiled = verifyAllInterfacesImplementation_PRIVATE(class) and compiled
+	local constructor
+	local initializer
+	constructor, initializer = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
+	if type(constructor) ~= 'function' then
+		addToErrorMsg_PRIVATE("class: "..name.." didn't create a proper constructor")
+		compiled = false
+	end
+	if type(initializer) ~= 'function' then
+		addToErrorMsg_PRIVATE("class: "..name.." didn't create a proper initializer")
+		compiled = false
+	end
 	-- if the class is well formed... 
 	assert(compiled, errorMsg)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the last function
-	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
-		constructors_PRIVATE[name] = constructor_function
+		constructors_PRIVATE[name] = constructor
+		initializers_PRIVATE[name] = initializer
 	else
 		-- @todo finish protected classes, setfenv on the constructor
 	end
@@ -659,14 +732,25 @@ function declareClass_PRIVATE(definition)
 	-- if the class implements all interface methods and abstract methods, allow instantiation
 	compiled = verifyAbstractImplementation_PRIVATE(class, class.super) and compiled
 	compiled = verifyAllInterfacesImplementation_PRIVATE(class) and compiled
+	local constructor
+	local initializer
+	constructor, initializer = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
+	if type(constructor) ~= 'function' then
+		addToErrorMsg_PRIVATE("class: "..name.." didn't create a proper constructor")
+		compiled = false
+	end
+	if type(initializer) ~= 'function' then
+		addToErrorMsg_PRIVATE("class: "..name.." didn't create a proper initializer")
+		compiled = false
+	end
 	-- if the class is well formed...
 	assert(compiled, errorMsg)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the constructor
-	local constructor_function = createConstructor_PRIVATE(class, metatables_PRIVATE[name])
 	if public then 
-		constructors_PRIVATE[name] = constructor_function
+		constructors_PRIVATE[name] = constructor
+		initializers_PRIVATE[name] = initializer
 	else
 		-- @todo finish protected classes, setfenv on the constructor
 	end

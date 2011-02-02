@@ -140,36 +140,25 @@ void Classes::test_define_lua_class()
 	lua_pop(L, 2);
 }
 
-class Simple : public LuaExtendable
-{
-public:
-	bool isSimple() const { return true; }
-	Simple* reproduce() const { return new Simple(); }
 
-	sint setMetatable(lua_State* L)
-	{
-		return setUserdataMetatable(L);
-	}
-
-	virtual const char* toString(void)
-	{ 
-		return "Simple"; 
-	}
-};
-
-
-declare_lua_LuaExtendable(Simple);
-
-define_lua_LuaExtendable(Simple, Simple)
-end_lua_LuaExtendable(Simple, Simple)
-
-void Classes::test_define_lua_LuaExtendable()
+void supporttest_define_lua_LuaExtendable()
 {
 	LuaExtension::Lua lua; 
-	register_lua_library((&lua), Simple);
+	// register_lua_library((&lua), Simple);
+	// register_lua_library((&lua), Derived);
 	UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
+void Classes::test_define_lua_LuaExtendable()
+{
+	/*
+	supporttest_define_lua_LuaExtendable();
+	CFIX_ASSERT(Simple::getNumAllocated() == 0);
+	CFIX_ASSERT(Simple::wasEverCreated());
+	CFIX_ASSERT(Derived::getNumAllocated() == 0);
+	CFIX_ASSERT(Derived::wasEverCreated());
+	*/
+}
 
 // BEGIN PROXY
 /**
