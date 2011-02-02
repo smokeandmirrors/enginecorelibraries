@@ -205,15 +205,7 @@ public:
 		return this == &other; 
 	}
 
-	sint setMetatable(lua_State* L)
-	{
-		return setProxyMetatable(L);
-	}
-
-	virtual const char* toString(void)
-	{ 
-		return "This is a Grandparent"; 
-	}
+	createLuaExtendableProxyDefaultFunctions(Grandparent)
 
 protected:
 	const char*				m_name;

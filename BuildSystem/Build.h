@@ -17,6 +17,9 @@ smokeandmirrorsdevelopment@gmail.com
 @date 1/20/2011
 */
 
+#include <assert.h>
+
+
 /**
 C/C++ types
 */
@@ -34,6 +37,6 @@ typedef unsigned long		ulong;
 // typedef double				double;
 typedef long double			ldouble;
 
-// \todo number types, and NULL
+// \todo number types, and NULL, assertions
 
 #endif//BUILD_H

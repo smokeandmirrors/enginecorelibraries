@@ -104,8 +104,7 @@ public:
 	// 	: x(v.x), y(v.y) 		{/* empty */}
 #if EXTENDED_BY_LUA
 	virtual ~Vector2(void)		{ /* empty */ };
-	lua_defaultToString(Vector2);
-	sint			setMetatable(lua_State* L) { return setUserdataMetatable(L); }
+	createLuaExtendableUserdataDefaultFunctions(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
@@ -197,8 +196,7 @@ public:
 	// 	: x(v.x), y(v.y), z(v.z) 			{/* empty */}
 #if EXTENDED_BY_LUA
 	virtual ~Vector3(void)		{ /* empty */ };
-	lua_defaultToString(Vector3);
-	sint			setMetatable(lua_State* L) { return setUserdataMetatable(L); }
+	createLuaExtendableUserdataDefaultFunctions(Vector3)
 #endif//EXTENDED_BY_LUA
 	
 	// access 

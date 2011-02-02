@@ -150,7 +150,38 @@ inline sint push(lua_State* L, double value)
 
 inline sint push(lua_State* L, LuaExtendable* value)
 {
-	return pushRegisteredClass(L, value);
+	pushRegisteredClass(L, value);					//s: ud
+	lua_getglobal(L, "getmetatable");				//s: ud, getmetatable	
+	lua_pushvalue(L, -2);							//s: ud, getmetatable, ud
+	lua_call(L, 1, 1);								//s: ud, getmetatable, ?
+
+	if (lua_istable(L, -1))
+	{												//s: ud, mt
+		lua_pop(L, 1);								//s: ud
+	}
+	else
+	{												//s: ud, nil	
+		assert(lua_isnil(L, -1));
+		lua_pop(L, 1);								//s: ud
+		assert(lua_isuserdata(L, -1));			
+		lua_getglobal(L, "ObjectOrientedParadigm"); //s: ud, OOP
+		assert(lua_istable(L, -1));			
+		assert(lua_isuserdata(L, -2));			
+		lua_getfield(L, -1, "initializers_PRIVATE");//s: ud, OOP, initializers
+		lua_replace(L, -2);							//s: ud, initializers
+		assert(lua_istable(L, -1));			
+		assert(lua_isuserdata(L, -2));			
+		lua_getfield(L, -1, value->getClassName());	//s: ud, initializers, "class_name"
+		lua_replace(L, -2);							//s: ud, class()
+		assert(lua_isfunction(L, -1));			
+		assert(lua_isuserdata(L, -2));			
+		lua_pushvalue(L, -2);						//s: ud, class(), ud
+		assert(lua_isuserdata(L, -1));			
+		assert(lua_isuserdata(L, -3));			
+		lua_call(L, 1, 0);							//s: ud
+	}
+
+	return 1;
 }
 
 inline sint push(lua_State* L, const char* value)

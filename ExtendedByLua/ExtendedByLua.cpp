@@ -43,22 +43,14 @@ public:
 	virtual uint	getValue(void) const		{ return 7; }
 	bool			isSimple(void) const		{ return true; }
 	Simple*			reproduce() const			{ return new Simple(); }
-
-	sint setMetatable(lua_State* L)
-	{
-		return setUserdataMetatable(L);
-	}
-
+	
 	void setOther(Simple* other) 
 	{ 
 		m_other = other; 
 	}
 
-	virtual const char* toString(void)
-	{ 
-		return "Simple"; 
-	}
-
+	createLuaExtendableUserdataDefaultFunctions(Simple)
+		
 private:
 	Simple*			m_other;
 };

@@ -407,7 +407,13 @@ run-time directive
 	virtual const char* toString(void) \
 	{ \
 		return "This is a " #Class; \
-	} \
+	}
+
+#define lua_getClassName(Class) \
+	virtual const char* getClassName(void) const \
+	{ \
+		return #Class; \
+	}
 
 #define lua_proxySetMetatableFunction(Class) \
 	virtual sint setMetatable(lua_State* L) \
@@ -415,8 +421,20 @@ run-time directive
 		return setProxyMetatable(L); \
 	}
 
-#define lua_proxyDefaultFunctions(Class) \
+#define lua_userdataSetMetatableFunction(Class) \
+	virtual sint setMetatable(lua_State* L) \
+	{ \
+		return setUserdataMetatable(L); \
+	}
+
+#define createLuaExtendableUserdataDefaultFunctions(Class) \
 	lua_defaultToString(Class) \
+	lua_getClassName(Class) \
+	lua_userdataSetMetatableFunction(Class) \
+	
+#define createLuaExtendableProxyDefaultFunctions(Class) \
+	lua_defaultToString(Class) \
+	lua_getClassName(Class) \
 	lua_proxySetMetatableFunction(Class) \
 	
 /**
@@ -490,7 +508,8 @@ public:
 	static sint				setUserdataMetatable(lua_State* L); 
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
-	/** \todo get rid of these function requirements, do this through the class declaration?*/
+	/** \todo test fuctionality with only parent class exposure */
+	virtual const char*		getClassName(void) const=0;
 	virtual sint			setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
