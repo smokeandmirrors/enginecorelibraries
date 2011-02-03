@@ -57,6 +57,10 @@ UT.test('table.countslow',
 		end	
 		UT.checkEqual(table.countslow(t), #t) 
 		UT.checkEqual(table.countslow(t), 100)
+		t[50] = nil
+		UT.checkEqual(table.countslow(t), 99)
+		table.remove(t)
+		UT.checkEqual(table.countslow(t), 98)
 	end
 )
 

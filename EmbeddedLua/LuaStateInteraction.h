@@ -203,7 +203,6 @@ template<typename RET_1, typename ARG_1, RET_1(* function)(ARG_1)>
 inline sint staticReturn1Param1(lua_State* L)
 {
 	ARG_1 arg1 = to<ARG_1>(L, -1);
-	lua_pop(L, -1);
 	return push(L, (*function)(arg1));	
 }
 

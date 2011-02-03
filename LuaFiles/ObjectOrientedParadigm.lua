@@ -17,8 +17,7 @@ require'Utilities'
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
--- @todo update documentation
--- \todo write the private methods with lua proxy privacy, or just local functions!
+-- \todo update documentation
 
 ---------------------------------------------------------------------
 -- change the following values to change compilation, error handling,

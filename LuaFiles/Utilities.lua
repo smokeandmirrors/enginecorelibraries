@@ -119,7 +119,6 @@ isValueFunction = function(key, value)
 end
 
 ---------------------------------------------------------------------
--- @todo test this
 table.countslow = function(t)
 	local n = 0
 	for _ in pairs(t) do
@@ -158,6 +157,7 @@ end
 
 ----------------------------------------------------------------------
 -- Create a read-only version of the table
+-- \warning this table can't be used in pairs()/ipairs()
 -- @param t modifiable table
 -- @return a read-only version of t
 function table.getreadonly(t)
@@ -220,11 +220,47 @@ function _G.sprintf(format_me, ...)
 end
 
 if table then
+function getTabs(number)
+	local indent = ''
+	for i = 1, number do
+		indent = indent..'\t'
+	end
+	return indent
+end
+
+function printTableEntries(object, indent, previous, tabs)
+	for key, value in pairs(object) do
+		if type(value) == 'table' then
+			print(tabs..tostring(key)..' -> '..tostring(value))
+			dprint(value, indent + 1, previous)
+		else
+			print(tabs..tostring(key)..' -> '..tostring(value))
+		end
+	end
+end
+
 ----------------------------------------------------------------------
 -- Recursive deep print 
 -- @todo make correct version
-function _G.dprint(object, indent) 
-
+function _G.dprint(object, indent, previous) 
+	indent = indent or 0
+	local tabs = getTabs(indent)	
+	if type(object) == 'table' then
+		if not previous then
+			previous = {}
+			previous[object] = true
+			print(tabs..tostring(object)..' : o')
+			printTableEntries(object, indent, previous, tabs)
+		elseif not previous[object] then
+			previous[object] = true
+			print(tabs..tostring(object)..' : o')
+			printTableEntries(object, indent, previous, tabs)
+		else
+			print(tabs..tostring(object)..' : x')
+		end
+	else
+		print(tabs..tostring(object))
+	end
 end
 
 ----------------------------------------------------------------------

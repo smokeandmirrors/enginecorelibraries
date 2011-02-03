@@ -12,3 +12,9 @@ _G.test = function()
 	
 end
 
+_G.testdprint = function()
+	_G.a = { 6, 5, 4 }
+	_G.b = { 9, a, 7 }
+	_G.c = { a, 10, b }
+	dprint(c)
+end
