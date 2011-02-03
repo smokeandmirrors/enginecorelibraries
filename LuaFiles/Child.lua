@@ -19,16 +19,3 @@ end
 __eq = function(self, other)
 	return self.favoritePark == other.favoritePark
 end
-
---[[
-onRefresh = function(self)
-	return 'Wes knows awesome when he sees it'
-end
-
-onRefresh2 = function(self, sweet)
-	self.favoritePark = sweet
-	return self.favoritePark
-end
-
-declareClass(Child)
---]]

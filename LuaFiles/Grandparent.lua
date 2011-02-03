@@ -14,15 +14,3 @@ end
 getNumberOfGrandKids = function(self)
 	return self.numberOfGrandKids
 end
-
---[[
-__eq = function(self, other)
-	return self.favoriteFood == other.favoriteFood
-end
-
-favoriteMusic = function(self)
-	return "The Beatles"
-end
-
-declareClass(Grandparent)
---]]

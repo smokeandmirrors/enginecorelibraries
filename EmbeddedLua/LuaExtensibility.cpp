@@ -51,7 +51,7 @@ inline bool isInstanceBeingRefreshed(lua_State* L)
 
 sint LuaExtendable::__gcmetamethod(lua_State* L)
 {
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
+	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	delete udata;
 	return 0;
 }
@@ -64,8 +64,8 @@ sint LuaExtendable::__getProxy(lua_State* L)
 
 sint LuaExtendable::__newindexError(lua_State* L)
 {											//: t, k, v
-#if 0 // \todo make this better with the LuaExtensibility functionality
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -3));
+#if DEBUG // \todo make this better with the LuaExtensibility functionality
+	LuaExtendable* udata = to<LuaExtendable*>(L, -3);
 	// pop values off the stack?
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
 		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
@@ -87,14 +87,14 @@ sint LuaExtendable::__newindexProxy(lua_State* L)
 
 sint LuaExtendable::__tostring(lua_State* L)
 {
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -1));
+	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	lua_pushstring(L, udata->toString());
 	return 1;
 }
 
 sint LuaExtendable::callSetMetatable(lua_State* L)
 {
-	LuaExtendable* udata = *static_cast<LuaExtendable**>(lua_touserdata(L, -2));
+	LuaExtendable* udata = to<LuaExtendable*>(L, -2);
 	return udata->setMetatable(L);
 }
 
@@ -266,96 +266,6 @@ void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* 
 	//s: class_def
 	lua_pop(L, 1);
 	//s:
-}
-
-/** \todo support the super_class name */
-void createGlobalClassMetatable(lua_State* L, const char* class_name, const char* /* super_class_name */)
-{
-	lua_pushstring(L, class_name);
-	createGlobalClassMetatable(L);
-}
-
-
-/**
-used to appear here:		
-	luaL_register(L, #derived_class, derived_class##_library); \
-	createGlobalClassMetatable(L, #derived_class, #super_class); \
-	LuaExtendable::declareLuaClass(L, #derived_class, #super_class); \
-
-in #define end_lua_LuaExtendable(derived_class, super_class) but,
-I can't imagine what good this thing was going to do me.
-
-*/
-sint createGlobalClassMetatable(lua_State* L)
-{	/*
-	function createGlobalClassMetatable(derived, super)
-		local class = _G[class_name]
-		if class then
-			local class_mt = _G.C_metatables[class_name]
-			if not class_mt then
-				class_mt = {}
-				_G.C_metatables[class_name] = class_mt
-			end
-			for metamethodname, _ in pairs(metamethods) do
-				if class[metamethodname] then
-					class_mt[metamethodname] = class[metamethodname]
-				end
-			end
-		end
-	end
-	*/
-															//s: class_name
-	const char* class_name = lua_tostring(L, -1);			//s: class_name
-	lua_pop(L, 1);											//s:
-	lua_getglobal(L, class_name);							//s: class
-	lua_getglobal(L, "C_metatables");						//s: class, C_metatables
-	lua_getfield(L, -1, class_name);						//s: class, C_metatables, ?
-	/** 
-	@todo under what situations would this be called 2x?  
-	when would this be non nil (for the same class)? 
-	*/
-	if (lua_isnil(L, -1))
-	{														//s: class, C_metatables, nil
-		lua_pop(L, 1);										//s: class, C_metatables
-		lua_newtable(L);									//s: class, C_metatables, class_mt
-		lua_pushvalue(L, -1);								//s: class, C_metatables, class_mt, class_mt
-		lua_setfield(L, -3, class_name);					//s: class, C_metatables, class_mt
-	}
-															//s: class, C_metatables, class_mt
-	lua_replace(L, -2);										//s: class, class_mt
-	
-	sint index = NUM_LUA_METAMETHODS;
-	do 
-	{
-		--index;
-		const char* method_name = lua_metamethodNames[index];
-		lua_getfield(L, -2, method_name);					//s: class, class_mt, ?
-		if (lua_isnil(L, -1))
-		{													//s: class, class_mt, nil
-			lua_pop(L, 1);									//s: class, class_mt
-		}
-		else
-		{													//s: class, class_mt, metamethod
-			lua_setfield(L, -2, method_name);				//s: class, class_mt
-		}
-	} 
-	while (index);
-															//s: class, class_mt
-	lua_getfield(L, -1, "__index");							//s: class, class_mt, ?
-	
-	if (lua_isnil(L, -1))
-	{														//s: class, class_mt, nil
-		lua_pop(L, 1);										//s: class, class_mt
-		lua_pushvalue(L, -2);								//s: class, class_mt, class
-		lua_setfield(L, -2, "__index");						//s: class, class_mt
-		lua_pop(L, 2);										//s: 
-	}
-	else
-	{														//s: class, class_mt, __index
-		lua_pop(L, 3);										//s: 
-	}
-															//s:
-	return 0;
 }
 
 void printToLua(lua_State* L, const char* string)

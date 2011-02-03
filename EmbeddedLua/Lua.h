@@ -12,9 +12,6 @@ creation of application and library code for %Lua.
 \email smokeandmirrorsdevelopment@gmail.com
 \date 2/18/2010
 
-\todo expose some ability to modify the require path at runtime
-\todo expose some ability to modify the require path at executions start up time
-\todo expose some ability to modify the folders searched by the require function
 */
 
 #include <stdlib.h>

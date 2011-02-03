@@ -18,7 +18,7 @@ require'Utilities'
 ----------------------------------------------------------------------
 
 -- @todo update documentation
--- \todo write the private methods with lua proxy privacy
+-- \todo write the private methods with lua proxy privacy, or just local functions!
 
 ---------------------------------------------------------------------
 -- change the following values to change compilation, error handling,
@@ -236,7 +236,6 @@ getName = function(instance)
 		instance.name = instance:getClassName()..' '..instance.name
 		instance.getName = getName2
 	elseif tupos == 'nil' then
-		-- \todo move this to the constructor
 		return instance:getClassName()
 	end	
 	return instance.name
@@ -896,7 +895,6 @@ function rawNilKeys_PRIVATE(t)
 end
 
 ----------------------------------------------------------------------
--- \todo this should only be required for proxy classes
 if DEBUG_INTERPRETATION then
 function refreshClasses_PRIVATE()
     for _, classdef in pairs(classes_PRIVATE) do

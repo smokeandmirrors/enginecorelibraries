@@ -190,7 +190,7 @@ end
 ----------------------------------------------------------------------
 -- module specific testing functions
 function testClassProperties(class_name, super_name, interfaces)
-	local OOP = require'ObjectOrientedParadigm';
+	local OOP = require'ObjectOrientedParadigm'
 	
 	if type(class_name) == 'string' then
 		if not _G.getClass(class_name) then
@@ -200,6 +200,11 @@ function testClassProperties(class_name, super_name, interfaces)
 	end
 			
 	local b = new(class_name)
+	testInstanceProperties(b, class_name, super_name, interfaces)
+end
+
+function testInstanceProperties(b, class_name, super_name, interfaces)
+	local OOP = require'ObjectOrientedParadigm'
 	
 	check(b.ACTS_AS == _G.ACTS_AS)
 	check(b.class == _G.getClass(class_name))

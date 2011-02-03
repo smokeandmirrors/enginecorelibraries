@@ -6,9 +6,6 @@
 
 namespace UnitTestingTools
 {
-	/**
-	the wchar_t* returned must be deleted[].
-	*/
 #ifdef EXTENDED_BY_LUA 
 	void executeLuaUnitTest(char* module, LuaExtension::Lua* lua=NULL);
 #endif

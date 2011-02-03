@@ -76,12 +76,12 @@ lua_func(incrementOne)
 	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
 }
 
-define_lua_class(One, One)
+define_lua_library(One)
 	lua_named_entry("new", newOne)
 	lua_named_entry("get", getOne)
 	lua_named_entry("getValue", getValueOne)
 	lua_named_entry("increment", incrementOne)
-end_lua_class(One, One)
+end_lua_library(One)
 
 void Classes::test_define_lua_class()
 {
@@ -141,23 +141,115 @@ void Classes::test_define_lua_class()
 }
 
 
+class Simple
+	: public LuaExtendable
+{
+private:
+	static bool everCreated;
+	static uint numAllocated;
+
+public:
+	Simple(void)
+	{
+		everCreated = true;
+		numAllocated++;
+	}
+
+	virtual ~Simple(void)
+	{
+		numAllocated--;
+	}
+
+	static uint getNumAllocated(void)	{ return numAllocated; }
+	static bool wasEverCreated(void)	{ return everCreated; }
+
+public:
+	Simple*			getOther(void) const		{ return m_other; }
+	virtual uint	getValue(void) const		{ return 7; }
+	bool			isSimple(void) const		{ return true; }
+	Simple*			reproduce() const			{ return new Simple(); }
+
+	void setOther(Simple* other) 
+	{ 
+		m_other = other; 
+	}
+
+	createLuaExtendableUserdataDefaultFunctions(Simple)
+
+private:
+	Simple*			m_other;
+};
+
+uint Simple::numAllocated = 0;
+bool Simple::everCreated = false;
+
+declare_lua_LuaExtendable(Simple);
+
+define_lua_LuaExtendable(Simple, Simple)
+lua_named_entry("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
+lua_named_entry("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
+lua_named_entry("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
+lua_named_entry("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
+lua_named_entry("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
+lua_named_entry("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
+end_lua_LuaExtendable(Simple, Simple)
+
+
+class Derived
+	: public Simple
+{
+private:
+	static bool everCreated;
+	static uint numAllocated;
+
+public:
+	Derived(void)
+	{
+		everCreated = true;
+		numAllocated++;
+	}
+
+	virtual ~Derived(void)
+	{
+		numAllocated--;
+	}
+
+	static uint getNumAllocated(void)		{ return numAllocated; }
+	static bool wasEverCreated(void)		{ return everCreated; }
+
+public:
+	uint				getDerivation(void) const	{ return 21; }
+	virtual uint		getValue(void) const		{ return 14; }
+	virtual const char* toString(void)
+	{ 
+		return "Derived"; 
+	}
+};
+
+uint Derived::numAllocated = 0;
+bool Derived::everCreated = false;
+
+declare_lua_LuaExtendable(Derived);
+
+define_lua_LuaExtendable(Derived, Simple)
+lua_named_entry("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
+end_lua_LuaExtendable(Derived, Simple)
+
 void supporttest_define_lua_LuaExtendable()
 {
 	LuaExtension::Lua lua; 
-	// register_lua_library((&lua), Simple);
-	// register_lua_library((&lua), Derived);
+	register_lua_library((&lua), Simple);
+	register_lua_library((&lua), Derived);
 	UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
 void Classes::test_define_lua_LuaExtendable()
 {
-	/*
 	supporttest_define_lua_LuaExtendable();
 	CFIX_ASSERT(Simple::getNumAllocated() == 0);
 	CFIX_ASSERT(Simple::wasEverCreated());
 	CFIX_ASSERT(Derived::getNumAllocated() == 0);
 	CFIX_ASSERT(Derived::wasEverCreated());
-	*/
 }
 
 // BEGIN PROXY
@@ -231,7 +323,7 @@ end_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
 /**
 @class
 
-demonstrates full inheritance tree and proxy usesage
+demonstrates full inheritance tree and proxy useage
 */
 class Parent 
 	: public Grandparent
@@ -268,7 +360,13 @@ class Child
 public:
 	typedef Parent super;
 
-	static Child*			get(void)					{ static Child c; return &c; }
+	static Child*			get(void) 
+	{ 
+		static Child* c(NULL); 
+		if (!c)
+			c = new Child();
+		return c; 
+	}
 
 	Parent*					getParent(void) const		{ return m_parent; }
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }

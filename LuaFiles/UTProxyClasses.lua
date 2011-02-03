@@ -18,7 +18,7 @@ UT.test('inheritance',
 		UT.checkEqual(g:getTitle(), 'Grandparent')
 		UT.checkT(g.__eq, 'function')
 		UT.check(g == g)
-		local g2 = new('Grandparent')
+		local g2 = new'Grandparent'
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
 		UT.checkEqual(g.."", 'This is a Grandparent') 
@@ -86,7 +86,7 @@ UT.test('inheritance',
 		UT.checkT(g.__eq, 'function')
 		UT.check(g == g)
 		UT.check(g ~= g2)
-		local g2 = new('Child')
+		local g2 = new'Child'
 		UT.check(g == g2 and g2 == g)
 		g2.favoritePark = 'Lake Harriett'
 		UT.check(g ~= g2 and g2 ~= g)
@@ -95,6 +95,8 @@ UT.test('inheritance',
 		UT.checkT(g.__gc, 'function')
 		UT.checkT(g.__call, 'function')
 		UT.check(g(), 7)
+		local g3 = g2:get()
+		UT.checkT(getmetatable(g3), 'table')
 		-- Lua constructor results
 		UT.checkEqual(g.numberOfKids, 0)
 		UT.checkEqual(g.numberOfGrandKids, 0)

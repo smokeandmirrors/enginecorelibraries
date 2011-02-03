@@ -83,8 +83,6 @@ enum LUA_EXPOSURE
 #define ARGUMENT_ERRORS 1
 #endif//!GOLDMASTER
 
-// extern uint testing; 
-
 /** 
 \def lua_func 
 
@@ -204,43 +202,6 @@ the require() function.
 		} \
 	}; // end namespace lua_library_##name
 // end #define end_lua_library_extensible
-
-/**
-\def define_lua_class
-define a %Lua library around a class, so that instances of the 
-class can be created or controlled in %Lua.  Using this method, the 
-programmer is responsible for the whole system of usage of the class in 
-in %Lua.  This also exposes simple userdata pointers with all 
-associated C++ and Lua methods, it doesn't create any ability
-to added new %Lua fields.  But, this is often never needed.
-This method is can be ideal for singletons.
-
-\note compile-time directive
-
-\param derived_class the class to expose
-\param super_class the parent class of the derived_class, if there is 
-no parent class, simply supply the derived class again
-*/
-#define define_lua_class(derived_class, super_class) \
-	define_lua_library(derived_class)
-// end #define define_lua_LuaExtendable
-
-/**
-\def end_lua_class
-\note compile-time directive
-*/
-#define end_lua_class(derived_class, super_class) \
-			lua_final_entry \
-		};	/* end function list */ \
-		sint key(lua_State* L) \
-		{ \
-			luaL_register(L, #derived_class, derived_class##_library); \
-			createGlobalClassMetatable(L, #derived_class, #super_class); \
-			return 1; \
-		} \
-	}; // end namespace lua_library_##name
-// end #define end_lua_class(derived_class, super_class) 
-
 
 /**
 \def declare_lua_LuaExtendable
@@ -521,46 +482,6 @@ the class in %Lua.
 \todo var-arg? for interfaces?
 */
 void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super);
-
-/**
-Creates the %Lua metatable that is used as the index for all the 
-methods/properties shared by the class.
-
-\note The timing of the calls to this function is critical.  if executed 
-after a %Lua extension file is loaded it means that the metamethods 
-redefined in %Lua will not be executed depending on what method of exposure
-to %Lua used on the class.
-*/
-void createGlobalClassMetatable(lua_State* L, const char* class_name, const char* super_class_name);
-
-/**
-C++ implementation of the fuction explained below in Lua.  Assumes that
-class_name and super_class name are at the top of the %Lua stack
-
-creates a metatable in %Lua representing the exposed methods from the C++
-class, and adds any metamethods defined in %Lua to the table.
-
-function createGlobalClassMetatable(class_name, metatable_name)
-	local class = _G[class_name]
-	if class then
-		local class_mt = _G.C_metatables[class_name]
-		if not class_mt then
-			class_mt = {}
-			_G.C_metatables[class_name] = class_mt
-		end
-		for metamethodname, _ in pairs(metamethods) do
-			if class[metamethodname] then
-				class_mt[metamethodname] = class[metamethodname]
-			end
-		end
-	end
-end
-
-\note this function cannot be used for the proxy class version because
-each instance requires it's own metatable
-
-*/
-sint createGlobalClassMetatable(lua_State* L);
 
 /**
 @todo follow up for direct wraps: sint setmetatableFromGlobalClass(lua_State* L);
