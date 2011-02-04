@@ -218,11 +218,18 @@ function testInstanceProperties(b, class_name, super_name, interfaces)
 	checkT(b.getSuperclass, 'function')
 	check(b.getSuperclass == OOP.getSuperclass)
 	check(b.IS_A == _G.IS_A)
+	if class_name == 'Derived' then
+		local tupos = type(b)
+		check(tupos == 'table' or (tupos == 'userdata' and getmetatable(b) and getmetatable(b).__index)) 
+		check(b.getClass ~= nil)
+		check(OOP.classes_PRIVATE[class_name] ~= nil)
+		check(OOP.introspect_PRIVATE(b:getClass(), OOP.classes_PRIVATE[class_name]))
+	end
 	check(b:IS_A(class_name))
 	check(b.IS_EXACTLY_A == _G.IS_EXACTLY_A)
 	check(b:IS_EXACTLY_A(class_name))
-	checkT(b.__tostring, 'function')
-	checkT(b:__tostring(), 'string')
+	checkT(getmetatable(b).__tostring, 'function')
+	checkT(getmetatable(b).__tostring(b), 'string')
 	checkT(b.toString, 'function')
 	checkT(b:toString(), 'string')
 	check(getmetatable(b) ~= nil and type(getmetatable(b).__concat) == 'function')
@@ -233,10 +240,13 @@ function testInstanceProperties(b, class_name, super_name, interfaces)
 		checkT(b.super, 'nil')
 		checkT(b:getSuperclass(), 'nil')
 	else
-		check(b:IS_A(super_name))
+		print('failure coming: ', b, super_name)
+		local instance = b
+		print(instance.getClass, OOP.classes_PRIVATE[super_name], OOP.introspect_PRIVATE(instance:getClass(), OOP.classes_PRIVATE[super_name]))
 		check(not b:IS_EXACTLY_A(super_name))
 		check(b:getSuperclass() == getClass(super_name))
 		check(b.super == getClass(super_name))
+		check(b:IS_A(super_name))
 	end
 	
 	if type(interfaces) == 'table' then

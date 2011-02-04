@@ -526,7 +526,7 @@ scalar and per element division
 inline void Vector2::divide(vec_t scalar)
 {
 	assert(scalar != 0.0f);
-	scalar = 1.0f / scalar; // \todo performance test
+	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
 }
@@ -557,7 +557,7 @@ inline Vector2& Vector2::operator/=(const Vector2& v)
 inline void Vector3::divide(vec_t scalar)
 {
 	assert(scalar != 0.0f);
-	scalar = 1.0f / scalar; // \todo performance test
+	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;

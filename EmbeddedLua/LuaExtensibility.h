@@ -55,7 +55,6 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 #include "Build.h"
 
 /**
-\todo handle interface exposure to lua
 \todo handle singleton exposure to lua with auto written functions, 
 	don't forget inheritance!
 */
@@ -301,7 +300,7 @@ This method would be preferable for objects like vectors.
 */
 #define end_lua_LuaExtendable(derived_class, super_class) \
 			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
-			lua_named_entry("__newindexable", LuaExtendable::__newindexableFalse) \
+			lua_named_entry("__newindexable", LuaExtension::pushFalse) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -339,7 +338,8 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 \note compile-time directive
 */
 #define end_lua_LuaExtendable_by_proxy(derived, super) \
-			lua_named_entry("__newindexable", LuaExtendable::__newindexableTrue) \
+			lua_named_entry("__newindexable", LuaExtension::pushTrue) \
+			lua_named_entry("__isExtendableByProxy", LuaExtension::pushTrue) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -417,6 +417,7 @@ public:
 	*/
 	static sint				__getProxy(lua_State* L);
 	/**
+	\note __newindex methods:
 	returns true if %Lua code like userdata[k] = v will operate correctly 
 	(without errors, and with the expected results) on the userdata pointer
 	
@@ -429,8 +430,6 @@ public:
 
 	\note using the given LuaExtendable definitions will make this a lot easier.
 	*/
-	static sint				__newindexableFalse(lua_State* L);
-	static sint				__newindexableTrue(lua_State* L);/** 
 	/**
 	__newindex method for the metatable of a class exposed to %Lua that 
 	should be configured to the desired error level for the build.
@@ -469,7 +468,6 @@ public:
 	static sint				setUserdataMetatable(lua_State* L); 
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
-	/** \todo test fuctionality with only parent class exposure */
 	virtual const char*		getClassName(void) const=0;
 	virtual sint			setMetatable(lua_State* L)=0;
 	virtual const char*		toString(void)=0;
@@ -478,14 +476,8 @@ public:
 /**
 completes a %Lua class declaration in case no script accompanied
 the class in %Lua.
-\todo interfaces
-\todo var-arg? for interfaces?
 */
 void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super);
-
-/**
-@todo follow up for direct wraps: sint setmetatableFromGlobalClass(lua_State* L);
-*/
 
 /**
 print the string to the %Lua output

@@ -115,8 +115,6 @@ push<T> functions
 pushes the object on top of the stack, and returns the
 number of actual %Lua type objects that were placed
 on top of the stack
-
-\todo check these arguments, especially the numerical ones
 */
 inline sint push(lua_State* L, bool value)
 {
@@ -148,6 +146,12 @@ inline sint push(lua_State* L, double value)
 	return 1;
 }
 
+inline sint push(lua_State* L, const char* value)
+{
+	lua_pushstring(L, value);
+	return 1;
+}
+
 inline sint push(lua_State* L, LuaExtendable* value)
 {
 	pushRegisteredClass(L, value);					//s: ud
@@ -161,33 +165,37 @@ inline sint push(lua_State* L, LuaExtendable* value)
 	}
 	else
 	{												//s: ud, nil	
-		assert(lua_isnil(L, -1));
+		// assert(lua_isnil(L, -1));
 		lua_pop(L, 1);								//s: ud
-		assert(lua_isuserdata(L, -1));			
+		// assert(lua_isuserdata(L, -1));			
 		lua_getglobal(L, "ObjectOrientedParadigm"); //s: ud, OOP
-		assert(lua_istable(L, -1));			
-		assert(lua_isuserdata(L, -2));			
+		// assert(lua_istable(L, -1));			
+		// assert(lua_isuserdata(L, -2));			
 		lua_getfield(L, -1, "initializers_PRIVATE");//s: ud, OOP, initializers
 		lua_replace(L, -2);							//s: ud, initializers
-		assert(lua_istable(L, -1));			
-		assert(lua_isuserdata(L, -2));			
+		// assert(lua_istable(L, -1));			
+		// assert(lua_isuserdata(L, -2));			
 		lua_getfield(L, -1, value->getClassName());	//s: ud, initializers, "class_name"
 		lua_replace(L, -2);							//s: ud, class()
-		assert(lua_isfunction(L, -1));			
-		assert(lua_isuserdata(L, -2));			
+		// assert(lua_isfunction(L, -1));			
+		// assert(lua_isuserdata(L, -2));			
 		lua_pushvalue(L, -2);						//s: ud, class(), ud
-		assert(lua_isuserdata(L, -1));			
-		assert(lua_isuserdata(L, -3));			
+		// assert(lua_isuserdata(L, -1));			
+		// assert(lua_isuserdata(L, -3));			
 		lua_call(L, 1, 0);							//s: ud
 	}
 
 	return 1;
 }
 
-inline sint push(lua_State* L, const char* value)
+inline sint pushFalse(lua_State* L)
 {
-	lua_pushstring(L, value);
-	return 1;
+	return push(L, false);
+}
+
+inline sint pushTrue(lua_State* L)
+{
+	return push(L, true);
 }
 
 /**

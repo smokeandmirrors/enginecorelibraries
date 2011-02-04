@@ -34,7 +34,6 @@ UT.test('inheritance',
 		UT.checkEqual(g:getNumberOfKids(), 2)
 		UT.checkT(g.getNumberOfGrandKids, 'function')
 		UT.checkEqual(g:getNumberOfGrandKids(), 5)
-				
 		g = new('Parent')
 		-- C++ functions
 		UT.checkT(g.setGrandparent, 'function')
@@ -117,7 +116,7 @@ UT.test('inheritance',
 		UT.checkT(g.getNumberOfParents, 'function')
 		UT.checkEqual(g:getNumberOfParents(), 2)		
 		UT.checkT(g.getNumberOfGrandparents, 'function')
-		UT.checkEqual(g:getNumberOfGrandparents(), 4)		
+		UT.checkEqual(g:getNumberOfGrandparents(), 4)	
 	end
 )
 
@@ -147,12 +146,22 @@ UT.test('proxy class redefinition',
 	function()
 		require'Child'
 		c = new'Child'
+		UT.testClassProperties('Parent', 'Grandparent')
+		UT.testClassProperties('Child', 'Parent')
 		Parent.onRefresh = function() return 'refreshed' end
 		declareClass(Parent)
 		UT.checkT(c.onRefresh, 'function')
 		UT.checkEqual(c:onRefresh(), 'refreshed')
+		UT.testInstanceProperties(c, 'Child', 'Parent')
 		Child.__add = function(lhs, rhs) return 2 end
+		Child.refreshed = function(self) return self() + 7 end
 		declareClass(Child)
 		UT.checkEqual(c + new'Child', 2)
+		UT.checkT(c.refreshed, 'function')
+		UT.checkEqual(c:refreshed(), 14)
+		UT.testInstanceProperties(c, 'Child', 'Parent')
+		UT.checkEqual((new'Child'):refreshed(), 14)
+		UT.testClassProperties('Parent', 'Grandparent')
+		UT.testClassProperties('Child', 'Parent')
 	end
 )

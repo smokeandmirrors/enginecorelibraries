@@ -19,7 +19,6 @@ smokeandmirrorsdevelopment@gmail.com
 
 #include <assert.h>
 
-
 /**
 C/C++ types
 */

@@ -119,18 +119,6 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	//s: 
 }
 
-sint LuaExtendable::__newindexableFalse(lua_State* L)
-{	//s: ud
-	lua_pop(L, 1);
-	return push(L, false);
-}
-
-sint LuaExtendable::__newindexableTrue(lua_State* L)
-{	//s: ud
-	lua_pop(L, 1);
-	return push(L, true);
-}
-
 sint LuaExtendable::setProxyMetatable(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
@@ -150,7 +138,7 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 		return setmetatable(userdata, instance_mt) -- can't be done from Lua
 	end
 	*/
-													//s: userdata, lua_class_mt
+												//s: userdata, lua_class_mt
 	if (isInstanceBeingRefreshed(L)) 
 	{	
 		// the class is being redefined			//s: userdata, lua_class_mt
@@ -215,10 +203,6 @@ sint LuaExtendable::setUserdataMetatable(lua_State* L)
 	return 1;
 }
 
-/** 
-\todo interfaces?
-\todo interfaces via var args?
-*/
 void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super)
 {
 	lua_getglobal(L, derived);

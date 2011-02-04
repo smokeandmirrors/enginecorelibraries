@@ -117,7 +117,11 @@ UT.test('OO.polymorphism',
 		UT.check(type(c.getNickName) == 'function' and c.getNickName() == 'buggaboo')
 		UT.check(type(c.isMiddleAged) == 'function' and c.isMiddleAged())
         UT.check(type(c.isOld) == 'function' and c.isOld())  
-		UT.check(type(c.isYoung) == 'function' and c.isYoung())      
+		UT.check(type(c.isYoung) == 'function' and c.isYoung())
+	
+		UT.testClassProperties('grandparent')
+		UT.testClassProperties('parent', 'grandparent')
+		UT.testClassProperties('child', 'parent')	      
     end
 )
 
@@ -184,6 +188,9 @@ UT.test('OO.construction and destruction',
 		UT.check(next(gp) == nil)
 		UT.check(next(p) == nil)
 		UT.check(next(c) == nil)
+		UT.testClassProperties('grandparent')
+		UT.testClassProperties('parent', 'grandparent')
+		UT.testClassProperties('child', 'parent')	      
 	end
 )
 
@@ -284,6 +291,9 @@ UT.test('OOP.classes and functions',
 				UT.check(v(c) == 3)
 			end			
 		end
+		UT.testClassProperties('one')
+		UT.testClassProperties('two')
+		UT.testClassProperties('three')	      
 	end
 )
 
@@ -317,6 +327,9 @@ function()
 	UT.check(d:getClassName() == 'Derived')
 	UT.check(d.super == getClass'Basic')
 	UT.check(d:getSuperclass() == getClass'Basic')
+	
+	UT.testClassProperties('Basic')
+	UT.testClassProperties('Derived', 'Basic')	     	
 end)
 
 ----------------------------------------------------------------------

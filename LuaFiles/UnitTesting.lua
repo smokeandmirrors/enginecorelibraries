@@ -207,6 +207,22 @@ UT.testSuite
 		tprint(9)
 		tprint(true)
 		tprint(coroutine.create(function() print'hello' end))
-end
+	end,
+	
+	dprint = function()
+		a = { 6, 5, 4 }
+		b = { 9, a, 7 }
+		c = { a, 10, b }
+		d = { 9, 8, {}, {}, "sweet", a, true, b, function() return true end, c, {}}
+		dprint(d)
+	end,
+	
+	sprint = function()
+		a = { 6, 5, 4 }
+		b = { 9, a, 7 }
+		c = { a, 10, b }
+		d = { 9, 8, {}, {}, "sweet", a, true, b, function() return true end, c, {}}
+		dprint(d)
+	end,
 }
 end -- if string

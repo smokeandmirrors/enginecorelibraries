@@ -231,8 +231,8 @@ end
 function printTableEntries(object, indent, previous, tabs)
 	for key, value in pairs(object) do
 		if type(value) == 'table' then
-			print(tabs..tostring(key)..' -> '..tostring(value))
-			dprint(value, indent + 1, previous)
+			-- print(..tostring(value))
+			dprint(value, indent, previous, tabs..tostring(key)..' -> ')
 		else
 			print(tabs..tostring(key)..' -> '..tostring(value))
 		end
@@ -241,22 +241,33 @@ end
 
 ----------------------------------------------------------------------
 -- Recursive deep print 
--- @todo make correct version
-function _G.dprint(object, indent, previous) 
+function _G.dprint(object, indent, previous, prefix) 
 	indent = indent or 0
 	local tabs = getTabs(indent)	
 	if type(object) == 'table' then
 		if not previous then
 			previous = {}
 			previous[object] = true
-			print(tabs..tostring(object)..' : o')
-			printTableEntries(object, indent, previous, tabs)
+			if prefix then
+				print(prefix..tostring(object)..' : o')
+			else
+				print(tabs..tostring(object)..' : o')
+			end
+			printTableEntries(object, indent + 1, previous, tabs)
 		elseif not previous[object] then
 			previous[object] = true
-			print(tabs..tostring(object)..' : o')
+			if prefix then
+				print(prefix..tostring(object)..' : o')
+			else
+				print(tabs..tostring(object)..' : o')
+			end
 			printTableEntries(object, indent, previous, tabs)
 		else
-			print(tabs..tostring(object)..' : x')
+			if prefix then
+				print(prefix..tostring(object)..' : x')
+			else
+				print(tabs..tostring(object)..' : x')
+			end
 		end
 	else
 		print(tabs..tostring(object))

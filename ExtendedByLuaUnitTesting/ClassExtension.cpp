@@ -140,7 +140,6 @@ void Classes::test_define_lua_class()
 	lua_pop(L, 2);
 }
 
-
 class Simple
 	: public LuaExtendable
 {
@@ -220,10 +219,8 @@ public:
 public:
 	uint				getDerivation(void) const	{ return 21; }
 	virtual uint		getValue(void) const		{ return 14; }
-	virtual const char* toString(void)
-	{ 
-		return "Derived"; 
-	}
+
+	createLuaExtendableUserdataDefaultFunctions(Derived)
 };
 
 uint Derived::numAllocated = 0;
@@ -231,8 +228,46 @@ bool Derived::everCreated = false;
 
 declare_lua_LuaExtendable(Derived);
 
+class Unexposed
+	: public Derived
+{
+private:
+	static bool everCreated;
+	static uint numAllocated;
+
+public:
+	Unexposed(void)
+	{
+		everCreated = true;
+		numAllocated++;
+	}
+
+	virtual ~Unexposed(void)
+	{
+		numAllocated--;
+	}
+
+	static Unexposed* getUnexposed(void)	
+	{ 
+		static Unexposed* singleton(NULL); 
+		if (!singleton) singleton = new Unexposed();
+		return singleton;
+	}
+	static uint getNumAllocated(void)		{ return numAllocated; }
+	static bool wasEverCreated(void)		{ return everCreated; }
+};
+
+uint Unexposed::numAllocated = 0;
+bool Unexposed::everCreated = false;
+
+lua_func(getUnexposed)
+{
+	return push(L, Unexposed::getUnexposed());
+}
+
 define_lua_LuaExtendable(Derived, Simple)
 lua_named_entry("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
+lua_entry(getUnexposed)
 end_lua_LuaExtendable(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
@@ -246,10 +281,13 @@ void supporttest_define_lua_LuaExtendable()
 void Classes::test_define_lua_LuaExtendable()
 {
 	supporttest_define_lua_LuaExtendable();
+
 	CFIX_ASSERT(Simple::getNumAllocated() == 0);
 	CFIX_ASSERT(Simple::wasEverCreated());
 	CFIX_ASSERT(Derived::getNumAllocated() == 0);
 	CFIX_ASSERT(Derived::wasEverCreated());
+	CFIX_ASSERT(Unexposed::getNumAllocated() == 0);
+	CFIX_ASSERT(Unexposed::wasEverCreated());
 }
 
 // BEGIN PROXY

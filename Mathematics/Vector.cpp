@@ -72,7 +72,7 @@ lua_func(__newindexVector2)
 define_lua_LuaExtendable(Vector2, Vector2)
 		lua_named_entry("__index", __indexVector2)
 		lua_named_entry("__newindex", __newindexVector2)
-		lua_named_entry("__newindexable", LuaExtendable::__newindexableFalse) 
+		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
 		lua_final_entry 
 	};	/* end function list */ 
@@ -133,7 +133,7 @@ lua_func(__newindexVector3)
 define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__index", __indexVector3)
 		lua_named_entry("__newindex", __newindexVector3) 
-		lua_named_entry("__newindexable", LuaExtendable::__newindexableFalse) 
+		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector3, const Vector3&, &Vector3::add>))
 		lua_final_entry 
 	};	/* end function list */ 

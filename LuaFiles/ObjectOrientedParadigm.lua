@@ -50,6 +50,11 @@ end
 -- @param instance the runtime object
 -- @param class_name the class type in question
 function _G.IS_A(instance, class_name)
+	if class_name == 'Derived' then
+		print('Derived, IS_A:')
+		print(instance.getClass, classes_PRIVATE[class_name], introspect_PRIVATE(instance:getClass(), classes_PRIVATE[class_name]))
+	end
+	
 	local tupos = type(instance)
 	return (tupos == 'table' or (tupos == 'userdata' and getmetatable(instance) and getmetatable(instance).__index)) 
 		and instance.getClass 
@@ -349,6 +354,8 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.__newindexable = class.__newindexable or _G.truef
 	class.toString		= class.__tostring or class.toString or OOP.toString
 	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
+	metatables_PRIVATE[class_name].__tostring = metatables_PRIVATE[class_name].__tostring or class.toString
+	assert(type(class.toString) == 'function')
 	class.super = super
 	return true
 end
@@ -537,7 +544,9 @@ function createConstructor_PRIVATE(class, metatable)
 	local initializer = function(instance, ...)
 		class.nextInstanceId = class.nextInstanceId + 1
 		addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setMetatable(instance, metatable), ...))
-		if (not instance.name) and class.__newindexable() then
+		if (not instance.name) 
+		and class.__newindexable() 
+		then
 			instance.name = class.nextInstanceId
 		end
 		return instance
@@ -673,6 +682,9 @@ function declareAbstractClass_PRIVATE(definition)
 	-- add to the list
 	classes_PRIVATE[name] = abstract_class
 	constructors_PRIVATE[name] = getAbstractConstructor(name)
+	if classesNeedRefresh then
+		refreshClasses_PRIVATE(name)
+	end
 end
 
 ----------------------------------------------------------------------
@@ -717,7 +729,7 @@ function declareClass_PRIVATE(definition)
 		-- @todo finish protected classes, setfenv on the constructor
 	end
 	if classesNeedRefresh then
-		refreshClasses_PRIVATE()
+		refreshClasses_PRIVATE(name)
 	end
 end
 else
@@ -895,17 +907,37 @@ end
 
 ----------------------------------------------------------------------
 if DEBUG_INTERPRETATION then
-function refreshClasses_PRIVATE()
-    for _, classdef in pairs(classes_PRIVATE) do
-		if classdef:getSuperclass() then
-			getmetatable(classdef).__index = classes_PRIVATE[classdef:getSuperclass():getClassName()]
+function refreshClasses_PRIVATE(name)
+    local direct_children = {}
+    local refreshed_class = classes_PRIVATE[name]
+    for _, class in pairs(classes_PRIVATE) do
+		-- find the immediate child, and update the super class values
+		local is_a = false
+		local immediate_child = class
+		local class = class:getSuperclass()
+		while class do
+			if class:getClassName() == name and (not direct_children[name]) then
+				direct_children[class:getClassName()] = true
+				is_a = true
+				break
+			end
+			immediate_child = class
+			class = class:getSuperclass()
 		end
-    end
+		
+		if is_a then
+			immediate_child.super = refreshed_class
+			getmetatable(class).__index = refreshed_class
+		end
+	end
     for _, instance in pairs(refreshInstances_PRIVATE) do
-		if instance.__setmetatable then
-			instance.__setmetatable(instance, metatables_PRIVATE[instance.className])
+		if instance.__isExtendableByProxy 
+		and instance:__isExtendableByProxy() then
+			local instance_mt = getmetatable(instance)
+			local proxy = instance_mt.__index
+			setmetatable(proxy, metatables_PRIVATE[instance:getClassName()])
 		elseif type(instance) == 'table' then
-			setmetatable(instance, metatables_PRIVATE[instance.className])
+			setmetatable(instance, metatables_PRIVATE[instance:getClassName()])
     	end
     end
 	classesNeedRefresh = false
