@@ -54,11 +54,6 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 */
 #include "Build.h"
 
-/**
-\todo handle singleton exposure to lua with auto written functions, 
-	don't forget inheritance!
-*/
-
 struct lua_State;
 struct lua_Debug;
 

@@ -203,21 +203,40 @@ function testClassProperties(class_name, super_name, interfaces)
 	testInstanceProperties(b, class_name, super_name, interfaces)
 end
 
+function testRefreshClassAbilities(class_declaration, class_name, super_name, interfaces)
+	local OOP = require'ObjectOrientedParadigm'
+	testClassProperties(class_name, super_name, interfaces)
+	local instance1 = new(class_name)
+	class_declaration.unitTestingFunction1 = function(self)
+		if not self.unitTestingValue1 then
+			self.unitTestingValue1 = 'assignedvalue'
+		end	
+		return 7
+	end
+	declareClass(class_declaration)
+	testInstanceProperties(instance1, class_name, super_name, interfaces)
+	testClassProperties(class_name, super_name, interfaces)
+	checkT(instance1.unitTestingFunction1, 'function')
+	checkEqual(instance1:unitTestingFunction1(), 7)
+	checkT(instance1.unitTestingValue1, 'string')
+	checkEqual(instance1.unitTestingValue1, 'assignedvalue')		
+end
+
 function testInstanceProperties(b, class_name, super_name, interfaces)
 	local OOP = require'ObjectOrientedParadigm'
 	
-	check(b.ACTS_AS == _G.ACTS_AS)
-	check(b.class == _G.getClass(class_name))
-	check(b.className == class_name)
-	check(b.getClass == OOP.getClass)
-	check(b:getClass() == _G.getClass(class_name))
-	check(b.getClassName == OOP.getClassName)
-	check(b:getClassName() == class_name)
+	checkEqual(b.ACTS_AS, _G.ACTS_AS)
+	checkEqual(b.class, _G.getClass(class_name))
+	checkEqual(b.className, class_name)
+	checkEqual(b.getClass, OOP.getClass)
+	checkEqual(b:getClass(), _G.getClass(class_name))
+	checkEqual(b.getClassName, OOP.getClassName)
+	checkEqual(b:getClassName(), class_name)
 	checkT(b.getName, 'function')
 	checkT(b:getName(), 'string')
 	checkT(b.getSuperclass, 'function')
-	check(b.getSuperclass == OOP.getSuperclass)
-	check(b.IS_A == _G.IS_A)
+	checkEqual(b.getSuperclass, OOP.getSuperclass)
+	checkEqual(b.IS_A, _G.IS_A)
 	if class_name == 'Derived' then
 		local tupos = type(b)
 		check(tupos == 'table' or (tupos == 'userdata' and getmetatable(b) and getmetatable(b).__index)) 
@@ -226,7 +245,7 @@ function testInstanceProperties(b, class_name, super_name, interfaces)
 		check(OOP.introspect_PRIVATE(b:getClass(), OOP.classes_PRIVATE[class_name]))
 	end
 	check(b:IS_A(class_name))
-	check(b.IS_EXACTLY_A == _G.IS_EXACTLY_A)
+	checkEqual(b.IS_EXACTLY_A, _G.IS_EXACTLY_A)
 	check(b:IS_EXACTLY_A(class_name))
 	checkT(getmetatable(b).__tostring, 'function')
 	checkT(getmetatable(b).__tostring(b), 'string')
@@ -240,12 +259,10 @@ function testInstanceProperties(b, class_name, super_name, interfaces)
 		checkT(b.super, 'nil')
 		checkT(b:getSuperclass(), 'nil')
 	else
-		print('failure coming: ', b, super_name)
 		local instance = b
-		print(instance.getClass, OOP.classes_PRIVATE[super_name], OOP.introspect_PRIVATE(instance:getClass(), OOP.classes_PRIVATE[super_name]))
 		check(not b:IS_EXACTLY_A(super_name))
-		check(b:getSuperclass() == getClass(super_name))
-		check(b.super == getClass(super_name))
+		checkEqual(b:getSuperclass(), getClass(super_name))
+		checkEqual(b.super, getClass(super_name))
 		check(b:IS_A(super_name))
 	end
 	

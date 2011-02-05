@@ -355,8 +355,147 @@ function()
 	UT.checkError(declareBadClass'IS_A')
 	UT.checkError(declareBadClass'IS_EXACTLY_A')
 	UT.checkError(declareBadClass'super')
-			
 end)
+
+
+
+----------------------------------------------------------------------
+UT.test('OOP.constuction and metatable methods',
+function()
+	UT = require'UnitTestingFramework'
+	----------------------------------------------------------------------
+	-- __new,		__setmetatable
+	local Both = {
+		name = 'Both',		
+		construct = function(self, ...)
+			self.value = 1
+		end,		
+		__new = function(...)
+			return {...}
+		end,		
+		__setmetatable = function(table, mt)
+			return setmetatable(table, mt)
+		end,		
+		only = function(self)
+			return self.value + 1
+		end
+	}
+	declareClass(Both)
+	local BothChild = { 
+		name = 'BothChild', 
+		extends = 'Both' 
+	}
+	declareClass(BothChild)
+	_G.instanceBoth = new'Both'
+	_G.instanceBoth_child = new'BothChild'
+	UT.testRefreshClassAbilities(Both, 'Both')
+    UT.testRefreshClassAbilities(BothChild, 'BothChild', 'Both')
+	UT.checkT(instanceBoth.only, 'function')
+	UT.checkT(instanceBoth.value, 'number')
+	UT.checkEqual(instanceBoth:only(), 2)
+	UT.testInstanceProperties(instanceBoth, 'Both') 
+	UT.checkT(instanceBoth_child.only, 'function')
+	UT.checkT(instanceBoth_child.value, 'number')
+	UT.checkEqual(instanceBoth_child:only(), 2)
+	UT.testInstanceProperties(instanceBoth_child, 'BothChild', 'Both')
+	
+	----------------------------------------------------------------------
+	-- OOP,			__setmetatable
+	local SetMetatable = {
+		name = 'SetMetatable',		
+		construct = function(self, ...)
+			self.value = 1
+		end,		
+		__setmetatable = function(table, mt)
+			return setmetatable(table, mt)
+		end,		
+		only = function(self)
+			return self.value + 1
+		end
+	}
+	declareClass(SetMetatable)
+	local SetMetatableChild = { 
+		name = 'SetMetatableChild', 
+		extends = 'SetMetatable' 
+	}
+	declareClass(SetMetatableChild)
+	_G.instanceSetMetatable = new'SetMetatable'
+	_G.instanceSetMetatable_child = new'SetMetatableChild'
+	UT.testRefreshClassAbilities(SetMetatable, 'SetMetatable')
+    UT.testRefreshClassAbilities(SetMetatableChild, 'SetMetatableChild', 'SetMetatable')
+	UT.checkT(instanceSetMetatable.only, 'function')
+	UT.checkT(instanceSetMetatable.value, 'number')
+	UT.checkEqual(instanceSetMetatable:only(), 2)
+	UT.testInstanceProperties(instanceSetMetatable, 'SetMetatable') 
+	UT.checkT(instanceSetMetatable_child.only, 'function')
+	UT.checkT(instanceSetMetatable_child.value, 'number')
+	UT.checkEqual(instanceSetMetatable_child:only(), 2)
+	UT.testInstanceProperties(instanceSetMetatable_child, 'SetMetatableChild', 'SetMetatable')
+	
+	----------------------------------------------------------------------
+	-- __new,		OOP
+	local NewOnly = {
+		name = 'NewOnly',		
+		construct = function(self, ...)
+			self.value = 1
+		end,		
+		__new = function(...)
+			return {...}
+		end,		
+		only = function(self)
+			return self.value + 1
+		end
+	}
+	declareClass(NewOnly)
+	local NewOnlyChild = { 
+		name = 'NewOnlyChild', 
+		extends = 'NewOnly' 
+	}
+	declareClass(NewOnlyChild)
+	_G.instanceNewOnly = new'NewOnly'
+	_G.instanceNewOnly_child = new'NewOnlyChild'
+	UT.testRefreshClassAbilities(NewOnly, 'NewOnly')
+    UT.testRefreshClassAbilities(NewOnlyChild, 'NewOnlyChild', 'NewOnly')
+	UT.checkT(instanceNewOnly.only, 'function')
+	UT.checkT(instanceNewOnly.value, 'number')
+	UT.checkEqual(instanceNewOnly:only(), 2)
+	UT.testInstanceProperties(instanceNewOnly, 'NewOnly') 
+	UT.checkT(instanceNewOnly_child.only, 'function')
+	UT.checkT(instanceNewOnly_child.value, 'number')
+	UT.checkEqual(instanceNewOnly_child:only(), 2)
+	UT.testInstanceProperties(instanceNewOnly_child, 'NewOnlyChild', 'NewOnly')
+	
+	----------------------------------------------------------------------
+	-- OOP,			OOP
+	local Neither = {
+		name = 'Neither',		
+		construct = function(self, ...)
+			self.value = 1
+		end,		
+		only = function(self)
+			return self.value + 1
+		end
+	}
+	declareClass(Neither)
+	local NeitherChild = { 
+		name = 'NeitherChild', 
+		extends = 'Neither' 
+	}
+	declareClass(NeitherChild)
+	_G.instanceNeither = new'Neither'
+	_G.instanceNeither_child = new'NeitherChild'
+	UT.testRefreshClassAbilities(Neither, 'Neither')
+    UT.testRefreshClassAbilities(NeitherChild, 'NeitherChild', 'Neither')
+	UT.checkT(instanceNeither.only, 'function')
+	UT.checkT(instanceNeither.value, 'number')
+	UT.checkEqual(instanceNeither:only(), 2)
+	UT.testInstanceProperties(instanceNeither, 'Neither') 
+	UT.checkT(instanceNeither_child.only, 'function')
+	UT.checkT(instanceNeither_child.value, 'number')
+	UT.checkEqual(instanceNeither_child:only(), 2)
+	UT.testInstanceProperties(instanceNeither_child, 'NeitherChild', 'Neither')
+end)
+
 ----------------------------------------------------------------------
 UT.test('OOP.misc',
 function()

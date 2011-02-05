@@ -64,13 +64,12 @@ sint LuaExtendable::__getProxy(lua_State* L)
 
 sint LuaExtendable::__newindexError(lua_State* L)
 {											//: t, k, v
-#if DEBUG // \todo make this better with the LuaExtensibility functionality
+#if DEBUG
 	LuaExtendable* udata = to<LuaExtendable*>(L, -3);
 	// pop values off the stack?
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
 		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
 #else
-	// \todo warn about the problem
 	lua_pop(L, 3);
 	return 0;
 #endif//DEBUG

@@ -411,7 +411,6 @@ function beginClassDeclaration_PRIVATE(definition)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		classesNeedRefresh = true
-		print('REDEFINING CLASS: '..name)
 	end
 	-- validate the baseclass name
 	local base_class_name = findBaseClassName_PRIVATE(extends)
@@ -528,7 +527,6 @@ if DEBUG_INTERPRETATION then
 function createConstructor_PRIVATE(class, metatable)
 	local allocator
 	local setMetatable
-	-- \todo test all constructor methods
 	if type(class.__new) == 'function' then
 		allocator = class.__new
 	else
@@ -557,47 +555,7 @@ function createConstructor_PRIVATE(class, metatable)
 	end
 			
 	return constructor, initializer
---[[	
-	if class.__new then
-		if class.__setmetatable then
-			return function(...)
-				class.nextInstanceId = class.nextInstanceId + 1
-				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)) 
-				if (not instance.name) and class.__newindexable() then
-					instance.name = class.nextInstanceId
-				end
-				return instance
-			end
-		else
-			return function(...)
-				class.nextInstanceId = class.nextInstanceId + 1
-				local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...))
-				if (not instance.name) and class.__newindexable() then
-					instance.name = class.nextInstanceId
-				end
-				return instance
-			end	
-		end
-	elseif class.__setmetatable then
-		return function(...)
-			class.nextInstanceId = class.nextInstanceId + 1
-			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...))
-			if (not instance.name) and class.__newindexable() then
-				instance.name = class.nextInstanceId
-			end
-			return instance
-		end
-	else
-		return function(...)
-			class.nextInstanceId = class.nextInstanceId + 1
-			local instance = addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...))
-			if (not instance.name) and class.__newindexable() then
-				instance.name = class.nextInstanceId
-			end
-			return instance
-		end
-	end
---]]
+
 end	
 else
 function createConstructor_PRIVATE(class, metatable)
@@ -626,28 +584,6 @@ function createConstructor_PRIVATE(class, metatable)
 	end
 			
 	return constructor, initializer
-	
---[[	
-	if class.__new then
-		if class.__setmetatable then
-			return function(...)
-				return constructHierarchy_PRIVATE(class, class.__setmetatable(class.__new(...), metatable), ...)
-			end
-		else
-			return function(...)
-				return constructHierarchy_PRIVATE(class, setmetatable(class.__new(...), metatable), ...)
-			end
-		end	
-	elseif class.__setmetatable then
-		return function(...)
-			return constructHierarchy_PRIVATE(class, class.__setmetatable({...}, metatable), ...)
-		end
-	else
-		return function(...)
-			return constructHierarchy_PRIVATE(class, setmetatable({...}, metatable), ...)
-		end
-	end
---]]	
 end 	
 end -- if DEBUG_INTERPRETATION
 

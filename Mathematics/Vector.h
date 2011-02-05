@@ -934,4 +934,5 @@ inline void Vector3::zero()
 }
 /** @} end Vector_Zero */
 /** @} end Vector_Operations */
+
 #endif//VECTOR_H

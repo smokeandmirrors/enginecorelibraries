@@ -1,7 +1,8 @@
 #include "Vector.h"
 
-// right handed spidey space
+// using namespace Math;
 
+// right handed spidey space
 const vec_t		vectorTolerance(0.0001f);
 
 const Vector2	down2D		( 0.0f, -1.0f);
@@ -75,7 +76,7 @@ define_lua_LuaExtendable(Vector2, Vector2)
 		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
 		lua_final_entry 
-	};	/* end function list */ 
+	};	// end function list 
 	sint key(lua_State* L) 
 	{ 
 		luaL_register(L, "Vector2", Vector2_library); 
@@ -136,7 +137,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector3, const Vector3&, &Vector3::add>))
 		lua_final_entry 
-	};	/* end function list */ 
+	};	// end function list 
 	sint key(lua_State* L) 
 	{ 
 		luaL_register(L, "Vector3", Vector3_library); 

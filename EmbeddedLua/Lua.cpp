@@ -221,10 +221,10 @@ sint Lua::report(lua_State* L, sint error_code)
 		const char *msg = lua_tostring(L, -1);
 		if (msg == NULL) 
 			msg = "(error object is not a string)";
-		
-		// \todo log the error or the msg
-		// l_message(progname, msg);
-		printf(msg);
+		// if (source) 
+		//	fprintf(stderr, "Error source: %s\n", source);
+		fprintf(stderr, "%s\n", msg);
+		fflush(stderr);
 		lua_pop(L, 1);
 	}
 	
