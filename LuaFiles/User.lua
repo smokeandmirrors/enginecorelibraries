@@ -9,8 +9,5 @@ _G.u = function()
 end
 
 _G.test = function()
-	_G.v = new('Vector3', 3,4,5)
-	_G.v2 = new('Vector3', v)
-	_G.v3 = new('Vector3', math.pi)
 end
 

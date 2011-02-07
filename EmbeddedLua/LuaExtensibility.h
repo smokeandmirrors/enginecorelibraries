@@ -53,7 +53,6 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 \note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
 
 \todo declare things from namespaces
-\todo examine and remove every lua_pop call
 
 */
 #include "Build.h"

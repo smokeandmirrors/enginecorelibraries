@@ -70,7 +70,6 @@ sint LuaExtendable::__newindexError(lua_State* L)
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
 		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
 #else
-	lua_pop(L, 3);
 	return 0;
 #endif//DEBUG
 }
