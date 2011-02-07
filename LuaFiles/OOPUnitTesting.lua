@@ -523,15 +523,7 @@ function()
 	UT.check(e..z == 'simplesimple')
 	UT.check(e..'hello' == 'simplehello')
 	UT.check('goodbye'..z == 'goodbyesimple')
-	
-	local ctor = function()
-		return {}
-	end
-	
-	OOP.addClassConstructor('void', ctor)
-	v = new'void'
-	UT.check(v ~= nil)
-	
+		
 	m = new'Mixed'
 	OOP.validateObject(m, 'Mixed', {'Hard'})
 	UT.checkError(

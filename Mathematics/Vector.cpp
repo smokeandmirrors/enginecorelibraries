@@ -31,8 +31,7 @@ lua_func(__indexVector2)
 {
 	const char* key = to<const char*>(L, -1);
 	const Vector2& v = to<const Vector2&>(L, -2);
-	lua_pop(L, 2);
-
+	
 	if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
 	{
 		return push(L, v[*key - 'x']);
@@ -56,8 +55,7 @@ lua_func(__newindexVector2)
 	float value = to<float>(L, -1);
 	const char* key = to<const char*>(L, -2);
 	Vector2& v = to<Vector2&>(L, -3);
-	lua_pop(L, 3); 
-
+	
 	if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
 	{
 		(&v.x)[*key - 'x'] = value;
@@ -90,8 +88,7 @@ lua_func(__indexVector3)
 {
 	const char* key = to<const char*>(L, -1);
 	const Vector3& v = to<const Vector3&>(L, -2);
-	lua_pop(L, 2);
-
+	
 	if (key[1] == '\0' 
 	&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
 	{
@@ -116,8 +113,7 @@ lua_func(__newindexVector3)
 	float value = to<float>(L, -1);
 	const char* key = to<const char*>(L, -2);
 	Vector3& v = to<Vector3&>(L, -3);
-	lua_pop(L, 3); 
-
+	
 	if (key[1] == '\0' 
 	&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
 	{
@@ -131,11 +127,59 @@ lua_func(__newindexVector3)
 	}
 }
 
+namespace lua_library_Vector3
+{	
+sint initialize(lua_State* L)
+{
+	sint stack_size = lua_gettop(L);
+	switch (stack_size)
+	{
+	case 2:
+	{
+		Vector3& v = to<Vector3&>(L, -2);
+		if (lua_isnumber(L, -1))
+		{
+			v.set(to<vec_t>(L, -1));
+		}
+		else
+		{
+			v.set(to<Vector3&>(L, -1));
+		}
+		lua_pushvalue(L, -2);
+		return 1;
+	}
+	break;
+	case 3:
+	{
+		Vector3& v = to<Vector3&>(L, -3);
+		v.set(to<sint>(L, -2), to<vec_t>(L, -1));
+		lua_pushvalue(L, -3);
+		return 1;
+	}
+	case 4:
+	{
+		Vector3& v = to<Vector3&>(L, -4);
+		v.set(to<vec_t>(L, -3), to<vec_t>(L, -2), to<vec_t>(L, -1));
+		lua_pushvalue(L, -4);
+		return 1;
+	}
+	break;
+	default:
+		luaL_error(L, "bad parameters to Vector3.Set()");
+		return 0;
+	}
+} // sint set(lua_State* L)
+
+} // end namespace lua_library_Vector3
+
 define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__index", __indexVector3)
 		lua_named_entry("__newindex", __newindexVector3) 
 		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector3, const Vector3&, &Vector3::add>))
+		lua_named_entry("construct", initialize)
+		lua_named_entry("set", initialize)
+		// lua_entry(set)
 		lua_final_entry 
 	};	// end function list 
 	sint key(lua_State* L) 

@@ -102,10 +102,6 @@ protected:
 	LuaExtendable classes.
 	*/
 	void				initializeDefaultProxyMetamethods(void) const;
-	/** 
-	initializes storage for global C defined classes and metatables
-	*/
-	void				initializeGlobalCSupport(void) const;
 	/**
 	initializes build configuration state that can be read from the lua_State
 	*/

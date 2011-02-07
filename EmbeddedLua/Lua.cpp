@@ -43,8 +43,7 @@ Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_sto
 		openStandardLibraries();
 	
 	initializeInterpretation();
-	initializeGlobalCSupport();
-
+	
 	if (initialize_userdata_storage)
 		initializeUserdataStorage();
 
@@ -101,12 +100,6 @@ void Lua::initializeDefaultProxyMetamethods(void) const
 	lua_pushcfunction(L, LuaExtendable::__tostring);		//s: table, __tostring
 	lua_setfield(L, -2, "__tostring");						//s: table
 	lua_setfield(L, LUA_REGISTRYINDEX, "proxymetamethods");	//s: 
-}
-
-void Lua::initializeGlobalCSupport(void) const
-{
-	lua_newtable(L);
-	lua_setglobal(L, "C_metatables");
 }
 
 void Lua::initializeInterpretation(void) const

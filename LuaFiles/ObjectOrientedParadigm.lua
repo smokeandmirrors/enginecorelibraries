@@ -17,8 +17,6 @@ require'Utilities'
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
--- \todo update documentation
-
 ---------------------------------------------------------------------
 -- change the following values to change compilation, error handling,
 -- error reporting, and informative messages
@@ -76,14 +74,6 @@ function _G.IS_EXACTLY_A(instance, class_name)
 end
 
 ----------------------------------------------------------------------
-function _G.addClassConstructor(class_name, constructor)
-	assert(not classes_PRIVATE[class_name], 'A class all ready is declared with that name')
-	assert(not constructors_PRIVATE[class_name], 'A constructor all ready exists for that class.')
-	classes_PRIVATE[class_name] = true
-	constructors_PRIVATE[class_name] = constructor
-end
-
-----------------------------------------------------------------------
 -- returns an iterator which progresses over all non-metatable classes
 -- registered in the system.
 function _G.classes()
@@ -101,9 +91,8 @@ end
 ----------------------------------------------------------------------
 -- Define an abstract class - cannot be instantiated, only extended!
 -- @param definition a table with entries as follows:
--- Name = (string) -- the class name
--- AbstractFunctions = (table of functions) -- list of functions that must be found in concrete class that extend this one
--- functions = (table of functions) -- the concrete methods for this class
+-- name = (string) -- the class name
+-- abstract = (table of functions) -- list of functions that must be found in concrete class that extend this one
 function _G.declareAbstractClass(definition)
 	declareAbstractClass_PRIVATE(definition)
 	collectgarbage'collect'
@@ -112,10 +101,9 @@ end
 ----------------------------------------------------------------------
 -- Define a class
 -- @param definition a table with entries as follows:
--- Name = (string) -- the class name
--- Extends = (string) -- the base class name (optional)
--- functions = (table of functions) -- the methods for this class
--- Implements = (table of interface names) -- the interfaces_PRIVATE this class implements
+-- name = (string) -- the class name
+-- extends = (string) -- the base class name (optional)
+-- implements = (table of interface names) -- the interfaces that this class implements
 function _G.declareClass(definition)
 	declareClass_PRIVATE(definition)
 	collectgarbage'collect'
@@ -130,8 +118,7 @@ function _G.declareInterface(definition)
 end
 
 ----------------------------------------------------------------------
--- nil out an object for garbage collection, and call any methods
--- it might have to clear out references to extension objects
+-- nil out an object for garbage collection, and call any destruct methods
 function _G.delete(object)
 	destructHierarchy_PRIVATE(object)
 end
@@ -169,7 +156,7 @@ end
 ----------------------------------------------------------------------
 -- Create a new instance of a class
 function _G.new(class_name, ...)
-	assert(classes_PRIVATE[class_name], 'No such class: '..class_name..' !')
+	-- assert(classes_PRIVATE[class_name], 'No such class: '..class_name..' !')
 	return constructors_PRIVATE[class_name](...)
 end
 
@@ -335,7 +322,7 @@ if DEBUG_INTERPRETATION then
 --	objects	with new function tables if the class gets redefined 
 classesNeedRefresh			= false
 refreshInstances_PRIVATE	= setmetatable({}, {__mode = 'v'})
-end --- DEBUG_INTERPRETATION
+end -- if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 -- this replaces having a base class of 'object', saving an index 
@@ -396,7 +383,7 @@ end
 ----------------------------------------------------------------------
 -- this verifies a table as definition and gives it the necessary Lua 
 -- features to allow it to operate as a class
--- @param def definition table in the same format as 
+-- @param definition definition table in the same format as 
 -- declareClass() and declareClass_PRIVATE()
 if DEBUG_INTERPRETATION then
 function beginClassDeclaration_PRIVATE(definition)
@@ -483,10 +470,10 @@ function beginClassDeclaration_PRIVATE(definition)
 	compiled = addCommonClassProperties_PRIVATE(class, base_class, name) and compiled
 	return class, compiled
 end
-end -- end if DEBUG_INTERPRETATION
+end -- if DEBUG_INTERPRETATION
 
-function constructTable(...)
-	return {...}
+function constructTable()
+	return {}
 end
 
 ----------------------------------------------------------------------
@@ -496,10 +483,6 @@ function createClassProperties_PRIVATE(name, superclass, custom__index)
 	-- define the class
 	local class = {className = name, nextInstanceId = 0}
 	-- implement inheritance from super classes
-	if (name == 'Vector2' or name == 'Vector3') then
-		print'***************************************'
-		print(custom__index)
-	end
 	setmetatable(class, {__index = superclass}) 
 	-- implement inheritance for instantiated objects
 	metatables_PRIVATE[name] = {__index = custom__index or class} 
@@ -516,7 +499,7 @@ function createClassProperties_PRIVATE(name, superclass, custom__index)
 	-- return the class definition
 	return class
 end
-end -- end if DEBUG_INTERPRETATION
+end -- if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 -- create the creation function for the object
@@ -552,10 +535,8 @@ function createConstructor_PRIVATE(class, metatable)
 	-- a full constructor for new() calls from Lua
 	local constructor = function(...)
 		return initializer(allocator(), ...)
-	end
-			
+	end			
 	return constructor, initializer
-
 end	
 else
 function createConstructor_PRIVATE(class, metatable)
@@ -581,8 +562,7 @@ function createConstructor_PRIVATE(class, metatable)
 	-- a full constructor for new() calls from Lua
 	local constructor = function(...)
 		return initializer(allocator(), ...)
-	end
-			
+	end			
 	return constructor, initializer
 end 	
 end -- if DEBUG_INTERPRETATION
@@ -613,7 +593,7 @@ function declareAbstractClass_PRIVATE(definition)
 	-- make the class abstract so it can't be directly instantiated
 	abstract_class.abstract = true
 	abstract_class.abstractFunctions = {}
-	compiled = verifyFunctionTable_PRIVATE(abstract_class.abstractFunctions, abstractFunctions, base_class, abstract_class:getClassName()..'.', ' is not a function.  Put this object in the Initialize() function.') and compiled
+	compiled = verifyFunctionTable_PRIVATE(abstract_class.abstractFunctions, abstractFunctions, definition, base_class, abstract_class:getClassName()..'.', ' is not a function.  Put this object in the Initialize() function.') and compiled
 	assert(compiled, errorMsg)
 	-- add to the list
 	classes_PRIVATE[name] = abstract_class
@@ -634,7 +614,6 @@ end
 ----------------------------------------------------------------------
 if DEBUG_INTERPRETATION then
 function declareClass_PRIVATE(definition)
-	local public = true
 	local name = definition.name or 'unnamed class'
 	local super_name = definition.extends
 	resetErrorMessage_PRIVATE('\nERROR:\nClass declaration for '..name..' is incorrect, see lua output or log.\n')
@@ -658,12 +637,9 @@ function declareClass_PRIVATE(definition)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
 	-- ...create the last function
-	if public then 
-		constructors_PRIVATE[name] = constructor
-		initializers_PRIVATE[name] = initializer
-	else
-		-- @todo finish protected classes, setfenv on the constructor
-	end
+	constructors_PRIVATE[name] = constructor
+	initializers_PRIVATE[name] = initializer
+	-- if the class is updated, refresh the instances
 	if classesNeedRefresh then
 		refreshClasses_PRIVATE(name)
 	end
@@ -693,15 +669,11 @@ function declareClass_PRIVATE(definition)
 	assert(compiled, errorMsg)
 	-- ...add to the list...
 	classes_PRIVATE[name] = class
-	-- ...create the constructor
-	if public then 
-		constructors_PRIVATE[name] = constructor
-		initializers_PRIVATE[name] = initializer
-	else
-		-- @todo finish protected classes, setfenv on the constructor
-	end
+	-- ...create the last function
+	constructors_PRIVATE[name] = constructor
+	initializers_PRIVATE[name] = initializer
 end
-end -- end if DEBUG_INTERPRETATION
+end -- if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 function declareInterface_PRIVATE(definition)
@@ -719,7 +691,7 @@ function declareInterface_PRIVATE(definition)
 	interfaces_PRIVATE[name] = {}
 	interface = interfaces_PRIVATE[name]
 		
-	compiled = verifyFunctionTable_PRIVATE(interface, funcs, nil, 'Everything in the interface, '..name..', function list must be a function.  ', ' is not.') and compiled 
+	compiled = verifyFunctionTable_PRIVATE(interface, funcs, definition, 'Everything in the interface, '..name..', function list must be a function.  ', ' is not.') and compiled 
 	assert(compiled, addToErrorMsg_PRIVATE)
 end
 
@@ -878,7 +850,7 @@ function refreshClasses_PRIVATE(name)
     end
 	classesNeedRefresh = false
 end
-end
+end -- if DEBUG_INTERPRETATION
 
 ----------------------------------------------------------------------
 -- resets the error message
@@ -942,95 +914,23 @@ function verifyFunctionImplementation_PRIVATE(class, functions)
 	return success
 end
 
-function getEnvironment_PRIVATE(functions)
-	for k, v in next, functions do
-		if type(v) == 'function' then
-			return getfenv(v)
-		end
-	end
-	if functions.protected then
-		for k, v in next, functions.protected do
-			if type(v) == 'function' then
-				return getfenv(v)
-			end
-		end
-	end
-	if functions.private then
-		for k, v in next, functions.private do
-			if type(v) == 'function' then
-				return getfenv(v)
-			end
-		end
-	end
-end
-
 ----------------------------------------------------------------------
 -- checks to see if everything in functionTable is a function, if it is it 
 -- adds it to Table.  If not, it prints the problem_message, + the !function name + messageCorrection
-function verifyFunctionTable_PRIVATE(t, functions, base_class, problem_message, correction_message) 
+function verifyFunctionTable_PRIVATE(class, functions, base_class, problem_message, correction_message) 
 	local success = true
 	if functions then
-		
-		local privateEnvironment
-		local reference = getEnvironment_PRIVATE(functions) 
-				
-		if reference and (functions.protected or functions.protected) then
-			privateEnvironment = { privateClass = t, super = function() return base_class end }
-			setmetatable(privateEnvironment, {__index = reference})
-		end					
-		
-		if functions.private then
-			for name, func in pairs(functions.private) do
-				if type(func) == 'function' then
-					t[name] = function(self, ...)
-						assert(getfenv(2) == t.privateEnvironment, 'function '..name..' is declared PRIVATE')
-						return func(self, ...) 
-					end
-				else
-					addToErrorMsg_PRIVATE(problem_message..name..correction_message)
-					success = false
-				end
-			end
-		end
-		
-		if functions.protected then
-			for name, func in pairs(functions.protected) do
-				if type(func) == 'function' then	
-					t[name] = function(self, ...)
-						assert(introspect_PRIVATE(self:getClass(), getfenv(2).privateClass), 'function' ..name.. ' is declared PROTECTED')
-						return func(self, ...) 
-					end
-				else
-					addToErrorMsg_PRIVATE(problem_message..name..correction_message)
-					success = false
-				end
-			end
-		end
-		functions.protected = nil
-		functions.private = nil
-		
-		for function_name, func in pairs(functions) do
-			
+		for name, func in pairs(functions) do
 			if type(func) == 'function' then
-				if privateEnvironment then 
-					setfenv(func, privateEnvironment)
-				end
-				
-				t[function_name] = func
-			elseif not ((type(func) == 'string' and (function_name == '_NAME' or function_name == '_PACKAGE')) 
-			or (type(func) == 'table' and function_name == '_M')) -- and func == the module itself? to really check? 
-			then				 
-				
+				class[name] = func
+			else
 				addToErrorMsg_PRIVATE(problem_message..function_name..correction_message)
 				success = false
 			end
-		end	
-		t.privateEnvironment = privateEnvironment
+		end
 	end
-	
 	return success
 end
--- t._NAME with the given name, t._M with the module (t itself), and t._PACKAGE
 		
 ----------------------------------------------------------------------
 -- Checks to see that Class implements all the interfaces it claims

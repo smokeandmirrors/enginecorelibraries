@@ -51,6 +51,10 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 @endcode
 
 \note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
+
+\todo declare things from namespaces
+\todo examine and remove every lua_pop call
+
 */
 #include "Build.h"
 
@@ -289,6 +293,16 @@ This method would be preferable for objects like vectors.
 			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define_lua_LuaExtendable
 
+#define define_lua_LuaExtendable_noctor(derived, super) \
+	namespace lua_library_##derived \
+	{ \
+		static const luaL_reg derived##_library[] = \
+		{ \
+			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
+			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring) 
+// end #define_lua_LuaExtendable
+
 /**
 \def end_lua_LuaExtendable
 \note compile-time directive
@@ -485,6 +499,11 @@ to compare userdata and use them as equivalent table keys
 @see comments in the implementation of void Lua::initializeUserdataStorage(void)
 */
 sint pushRegisteredClass(lua_State* L, void* pushee);
+
+/**
+helper function for simply registering global native functions to %Lua
+*/
+void registerGlobalLibrary(lua_State* L);
 
 } // namespace LuaExtension 
 

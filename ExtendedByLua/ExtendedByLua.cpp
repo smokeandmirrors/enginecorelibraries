@@ -12,7 +12,6 @@ Defines the entry point for the console application.
 #include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-
 using namespace LuaExtension;
 
 #endif//EXTENDED_BY_LUA
@@ -37,7 +36,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #ifdef EXTENDED_BY_LUA 
 	{
 		LuaExtension::Lua lua;
-		assert(lua.require("Utilities"));
+		registerGlobalLibrary(lua.getState());
+		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
 		register_lua_library((&lua), Vector2);
 		register_lua_library((&lua), Vector3);
