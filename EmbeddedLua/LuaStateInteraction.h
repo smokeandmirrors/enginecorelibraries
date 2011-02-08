@@ -235,6 +235,16 @@ inline sint staticReturn2Param1(lua_State* L)
 /**
 class functions
 */
+template<typename CLASS, void(CLASS::* function)(void)>
+inline sint return0Param0(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -1))
+	{
+		(object->*function)();
+	}
+	return 0;	
+}
+
 template<typename CLASS, typename ARG_1, void(CLASS::* function)(ARG_1)>
 inline sint return0Param1(lua_State* L)
 {
@@ -242,8 +252,21 @@ inline sint return0Param1(lua_State* L)
 	{
 		(object->*function)( to<ARG_1>(L, -1));
 	}
-
 	return 0;	
+}
+
+template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void)>
+inline sint return1Param0(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -1))
+	{
+		RET_1 value = (object->*function)();
+		return push(L, value);
+	}
+	else
+	{
+		return 0;
+	}	
 }
 
 template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void) const>
@@ -267,6 +290,23 @@ inline sint return1Param1const(lua_State* L)
 	{
 		ARG_1 argument = to<ARG_1>(L, -1);
 		RET_1 value = (object->*function)(argument);
+		return push(L, value);
+	}
+	else
+	{
+		return 0;
+	}	
+}
+
+
+template<typename CLASS, typename RET_1, typename ARG_1, typename ARG_2, RET_1(CLASS::* function)(ARG_1, ARG_2) const>
+inline sint return1Param2const(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -3))
+	{
+		ARG_1 arg1 = to<ARG_1>(L, -1);
+		ARG_2 arg2 = to<ARG_2>(L, -2);
+		RET_1 value = (object->*function)(arg1, arg2);
 		return push(L, value);
 	}
 	else

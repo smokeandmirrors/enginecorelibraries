@@ -114,7 +114,7 @@ public:
 	void 			add(vec_t X, vec_t Y);
 	void 			add(const Vector2& v);
 	/** \warning abuse may be slow! */
-	const Vector2 	operator+(const Vector2& v) const; 
+	Vector2 		operator+(const Vector2& v) const; 
 	Vector2& 		operator+=(const Vector2& v);
 	// distance to another
 	vec_t			distanceTo(const Vector2& v) const;
@@ -126,7 +126,7 @@ public:
 	void 			divide(vec_t X, vec_t Y);
 	void 			divide(const Vector2& v);
 	/** \warning abuse may be slow! */
-	const Vector2 	operator/(const Vector2& v) const; 
+	Vector2 		operator/(const Vector2& v) const; 
 	Vector2& 		operator/=(const Vector2& v);
 	// dot product 
 	vec_t 			dot(const Vector2& v) const;
@@ -149,7 +149,7 @@ public:
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y);
 	void 			scale(const Vector2& v);
-	const Vector2 	operator*(const Vector2& v) const; 
+	Vector2 		operator*(const Vector2& v) const; 
 	Vector2& 		operator*=(const Vector2& v);
 	// mutation 
 	void 			set(vec_t scalar);
@@ -158,11 +158,11 @@ public:
 	void			set(sint index, vec_t scalar);
 	Vector2& 		operator=(const Vector2& v);
 	// substraction 
-	void 			substract(vec_t scalar);
-	void 			substract(vec_t X, vec_t Y);
-	void 			substract(const Vector2& v);
+	void 			subtract(vec_t scalar);
+	void 			subtract(vec_t X, vec_t Y);
+	void 			subtract(const Vector2& v);
 	/** \warning abuse may be slow! */
-	const Vector2 	operator-(const Vector2& v) const; 
+	Vector2 		operator-(const Vector2& v) const; 
 	Vector2& 		operator-=(const Vector2& v);
 	// zero
 	bool			isZero(void) const;
@@ -207,7 +207,7 @@ public:
 	void 			add(vec_t X, vec_t Y, vec_t Z);
 	void 			add(const Vector3& v);	
 	/** \warning abuse may be slow! */
-	const Vector3 	operator+(const Vector3& v) const; 
+	Vector3 		operator+(const Vector3& v) const; 
 	Vector3& 		operator+=(const Vector3& v);
 	// cross product 
 	void 			cross(const Vector3& v);
@@ -227,7 +227,7 @@ public:
 	void 			divide(vec_t X, vec_t Y, vec_t Z);
 	void 			divide(const Vector3& v);
 	/** \warning abuse may be slow! */
-	const Vector3 	operator/(const Vector3& v) const; 
+	Vector3 		operator/(const Vector3& v) const; 
 	Vector3& 		operator/=(const Vector3& v);
 	// dot product 
 	vec_t 			dot(const Vector3& v) const;
@@ -250,12 +250,13 @@ public:
 	Vector3(const Vector3& v, bool /* IGNORED */)
 		: x(v.x), y(v.y), z(v.z) { normalize(); }
 	// multiplication & scaling 
-	const Vector3& 	negate(void);
+	Vector3&		operator-(void);
+	Vector3& 		negate(void);
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y, vec_t Z);
 	void 			scale(const Vector3& v);
 	/** \warning abuse may be slow! */
-	const Vector3 	operator*(const Vector3& v) const;
+	Vector3 		operator*(const Vector3& v) const;
 	Vector3& 		operator*=(const Vector3& v);
 	// mutation 
 	void 			set(vec_t scalar);
@@ -264,11 +265,11 @@ public:
 	void			set(sint index, vec_t scalar);
 	Vector3& 		operator=(const Vector3& v);
 	// substraction 
-	void 			substract(vec_t scalar);
-	void 			substract(vec_t X, vec_t Y, vec_t Z);
-	void 			substract(const Vector3& v);
+	void 			subtract(vec_t scalar);
+	void 			subtract(vec_t X, vec_t Y, vec_t Z);
+	void 			subtract(const Vector3& v);
 	/** \warning abuse may be slow! */
-	const Vector3 	operator-(const Vector3& v) const; 
+	Vector3 		operator-(const Vector3& v) const; 
 	Vector3& 		operator-=(const Vector3& v);
 	// zero
 	bool			isZero(void) const;
@@ -333,7 +334,7 @@ inline void Vector2::add(const Vector2& v)
 	x += v.x;
 	y += v.y;
 }
-inline const Vector2 Vector2::operator+(const Vector2& v) const
+inline Vector2 Vector2::operator+(const Vector2& v) const
 {	// warning: abuse can be slow!
 	return Vector2(x + v.x, y + v.y);
 }
@@ -361,7 +362,7 @@ inline void Vector3::add(const Vector3& v)
 	y += v.y;
 	z += v.z;
 }
-inline const Vector3 Vector3::operator+(const Vector3& v) const
+inline Vector3 Vector3::operator+(const Vector3& v) const
 {	// warning: abuse can be slow!
 	return Vector3(x + v.x, y + v.y, z + v.z);
 }
@@ -525,38 +526,32 @@ scalar and per element division
 */
 inline void Vector2::divide(vec_t scalar)
 {
-	assert(scalar != 0.0f);
 	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
 }
 inline void Vector2::divide(vec_t X, vec_t Y)
 {
-	assert(X != 0.0f && Y != 0.0f);
 	x /= X;
 	y /= Y;
 }
 inline void Vector2::divide(const Vector2& v)
 {
-	assert(v.x != 0.0f && v.y != 0.0f);
 	x /= v.x;
 	y /= v.y;
 }
-inline const Vector2 Vector2::operator/(const Vector2& v) const
+inline Vector2 Vector2::operator/(const Vector2& v) const
 {	// warning: abuse can be slow!
-	assert(v.x != 0.0f && v.y != 0.0f);
 	return Vector2(x / v.x, y / v.y);
 }
 inline Vector2& Vector2::operator/=(const Vector2& v)
 {
-	assert(v.x != 0.0f && v.y != 0.0f);
 	x /= v.x;
 	y /= v.y;
 	return *this;
 }
 inline void Vector3::divide(vec_t scalar)
 {
-	assert(scalar != 0.0f);
 	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
@@ -564,26 +559,22 @@ inline void Vector3::divide(vec_t scalar)
 }
 inline void Vector3::divide(vec_t X, vec_t Y, vec_t Z)
 {
-	assert(X != 0.0f && Y != 0.0f && Z != 0.0f);
 	x /= X;
 	y /= Y;
 	z /= Z;
 }
 inline void Vector3::divide(const Vector3& v)
 {
-	assert(v.x != 0.0f && v.y != 0.0f && v.z != 0.0f);
 	x /= v.x;
 	y /= v.y;
 	z /= v.z;
 }
-inline const Vector3 Vector3::operator/(const Vector3& v) const
+inline Vector3 Vector3::operator/(const Vector3& v) const
 {	// warning: abuse can be slow!
-	assert(v.x != 0.0f && v.y != 0.0f && v.z != 0.0f);
 	return Vector3(x / v.x, y / v.y, z / v.z);
 }
 inline Vector3& Vector3::operator/=(const Vector3& v)
 {
-	assert(v.x != 0.0f && v.y != 0.0f && v.z != 0.0f);
 	x /= v.x;
 	y /= v.y;
 	z /= v.z;
@@ -683,7 +674,6 @@ inline bool Vector3::isNormal(void) const
 inline vec_t Vector2::normalize(void)
 {
 	vec_t magnitude = sqrtvec_t(x * x + y * y);
-	assert(magnitude != 0.0f);
 	const vec_t scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;
@@ -693,7 +683,6 @@ inline vec_t Vector2::normalize(void)
 inline vec_t Vector3::normalize(void)
 {
 	vec_t magnitude = sqrtvec_t(x * x + y * y + z * z);
-	assert(magnitude != 0.0f);
 	const vec_t scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;
@@ -723,7 +712,7 @@ inline void Vector2::scale(const Vector2& v)
 	x *= v.x;
 	y *= v.y;
 }
-inline const Vector2 Vector2::operator*(const Vector2& v) const
+inline Vector2 Vector2::operator*(const Vector2& v) const
 {	// warning: abuse can be slow!
 	return Vector2(x * v.x, y * v.y);
 }
@@ -758,7 +747,7 @@ inline void Vector3::scale(const Vector3& v)
 	y *= v.y;
 	z *= v.z;
 }
-inline const Vector3 Vector3::operator*(const Vector3& v) const
+inline Vector3 Vector3::operator*(const Vector3& v) const
 {	// warning: abuse can be slow!
 	return Vector3(x * v.x, y * v.y, z * v.z);
 }
@@ -770,7 +759,7 @@ inline Vector3& Vector3::operator*=(const Vector3& v)
 	return *this;
 }
 /** scale by -1 */
-inline const Vector3& Vector3::negate(void)
+inline Vector3& Vector3::negate(void)
 {
 	x *= -1.0f;
 	y *= -1.0f;
@@ -785,22 +774,22 @@ inline const Vector3& Vector3::negate(void)
 Vector Substraction
 @{
 */
-inline void Vector2::substract(vec_t scalar)
+inline void Vector2::subtract(vec_t scalar)
 {
 	x -= scalar;
 	y -= scalar;
 }
-inline void Vector2::substract(vec_t X, vec_t Y)
+inline void Vector2::subtract(vec_t X, vec_t Y)
 {
 	x -= X;
 	y -= Y;
 }
-inline void Vector2::substract(const Vector2& v)
+inline void Vector2::subtract(const Vector2& v)
 {
 	x -= v.x;
 	y -= v.y;
 }
-inline const Vector2 Vector2::operator-(const Vector2& v) const
+inline Vector2 Vector2::operator-(const Vector2& v) const
 {	// warning: abuse can be slow!
 	return Vector2(x - v.x, y - v.y);
 }
@@ -810,25 +799,25 @@ inline Vector2& Vector2::operator-=(const Vector2& v)
 	y -= v.y;
 	return *this;
 }
-inline void Vector3::substract(vec_t scalar)
+inline void Vector3::subtract(vec_t scalar)
 {
 	x -= scalar;
 	y -= scalar;
 	z -= scalar;
 }
-inline void Vector3::substract(vec_t X, vec_t Y, vec_t Z)
+inline void Vector3::subtract(vec_t X, vec_t Y, vec_t Z)
 {
 	x -= X;
 	y -= Y;
 	z -= Z;
 }
-inline void Vector3::substract(const Vector3& v)
+inline void Vector3::subtract(const Vector3& v)
 {
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
 }
-inline const Vector3 Vector3::operator-(const Vector3& v) const
+inline Vector3 Vector3::operator-(const Vector3& v) const
 {	// warning: abuse can be slow!
 	return Vector3(x - v.x, y - v.y, z - v.z);
 }
