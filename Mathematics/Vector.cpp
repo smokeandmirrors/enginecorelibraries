@@ -307,6 +307,26 @@ defineVector3Operator(__mul, *)
 defineVoidVector3Func(subtract)
 defineVector3Operator(__sub, -)
 
+lua_func(getPerpendicular)
+{
+	const Vector3& v = to<const Vector3&>(L, -1);
+	return push(L, new Vector3(v.getPerpendicular())); 
+}
+
+
+lua_func(negate)
+{
+	Vector3* v = to<Vector3*>(L, -1);
+	v->negate();
+	return push(L, v);
+}
+
+lua_func(__unm)
+{
+	Vector3* v = to<Vector3*>(L, -1);
+	-(*v);
+	return push(L, v);
+}
 
 } // end namespace lua_library_Vector3
 
@@ -333,15 +353,15 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_entry(equals)
 		lua_entry(nearlyEquals)
 		lua_named_entry("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
-		// lua_entry(getPerpendicular)
+		lua_entry(getPerpendicular)
 		lua_named_entry("magnitude", (return1Param0const<Vector3, vec_t, &Vector3::magnitude>))
 		lua_named_entry("magnitudeSqrd", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeSqrd>))
 		lua_named_entry("magnitudeXY", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXY>))
 		lua_named_entry("magnitudeXYSqrd", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXYSqrd>))
 		lua_named_entry("isNormal", (return1Param0const<Vector3, bool, &Vector3::isNormal>))
 		lua_named_entry("normalize", (return1Param0<Vector3, vec_t, &Vector3::normalize>))
-		// lua_entry(__unm)
-		// lua_entry(negate)
+		lua_entry(__unm)
+		lua_entry(negate)
 		lua_entry(scale)
 		lua_entry(__mul)
 		lua_named_entry("set", initialize)
@@ -349,7 +369,6 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_entry(__sub)
 		lua_named_entry("isZero", (return1Param0const<Vector3, bool, &Vector3::isZero>))
 		lua_named_entry("zero", (return0Param0<Vector3, &Vector3::zero>))
-		// lua_entry(set)
 		lua_final_entry 
 	};	// end function list 
 	sint key(lua_State* L) 

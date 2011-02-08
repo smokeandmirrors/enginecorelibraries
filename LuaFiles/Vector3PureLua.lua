@@ -22,48 +22,77 @@ Vector3PureLua.extends = "Vector2PureLua"
 ----------------------------------------------------------------------
 -- adds a vector to self
 -- @return self
-function Vector3PureLua:Add(v)
-        self.x = self.x + v.x
-        self.y = self.y + v.y
-        self.z = self.z + v.z
-        return self
+function Vector3PureLua:add(x, y, z)
+	local type_x = type(x)
+	if type_x == 'number' then
+		if type(y) == 'number' then
+			self.x = self.x + x
+			self.y = self.y + y
+			self.z = self.z + x
+		else
+			self.x = x
+			self.y = x
+			self.z = x
+		end
+	elseif type_x ~= nil then 
+		self.x = self.x + x.x
+		self.y = self.y + x.y
+		self.z = self.y + x.z
+	end
 end
 
 ----------------------------------------------------------------------
--- adds a vector to self
--- @return self
-function Vector3PureLua:AddComponent(x, y, z)
-        self.x = self.x + x
-        self.y = self.y + y
-        self.z = self.z + z
-        return self
-end
-----------------------------------------------------------------------
 -- initalizes to passed in numbers.  Usage: v = new("Vector3PureLua", 1,2,3) or v = new("Vector3PureLua", otherVec)
 function Vector3PureLua:construct(...)
-        if ... then
-                self:Set(...)
-        end
+	if ... then
+		self:set(...)
+	end
 end
 
 ----------------------------------------------------------------------
 -- 3D vector component multiply
 -- @return self
-function Vector3PureLua:ComponentMul(v)
-        self.x = self.x * v.x
-        self.y = self.y * v.y
-        self.z = self.z * v.z
-        return self
+function Vector3PureLua:scale(x, y, z)
+    local type_x = type(x)
+	if type_x == 'number' then
+		if type(y) == 'number' then
+			self.x = self.x * x
+			self.y = self.y * y
+			self.z = self.z * x
+		else
+			self.x = x
+			self.y = x
+			self.z = x
+		end
+	elseif type_x ~= nil then 
+		self.x = self.x * x.x
+		self.y = self.y * x.y
+		self.z = self.y * x.z
+	end
+	return self
 end
 
 ----------------------------------------------------------------------
 -- 3D vector component division
 -- @return self
-function Vector3PureLua:ComponentDiv(v)
-        self.x = self.x / v.x
-        self.y = self.y / v.y
-        self.z = self.z / v.z
-        return self
+function Vector3PureLua:divide(x, y, z)
+	local type_x = type(x)
+	if type_x == 'number' then
+		if type(y) == 'number' then
+			self.x = self.x / x
+			self.y = self.y / y
+			self.z = self.z / x
+		else
+			self.x = x
+			self.y = x
+			self.z = x
+		end
+	elseif type_x ~= nil then 
+		self.x = self.x / x.x
+		self.y = self.y / x.y
+		self.z = self.y / x.z
+	end
+	return self
 end
 
 ----------------------------------------------------------------------
@@ -141,22 +170,22 @@ end
 ----------------------------------------------------------------------
 -- creates a table of 3 numbers, all zero
 function Vector3PureLua:construct(...)
-        local a, b, c = ...
-        if a then
-                if b then
-                        self.x = a
-                        self.y = b
-                        self.z = c or 0
-                else
-                        self.x = a.x
-                        self.y = a.y
-                        self.z = a.z
-                end
-        else
-                self.x = 0
-                self.y = 0
-                self.z = 0
-        end
+	local a, b, c = ...
+	if a then
+		if b then
+			self.x = a
+			self.y = b
+			self.z = c or 0
+		else
+			self.x = a.x
+			self.y = a.y
+			self.z = a.z
+		end
+	else
+		self.x = 0
+		self.y = 0
+		self.z = 0
+	end
 end
 ----------------------------------------------------------------------
 -- checks wither the vector is close enough to another
@@ -206,11 +235,11 @@ end
 ----------------------------------------------------------------------
 -- negates the vector
 -- @return self
-function Vector3PureLua:Negate()
-        self.x = -self.x
-        self.y = -self.y
-        self.z = -self.z
-        return self
+function Vector3PureLua:negate()
+	self.x = -self.x
+	self.y = -self.y
+	self.z = -self.z
+	return self
 end
 ----------------------------------------------------------------------
 -- normalized the vector, sets it to unit length

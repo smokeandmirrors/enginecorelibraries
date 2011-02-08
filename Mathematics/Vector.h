@@ -766,6 +766,13 @@ inline Vector3& Vector3::negate(void)
 	z *= -1.0f;
 	return *this;
 }
+inline Vector3& Vector3::operator-(void)
+{
+	x *= -1.0f;
+	y *= -1.0f;
+	z *= -1.0f;
+	return *this;
+}
 /** @} end Vector_Scaling */
 
 /** 
