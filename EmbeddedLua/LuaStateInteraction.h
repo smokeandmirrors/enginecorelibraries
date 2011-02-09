@@ -200,6 +200,14 @@ inline sint pushTrue(lua_State* L)
 /**
 static functions
 */
+template<typename ARG_1, void(* function)(ARG_1)>
+inline sint staticReturn0Param1(lua_State* L)
+{
+	ARG_1 arg1 = to<ARG_1>(L, -1);
+	(*function)(arg1);
+	return 0;
+}
+
 template<typename RET_1, RET_1(* function)(void)>
 inline sint staticReturn1Param0(lua_State* L)
 {

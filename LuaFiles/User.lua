@@ -10,27 +10,41 @@ _G.u = function()
 end
 
 _G.test = function()
-	UT.runModule('UTVector')
+	vpt(1000)
+	vpt(10000)
+	vpt(100000)
+	vpt(1000000)
 end
 
 _G.vpt = function(iterations)
-	print'Start native!'
+	print'\n\n\n\nStart Lua->Native!'
 	collectgarbage'collect'
 	local native_start = os.clock()
 	vectorPerformance('Vector3', iterations)
 	local native_end = os.clock()
-	print'End native!'
+	print'Finis Lua->Native!'
 	collectgarbage'collect'
-	print'Start Lua!'
+	print'Start Lua->Lua!'
 	local script_start = os.clock()
 	vectorPerformance('Vector3PureLua', iterations)
 	local script_end = os.clock()
-	print'End Lua!'
+	print'Finis Lua->Lua!'
+	collectgarbage'collect'
+	print'Start Native->Native!'
+	local all_native_start = os.clock()
+	nativeVectorPerformance(iterations)
+	local all_native_end = os.clock()
+	print'Finis Native->Native!'
+	-- nativeVectorPerformance
 	
 	local native = os.difftime(native_end, native_start)
 	local script = os.difftime(script_end, script_start)
-	print'***************************'
-	printf('Native: %f. Script: %f.  Native was %f x faster', native, script, script/native)
+	local all_native = os.difftime(all_native_end, all_native_start)
+	print'************************************************************************************************'
+	printf('Native: %f. Script: %f. All Native: %f.  Native was %fx faster; Native native was %fx faster.', 
+		native, script, all_native, script/native, script/all_native)
+	print'************************************************************************************************'
+	
 end
 
 
@@ -45,8 +59,6 @@ vectorPerformance = function(class_name, iterations)
 	v:__eq(w)
 	local is_true
 	is_true = (v == w)
-	v = -v
-	v = -v
 	v:add(x)
 	v:subtract(x)
 	v:construct(math.pi, math.pi/2, math.pi/3)

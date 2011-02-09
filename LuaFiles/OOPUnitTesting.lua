@@ -362,6 +362,7 @@ end)
 ----------------------------------------------------------------------
 UT.test('OOP.constuction and metatable methods',
 function()
+	local OOP = rerequire'ObjectOrientedParadigm'
 	UT = require'UnitTestingFramework'
 	----------------------------------------------------------------------
 	-- __new,		__setmetatable
@@ -388,6 +389,7 @@ function()
 	declareClass(BothChild)
 	_G.instanceBoth = new'Both'
 	_G.instanceBoth_child = new'BothChild'
+	
 	UT.testRefreshClassAbilities(Both, 'Both')
     UT.testRefreshClassAbilities(BothChild, 'BothChild', 'Both')
 	UT.checkT(instanceBoth.only, 'function')

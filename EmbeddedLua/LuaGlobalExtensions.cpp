@@ -3,6 +3,7 @@
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
+#include "Vector.h"
 /**
 add native function that you wish to be in the global %Lua namespace
 here
@@ -11,14 +12,8 @@ here
 namespace LuaExtension
 {
 
-lua_func(wtf)
-{
-	sint stack_size = lua_gettop(L);
-	return push(L, stack_size);
-}
-
 static const luaL_reg lua_library_Global[] = {
-	lua_entry(wtf)
+	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &nativeVectorPerformance>))
 	lua_final_entry
 };
 

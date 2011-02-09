@@ -135,6 +135,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				GenerateDebugInformation="true"
 				LinkTimeCodeGeneration="0"
 			/>
 			<Tool
@@ -162,7 +163,7 @@
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
-<Configuration
+		<Configuration
 			Name="GoldMaster|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"

@@ -213,7 +213,7 @@ function testClassProperties(class_name, super_name, interfaces)
 	
 	if type(class_name) == 'string' then
 		if not _G.getClass(class_name) then
-			require(class_name)
+			pcall(function() require(class_name) end)
 			OOP.declareClass(_G[class_name])
 		end
 	end
@@ -223,22 +223,24 @@ function testClassProperties(class_name, super_name, interfaces)
 end
 
 function testRefreshClassAbilities(class_declaration, class_name, super_name, interfaces)
-	local OOP = require'ObjectOrientedParadigm'
-	testClassProperties(class_name, super_name, interfaces)
-	local instance1 = new(class_name)
-	class_declaration.unitTestingFunction1 = function(self)
-		if not self.unitTestingValue1 then
-			self.unitTestingValue1 = 'assignedvalue'
-		end	
-		return 7
+	if DEBUG_INTERPRETATION then
+		local OOP = require'ObjectOrientedParadigm'
+		testClassProperties(class_name, super_name, interfaces)
+		local instance1 = new(class_name)
+		class_declaration.unitTestingFunction1 = function(self)
+			if not self.unitTestingValue1 then
+				self.unitTestingValue1 = 'assignedvalue'
+			end	
+			return 7
+		end
+		declareClass(class_declaration)
+		testInstanceProperties(instance1, class_name, super_name, interfaces)
+		testClassProperties(class_name, super_name, interfaces)
+		checkT(instance1.unitTestingFunction1, 'function')
+		checkEqual(instance1:unitTestingFunction1(), 7)
+		checkT(instance1.unitTestingValue1, 'string')
+		checkEqual(instance1.unitTestingValue1, 'assignedvalue')		
 	end
-	declareClass(class_declaration)
-	testInstanceProperties(instance1, class_name, super_name, interfaces)
-	testClassProperties(class_name, super_name, interfaces)
-	checkT(instance1.unitTestingFunction1, 'function')
-	checkEqual(instance1:unitTestingFunction1(), 7)
-	checkT(instance1.unitTestingValue1, 'string')
-	checkEqual(instance1.unitTestingValue1, 'assignedvalue')		
 end
 
 function testInstanceProperties(b, class_name, super_name, interfaces)

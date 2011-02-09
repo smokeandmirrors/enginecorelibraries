@@ -6,10 +6,6 @@ require 'Utilities'
 ----------------------------------------------------------------------
 UT.test('inheritance',
 	function()
-		require'Grandparent'
-		require'Parent'
-		require'Child'
-		
 		local g = new'Grandparent'
 		-- C++ functions
 		UT.check(type(g.getFamilyName) == 'function')
@@ -123,7 +119,6 @@ UT.test('inheritance',
 ----------------------------------------------------------------------
 UT.test('proxy useage',
 	function()
-		require'Child'
 		local c = new'Child'
 		UT.checkT(c, 'userdata')
 		UT.check(c.newThing == nil)
@@ -144,24 +139,26 @@ UT.test('proxy OOP friendliness',
 ----------------------------------------------------------------------
 UT.test('proxy class redefinition',
 	function()
-		require'Child'
-		c = new'Child'
-		UT.testClassProperties('Parent', 'Grandparent')
-		UT.testClassProperties('Child', 'Parent')
-		Parent.onRefresh = function() return 'refreshed' end
-		declareClass(Parent)
-		UT.checkT(c.onRefresh, 'function')
-		UT.checkEqual(c:onRefresh(), 'refreshed')
-		UT.testInstanceProperties(c, 'Child', 'Parent')
-		Child.__add = function(lhs, rhs) return 2 end
-		Child.refreshed = function(self) return self() + 7 end
-		declareClass(Child)
-		UT.checkEqual(c + new'Child', 2)
-		UT.checkT(c.refreshed, 'function')
-		UT.checkEqual(c:refreshed(), 14)
-		UT.testInstanceProperties(c, 'Child', 'Parent')
-		UT.checkEqual((new'Child'):refreshed(), 14)
-		UT.testClassProperties('Parent', 'Grandparent')
-		UT.testClassProperties('Child', 'Parent')
+		if DEBUG_INTERPRETATION then
+			require'Child'
+			c = new'Child'
+			UT.testClassProperties('Parent', 'Grandparent')
+			UT.testClassProperties('Child', 'Parent')
+			Parent.onRefresh = function() return 'refreshed' end
+			declareClass(Parent)
+			UT.checkT(c.onRefresh, 'function')
+			UT.checkEqual(c:onRefresh(), 'refreshed')
+			UT.testInstanceProperties(c, 'Child', 'Parent')
+			Child.__add = function(lhs, rhs) return 2 end
+			Child.refreshed = function(self) return self() + 7 end
+			declareClass(Child)
+			UT.checkEqual(c + new'Child', 2)
+			UT.checkT(c.refreshed, 'function')
+			UT.checkEqual(c:refreshed(), 14)
+			UT.testInstanceProperties(c, 'Child', 'Parent')
+			UT.checkEqual((new'Child'):refreshed(), 14)
+			UT.testClassProperties('Parent', 'Grandparent')
+			UT.testClassProperties('Child', 'Parent')
+		end
 	end
 )

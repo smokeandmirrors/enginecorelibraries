@@ -1,12 +1,11 @@
 module(..., package.seeall)
-local OOP = require'ObjectOrientedParadigm'
 local UT = require'UnitTestingFramework'
 require 'Utilities'
 
 ----------------------------------------------------------------------
 UT.test('simple declaration',
 	function()
-		pcall(function() require'Simple' end)
+		local OOP = rerequire'ObjectOrientedParadigm'
 		UT.testClassProperties('Simple')
 		local s = new'Simple'
 		UT.checkT(s.__tostring, 'function')
@@ -25,23 +24,24 @@ UT.test('simple declaration',
 		s:setOther(s2)
 		local s3 = s:getOther()
 		UT.checkEqual(s2, s3)
-		pcall(function() require'Derived' end)
 		UT.testClassProperties('Derived', 'Simple')
 		dOriginal = new'Derived'
 		UT.testInstanceProperties(s3, 'Simple')
 		Simple.refreshed = function(self) return s:getValue() + 7 end
 		UT.testInstanceProperties(s3, 'Simple')
-		declareClass(Simple)
-		UT.testClassProperties('Simple')
-		UT.checkT(s.refreshed, 'function')
-		UT.checkT(s2.refreshed, 'function')
-		UT.checkT(s3.refreshed, 'function')
-		UT.checkT(dOriginal.refreshed, 'function')
-		UT.checkEqual(s:refreshed(), 14)
-		UT.checkEqual(s2:refreshed(), 14)
-		UT.checkEqual(s3:refreshed(), 14)
-		UT.checkEqual(dOriginal:refreshed(), 14)
-		UT.testClassProperties('Derived', 'Simple')
+		if DEBUG_INTERPRETATION then
+			declareClass(Simple)
+			UT.testClassProperties('Simple')
+			UT.checkT(s.refreshed, 'function')
+			UT.checkT(s2.refreshed, 'function')
+			UT.checkT(s3.refreshed, 'function')
+			UT.checkT(dOriginal.refreshed, 'function')
+			UT.checkEqual(s:refreshed(), 14)
+			UT.checkEqual(s2:refreshed(), 14)
+			UT.checkEqual(s3:refreshed(), 14)
+			UT.checkEqual(dOriginal:refreshed(), 14)
+			UT.testClassProperties('Derived', 'Simple')
+		end
 		local doNotCrash = new'Simple'
 		local d = new'Derived'
 		UT.checkT(d.__tostring, 'function')
@@ -79,5 +79,6 @@ UT.test('simple declaration',
 		UT.checkEqual(d:isSimple(), true)
 		UT.checkT(d.reproduce, 'function')
 		UT.checkT(d:reproduce(), 'userdata')
+		
 	end
 )

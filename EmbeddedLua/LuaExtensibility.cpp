@@ -70,6 +70,7 @@ sint LuaExtendable::__newindexError(lua_State* L)
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
 		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
 #else
+	(void*)L;
 	return 0;
 #endif//DEBUG
 }
@@ -113,8 +114,10 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	lua_getglobal(L, derived);
 	assert(lua_istable(L, -1));
 	//s: declareClass derived
-	assert(Lua::callProtected(L, 1, 0) == 0);
+	bool success = Lua::callProtected(L, 1, 0) == 0;
 	//s: 
+	assert(success);
+	
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)

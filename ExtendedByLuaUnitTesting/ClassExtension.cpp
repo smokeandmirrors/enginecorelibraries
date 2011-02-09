@@ -374,6 +374,7 @@ public:
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
+	lua_getClassName(Parent)
 
 private:
 	Grandparent*			m_grandParent;			
@@ -410,6 +411,7 @@ public:
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
+	lua_getClassName(Child)
 
 private:
 	Parent*					m_parent;

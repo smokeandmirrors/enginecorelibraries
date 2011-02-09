@@ -23,15 +23,6 @@ function Vector3PureLua.__eq(lhs, rhs)
 	return rawequal(lhs, rhs) or (lhs.x == rhs.x and lhs.y == rhs.y and lhs.z == rhs.z)
 end
 ----------------------------------------------------------------------
--- the "-" (unary minus) operator.  Negates the vector
--- @return self
-function Vector3PureLua.__unm(rhs)
-	rhs.x = -rhs.x
-	rhs.y = -rhs.y
-	rhs.z = -rhs.z
-	return rhs
-end
-----------------------------------------------------------------------
 -- adds a vector to self
 -- @return self
 function Vector3PureLua:add(x, y, z)

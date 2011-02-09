@@ -26,7 +26,16 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	}
 
 	lua->require("UnitTestingFramework");
-	CFIX_ASSERT(lua->require(module));
+	if (!lua->require(module))
+	{
+		size_t origsize = strlen(module) + 1;
+		size_t convertedChars = 0;
+		wchar_t* wmodule = new wchar_t[origsize * 10];
+		mbstowcs_s(&convertedChars, wmodule, origsize, module, _TRUNCATE);
+		CFIX_LOG(L"\nLua Unit Test Report: %s", wmodule);
+		CFIX_LOG(L"Test not found or written incorrectly: %s", wmodule);
+		return;
+	}
 	lua_State* L = lua->getState();
 	//s: ?
 	lua_getglobal(L, "UnitTestingFramework");
@@ -50,11 +59,11 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	// Convert to a wchar_t*
 	size_t origsize = strlen(report) + 1;
 	size_t convertedChars = 0;
-	wchar_t* wcstring = new wchar_t[origsize];
-	mbstowcs_s(&convertedChars, wcstring, origsize, report, _TRUNCATE);
-	CFIX_LOG(L"\nLua Unit Test Report: %s", wcstring);
+	wchar_t* wreport = new wchar_t[origsize * 10];
+	mbstowcs_s(&convertedChars, wreport, origsize, report, _TRUNCATE);
+	CFIX_LOG(L"\nLua Unit Test Report: %s", wreport);
 	
-	delete[] wcstring;
+	delete[] wreport;
 	if (delete_lua)
 		delete lua;
 

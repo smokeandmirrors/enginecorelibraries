@@ -304,13 +304,6 @@ defineVoidVector3Func(scale)
 
 defineVoidVector3Func(subtract)
 
-lua_func(__unm)
-{
-	Vector3* v = to<Vector3*>(L, -1);
-	-(*v);
-	return push(L, v);
-}
-
 } // end namespace lua_library_Vector3
 
 define_lua_LuaExtendable(Vector3, Vector3)
@@ -318,7 +311,6 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__index", __indexVector3)
 		lua_named_entry("__newindex", __newindexVector3) 
 		lua_named_entry("__newindexable", LuaExtension::pushFalse)
-		lua_entry(		 __unm)
 		lua_entry(		 add)
 		lua_named_entry("construct", initialize)
 		lua_entry(		 cross)
@@ -356,5 +348,178 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		return 1; 
 	} 
 }; // end namespace lua_library_Vector3
+
+static const vec_t pi = 3.141592653589793f;
+
+void nativeVectorPerformance(uint iterations)
+{
+	for (uint i(0); i < iterations; i++)
+	{
+		Vector3* v = new Vector3(3.0f,2.0f,1.0f);
+		Vector3* w = new Vector3(3.0f,2.0f,1.0f);
+		Vector3* x = new Vector3(1.0f,3.0f,2.0f);
+
+		bool is_true;
+		is_true = w == v;
+		is_true = v == w;
+		v->add(*x);
+		v->subtract(*x);
+		v->set(pi, pi/2, pi/3);
+		v->set(pi/4);
+		v->set(*w);
+		Vector3* z = new Vector3();
+		v->set(10,0,0);
+		v->distance(*z);
+		v->distanceSqr(*z);
+		v->distanceXY(*z);
+		v->distanceXYSqr(*z); 
+		v->set(0,10,0);
+		v->distance(*z);
+		v->distanceSqr(*z);
+		v->distanceXY(*z); 
+		v->distanceXYSqr(*z);
+		v->set(0,0,10);
+		v->distance(*z);
+		v->distanceSqr(*z); 
+		v->distanceXY(*z); 
+		v->distanceXYSqr(*z); 
+		v->set(1,1,1);
+		v->distance(*z); 
+		v->distanceSqr(*z); 
+		v->distanceXY(*z); 
+		v->distanceXYSqr(*z); 
+		v->normalize();
+		v->distance(*z); 
+		v->distanceSqr(*z); 
+		v->set(0,1,1);
+		v->distanceXY(*z); 
+		v->distanceXYSqr(*z); 
+		v->set(8,4,2);
+		v->divide(2);
+		v->set(8,4,2);
+		v->divide(8,4,2);
+		v->set(100,100,100);
+		v->divide(50, 25, 10);
+		v->set(1,2,3);
+		z->set(-1,-2,-3);
+		vec_t v_dot_z = v->dot(*z);
+		vec_t z_dot_v = z->dot(*v);
+		v->set(*w);
+		v->equals(*w);
+		w->equals(*v);
+		v->zero();
+		z->set(0,0,10);
+		v->isFar(*z,5);
+		is_true = ! v->isFar(*z,10);
+		is_true = ! v->isFarXY(*z,0);
+		is_true = ! v->isFarXY(*z,0);
+		is_true = v->isNear(*z,10);
+		is_true = ! v->isNear(*z,9.99f);
+		is_true = v->isNearXY(*z,0);
+		v->set(10000000, 0, 0);
+		v->normalize();
+		v->isNormal();
+		v->magnitude();
+		v->set(0, 10000000, 0);
+		v->normalize();
+		v->isNormal();
+		v->magnitude();
+		v->set(0, 0, 10000000);
+		v->normalize();
+		is_true = v->isNormal();
+		v->magnitude();
+		is_true = ! w->isNormal();
+		is_true = ! w->isZero();
+		v->set(0);
+		v->isZero();
+		v->set(2,0,0);
+		v->magnitude();
+		v->magnitudeSqr();
+		v->magnitudeXY();
+		v->magnitudeXYSqr();
+		v->set(0,2,0);
+		v->magnitudeSqr();
+		v->magnitude();
+		v->magnitudeXY();
+		v->magnitudeXYSqr();
+		v->set(0,0,2);
+		v->magnitude();
+		v->magnitudeSqr();
+		v->magnitudeXY();
+		v->magnitudeXYSqr();
+		z->set(0,0,2.00001f);
+		is_true = !v->equals(*z);
+		is_true = *v == *z;
+		v->nearlyEquals(*z);
+		v->set(2,3,4);
+		v->negate();
+		v->negate();
+		v->scale(2);
+		v->scale(1/4, 1/6, 1/8);
+		Vector3* scaleV = new Vector3(2,3,4);
+		v->scale(*scaleV);
+		v->zero();
+		v->subtract(1,2,3);
+		Vector3* subtractV = new Vector3( -1,-2,-3);
+		v->subtract(*subtractV);
+		is_true = v->isZero();
+		v->subtract(9);
+		Vector3* Xpos = new Vector3( 1, 0, 0);
+		Vector3* Ypos = new Vector3( 0, 1, 0);
+		Vector3* Zpos = new Vector3( 0, 0, 1);
+		Vector3* Xneg = new Vector3(-1, 0, 0);
+		Vector3* Yneg = new Vector3( 0,-1, 0);
+		Vector3* Zneg = new Vector3( 0, 0,-1);
+		// x positive
+		v->set(*Xpos);
+		v->cross(*Zpos);
+		v->set(*Xpos);
+		v->cross(*Ypos);
+		v->set(*Xpos);
+		v->cross(*Zneg);
+		v->set(*Xpos);
+		v->cross(*Yneg);
+		// y positive
+		v->set(*Ypos);
+		v->cross(*Zpos);
+		v->set(*Ypos);
+		v->cross(*Xneg);
+		v->set(*Ypos);
+		v->cross(*Zneg);
+		v->set(*Ypos);
+		v->cross(*Xpos);
+		// z positive
+		v->set(*Zpos);
+		v->cross(*Yneg);
+		v->set(*Zpos);
+		v->cross(*Xpos);
+		v->set(*Zpos);
+		v->cross(*Ypos);
+		v->set(*Zpos);
+		v->cross(*Xneg);
+		// perpendicular
+		v->set(2,3,4);
+		w->set(*v);
+		v->perpendicular();
+		v->dot(*w);
+		v->set(-4,-2,-3);
+		w->set(*v);
+		v->perpendicular();
+
+		delete v;
+		delete w;
+		delete x;
+		delete z;
+		delete  scaleV ; // Vector3(2,3,4);
+		delete  subtractV ; // Vector3( -1,-2,-3);
+		delete  Xpos ; // Vector3( 1, 0, 0);
+		delete  Ypos ; // Vector3( 0, 1, 0);
+		delete  Zpos ; // Vector3( 0, 0, 1);
+		delete  Xneg ; // Vector3(-1, 0, 0);
+		delete  Yneg ; // Vector3( 0,-1, 0);
+		delete  Zneg ; // Vector3( 0, 0,-1);
+	}
+
+}
 
 #endif//EXTENDED_BY_LUA

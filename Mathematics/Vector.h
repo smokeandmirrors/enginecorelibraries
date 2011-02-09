@@ -238,7 +238,6 @@ public:
 	Vector3(const Vector3& v, bool /* IGNORED */)
 		: x(v.x), y(v.y), z(v.z) { normalize(); }
 	// multiplication & scaling 
-	Vector3&		operator-(void);
 	void 			negate(void);
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y, vec_t Z);
@@ -263,6 +262,8 @@ public:
 #if EXTENDED_BY_LUA
 declare_lua_LuaExtendable(Vector3);
 #endif//EXTENDED_BY_LUA
+
+void nativeVectorPerformance(uint iterations);
 
 /** 
 @defgroup Vector_Operations Operations
@@ -715,13 +716,6 @@ inline void Vector3::negate(void)
 	x *= -1.0f;
 	y *= -1.0f;
 	z *= -1.0f;
-}
-inline Vector3& Vector3::operator-(void)
-{
-	x *= -1.0f;
-	y *= -1.0f;
-	z *= -1.0f;
-	return *this;
 }
 /** @} end Vector_Scaling */
 
