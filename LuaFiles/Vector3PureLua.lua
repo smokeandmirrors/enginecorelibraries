@@ -69,6 +69,39 @@ function Vector3PureLua:construct(...)
 		self.z = 0
 	end
 end
+
+function Vector3PureLua:setAll(a)
+	self.x = a
+	self.y = a
+	self.z = a
+end
+
+function Vector3PureLua:setEach(a,b,c)
+	self.x = a
+	self.y = b
+	self.z = c
+end
+
+function Vector3PureLua:setEqual(a)
+	self.x = a.x
+	self.y = a.y
+	self.z = a.z
+end
+
+function Vector3PureLua:setIndex(i, a)
+	if i == 0 then
+		self.x = a
+	elseif i == 1 then
+		self.y = a
+	else
+		self.z = a
+	end
+end
+
+----------------------------------------------------------------------
+-- sets the vector to the passed in values
+-- @param ... either a table with x,y,z indices (another vector), or 3 numbers
+Vector3PureLua.set = Vector3PureLua.construct
 ----------------------------------------------------------------------
 -- 3D vector cross product
 -- @return self
@@ -289,10 +322,6 @@ function Vector3PureLua:scale(x, y, z)
 	end
 	return self
 end
-----------------------------------------------------------------------
--- sets the vector to the passed in values
--- @param ... either a table with x,y,z indices (another vector), or 3 numbers
-Vector3PureLua.set = Vector3PureLua.construct
 ----------------------------------------------------------------------
 -- subtract a vector to self
 -- @return self

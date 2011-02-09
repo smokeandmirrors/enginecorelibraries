@@ -337,6 +337,11 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("perpendicular", (return0Param0<Vector3, &Vector3::perpendicular>))
 		lua_entry(		 scale)
 		lua_named_entry("set", initialize)
+		// slightly higher performance options for Lua
+		lua_named_entry("setAll", (return0Param1<Vector3, vec_t, &Vector3::set>))
+		lua_named_entry("setEach", (return0Param3<Vector3, vec_t, vec_t, vec_t, &Vector3::set>))
+		lua_named_entry("setEqual", (return0Param1<Vector3, const Vector3&, &Vector3::set>))
+		lua_named_entry("setIndex", (return0Param2<Vector3, uint, vec_t, &Vector3::set>))
 		lua_entry(		 subtract)
 		lua_named_entry("zero", (return0Param0<Vector3, &Vector3::zero>))
 		lua_final_entry 
@@ -353,12 +358,21 @@ static const vec_t pi = 3.141592653589793f;
 
 void nativeVectorPerformance(uint iterations)
 {
+	Vector3* v = new Vector3(3.0f,2.0f,1.0f);
+	Vector3* w = new Vector3(3.0f,2.0f,1.0f);
+	Vector3* x = new Vector3(1.0f,3.0f,2.0f);
+	Vector3* z = new Vector3();
+	Vector3* scaleV = new Vector3(2,3,4);
+	Vector3* subtractV = new Vector3( -1,-2,-3);
+	Vector3* Xpos = new Vector3( 1, 0, 0);
+	Vector3* Ypos = new Vector3( 0, 1, 0);
+	Vector3* Zpos = new Vector3( 0, 0, 1);
+	Vector3* Xneg = new Vector3(-1, 0, 0);
+	Vector3* Yneg = new Vector3( 0,-1, 0);
+	Vector3* Zneg = new Vector3( 0, 0,-1);
+
 	for (uint i(0); i < iterations; i++)
 	{
-		Vector3* v = new Vector3(3.0f,2.0f,1.0f);
-		Vector3* w = new Vector3(3.0f,2.0f,1.0f);
-		Vector3* x = new Vector3(1.0f,3.0f,2.0f);
-
 		bool is_true;
 		is_true = w == v;
 		is_true = v == w;
@@ -367,7 +381,6 @@ void nativeVectorPerformance(uint iterations)
 		v->set(pi, pi/2, pi/3);
 		v->set(pi/4);
 		v->set(*w);
-		Vector3* z = new Vector3();
 		v->set(10,0,0);
 		v->distance(*z);
 		v->distanceSqr(*z);
@@ -404,6 +417,7 @@ void nativeVectorPerformance(uint iterations)
 		z->set(-1,-2,-3);
 		vec_t v_dot_z = v->dot(*z);
 		vec_t z_dot_v = z->dot(*v);
+		v_dot_z = z_dot_v;
 		v->set(*w);
 		v->equals(*w);
 		w->equals(*v);
@@ -456,20 +470,12 @@ void nativeVectorPerformance(uint iterations)
 		v->negate();
 		v->scale(2);
 		v->scale(1/4, 1/6, 1/8);
-		Vector3* scaleV = new Vector3(2,3,4);
 		v->scale(*scaleV);
 		v->zero();
 		v->subtract(1,2,3);
-		Vector3* subtractV = new Vector3( -1,-2,-3);
 		v->subtract(*subtractV);
 		is_true = v->isZero();
 		v->subtract(9);
-		Vector3* Xpos = new Vector3( 1, 0, 0);
-		Vector3* Ypos = new Vector3( 0, 1, 0);
-		Vector3* Zpos = new Vector3( 0, 0, 1);
-		Vector3* Xneg = new Vector3(-1, 0, 0);
-		Vector3* Yneg = new Vector3( 0,-1, 0);
-		Vector3* Zneg = new Vector3( 0, 0,-1);
 		// x positive
 		v->set(*Xpos);
 		v->cross(*Zpos);
@@ -505,21 +511,20 @@ void nativeVectorPerformance(uint iterations)
 		v->set(-4,-2,-3);
 		w->set(*v);
 		v->perpendicular();
-
-		delete v;
-		delete w;
-		delete x;
-		delete z;
-		delete  scaleV ; // Vector3(2,3,4);
-		delete  subtractV ; // Vector3( -1,-2,-3);
-		delete  Xpos ; // Vector3( 1, 0, 0);
-		delete  Ypos ; // Vector3( 0, 1, 0);
-		delete  Zpos ; // Vector3( 0, 0, 1);
-		delete  Xneg ; // Vector3(-1, 0, 0);
-		delete  Yneg ; // Vector3( 0,-1, 0);
-		delete  Zneg ; // Vector3( 0, 0,-1);
 	}
 
+	delete v;
+	delete w;
+	delete x;
+	delete z;
+	delete  scaleV ; // Vector3(2,3,4);
+	delete  subtractV ; // Vector3( -1,-2,-3);
+	delete  Xpos ; // Vector3( 1, 0, 0);
+	delete  Ypos ; // Vector3( 0, 1, 0);
+	delete  Zpos ; // Vector3( 0, 0, 1);
+	delete  Xneg ; // Vector3(-1, 0, 0);
+	delete  Yneg ; // Vector3( 0,-1, 0);
+	delete  Zneg ; // Vector3( 0, 0,-1);
 }
 
 #endif//EXTENDED_BY_LUA

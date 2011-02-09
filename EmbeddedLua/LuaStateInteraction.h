@@ -258,7 +258,34 @@ inline sint return0Param1(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -2))
 	{
-		(object->*function)( to<ARG_1>(L, -1));
+		(object->*function)(to<ARG_1>(L, -1));
+	}
+	return 0;	
+}
+
+template<typename CLASS, 
+	typename ARG_1,
+	typename ARG_2,
+	void(CLASS::* function)(ARG_1, ARG_2)>
+inline sint return0Param2(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -3))
+	{
+		(object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+	}
+	return 0;	
+}
+
+template<typename CLASS, 
+	typename ARG_1,
+	typename ARG_2,
+	typename ARG_3,
+	void(CLASS::* function)(ARG_1, ARG_2, ARG_3)>
+inline sint return0Param3(lua_State* L)
+{
+	if (CLASS* object = to<CLASS*>(L, -4))
+	{
+		(object->*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
 	}
 	return 0;	
 }
@@ -268,13 +295,9 @@ inline sint return1Param0(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -1))
 	{
-		RET_1 value = (object->*function)();
-		return push(L, value);
+		return push(L, (object->*function)());
 	}
-	else
-	{
-		return 0;
-	}	
+	return 0;
 }
 
 template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void) const>
@@ -282,45 +305,36 @@ inline sint return1Param0const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -1))
 	{
-		RET_1 value = (object->*function)();
-		return push(L, value);
+		return push(L, (object->*function)());
 	}
-	else
-	{
-		return 0;
-	}	
+	return 0;
 }
 
-template<typename CLASS, typename RET_1, typename ARG_1,  RET_1(CLASS::* function)(ARG_1) const>
+template<typename CLASS, 
+	typename RET_1, 
+	typename ARG_1,  
+	RET_1(CLASS::* function)(ARG_1) const>
 inline sint return1Param1const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -2))
 	{
-		ARG_1 argument = to<ARG_1>(L, -1);
-		RET_1 value = (object->*function)(argument);
-		return push(L, value);
+		return push(L, (object->*function)(to<ARG_1>(L, -1)));
 	}
-	else
-	{
-		return 0;
-	}	
+	return 0;
 }
 
-
-template<typename CLASS, typename RET_1, typename ARG_1, typename ARG_2, RET_1(CLASS::* function)(ARG_1, ARG_2) const>
+template<typename CLASS, 
+	typename RET_1, 
+	typename ARG_1, 
+	typename ARG_2, 
+	RET_1(CLASS::* function)(ARG_1, ARG_2) const>
 inline sint return1Param2const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -3))
 	{
-		ARG_1 arg1 = to<ARG_1>(L, -2);
-		ARG_2 arg2 = to<ARG_2>(L, -1);
-		RET_1 value = (object->*function)(arg1, arg2);
-		return push(L, value);
+		return push(L, (object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1)));
 	}
-	else
-	{
-		return 0;
-	}	
+	return 0;
 }
 
 } // namespace LuaExtension

@@ -108,7 +108,7 @@ public:
 #endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
-	vec_t 			operator[](uint i);
+	vec_t& 			operator[](uint i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y);
@@ -150,7 +150,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y);
 	void 			set(const Vector2& v);
-	void			set(sint index, vec_t scalar);
+	void			set(uint index, vec_t scalar);
 	Vector2& 		operator=(const Vector2& v);
 	// substraction 
 	void 			subtract(vec_t scalar);
@@ -194,7 +194,7 @@ public:
 	
 	// access 
 	const vec_t& 	operator[](uint i) const;	
-	vec_t 			operator[](uint i);
+	vec_t& 			operator[](uint i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y, vec_t Z);
@@ -247,7 +247,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y, vec_t Z);
 	void 			set(const Vector3& v);
-	void			set(sint index, vec_t scalar);
+	void			set(uint index, vec_t scalar);
 	Vector3& 		operator=(const Vector3& v);
 	// substraction 
 	void 			subtract(vec_t scalar);
@@ -282,7 +282,7 @@ inline const vec_t& Vector2::operator[](uint i) const
 	assert(i < 2);
 	return (&x)[i];
 }
-inline vec_t Vector2::operator[](uint i)
+inline vec_t& Vector2::operator[](uint i)
 {
 	assert(i < 2);
 	return (&x)[i];
@@ -292,7 +292,7 @@ inline const vec_t& Vector3::operator[](uint i) const
 	assert(i < 3);
 	return (&x)[i];
 }
-inline vec_t Vector3::operator[](uint i)
+inline vec_t& Vector3::operator[](uint i)
 {
 	assert(i < 3);
 	return (&x)[i];
@@ -799,12 +799,12 @@ inline Vector2& Vector2::operator=(const Vector2& v)
 	y = v.y;
 	return *this;
 }
-inline void Vector2::set(sint index, vec_t scalar)
+inline void Vector2::set(uint index, vec_t scalar)
 {
 	switch (index)
 	{
-	case 1: x = scalar;
-	case 2: y = scalar;
+	case 0: x = scalar;
+	case 1: y = scalar;
 	default: assert(false);
 	}
 }
@@ -831,13 +831,13 @@ inline Vector3& Vector3::operator=(const Vector3& v)
 	z = v.z;
 	return *this;
 }
-inline void Vector3::set(sint index, vec_t scalar)
+inline void Vector3::set(uint index, vec_t scalar)
 {
 	switch (index)
 	{
-	case 1: x = scalar;
-	case 2: y = scalar;
-	case 3: z = scalar;
+	case 0: x = scalar;
+	case 1: y = scalar;
+	case 2: z = scalar;
 	default: assert(false);
 	}
 }
