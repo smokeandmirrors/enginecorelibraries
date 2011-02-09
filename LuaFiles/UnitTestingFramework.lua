@@ -27,6 +27,8 @@ checkNearEqual(lhs, rhs, tolerance, fail_message)
 checkT(value, tupos)
 --]]
 
+vectorTolerance = 0.0001
+
 ----------------------------------------------------------------------
 -- PUBLIC
 -- result checking functions
@@ -56,10 +58,18 @@ end
 ----------------------------------------------------------------------
 -- checks the values for equality within the given tolerance
 checkNearEqual = function(lhs, rhs, tolerance, fail_message)
-	assert((math.abs((lhs - rhs)/rhs)) < tolerance, 
-		'checkEqual failed, '..tostring(lhs)..
-		' is not equal to '..tostring(rhs)..
-		' within '..tostring(tolerance)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
+	tolerance = tolerance or vectorTolerance
+	if rhs ~= 0 then
+		assert(math.abs((lhs - rhs) / rhs) <= tolerance, 
+			'checkEqual failed, '..tostring(lhs)..
+			' is not equal to '..tostring(rhs)..
+			' within '..tostring(tolerance)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
+	else
+		assert(math.abs(lhs - rhs) <= tolerance, 
+			'checkEqual failed, '..tostring(lhs)..
+			' is not equal to '..tostring(rhs)..
+			' within '..tostring(tolerance)..': '..(fail_message ~= nil and tostring(fail_message) or ''))
+	end
 end
 
 ----------------------------------------------------------------------
@@ -79,9 +89,17 @@ checkT = function(value, tupos)
 end
 
 ----------------------------------------------------------------------
+checkVector = function(v, x, y, z, tolerance)
+	tolerance = tolerance or vectorTolerance
+	checkNearEqual(v.x, x, tolerance, 'x component not equal!')
+	checkNearEqual(v.y, y, tolerance, 'y component not equal!')
+	checkNearEqual(v.z, z, tolerance, 'z component not equal!')
+end
+
+----------------------------------------------------------------------
 -- runs all the unit test functions
 -- \return the number of failures
-runAll = function()
+runAll = function(print_out)
 	local start_time = os.clock()
 	for _, tester in pairs(unitTests) do
 		tester();
@@ -125,13 +143,14 @@ testSuite = function(args)
 	end
 end
 
-_G.testAll = function(print_out)
-	-- require all the unit test modules here
-	rerequire'UnitTesting'
-	rerequire'OOPUnitTesting'
+testAll = function(print_out)
 	runAll(print_out)
 end
 
+runModule = function(name, print_out)
+	require(name)
+	runAll(print_out)
+end
 
 ----------------------------------------------------------------------
 -- PRIVATE

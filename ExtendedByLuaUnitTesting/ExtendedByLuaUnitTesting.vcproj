@@ -369,6 +369,18 @@
 				RelativePath="..\LuaFiles\UTProxyClasses.lua"
 				>
 			</File>
+			<Filter
+				Name="Math"
+				>
+				<File
+					RelativePath="..\LuaFiles\UTVector.lua"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Math"
+			>
 		</Filter>
 		<File
 			RelativePath=".\ClassExtension.cpp"
@@ -388,6 +400,14 @@
 		</File>
 		<File
 			RelativePath=".\UnitTestingTools.h"
+			>
+		</File>
+		<File
+			RelativePath=".\UTLuaFiles.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\UTVector.cpp"
 			>
 		</File>
 	</Files>

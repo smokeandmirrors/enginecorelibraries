@@ -113,20 +113,16 @@ public:
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y);
 	void 			add(const Vector2& v);
-	/** \warning abuse may be slow! */
-	Vector2 		operator+(const Vector2& v) const; 
 	Vector2& 		operator+=(const Vector2& v);
 	// distance to another
-	vec_t			distanceTo(const Vector2& v) const;
-	vec_t 			distanceToSqrd(const Vector2& v) const;
-	bool			isFarFrom(const Vector2& v, vec_t closest_range) const;
-	bool			isNearTo(const Vector2& v, vec_t farthest_range) const;
+	vec_t			distance(const Vector2& v) const;
+	vec_t 			distanceSqr(const Vector2& v) const;
+	bool			isFar(const Vector2& v, vec_t closest_range) const;
+	bool			isNear(const Vector2& v, vec_t farthest_range) const;
 	// division
 	void 			divide(vec_t scalar);
 	void 			divide(vec_t X, vec_t Y);
 	void 			divide(const Vector2& v);
-	/** \warning abuse may be slow! */
-	Vector2 		operator/(const Vector2& v) const; 
 	Vector2& 		operator/=(const Vector2& v);
 	// dot product 
 	vec_t 			dot(const Vector2& v) const;
@@ -137,7 +133,7 @@ public:
 	bool 			operator==(const Vector2& v) const;
 	// magnitude 
 	vec_t 			magnitude(void) const;
-	vec_t 			magnitudeSqrd(void) const;
+	vec_t 			magnitudeSqr(void) const;
 	// normalization 
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
@@ -145,11 +141,10 @@ public:
 	Vector2(const Vector2& v, bool /* IGNORED */)
 		: x(v.x), y(v.y) { normalize(); }
 	// multiplication & scaling 
-	const Vector2& 	negate(void);
+	void			negate(void);
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y);
 	void 			scale(const Vector2& v);
-	Vector2 		operator*(const Vector2& v) const; 
 	Vector2& 		operator*=(const Vector2& v);
 	// mutation 
 	void 			set(vec_t scalar);
@@ -161,8 +156,6 @@ public:
 	void 			subtract(vec_t scalar);
 	void 			subtract(vec_t X, vec_t Y);
 	void 			subtract(const Vector2& v);
-	/** \warning abuse may be slow! */
-	Vector2 		operator-(const Vector2& v) const; 
 	Vector2& 		operator-=(const Vector2& v);
 	// zero
 	bool			isZero(void) const;
@@ -206,28 +199,25 @@ public:
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y, vec_t Z);
 	void 			add(const Vector3& v);	
-	/** \warning abuse may be slow! */
-	Vector3 		operator+(const Vector3& v) const; 
 	Vector3& 		operator+=(const Vector3& v);
 	// cross product 
 	void 			cross(const Vector3& v);
 	void 			cross(const Vector3& a, const Vector3& b);
-	Vector3 		getCross(const Vector3& v) const;
+	// perpendicular 
+	void			perpendicular(void);
 	// distance to another 
-	vec_t			distanceTo(const Vector3& v) const;
-	vec_t 			distanceToSqrd(const Vector3& v) const;
-	vec_t 			distanceToXY(const Vector3& v) const;
-	vec_t 			distanceToXYSqrd(const Vector3& v) const;
-	bool			isFarFrom(const Vector3& v, vec_t closest_range) const;
-	bool			isFarFromXY(const Vector3& v, vec_t closest_range) const;
-	bool			isNearTo(const Vector3& v, vec_t farthest_range) const;
-	bool			isNearToXY(const Vector3& v, vec_t farthest_range) const;
+	vec_t			distance(const Vector3& v) const;
+	vec_t 			distanceSqr(const Vector3& v) const;
+	vec_t 			distanceXY(const Vector3& v) const;
+	vec_t 			distanceXYSqr(const Vector3& v) const;
+	bool			isFar(const Vector3& v, vec_t closest_range) const;
+	bool			isFarXY(const Vector3& v, vec_t closest_range) const;
+	bool			isNear(const Vector3& v, vec_t farthest_range) const;
+	bool			isNearXY(const Vector3& v, vec_t farthest_range) const;
 	// division 
 	void 			divide(vec_t scalar);
 	void 			divide(vec_t X, vec_t Y, vec_t Z);
 	void 			divide(const Vector3& v);
-	/** \warning abuse may be slow! */
-	Vector3 		operator/(const Vector3& v) const; 
 	Vector3& 		operator/=(const Vector3& v);
 	// dot product 
 	vec_t 			dot(const Vector3& v) const;
@@ -236,13 +226,11 @@ public:
 	bool 			equals(vec_t X, vec_t Y, vec_t Z) const;
 	bool			nearlyEquals(const Vector3& v, vec_t epsilon=vectorTolerance) const;
 	bool 			operator==(const Vector3& v) const;
-	// perpendicular 
-	Vector3			getPerpendicular(void) const;
 	// magnitude 
 	vec_t 			magnitude(void) const;
-	vec_t 			magnitudeSqrd(void) const;
+	vec_t 			magnitudeSqr(void) const;
 	vec_t 			magnitudeXY(void) const;
-	vec_t 			magnitudeXYSqrd(void) const;
+	vec_t 			magnitudeXYSqr(void) const;
 	// normalization
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
@@ -251,12 +239,10 @@ public:
 		: x(v.x), y(v.y), z(v.z) { normalize(); }
 	// multiplication & scaling 
 	Vector3&		operator-(void);
-	Vector3& 		negate(void);
+	void 			negate(void);
 	void 			scale(vec_t scalar);
 	void 			scale(vec_t X, vec_t Y, vec_t Z);
 	void 			scale(const Vector3& v);
-	/** \warning abuse may be slow! */
-	Vector3 		operator*(const Vector3& v) const;
 	Vector3& 		operator*=(const Vector3& v);
 	// mutation 
 	void 			set(vec_t scalar);
@@ -268,8 +254,6 @@ public:
 	void 			subtract(vec_t scalar);
 	void 			subtract(vec_t X, vec_t Y, vec_t Z);
 	void 			subtract(const Vector3& v);
-	/** \warning abuse may be slow! */
-	Vector3 		operator-(const Vector3& v) const; 
 	Vector3& 		operator-=(const Vector3& v);
 	// zero
 	bool			isZero(void) const;
@@ -334,10 +318,6 @@ inline void Vector2::add(const Vector2& v)
 	x += v.x;
 	y += v.y;
 }
-inline Vector2 Vector2::operator+(const Vector2& v) const
-{	// warning: abuse can be slow!
-	return Vector2(x + v.x, y + v.y);
-}
 inline Vector2& Vector2::operator+=(const Vector2& v)
 {
 	x += v.x;
@@ -361,10 +341,6 @@ inline void Vector3::add(const Vector3& v)
 	x += v.x;
 	y += v.y;
 	z += v.z;
-}
-inline Vector3 Vector3::operator+(const Vector3& v) const
-{	// warning: abuse can be slow!
-	return Vector3(x + v.x, y + v.y, z + v.z);
 }
 inline Vector3& Vector3::operator+=(const Vector3& v)
 {
@@ -396,23 +372,15 @@ inline void Vector3::cross(const Vector3& a, const Vector3& b)
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
 }
-inline Vector3 Vector3::getCross(const Vector3& v) const
+inline void Vector3::perpendicular(void)
 {
-	vec_t a = y * v.z - z * v.y;
-	vec_t b = z * v.x - x * v.z;
-	vec_t c = x * v.y - y * v.x;
-	return Vector3(a,b,c);
-}
-
-inline Vector3 Vector3::getPerpendicular(void) const
-{
-	if ((x != 0.0f || y != 0.0f))
+	if (x != 0.0f || y != 0.0f)
 	{
-		return getCross(up3D);
+		cross(up3D);
 	}
 	else 
 	{
-		return getCross(right3D);
+		cross(right3D);
 	}
 }
 /** @} end Vector_CrossProduct */
@@ -423,77 +391,77 @@ inline Vector3 Vector3::getPerpendicular(void) const
 distance to another vector
 @{
 */
-inline vec_t Vector2::distanceTo(const Vector2& v) const
+inline vec_t Vector2::distance(const Vector2& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
 }
-inline vec_t Vector2::distanceToSqrd(const Vector2& v) const
+inline vec_t Vector2::distanceSqr(const Vector2& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return x_dist * x_dist + y_dist * y_dist;
 }
-inline bool Vector2::isFarFrom(const Vector2& v, vec_t closest_range) const
+inline bool Vector2::isFar(const Vector2& v, vec_t closest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) > (closest_range * closest_range);
 }
-inline bool Vector2::isNearTo(const Vector2& v, vec_t farthest_range) const
+inline bool Vector2::isNear(const Vector2& v, vec_t farthest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) <= (farthest_range * farthest_range);
 }
-inline vec_t Vector3::distanceTo(const Vector3& v) const
+inline vec_t Vector3::distance(const Vector3& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	vec_t z_dist = v.z - z;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
 }
-inline vec_t Vector3::distanceToSqrd(const Vector3& v) const
+inline vec_t Vector3::distanceSqr(const Vector3& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	vec_t z_dist = v.z - z;
 	return x_dist * x_dist + y_dist * y_dist + z_dist * z_dist;
 }
-inline vec_t Vector3::distanceToXY(const Vector3& v) const
+inline vec_t Vector3::distanceXY(const Vector3& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
 }
-inline vec_t Vector3::distanceToXYSqrd(const Vector3& v) const
+inline vec_t Vector3::distanceXYSqr(const Vector3& v) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return x_dist * x_dist + y_dist * y_dist;
 }
-inline bool Vector3::isFarFrom(const Vector3& v, vec_t closest_range) const
+inline bool Vector3::isFar(const Vector3& v, vec_t closest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	vec_t z_dist = v.z - z;
 	return (x_dist * x_dist + y_dist * y_dist + z_dist * z_dist) > (closest_range * closest_range);
 }
-inline bool Vector3::isFarFromXY(const Vector3& v, vec_t closest_range) const
+inline bool Vector3::isFarXY(const Vector3& v, vec_t closest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) > (closest_range * closest_range);
 }
-inline bool Vector3::isNearTo(const Vector3& v, vec_t farthest_range) const
+inline bool Vector3::isNear(const Vector3& v, vec_t farthest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
 	vec_t z_dist = v.z - z;
 	return (x_dist * x_dist + y_dist * y_dist + z_dist * z_dist) <= (farthest_range * farthest_range);
 }
-inline bool Vector3::isNearToXY(const Vector3& v, vec_t farthest_range) const
+inline bool Vector3::isNearXY(const Vector3& v, vec_t farthest_range) const
 {
 	vec_t x_dist = v.x - x;
 	vec_t y_dist = v.y - y;
@@ -540,10 +508,6 @@ inline void Vector2::divide(const Vector2& v)
 	x /= v.x;
 	y /= v.y;
 }
-inline Vector2 Vector2::operator/(const Vector2& v) const
-{	// warning: abuse can be slow!
-	return Vector2(x / v.x, y / v.y);
-}
 inline Vector2& Vector2::operator/=(const Vector2& v)
 {
 	x /= v.x;
@@ -568,10 +532,6 @@ inline void Vector3::divide(const Vector3& v)
 	x /= v.x;
 	y /= v.y;
 	z /= v.z;
-}
-inline Vector3 Vector3::operator/(const Vector3& v) const
-{	// warning: abuse can be slow!
-	return Vector3(x / v.x, y / v.y, z / v.z);
 }
 inline Vector3& Vector3::operator/=(const Vector3& v)
 {
@@ -632,7 +592,7 @@ inline vec_t Vector2::magnitude(void) const
 {
 	return sqrtvec_t(x * x + y * y);
 }
-inline vec_t Vector2::magnitudeSqrd(void) const
+inline vec_t Vector2::magnitudeSqr(void) const
 {
 	return x * x + y * y;
 }
@@ -640,7 +600,7 @@ inline vec_t Vector3::magnitude(void) const
 {
 	return sqrtvec_t(x * x + y * y + z * z);
 }
-inline vec_t Vector3::magnitudeSqrd(void) const
+inline vec_t Vector3::magnitudeSqr(void) const
 {
 	return x * x + y * y + z * z;
 }
@@ -648,7 +608,7 @@ inline vec_t Vector3::magnitudeXY(void) const
 {
 	return sqrtvec_t(x * x + y * y);
 }
-inline vec_t Vector3::magnitudeXYSqrd(void) const
+inline vec_t Vector3::magnitudeXYSqr(void) const
 {
 	return x * x + y * y;
 }
@@ -712,10 +672,6 @@ inline void Vector2::scale(const Vector2& v)
 	x *= v.x;
 	y *= v.y;
 }
-inline Vector2 Vector2::operator*(const Vector2& v) const
-{	// warning: abuse can be slow!
-	return Vector2(x * v.x, y * v.y);
-}
 inline Vector2& Vector2::operator*=(const Vector2& v)
 {
 	x *= v.x;
@@ -723,11 +679,10 @@ inline Vector2& Vector2::operator*=(const Vector2& v)
 	return *this;
 }
 /** scale by -1 */
-inline const Vector2& Vector2::negate(void)
+inline void Vector2::negate(void)
 {
 	x *= -1.0f;
 	y *= -1.0f;
-	return *this;
 }
 inline void Vector3::scale(vec_t scalar)
 {
@@ -747,10 +702,6 @@ inline void Vector3::scale(const Vector3& v)
 	y *= v.y;
 	z *= v.z;
 }
-inline Vector3 Vector3::operator*(const Vector3& v) const
-{	// warning: abuse can be slow!
-	return Vector3(x * v.x, y * v.y, z * v.z);
-}
 inline Vector3& Vector3::operator*=(const Vector3& v)
 {
 	x *= v.x;
@@ -759,12 +710,11 @@ inline Vector3& Vector3::operator*=(const Vector3& v)
 	return *this;
 }
 /** scale by -1 */
-inline Vector3& Vector3::negate(void)
+inline void Vector3::negate(void)
 {
 	x *= -1.0f;
 	y *= -1.0f;
 	z *= -1.0f;
-	return *this;
 }
 inline Vector3& Vector3::operator-(void)
 {
@@ -796,10 +746,6 @@ inline void Vector2::subtract(const Vector2& v)
 	x -= v.x;
 	y -= v.y;
 }
-inline Vector2 Vector2::operator-(const Vector2& v) const
-{	// warning: abuse can be slow!
-	return Vector2(x - v.x, y - v.y);
-}
 inline Vector2& Vector2::operator-=(const Vector2& v)
 {
 	x -= v.x;
@@ -823,10 +769,6 @@ inline void Vector3::subtract(const Vector3& v)
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
-}
-inline Vector3 Vector3::operator-(const Vector3& v) const
-{	// warning: abuse can be slow!
-	return Vector3(x - v.x, y - v.y, z - v.z);
 }
 inline Vector3& Vector3::operator-=(const Vector3& v)
 {

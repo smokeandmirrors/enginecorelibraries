@@ -304,8 +304,8 @@ inline sint return1Param2const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -3))
 	{
-		ARG_1 arg1 = to<ARG_1>(L, -1);
-		ARG_2 arg2 = to<ARG_2>(L, -2);
+		ARG_1 arg1 = to<ARG_1>(L, -2);
+		ARG_2 arg2 = to<ARG_2>(L, -1);
 		RET_1 value = (object->*function)(arg1, arg2);
 		return push(L, value);
 	}

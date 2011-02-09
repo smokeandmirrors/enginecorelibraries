@@ -614,7 +614,8 @@ end
 ----------------------------------------------------------------------
 if DEBUG_INTERPRETATION then
 function declareClass_PRIVATE(definition)
-	local name = definition.name or 'unnamed class'
+	local name = definition.name
+	assert(type(name) == 'string', 'ERROR:\nClass declaration has no \'name\' field')
 	local super_name = definition.extends
 	resetErrorMessage_PRIVATE('\nERROR:\nClass declaration for '..name..' is incorrect, see lua output or log.\n')
 	local class, compiled = beginClassDeclaration_PRIVATE(definition)

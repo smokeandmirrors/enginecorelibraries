@@ -224,6 +224,13 @@ void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* 
 		//s: class_def derived
 		lua_setfield(L, -2, "name");
 		//s: class_def
+
+		lua_getfield(L, -1, "name");
+		assert(lua_isstring(L, -1));
+		//s: class_def class_def.name
+		assert(!strcmp(lua_tostring(L, -1), derived));
+		lua_pop(L, 1);
+		//s: class_def 
 	}
 	//s: class_def
 	/* ensure a proper 'extends' field */
