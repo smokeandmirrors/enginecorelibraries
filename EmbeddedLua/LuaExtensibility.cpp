@@ -118,8 +118,8 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	bool success = Lua::callProtected(L, 1, 0) == 0;
 	assert(success);
 #else
-	Lua::callProtected(L, 1, 0) == 0;
-#endif
+	Lua::callProtected(L, 1, 0);
+#endif//DEBUG
 	//s: 
 }
 
