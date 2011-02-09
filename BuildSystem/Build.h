@@ -19,6 +19,8 @@ smokeandmirrorsdevelopment@gmail.com
 
 #include <assert.h>
 
+#define BUILD_WITH_UNIT_TESTING 1
+
 /**
 C/C++ types
 */

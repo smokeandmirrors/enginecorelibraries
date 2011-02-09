@@ -13,7 +13,6 @@ Defines the entry point for the console application.
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 using namespace LuaExtension;
-
 #endif//EXTENDED_BY_LUA
 
 #if !GOLDMASTER
@@ -33,18 +32,16 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 	Sandbox::play();
 #endif//SANDBOX
 
-#ifdef EXTENDED_BY_LUA 
-	{
-		LuaExtension::Lua lua;
-		registerGlobalLibrary(lua.getState());
-		lua.require("Utilities");
-		lua.require("ObjectOrientedParadigm");
-		register_lua_library((&lua), Vector2);
-		register_lua_library((&lua), Vector3);
-		// get the user file for easier rapid iteration
-		lua.require("User");
-		lua.runConsole();
-	}
+#if EXTENDED_BY_LUA 
+	LuaExtension::Lua lua;
+	registerGlobalLibrary(lua.getState());
+	lua.require("Utilities");
+	lua.require("ObjectOrientedParadigm");
+	register_lua_library((&lua), Vector2);
+	register_lua_library((&lua), Vector3);
+	// get the user file for easier rapid iteration
+	lua.require("User");
+	lua.runConsole();
 #endif//EXTENDED_BY_LUA
 	return 0;
 }

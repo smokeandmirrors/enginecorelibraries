@@ -36,7 +36,7 @@ Vector classes and operations
 #if EXTENDED_BY_LUA
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
-#endif
+#endif//EXTENDED_BY_LUA
 
 namespace Math
 {

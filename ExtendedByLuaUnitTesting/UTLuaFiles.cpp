@@ -1,3 +1,5 @@
+#include "Build.h"
+#if BUILD_WITH_UNIT_TESTING
 #include <cfixcc.h>
 
 #include "UTTools.h"
@@ -21,4 +23,4 @@ CFIXCC_BEGIN_CLASS(UTLuaFiles)
 	CFIXCC_METHOD(LuaUnitTesting)
 	CFIXCC_METHOD(LuaOOPUnitTesting)
 CFIXCC_END_CLASS()
-
+#endif//BUILD_WITH_UNIT_TESTING

@@ -335,7 +335,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Lua"
+			Name="UTLuaFiles"
 			>
 			<File
 				RelativePath="..\LuaFiles\UnitTestingFramework.lua"
@@ -381,7 +381,7 @@
 					>
 				</File>
 				<Filter
-					Name="Math"
+					Name="UTMath"
 					>
 					<File
 						RelativePath="..\LuaFiles\UTVector.lua"

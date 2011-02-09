@@ -114,10 +114,13 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	lua_getglobal(L, derived);
 	assert(lua_istable(L, -1));
 	//s: declareClass derived
+#if DEBUG 
 	bool success = Lua::callProtected(L, 1, 0) == 0;
-	//s: 
 	assert(success);
-	
+#else
+	Lua::callProtected(L, 1, 0) == 0;
+#endif
+	//s: 
 }
 
 sint LuaExtendable::setProxyMetatable(lua_State* L)

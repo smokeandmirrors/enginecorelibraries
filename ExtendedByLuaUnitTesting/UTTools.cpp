@@ -1,9 +1,12 @@
-#include "UTTools.h"
+#include "Build.h"
+#if BUILD_WITH_UNIT_TESTING
 
 #include <cfixcc.h>
-#include <string.h>
 
-#ifdef EXTENDED_BY_LUA 
+#include <string.h>
+#include "UTTools.h"
+
+#if EXTENDED_BY_LUA 
 #include "Lua.h"
 #include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
@@ -12,7 +15,7 @@
 
 namespace UnitTestingTools
 {
-#ifdef EXTENDED_BY_LUA 
+#if EXTENDED_BY_LUA 
 using namespace LuaExtension;
 
 void executeLuaUnitTest(char* module, Lua* lua)
@@ -72,3 +75,4 @@ void executeLuaUnitTest(char* module, Lua* lua)
 #endif
 
 } // namespace UnitTestingTools
+#endif//BUILD_WITH_UNIT_TESTING

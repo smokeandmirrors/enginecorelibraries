@@ -22,7 +22,7 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 
 }
 
-#ifdef EXTENDED_BY_LUA
+#if EXTENDED_BY_LUA
 #include <assert.h>
 #include <string.h>
 

@@ -1,3 +1,4 @@
+#if BUILD_WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include <string.h>
 
@@ -36,4 +37,4 @@ public:
 CFIXCC_BEGIN_CLASS(UTVector)
 	CFIXCC_METHOD(testLuaExtension)
 CFIXCC_END_CLASS()
-
+#endif//BUILD_WITH_UNIT_TESTING
