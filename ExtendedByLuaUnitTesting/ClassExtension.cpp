@@ -17,7 +17,7 @@ class Classes : public cfixcc::TestFixture
 {
 public:
 	void test_define_lua_class();
-	void test_define_lua_LuaExtendable(); // \todo expose and test the vector class
+	void test_define_lua_LuaExtendable(); 
 	void test_define_lua_LuaExtendable_by_proxy();
 };
 

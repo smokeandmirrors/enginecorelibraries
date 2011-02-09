@@ -15,7 +15,6 @@ smokeandmirrorsdevelopment@gmail.com
 
 @date 2/18/2010
 
-\todo Math namespaces
 */
 
 /** 
@@ -38,6 +37,9 @@ Vector classes and operations
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 #endif
+
+namespace Math
+{
 
 /**
 @ingroup Vectors
@@ -162,9 +164,6 @@ public:
 	void			zero(void);
 }; // class Vector2
 
-#if EXTENDED_BY_LUA
-declare_lua_LuaExtendable(Vector2);
-#endif//EXTENDED_BY_LUA
 
 class Vector3 
 #if EXTENDED_BY_LUA
@@ -258,10 +257,6 @@ public:
 	bool			isZero(void) const;
 	void			zero(void);
 }; // class Vector3
-
-#if EXTENDED_BY_LUA
-declare_lua_LuaExtendable(Vector3);
-#endif//EXTENDED_BY_LUA
 
 void nativeVectorPerformance(uint iterations);
 
@@ -866,5 +861,12 @@ inline void Vector3::zero()
 }
 /** @} end Vector_Zero */
 /** @} end Vector_Operations */
+
+} // end namespace Math
+
+#if EXTENDED_BY_LUA
+declare_lua_LuaExtendable_ns(Math, Vector2);
+declare_lua_LuaExtendable_ns(Math, Vector3);
+#endif//EXTENDED_BY_LUA
 
 #endif//VECTOR_H

@@ -52,8 +52,6 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 
 \note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
 
-\todo declare things from namespaces
-
 */
 #include "Build.h"
 
@@ -201,16 +199,11 @@ the require() function.
 // end #define end_lua_library_extensible
 
 /**
-\def declare_lua_LuaExtendable
-
-Declares a library around a class that implements
-the LuaExtendable interface.
-
-\note compile-time directive
+defines functions that can be used to get specific class pointers
+back out of %Lua.
 */
 #if ARGUMENT_ERRORS
-#define declare_lua_LuaExtendable(class_name) \
-	declare_lua_library(class_name) \
+#define declare_to_LuaExtables(class_name) \
 	namespace LuaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
@@ -239,10 +232,9 @@ the LuaExtendable interface.
 			return *object; \
 		} \
 	}
-// end #define declare_lua_LuaExtendable
+// end #define declare_to_LuaExtables
 #else
-#define declare_lua_LuaExtendable(class_name) \
-	declare_lua_library(class_name) \
+#define declare_to_LuaExtables(class_name) \
 	namespace LuaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
@@ -262,8 +254,34 @@ the LuaExtendable interface.
 			return *to<class_name*>(L, index); \
 		} \
 	}
-// end #define declare_lua_LuaExtendable
+// end #define declare_to_LuaExtables
 #endif//ARGUMENT_ERRORS
+
+/**
+\def declare_lua_LuaExtendable
+
+Declares a library around a class that implements
+the LuaExtendable interface.
+
+\note compile-time directive
+*/
+#define declare_lua_LuaExtendable(class_name) \
+	declare_lua_library(class_name) \
+	declare_to_LuaExtables(class_name) 
+// end #define declare_lua_LuaExtendable
+
+
+/**
+\def declare_lua_LuaExtendable_ns
+
+Declares a library around a class in a namespace that implements
+the LuaExtendable interface.
+
+\note compile-time directive
+*/
+#define declare_lua_LuaExtendable_ns(namespace_name, class_name) \
+	declare_lua_library(class_name)	\
+	declare_to_LuaExtables(namespace_name::class_name)
 
 /**
 \def define_lua_LuaExtendable

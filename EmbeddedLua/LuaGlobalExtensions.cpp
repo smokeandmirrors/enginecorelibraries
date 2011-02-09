@@ -13,7 +13,7 @@ namespace LuaExtension
 {
 
 static const luaL_reg lua_library_Global[] = {
-	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &nativeVectorPerformance>))
+	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &Math::nativeVectorPerformance>))
 	lua_final_entry
 };
 

@@ -1,6 +1,7 @@
 #include "Vector.h"
 
-// using namespace Math;
+namespace Math
+{
 
 // right handed spidey space
 const vec_t		vectorTolerance(0.0001f);
@@ -19,6 +20,8 @@ const Vector3	origin3D	( 0.0f,  0.0f,  0.0f);
 const Vector3	right3D		( 1.0f,  0.0f,  0.0f);
 const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 
+}
+
 #ifdef EXTENDED_BY_LUA
 #include <assert.h>
 #include <string.h>
@@ -26,6 +29,7 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 #include "LuaExtensionInclusions.h"
 
 using namespace LuaExtension;
+using namespace Math;
 
 lua_func(__indexVector2)
 {
@@ -356,7 +360,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 
 static const vec_t pi = 3.141592653589793f;
 
-void nativeVectorPerformance(uint iterations)
+void Math::nativeVectorPerformance(uint iterations)
 {
 	Vector3* v = new Vector3(3.0f,2.0f,1.0f);
 	Vector3* w = new Vector3(3.0f,2.0f,1.0f);
