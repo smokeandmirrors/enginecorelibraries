@@ -1,6 +1,6 @@
-module('OOPUnitTesting', package.seeall)
+module(..., package.seeall)
 ----------------------------------------------------------------------
--- OOPUnitTesting.lua
+-- UTOOP.lua
 --
 -- This file defines lua unit tests for the ObjectOrientedParadigm
 --
@@ -53,7 +53,7 @@ UT.test('OOP.interfaces',
 	end
 )
 ----------------------------------------------------------------------
-UT.test('OO.polymorphism',
+UT.test('OOP.polymorphism',
     function()
 		rerequire'ObjectOrientedParadigm'
         declareClass {
@@ -126,7 +126,7 @@ UT.test('OO.polymorphism',
 )
 
 ----------------------------------------------------------------------
-UT.test('OO.construction and destruction',
+UT.test('OOP.construction and destruction',
 	function()
 		rerequire'ObjectOrientedParadigm'
 		declareClass {
@@ -333,7 +333,7 @@ function()
 end)
 
 ----------------------------------------------------------------------
-UT.test('OOP reserved words',
+UT.test('OOP.reserved words',
 function()
 	rerequire'ObjectOrientedParadigm'
 	

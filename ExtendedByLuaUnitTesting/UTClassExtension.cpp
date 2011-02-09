@@ -1,7 +1,7 @@
 #include <cfixcc.h>
 #include <string.h>
 
-#include "UnitTestingTools.h"
+#include "UTTools.h"
 #include "Vector.h"
 
 #if EXTENDED_BY_LUA

@@ -1,8 +1,9 @@
-module('UnitTesting', package.seeall)
+module(..., package.seeall)
 ----------------------------------------------------------------------
--- UnitTesting.lua
+-- UTLibraryFunctions.lua
 --
--- This file defines lua unit tests
+-- This file defines lua unit tests that test additions
+-- to the standard lua modules
 --
 --	\author Smoke and Mirrors Development
 --	\email smokeandmirrorsdevelopment@gmail.com

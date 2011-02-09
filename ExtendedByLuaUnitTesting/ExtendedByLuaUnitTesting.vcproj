@@ -338,68 +338,76 @@
 			Name="Lua"
 			>
 			<File
-				RelativePath="..\LuaFiles\Child.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\Grandparent.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\OOPUnitTesting.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\Parent.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\UnitTesting.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\UTLuaExtendableClasses.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\UTOne.lua"
-				>
-			</File>
-			<File
-				RelativePath="..\LuaFiles\UTProxyClasses.lua"
+				RelativePath="..\LuaFiles\UnitTestingFramework.lua"
 				>
 			</File>
 			<Filter
-				Name="Math"
+				Name="UTSupport"
 				>
 				<File
-					RelativePath="..\LuaFiles\UTVector.lua"
+					RelativePath="..\LuaFiles\Child.lua"
 					>
 				</File>
+				<File
+					RelativePath="..\LuaFiles\Grandparent.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\Parent.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UTOne.lua"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="UTTests"
+				>
+				<File
+					RelativePath="..\LuaFiles\UTLibraryFunctions.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UTLuaExtendableClasses.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UTOOP.lua"
+					>
+				</File>
+				<File
+					RelativePath="..\LuaFiles\UTProxyClasses.lua"
+					>
+				</File>
+				<Filter
+					Name="Math"
+					>
+					<File
+						RelativePath="..\LuaFiles\UTVector.lua"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Math"
 			>
+			<File
+				RelativePath=".\UTVector.cpp"
+				>
+			</File>
 		</Filter>
 		<File
-			RelativePath=".\ClassExtension.cpp"
+			RelativePath=".\UTClassExtension.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\LibraryExtension.cpp"
+			RelativePath=".\UTLibraryExtension.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\LuaClass.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UnitTestingTools.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UnitTestingTools.h"
+			RelativePath=".\UTLuaClass.cpp"
 			>
 		</File>
 		<File
@@ -407,7 +415,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\UTVector.cpp"
+			RelativePath=".\UTTools.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\UTTools.h"
 			>
 		</File>
 	</Files>

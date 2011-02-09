@@ -6,7 +6,7 @@
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-#include "UnitTestingTools.h"
+#include "UTTools.h"
 
 using namespace LuaExtension;
 
@@ -54,12 +54,6 @@ public:
 		lua.doString("print\'Hello!\'");
 	}
 		
-	void luaUnitTesting()
-	{
-
-		UnitTestingTools::executeLuaUnitTest("UnitTesting");
-	}
-
 	void nilLoadedStatus()
 	{
 		Lua lua;
@@ -110,7 +104,6 @@ CFIXCC_BEGIN_CLASS(LuaClass)
 	CFIXCC_METHOD(luaObjectCreationAndDestruction)
 	CFIXCC_METHOD(luaRequire)
 	CFIXCC_METHOD(doString)
-	CFIXCC_METHOD(luaUnitTesting)
 	CFIXCC_METHOD(nilLoadedStatus)
 	CFIXCC_METHOD(callProtected)
 CFIXCC_END_CLASS()

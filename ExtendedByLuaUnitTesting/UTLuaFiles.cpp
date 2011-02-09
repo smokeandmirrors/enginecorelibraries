@@ -1,6 +1,6 @@
 #include <cfixcc.h>
 
-#include "UnitTestingTools.h"
+#include "UTTools.h"
 
 class UTLuaFiles : public cfixcc::TestFixture
 {
@@ -9,11 +9,11 @@ private:
 public:
 	void LuaUnitTesting()
 	{
-		UnitTestingTools::executeLuaUnitTest("UnitTesting");
+		UnitTestingTools::executeLuaUnitTest("UTLibraryFunctions");
 	}
 	void LuaOOPUnitTesting()
 	{
-		UnitTestingTools::executeLuaUnitTest("OOPUnitTesting");
+		UnitTestingTools::executeLuaUnitTest("UTOOP");
 	}
 };
 
