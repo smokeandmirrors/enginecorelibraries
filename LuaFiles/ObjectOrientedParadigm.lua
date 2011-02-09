@@ -442,7 +442,7 @@ function beginClassDeclaration_PRIVATE(definition)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		-- warn(false, 'Class '..name..' already exists!')
-		assert(false, 'Class '..name..' already exists!')
+		print('WARNING! Class '..name..' already exists!')
 	end
 	-- validate the baseclass name
 	local base_class_name = findBaseClassName_PRIVATE(extends)

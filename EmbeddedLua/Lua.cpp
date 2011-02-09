@@ -104,10 +104,10 @@ void Lua::initializeDefaultProxyMetamethods(void) const
 
 void Lua::initializeInterpretation(void) const
 {
-#if		DEBUG ///////////////////////////////// 
-	lua_pushboolean(L, 1);
-	lua_setglobal(L, "DEBUG_INTERPRETATION");
-#endif//DEBUG /////////////////////////////////
+#if	DEBUG 
+	// lua_pushboolean(L, 1);
+	// lua_setglobal(L, "DEBUG_INTERPRETATION");
+#endif//DEBUG 
 }
 
 void Lua::initializeUserdataStorage(void) const

@@ -1,11 +1,10 @@
 module(..., package.seeall)
 
-_G.DEBUG_INTERPRETATION = true
-
 require'Utilities'
 require'ObjectOrientedParadigm'
 require'Vector3PureLua'
 UT = require'UnitTestingFramework'
+
 _G.u = function()
 	rerequire'User'
 end
