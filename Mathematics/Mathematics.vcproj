@@ -400,6 +400,14 @@
 			Name="3D Math"
 			>
 			<File
+				RelativePath=".\Numbers.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Numbers.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Vector.cpp"
 				>
 			</File>

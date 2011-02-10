@@ -1,11 +1,10 @@
+#include "Numbers.h"
 #include "Vector.h"
 
 namespace Math
 {
 
 // right handed spidey space
-const vec_t		vectorTolerance(0.0001f);
-
 const Vector2	down2D		( 0.0f, -1.0f);
 const Vector2	left2D		(-1.0f,  0.0f);
 const Vector2	origin2D	( 0.0f,  0.0f);
@@ -358,7 +357,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 	} 
 }; // end namespace lua_library_Vector3
 
-static const vec_t pi = 3.141592653589793f;
+
 
 void Math::nativeVectorPerformance(uint iterations)
 {

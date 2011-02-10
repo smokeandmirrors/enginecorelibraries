@@ -16,13 +16,14 @@ _G.test = function()
 	vpt(1000000)
 end
 
+
 _G.vpt = function(iterations)
-	print'Start Lua->Lua!'
+	print'\n\n\n\nStart Lua->Lua!'
 	local script_start = os.clock()
 	vectorPerformance('Vector3PureLua', iterations)
 	local script_end = os.clock()
 	print'Finis Lua->Lua!'
-	print'\n\n\n\nStart Lua->Native!'
+	print'Start Lua->Native!'
 	local native_start = os.clock()
 	vectorPerformance('Vector3', iterations)
 	local native_end = os.clock()

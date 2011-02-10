@@ -32,6 +32,7 @@ Vector classes and operations
 #include <assert.h>
 
 #include "Build.h"
+#include "Numbers.h"
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensibility.h"
@@ -40,21 +41,6 @@ Vector classes and operations
 
 namespace Math
 {
-
-/**
-@ingroup Vectors
-\def sqrtvec_t
-defines the vector element square root function
-*/
-#define sqrtvec_t sqrtf
-
-typedef float vec_t;
-
-/** 
-@ingroup Mathematics
-for tolerance comparisons of vectors
-*/
-extern const vec_t		vectorTolerance;
 
 class Vector2;
 class Vector3;
@@ -102,8 +88,6 @@ public:
 	Vector2(vec_t scalar) 
 		: x(scalar), y(scalar) 	{/* empty */}
 	// \see normalized constructor below
-	// Vector2(const Vector2& v, bool /* IGNORED */);
-	// 	: x(v.x), y(v.y) 		{/* empty */}
 #if EXTENDED_BY_LUA
 	virtual ~Vector2(void)		{ /* empty */ };
 	createLuaExtendableUserdataDefaultFunctions(Vector2)
@@ -140,7 +124,7 @@ public:
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
 	// construction (normalized)
-	Vector2(const Vector2& v, bool /* IGNORED */)
+	Vector2(const Vector2& v, bool /* ignored */)
 		: x(v.x), y(v.y) { normalize(); }
 	// multiplication & scaling 
 	void			negate(void);
@@ -184,13 +168,10 @@ public:
 	Vector3(vec_t scalar) 
 		: x(scalar), y(scalar), z(scalar) 	{/* empty */}
 	// \see normalized constructor below
-	// Vector3(const Vector3& v, bool /* IGNORED */);
-	// 	: x(v.x), y(v.y), z(v.z) 			{/* empty */}
 #if EXTENDED_BY_LUA
 	virtual ~Vector3(void)		{ /* empty */ };
 	createLuaExtendableUserdataDefaultFunctions(Vector3)
-#endif//EXTENDED_BY_LUA
-	
+#endif//EXTENDED_BY_LUA	
 	// access 
 	const vec_t& 	operator[](uint i) const;	
 	vec_t& 			operator[](uint i);
@@ -234,7 +215,7 @@ public:
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
 	// construction (normalized)
-	Vector3(const Vector3& v, bool /* IGNORED */)
+	Vector3(const Vector3& v, bool /* ignored */)
 		: x(v.x), y(v.y), z(v.z) { normalize(); }
 	// multiplication & scaling 
 	void 			negate(void);
@@ -247,6 +228,7 @@ public:
 	void 			set(vec_t X, vec_t Y, vec_t Z);
 	void 			set(const Vector3& v);
 	void			set(uint index, vec_t scalar);
+	Vector3&		operator=(const Vector2& v);
 	Vector3& 		operator=(const Vector3& v);
 	// substraction 
 	void 			subtract(vec_t scalar);
@@ -824,6 +806,12 @@ inline Vector3& Vector3::operator=(const Vector3& v)
 	x = v.x;
 	y = v.y;
 	z = v.z;
+	return *this;
+}
+inline Vector3& Vector3::operator=(const Vector2& v)
+{
+	x = v.x;
+	y = v.y;
 	return *this;
 }
 inline void Vector3::set(uint index, vec_t scalar)

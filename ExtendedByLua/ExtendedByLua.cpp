@@ -43,6 +43,9 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 	lua.require("User");
 	lua.runConsole();
 #endif//EXTENDED_BY_LUA
+	Math::Vector3 v3(4,5,6);
+	Math::Vector3 v32;
+	v32 = v3;
 	return 0;
 }
 
