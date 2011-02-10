@@ -32,3 +32,7 @@ glob:Sandbox/ReleaseNoLua/
 glob:BuildSystem/Debug/BuildLog.htm
 glob:BuildSystem/Release/BuildLog.htm
 glob:LuaFiles/vsluaplugin_log.txt
+glob:BuildSystem/Debug/Build.obj
+glob:BuildSystem/Debug/BuildSystem.lib
+glob:BuildSystem/Debug/vc80.idb
+glob:BuildSystem/Debug/vc80.pdb

@@ -1,0 +1,159 @@
+requiring:      ObjectOrientedParadigm
+requiring:      Vector2
+requiring:      Vector3
+requiring:      User
+requiring:      Vector3PureLua
+requiring:      UnitTestingFramework
+vpt()
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************************************************************************
+Native: 0.000000. Script: 0.000000. All Native: 0.000000.  Native was -1.#IND00x faster; Native native was -1.#IND00x faster.
+************************************************************************************************
+test()
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************************************************************************
+Native: 0.000000. Script: 0.000000. All Native: 0.000000.  Native was -1.#IND00x faster; Native native was -1.#IND00x faster.
+************************************************************************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************************************************************************
+Native: 1.000000. Script: 2.000000. All Native: 0.000000.  Native was 2.000000x faster; Native native was 1.#INF00x faster.
+************************************************************************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************************************************************************
+Native: 12.000000. Script: 15.000000. All Native: 0.000000.  Native was 1.250000x faster; Native native was 1.#INF00x faster.
+************************************************************************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************************************************************************
+Native: 122.000000. Script: 145.000000. All Native: 1.000000.  Native was 1.188525x faster; Native native was 145.000000x faster.
+************************************************************************************************
+
+
+****** !!!!!!!  one !!!!!!!!!!!***************
+
+requiring:      ObjectOrientedParadigm
+requiring:      Vector2
+requiring:      Vector3
+requiring:      User
+requiring:      Vector3PureLua
+requiring:      UnitTestingFramework
+test()
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************
+Iterations: 1000
+Native: 0.000000
+Script: 1.000000
+All Native: 0.000000
+Native was 1.#INF00x faster than script
+All native was 1.#INF00x faster than script.
+************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************
+Iterations: 10000
+Native: 0.000000
+Script: 1.000000
+All Native: 0.000000
+Native was 1.#INF00x faster than script
+All native was 1.#INF00x faster than script.
+************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************
+Iterations: 100000
+Native: 4.000000
+Script: 5.000000
+All Native: 0.000000
+Native was 1.250000x faster than script
+All native was 1.#INF00x faster than script.
+************************************
+
+
+
+
+Start Lua->Native!
+Finis Lua->Native!
+Start Lua->Lua!
+Finis Lua->Lua!
+Start Native->Native!
+Finis Native->Native!
+************************************
+Iterations: 1000000
+Native: 43.000000
+Script: 61.000000
+All Native: 0.000000
+Native was 1.418605x faster than script
+All native was 1.#INF00x faster than script.
+************************************
+
+two
+
