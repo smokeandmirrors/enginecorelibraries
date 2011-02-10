@@ -1,7 +1,7 @@
 #include "Numbers.h"
 #include "Vector.h"
 
-namespace Math
+namespace math
 {
 
 // right handed spidey space
@@ -27,8 +27,8 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 
 #include "LuaExtensionInclusions.h"
 
-using namespace LuaExtension;
-using namespace Math;
+using namespace luaExtension;
+using namespace math;
 
 lua_func(__indexVector2)
 {
@@ -74,7 +74,7 @@ lua_func(__newindexVector2)
 define_lua_LuaExtendable(Vector2, Vector2)
 		lua_named_entry("__index", __indexVector2)
 		lua_named_entry("__newindex", __newindexVector2)
-		lua_named_entry("__newindexable", LuaExtension::pushFalse) 
+		lua_named_entry("__newindexable", luaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
 		lua_final_entry 
 	};	// end function list 
@@ -212,7 +212,7 @@ lua_func(equals)
 	{ 
 		Vector3& lhs = to<Vector3&>(L, -2); 
 		Vector3& rhs = to<Vector3&>(L, -1);
-		return push(L, lhs.equals(rhs)); 
+		return push(L, lhs == rhs); 
 	} 
 	break; 
 	case 4: 
@@ -313,7 +313,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
 		lua_named_entry("__index", __indexVector3)
 		lua_named_entry("__newindex", __newindexVector3) 
-		lua_named_entry("__newindexable", LuaExtension::pushFalse)
+		lua_named_entry("__newindexable", luaExtension::pushFalse)
 		lua_entry(		 add)
 		lua_named_entry("construct", initialize)
 		lua_entry(		 cross)
@@ -359,7 +359,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 
 
 
-void Math::nativeVectorPerformance(uint iterations)
+void math::nativeVectorPerformance(uint iterations)
 {
 	Vector3* v = new Vector3(3.0f,2.0f,1.0f);
 	Vector3* w = new Vector3(3.0f,2.0f,1.0f);
@@ -422,8 +422,8 @@ void Math::nativeVectorPerformance(uint iterations)
 		vec_t z_dot_v = z->dot(*v);
 		v_dot_z = z_dot_v;
 		v->set(*w);
-		v->equals(*w);
-		w->equals(*v);
+		*v == *w;
+		*w == *v;
 		v->zero();
 		z->set(0,0,10);
 		v->isFar(*z,5);
@@ -465,7 +465,7 @@ void Math::nativeVectorPerformance(uint iterations)
 		v->magnitudeXY();
 		v->magnitudeXYSqr();
 		z->set(0,0,2.00001f);
-		is_true = !v->equals(*z);
+		is_true = *v == *z;
 		is_true = *v == *z;
 		v->nearlyEquals(*z);
 		v->set(2,3,4);

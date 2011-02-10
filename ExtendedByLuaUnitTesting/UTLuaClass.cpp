@@ -10,7 +10,7 @@
 #include "LuaInclusions.h"
 #include "UTTools.h"
 
-using namespace LuaExtension;
+using namespace luaExtension;
 
 class LuaClass : public cfixcc::TestFixture
 {

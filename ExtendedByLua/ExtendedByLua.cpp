@@ -12,7 +12,7 @@ Defines the entry point for the console application.
 #include "LuaStateInteraction.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
-using namespace LuaExtension;
+using namespace luaExtension;
 #endif//EXTENDED_BY_LUA
 
 #if !GOLDMASTER
@@ -33,7 +33,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//SANDBOX
 
 #if EXTENDED_BY_LUA 
-	LuaExtension::Lua lua;
+	luaExtension::Lua lua;
 	registerGlobalLibrary(lua.getState());
 	lua.require("Utilities");
 	lua.require("ObjectOrientedParadigm");
@@ -43,8 +43,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 	lua.require("User");
 	lua.runConsole();
 #endif//EXTENDED_BY_LUA
-	Math::Vector3 v3(4,5,6);
-	Math::Vector3 v32;
+	math::Vector3 v3(4,5,6);
+	math::Vector3 v32;
 	v32 = v3;
 	return 0;
 }

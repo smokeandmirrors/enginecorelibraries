@@ -7,12 +7,14 @@
 
 #include "Lua.h"
 
-namespace UnitTestingTools
+namespace unitTestingTools
 {
+	void checkNearEqual(float lhs, float rhs, float tolerance=0.0f);
+	void checkNearEqual(double lhs, double rhs, double tolerance=0.0f);
 #if EXTENDED_BY_LUA 
-	void executeLuaUnitTest(char* module, LuaExtension::Lua* lua=NULL);
+	void executeLuaUnitTest(char* module, luaExtension::Lua* lua=NULL);
 #endif
-} // namespace UnitTestingTools
+} // namespace unitTestingTools
 
 #endif//BUILD_WITH_UNIT_TESTING
 #endif//UNITTESTINGTOOLS_H

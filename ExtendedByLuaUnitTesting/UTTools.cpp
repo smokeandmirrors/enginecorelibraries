@@ -2,8 +2,8 @@
 #if BUILD_WITH_UNIT_TESTING
 
 #include <cfixcc.h>
-
 #include <string.h>
+#include <math.h>
 #include "UTTools.h"
 
 #if EXTENDED_BY_LUA 
@@ -13,10 +13,25 @@
 #include "LuaInclusions.h"
 #endif
 
-namespace UnitTestingTools
+namespace unitTestingTools
 {
+
+void checkNearEqual(float lhs, float rhs, float tolerance)
+{
+	tolerance = tolerance == 0.0f ? 0.0001f : tolerance;
+	float delta = fabsf(lhs - rhs);
+	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
+}
+
+void checkNearEqual(double lhs, double rhs, double tolerance)
+{
+	tolerance = tolerance == 0.0f ? 0.0001 : tolerance;
+	double delta = abs(lhs - rhs);
+	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
+}
+
 #if EXTENDED_BY_LUA 
-using namespace LuaExtension;
+using namespace luaExtension;
 
 void executeLuaUnitTest(char* module, Lua* lua)
 {
@@ -74,5 +89,5 @@ void executeLuaUnitTest(char* module, Lua* lua)
 }
 #endif
 
-} // namespace UnitTestingTools
+} // namespace unitTestingTools
 #endif//BUILD_WITH_UNIT_TESTING

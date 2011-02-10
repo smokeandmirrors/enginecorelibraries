@@ -6,7 +6,7 @@
 
 #include "LuaInclusions.h"
 
-namespace LuaExtension 
+namespace luaExtension 
 {
 
 #if !GOLDMASTER
@@ -271,4 +271,4 @@ void Lua::runSandbox(void) const
 	
 }
 
-} // namespace LuaExtension
+} // namespace luaExtension

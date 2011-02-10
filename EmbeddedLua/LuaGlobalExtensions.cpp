@@ -9,11 +9,11 @@ add native function that you wish to be in the global %Lua namespace
 here
 */
 
-namespace LuaExtension
+namespace luaExtension
 {
 
 static const luaL_reg lua_library_Global[] = {
-	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &Math::nativeVectorPerformance>))
+	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &math::nativeVectorPerformance>))
 	lua_final_entry
 };
 
@@ -22,4 +22,4 @@ void registerGlobalLibrary(lua_State* L)
 	luaL_register(L, NULL, lua_library_Global);
 }
 
-} // namespace LuaExtension
+} // namespace luaExtension

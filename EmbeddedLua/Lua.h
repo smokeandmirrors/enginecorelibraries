@@ -17,7 +17,7 @@ creation of application and library code for %Lua.
 #include <stdlib.h>
 #include "LuaExtensibility.h"
 
-namespace LuaExtension 
+namespace luaExtension 
 {
 
 /**
@@ -142,6 +142,6 @@ private:
 	char*				m_name;
 };
 
-} // namespace LuaExtension 
+} // namespace luaExtension 
 
 #endif//LUA_H

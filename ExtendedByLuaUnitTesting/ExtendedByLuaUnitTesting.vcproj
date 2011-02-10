@@ -393,10 +393,6 @@
 		<Filter
 			Name="Math"
 			>
-			<File
-				RelativePath=".\UTVector.cpp"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\UTClassExtension.cpp"

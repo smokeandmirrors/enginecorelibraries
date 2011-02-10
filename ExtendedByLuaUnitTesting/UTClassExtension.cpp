@@ -13,7 +13,7 @@
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
-using namespace LuaExtension;
+using namespace luaExtension;
 
 class Classes : public cfixcc::TestFixture
 {
@@ -21,6 +21,8 @@ public:
 	void test_define_lua_class();
 	void test_define_lua_LuaExtendable(); 
 	void test_define_lua_LuaExtendable_by_proxy();
+	void testVector3();
+	void testLuaExtension(void);
 };
 
 class One
@@ -138,7 +140,7 @@ void Classes::test_define_lua_class()
 	//s: _G.there _G.zero
 	CFIX_ASSERT(lua_isnumber(L, -1));
 	sint zero = to<sint>(L, -1);
-	CFIX_ASSERT(zero == 0);
+	CFIX_ASSERT(zero == 0.0f);
 	lua_pop(L, 2);
 }
 
@@ -274,21 +276,21 @@ end_lua_LuaExtendable(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
 {
-	LuaExtension::Lua lua; 
+	luaExtension::Lua lua; 
 	register_lua_library((&lua), Simple);
 	register_lua_library((&lua), Derived);
-	UnitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
+	unitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
 void Classes::test_define_lua_LuaExtendable()
 {
 	supporttest_define_lua_LuaExtendable();
 
-	CFIX_ASSERT(Simple::getNumAllocated() == 0);
+	CFIX_ASSERT(Simple::getNumAllocated() == 0.0f);
 	CFIX_ASSERT(Simple::wasEverCreated());
-	CFIX_ASSERT(Derived::getNumAllocated() == 0);
+	CFIX_ASSERT(Derived::getNumAllocated() == 0.0f);
 	CFIX_ASSERT(Derived::wasEverCreated());
-	CFIX_ASSERT(Unexposed::getNumAllocated() == 0);
+	CFIX_ASSERT(Unexposed::getNumAllocated() == 0.0f);
 	CFIX_ASSERT(Unexposed::wasEverCreated());
 }
 
@@ -432,24 +434,295 @@ end_lua_LuaExtendable_by_proxy(Child, Parent)
 
 void supportProxyTesting(void)
 {
-	LuaExtension::Lua lua; 
+	luaExtension::Lua lua; 
 	register_lua_library((&lua), Grandparent);
 	register_lua_library((&lua), Parent);
 	register_lua_library((&lua), Child);
-	UnitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
+	unitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
 }
 
 void Classes::test_define_lua_LuaExtendable_by_proxy()
 {
 	supportProxyTesting();
-	CFIX_ASSERT(Grandparent::getNumAllocated() == 0);
+	CFIX_ASSERT(Grandparent::getNumAllocated() == 0.0f);
 	CFIX_ASSERT(Grandparent::wasEverCreated());
+}
+
+#include "Numbers.h"
+#include "UTTools.h"
+#include "Vector.h"
+
+/** 
+	// \todo, move to it's own file
+	CFIXCC_BEGIN_CLASS(UTVector)
+	#if EXTENDED_BY_LUA
+	CFIXCC_METHOD(testLuaExtension)
+	#endif//EXTENDED_BY_LUA
+	CFIXCC_METHOD(testVector3)
+	CFIXCC_END_CLASS()
+*/
+
+using namespace unitTestingTools;
+using namespace math;
+void Classes::testLuaExtension(void)
+{
+	Lua lua;
+	registerGlobalLibrary(lua.getState());
+	lua.require("Utilities");
+	lua.require("ObjectOrientedParadigm");
+	register_lua_library((&lua), Vector3);
+	unitTestingTools::executeLuaUnitTest("UTVector", &lua);	
+}
+
+void checkVector(const Vector3& v, vec_t x, vec_t y, vec_t z)
+{
+	CFIXCC_ASSERT_EQUALS(v.x, x);
+	CFIXCC_ASSERT_EQUALS(v.y, y);
+	CFIXCC_ASSERT_EQUALS(v.z, z);
+}
+
+void checkVector(const Vector3& v, vec_t x, vec_t y, vec_t z, vec_t tolerance)
+{
+	checkNearEqual(v.x, x, tolerance);
+	checkNearEqual(v.y, y, tolerance);
+	checkNearEqual(v.z, z, tolerance);
+}
+
+void checkVectorEqual(const Vector3& lhs, const Vector3& rhs)
+{
+	CFIXCC_ASSERT_EQUALS(lhs.x, rhs.x);
+	CFIXCC_ASSERT_EQUALS(lhs.y, rhs.y);
+	CFIXCC_ASSERT_EQUALS(lhs.z, rhs.z);
+}
+
+
+
+void Classes::testVector3(void)
+{
+	Vector3 v(3.0f,2.0f,1.0f);
+	Vector3 w(3.0f,2.0f,1.0f);
+	Vector3 x(1.0f,3.0f,2.0f);
+	Vector3 z(0.0f);
+	Vector3 scaleV(2,3,4);
+	Vector3 subtractV( -1,-2,-3);
+	Vector3 Xpos( 1, 0.0f, 0.0f);
+	Vector3 Ypos( 0.0f, 1, 0.0f);
+	Vector3 Zpos( 0.0f, 0.0f, 1);
+	Vector3 Xneg(-1, 0.0f, 0.0f);
+	Vector3 Yneg( 0.0f,-1, 0.0f);
+	Vector3 Zneg( 0.0f, 0.0f,-1);
+
+	CFIX_ASSERT(v == w);
+	checkVector(v,3,2,1);
+	checkVector(w,3,2,1);
+	v.negate();
+	checkVector(v,-3,-2,-1);
+	v.negate();
+	checkVector(v,3,2,1);
+	v.add(x);
+	checkVector(v,4,5,3);
+	v.subtract(x);
+	checkVector(v,3,2,1);
+	checkVector(w,3,2,1);
+	v.set(math::pi, math::pi/2, math::pi/3);
+	checkVector(v,math::pi, math::pi/2, math::pi/3);
+	v.set(math::pi/4);
+	checkVector(v,math::pi/4, math::pi/4, math::pi/4);
+	v.set(w);
+	checkVector(v,3,2,1);
+	checkVector(w,3,2,1);
+	v.set(10.0f,0.0f,0.0f);
+	checkVector(v, 10.0f, 0.0f, 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distance(z), 10.0f);
+	checkVector(z,0.0f,0.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceSqr(z), 100.0f);
+	checkVector(z,0.0f,0.0f,0.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXY(z), 10.0f);
+	checkVector(z,0.0f,0.0f,0.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXYSqr(z), 100.0f);
+	checkVector(z,0.0f,0.0f,0.0f,0.0f);
+	v.set(0.0f,10.0f,0.0f);
+	checkVector(v, 0.0f, 10.0f, 0.0f, 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distance(z), 10.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceSqr(z), 100.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXY(z), 10.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXYSqr(z), 100.0f);
+	v.set(0.0f,0.0f,10.0f);
+	checkVector(v, 0.0f, 0.0f, 10.0f, 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distance(z), 10.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceSqr(z), 100.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXY(z), 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXYSqr(z), 0.0f);
+	v.set(1,1,1);
+	checkVector(v, 1, 1, 1, 0.0f);
+	checkNearEqual(v.distance(z), 1.73205f);
+	CFIXCC_ASSERT_EQUALS(v.distanceSqr(z), 3.0f);
+	checkNearEqual(v.distanceXY(z), 1.414213f);
+	CFIXCC_ASSERT_EQUALS(v.distanceXYSqr(z), 2.0f);
+	v.normalize();
+	checkNearEqual(v.distance(z), 1);
+	checkNearEqual(v.distanceSqr(z), 1);
+	v.set(0.0f,1,1);
+	checkNearEqual(v.distanceXY(z), 1);
+	checkNearEqual(v.distanceXYSqr(z), 1);
+	v.set(8,4,2);
+	v.divide(2);
+	checkVector(v,4,2,1);
+	v.set(8,4,2);
+	checkVector(v,8,4,2);
+	v.divide(8,4,2);
+	checkVector(v, 1,1,1);
+	v.set(100.0f,100.0f,100.0f);
+	v.divide(50, 25, 10.0f);
+	checkVector(v,2,4,10.0f);
+	v.set(1,2,3);
+	checkVector(v,1,2,3,0.0f);
+	z.set(-1,-2,-3);
+	checkVector(z,-1,-2,-3,0.0f);
+	vec_t v_dot_z = v.dot(z);
+	vec_t z_dot_v = z.dot(v);
+	CFIXCC_ASSERT_EQUALS(v_dot_z, z_dot_v);
+	CFIXCC_ASSERT_EQUALS(v_dot_z, -14.0f);
+	CFIXCC_ASSERT_EQUALS(z_dot_v, -14.0f);
+	checkVector(z,-1,-2,-3,0.0f);
+	checkVector(v,1,2,3,0.0f);
+	v.set(w);
+	CFIX_ASSERT(! (v != w));
+	CFIX_ASSERT(! (w != v));
+	CFIX_ASSERT(w == v);
+	CFIX_ASSERT(v == w);
+	v.zero();
+	checkVector(v, 0.0f,0.0f,0.0f);
+	z.set(0.0f,0.0f,10.0f);
+	checkVector(z,0.0f,0.0f,10.0f);
+	CFIX_ASSERT(v.isFar(z,5));
+	CFIX_ASSERT(!v.isFar(z,10.0f));
+	CFIX_ASSERT(!v.isFarXY(z,0.0f));
+	CFIX_ASSERT(!v.isFarXY(z,0.0f));
+	checkVector(z,0.0f,0.0f,10.0f);
+	checkVector(v, 0.0f,0.0f,0.0f);
+	CFIX_ASSERT(v.isNear(z,10.0f));
+	CFIX_ASSERT(!v.isNear(z,9.99f));
+	CFIX_ASSERT(v.isNearXY(z,0.0f));
+	v.set(10000000.0f, 0.0f, 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.normalize(), 10000000.0f);
+	CFIX_ASSERT(v.isNormal());
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 1.0f);
+	checkVector(v,1,0.0f,0.0f);
+	v.set(0.0f, 10000000.0f, 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.normalize(), 10000000.0f);
+	CFIX_ASSERT(v.isNormal());
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 1.0f);
+	checkVector(v,0.0f,1.0f,0.0f);
+	v.set(0.0f, 0.0f, 10000000.0f);
+	CFIXCC_ASSERT_EQUALS(v.normalize(), 10000000.0f);
+	CFIX_ASSERT(v.isNormal());
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 1.0f);
+	checkVector(v,0.0f,0.0f,1.0f);
+	CFIX_ASSERT(!w.isNormal());
+	CFIX_ASSERT(!w.isZero());
+	v.set(0.0f);
+	checkVector(v,0.0f,0.0f,0.0f,0.0f);
+	CFIX_ASSERT(v.isZero());
+	v.set(2,0.0f,0.0f);
+	checkVector(v,2,0.0f,0.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 2.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeSqr(), 4.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXY(), 2.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXYSqr(), 4.0f);
+	v.set(0.0f,2.0f,0.0f);
+	checkVector(v,0.0f,2.0f,0.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeSqr(), 4.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 2.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXY(), 2.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXYSqr(), 4.0f);
+	v.set(0.0f,0.0f,2.0f);
+	checkVector(v,0.0f,0.0f,2.0f,0.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitude(), 2.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeSqr(), 4.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXY(), 0.0f);
+	CFIXCC_ASSERT_EQUALS(v.magnitudeXYSqr(), 0.0f);
+	z.set(0.0f,0.0f,2.00001f);
+	CFIX_ASSERT(! (v == z));
+	CFIX_ASSERT(v != z);
+	CFIX_ASSERT(v.nearlyEquals(z));
+	v.set(2,3,4);
+	checkVector(v,2,3,4,0.0f);
+	v.negate();
+	checkVector(v,-2,-3,-4,0.0f);
+	v.negate();
+	checkVector(v,2,3,4,0.0f);
+	v.scale(2);
+	checkVector(v,4,6,8,0.0f);
+	v.scale(1.0f/4.0f, 1.0f/6.0f, 1.0f/8.0f);
+	checkVector(v,1.0f,1.0f,1.0f,0.0f);
+	v.scale(scaleV);
+	checkVector(v,2.0f,3.0f,4.0f,0.0f);
+	v.zero();
+	checkVector(v,0.0f,0.0f,0.0f,0.0f);
+	v.subtract(1.0f,2.0f,3.0f);
+	checkVector(v,-1.0f,-2.0f,-3.0f);
+	v.subtract(subtractV);
+	CFIX_ASSERT(v.isZero());
+	checkVector(v,0.0f,0.0f,0.0f,0.0f);
+	v.subtract(9.0f);
+	checkVector(v,-9.0f,-9.0f,-9.0f,0.0f);
+	// x positive
+	v.set(Xpos);
+	v.cross(Zpos);
+	checkVectorEqual(v, Yneg);
+	v.set(Xpos);
+	v.cross(Ypos);
+	checkVectorEqual(v, Zpos);
+	v.set(Xpos);
+	v.cross(Zneg);
+	checkVectorEqual(v, Ypos);
+	v.set(Xpos);
+	v.cross(Yneg);
+	checkVectorEqual(v, Zneg);
+	// y positive
+	v.set(Ypos);
+	v.cross(Zpos);
+	checkVectorEqual(v, Xpos);
+	v.set(Ypos);
+	v.cross(Xneg);
+	checkVectorEqual(v, Zpos);
+	v.set(Ypos);
+	v.cross(Zneg);
+	checkVectorEqual(v, Xneg);
+	v.set(Ypos);
+	v.cross(Xpos);
+	checkVectorEqual(v, Zneg);
+	// z positive
+	v.set(Zpos);
+	v.cross(Yneg);
+	checkVectorEqual(v, Xpos);
+	v.set(Zpos);
+	v.cross(Xpos);
+	checkVectorEqual(v, Ypos);
+	v.set(Zpos);
+	v.cross(Ypos);
+	checkVectorEqual(v, Xneg);
+	v.set(Zpos);
+	v.cross(Xneg);
+	checkVectorEqual(v, Yneg);
+	// perpendicular
+	v.set(2,3,4);
+	w.set(v);
+	v.perpendicular();
+	CFIXCC_ASSERT_EQUALS(v.dot(w), 0.0f);
+	v.set(-4,-2,-3);
+	w.set(v);
+	v.perpendicular();
+	CFIXCC_ASSERT_EQUALS(v.dot(w), 0.0f);
 }
 
 CFIXCC_BEGIN_CLASS(Classes)
 	CFIXCC_METHOD(test_define_lua_class)
 	CFIXCC_METHOD(test_define_lua_LuaExtendable)
 	CFIXCC_METHOD(test_define_lua_LuaExtendable_by_proxy)
+	CFIXCC_METHOD(testVector3)
+	CFIXCC_METHOD(testLuaExtension)
 CFIXCC_END_CLASS()
 
 #endif//EXTENDED_BY_LUA

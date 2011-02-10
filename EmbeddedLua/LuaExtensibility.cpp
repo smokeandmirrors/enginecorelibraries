@@ -6,7 +6,7 @@
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
-namespace LuaExtension
+namespace luaExtension
 {
 
 #define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */\
@@ -291,4 +291,4 @@ sint pushRegisteredClass(lua_State* L, void* pushee)
 	return 1;
 }
 
-} // namespace LuaExtension
+} // namespace luaExtension

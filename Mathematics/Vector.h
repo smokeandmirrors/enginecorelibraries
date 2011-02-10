@@ -19,7 +19,7 @@ smokeandmirrorsdevelopment@gmail.com
 
 /** 
 @defgroup Mathematics Mathematics 
-Math classes, constants, functions and formulas
+math classes, constants, functions and formulas
 */
 
 /**
@@ -39,7 +39,7 @@ Vector classes and operations
 #include "LuaStateInteraction.h"
 #endif//EXTENDED_BY_LUA
 
-namespace Math
+namespace math
 {
 
 class Vector2;
@@ -72,7 +72,7 @@ a 2D Vector class with vec_t elements
 */
 class Vector2 
 #if EXTENDED_BY_LUA
-	: public LuaExtension::LuaExtendable
+	: public luaExtension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
@@ -113,10 +113,11 @@ public:
 	// dot product 
 	vec_t 			dot(const Vector2& v) const;
 	// equality 
-	bool 			equals(const Vector2& v) const;
 	bool 			equals(vec_t X, vec_t Y) const;
 	bool			nearlyEquals(const Vector2& v, vec_t epsilon=vectorTolerance) const;
+	bool 			notEquals(vec_t X, vec_t Y) const;
 	bool 			operator==(const Vector2& v) const;
+	bool			operator!=(const Vector2& v) const;
 	// magnitude 
 	vec_t 			magnitude(void) const;
 	vec_t 			magnitudeSqr(void) const;
@@ -151,7 +152,7 @@ public:
 
 class Vector3 
 #if EXTENDED_BY_LUA
-	: public LuaExtension::LuaExtendable
+	: public luaExtension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
@@ -202,10 +203,11 @@ public:
 	// dot product 
 	vec_t 			dot(const Vector3& v) const;
 	// equality 
-	bool 			equals(const Vector3& v) const;
 	bool 			equals(vec_t X, vec_t Y, vec_t Z) const;
 	bool			nearlyEquals(const Vector3& v, vec_t epsilon=vectorTolerance) const;
+	bool			notEquals(vec_t X, vec_t Y, vec_t Z) const;
 	bool 			operator==(const Vector3& v) const;
+	bool 			operator!=(const Vector3& v) const;
 	// magnitude 
 	vec_t 			magnitude(void) const;
 	vec_t 			magnitudeSqr(void) const;
@@ -526,10 +528,6 @@ inline Vector3& Vector3::operator/=(const Vector3& v)
 equality testing
 @{
 */
-inline bool Vector2::equals(const Vector2& v) const
-{
-	return x == v.x && y == v.y;
-}
 inline bool Vector2::equals(vec_t X, vec_t Y) const
 {
 	return x == X && y == Y;
@@ -538,13 +536,17 @@ inline bool Vector2::nearlyEquals(const Vector2& v, vec_t epsilon) const
 {
 	return fabsf(x - v.x) <= epsilon && fabsf(y - v.y) <= epsilon;
 }
+inline bool Vector2::notEquals(vec_t X, vec_t Y) const
+{
+	return x != X || y != Y;
+}
 inline bool Vector2::operator==(const Vector2& v) const
 {	
 	return x == v.x && y == v.y;
 }
-inline bool Vector3::equals(const Vector3& v) const
-{
-	return x == v.x && y == v.y && z == v.z;
+inline bool Vector2::operator!=(const Vector2& v) const
+{	
+	return x != v.x || y != v.y;
 }
 inline bool Vector3::equals(vec_t X, vec_t Y, vec_t Z) const
 {
@@ -554,9 +556,17 @@ inline bool Vector3::nearlyEquals(const Vector3& v, vec_t epsilon) const
 {
 	return fabsf(x - v.x) <= epsilon && fabsf(y - v.y) <= epsilon && fabsf(z - v.z) <= epsilon;
 }
+inline bool Vector3::notEquals(vec_t X, vec_t Y, vec_t Z) const
+{
+	return x != X || y != Y || z != Z;
+}
 inline bool Vector3::operator==(const Vector3& v) const
 {	
 	return x == v.x && y == v.y && z == v.z;
+}
+inline bool Vector3::operator!=(const Vector3& v) const
+{	
+	return x != v.x || y != v.y || z != v.z;
 }
 /** @} end Vector_Equality */
 
@@ -850,11 +860,11 @@ inline void Vector3::zero()
 /** @} end Vector_Zero */
 /** @} end Vector_Operations */
 
-} // end namespace Math
+} // end namespace math
 
 #if EXTENDED_BY_LUA
-declare_lua_LuaExtendable_ns(Math, Vector2);
-declare_lua_LuaExtendable_ns(Math, Vector3);
+declare_lua_LuaExtendable_ns(math, Vector2);
+declare_lua_LuaExtendable_ns(math, Vector3);
 #endif//EXTENDED_BY_LUA
 
 #endif//VECTOR_H

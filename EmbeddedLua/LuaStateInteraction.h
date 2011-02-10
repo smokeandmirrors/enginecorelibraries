@@ -18,7 +18,7 @@ the %Lua state to include custom types.
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 
-namespace LuaExtension 
+namespace luaExtension 
 { 
 #if ARGUMENT_ERRORS 
 #pragma message("Compiling with Lua stack argument type checking.")
@@ -337,6 +337,6 @@ inline sint return1Param2const(lua_State* L)
 	return 0;
 }
 
-} // namespace LuaExtension
+} // namespace luaExtension
 
 #endif//LUASTATEINTERACTION_H

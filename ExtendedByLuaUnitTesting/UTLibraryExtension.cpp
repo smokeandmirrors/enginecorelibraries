@@ -9,7 +9,7 @@
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
-using namespace LuaExtension;
+using namespace luaExtension;
 
 static sint getOne(void)
 {

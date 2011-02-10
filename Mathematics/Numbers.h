@@ -4,20 +4,20 @@
 
 #include "Build.h"
 
-namespace Math
+namespace math
 {
 /** 
 @ingroup Mathematics
 for tolerance comparisons of vectors
 */
-extern const vec_t vectorTolerance;
+extern const vec_t	vectorTolerance;
 
 /** 
 @ingroup Mathematics
 circumference / diameter of a any circle 
 */
-extern const vec_t pi; 
+extern const vec_t	pi; 
 
-} // namespace Math
+} // namespace math
 
 #endif//NUMBERS_H

@@ -60,7 +60,7 @@ struct lua_Debug;
 
 typedef sint (*lua_function)(lua_State* L);
 
-namespace LuaExtension 
+namespace luaExtension 
 {
 
 enum LUA_EXPOSURE
@@ -204,7 +204,7 @@ back out of %Lua.
 */
 #if ARGUMENT_ERRORS
 #define declare_to_LuaExtables(class_name) \
-	namespace LuaExtension \
+	namespace luaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
@@ -235,7 +235,7 @@ back out of %Lua.
 // end #define declare_to_LuaExtables
 #else
 #define declare_to_LuaExtables(class_name) \
-	namespace LuaExtension \
+	namespace luaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
 		{ \
@@ -326,7 +326,7 @@ This method would be preferable for objects like vectors.
 */
 #define end_lua_LuaExtendable(derived_class, super_class) \
 			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
-			lua_named_entry("__newindexable", LuaExtension::pushFalse) \
+			lua_named_entry("__newindexable", luaExtension::pushFalse) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -364,8 +364,8 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 \note compile-time directive
 */
 #define end_lua_LuaExtendable_by_proxy(derived, super) \
-			lua_named_entry("__newindexable", LuaExtension::pushTrue) \
-			lua_named_entry("__isExtendableByProxy", LuaExtension::pushTrue) \
+			lua_named_entry("__newindexable", luaExtension::pushTrue) \
+			lua_named_entry("__isExtendableByProxy", luaExtension::pushTrue) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -522,6 +522,6 @@ helper function for simply registering global native functions to %Lua
 */
 void registerGlobalLibrary(lua_State* L);
 
-} // namespace LuaExtension 
+} // namespace luaExtension 
 
 #endif//LUAEXTENSIBILITY_H
