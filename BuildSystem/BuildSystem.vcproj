@@ -391,6 +391,10 @@
 	</References>
 	<Files>
 		<File
+			RelativePath=".\Build.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\Build.h"
 			>
 		</File>

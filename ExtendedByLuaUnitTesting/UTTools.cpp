@@ -19,7 +19,7 @@ namespace unitTestingTools
 void checkNearEqual(float lhs, float rhs, float tolerance)
 {
 	tolerance = tolerance == 0.0f ? 0.0001f : tolerance;
-	float delta = fabsf(lhs - rhs);
+	float delta = fabs(lhs - rhs);
 	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
 }
 

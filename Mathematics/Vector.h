@@ -2,19 +2,14 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 /**
-@file Vector.h
-Vector definitions mostly for performance testing on a lua library
-extention.  That is, I want to see if it would be faster to have 
-any or all vector operations implemented in C.  Previously, testing
-has revealed that at least complicated operations benefit, but 
-that simple operations may not be worth it.
+\file Vector.h
 
-@author Smoke and Mirrors Development
-copyright 2010 Smoke and Mirrors Development
-smokeandmirrorsdevelopment@gmail.com
+2D and 3D vectors, which are exposed to %Lua.
 
-@date 2/18/2010
-
+\author Smoke and Mirrors Development
+\copyright 2010 Smoke and Mirrors Development
+\email smokeandmirrorsdevelopment@gmail.com
+\ date 2/18/2010
 */
 
 /** 
@@ -144,7 +139,8 @@ public:
 	void 			subtract(vec_t X, vec_t Y);
 	void 			subtract(const Vector2& v);
 	Vector2& 		operator-=(const Vector2& v);
-	// zero
+	// zero, infinity and NaN
+	bool			isValid(void) const;
 	bool			isZero(void) const;
 	void			zero(void);
 }; // class Vector2
@@ -238,6 +234,7 @@ public:
 	void 			subtract(const Vector3& v);
 	Vector3& 		operator-=(const Vector3& v);
 	// zero
+	bool			isValid(void) const;
 	bool			isZero(void) const;
 	void			zero(void);
 }; // class Vector3
@@ -534,7 +531,7 @@ inline bool Vector2::equals(vec_t X, vec_t Y) const
 }
 inline bool Vector2::nearlyEquals(const Vector2& v, vec_t epsilon) const
 {
-	return fabsf(x - v.x) <= epsilon && fabsf(y - v.y) <= epsilon;
+	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon;
 }
 inline bool Vector2::notEquals(vec_t X, vec_t Y) const
 {
@@ -554,7 +551,7 @@ inline bool Vector3::equals(vec_t X, vec_t Y, vec_t Z) const
 }
 inline bool Vector3::nearlyEquals(const Vector3& v, vec_t epsilon) const
 {
-	return fabsf(x - v.x) <= epsilon && fabsf(y - v.y) <= epsilon && fabsf(z - v.z) <= epsilon;
+	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon && absvec_t(z - v.z) <= epsilon;
 }
 inline bool Vector3::notEquals(vec_t X, vec_t Y, vec_t Z) const
 {
@@ -841,13 +838,27 @@ inline void Vector3::set(uint index, vec_t scalar)
 Vector Mutatators
 @{
 */
+inline bool Vector2::isValid() const
+{
+	return math::isValid(x) 
+		&& math::isValid(y);
+}
+inline bool Vector3::isValid() const
+{
+	return math::isValid(x) 
+		&& math::isValid(y) 
+		&& math::isValid(z);
+}
 inline bool Vector2::isZero() const
 {
-	return x == 0.0f && y == 0.0f;
+	return x == 0.0f 
+		&& y == 0.0f;
 }
 inline bool Vector3::isZero() const
 {
-	return x == 0.0f && y == 0.0f && z == 0.0f;
+	return x == 0.0f 
+		&& y == 0.0f 
+		&& z == 0.0f;
 }
 inline void Vector2::zero() 
 {

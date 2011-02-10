@@ -22,14 +22,6 @@ smokeandmirrorsdevelopment@gmail.com
 #define BUILD_WITH_UNIT_TESTING 1
 
 /**
-@ingroup Vectors
-\def sqrtvec_t
-defines the vector element square root function
-*/
-#define sqrtvec_t sqrtf
-
-
-/**
 C/C++ types
 */
 // typedef bool				bool;
@@ -45,9 +37,6 @@ typedef unsigned long		ulong;
 // typedef float				float;
 // typedef double				double;
 typedef long double			ldouble;
-
-/** the vector element type */
-typedef float vec_t;
 
 // \todo 32/64-bit number types, NULL, assert, warn, error
 

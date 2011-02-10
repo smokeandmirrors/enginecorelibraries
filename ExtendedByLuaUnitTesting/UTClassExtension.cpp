@@ -18,10 +18,11 @@ using namespace luaExtension;
 class Classes : public cfixcc::TestFixture
 {
 public:
-	void test_define_lua_class();
-	void test_define_lua_LuaExtendable(); 
-	void test_define_lua_LuaExtendable_by_proxy();
-	void testVector3();
+	void test_define_lua_class(void);
+	void test_define_lua_LuaExtendable(void); 
+	void test_define_lua_LuaExtendable_by_proxy(void);
+	void testNumbers(void);
+	void testVector3(void);
 	void testLuaExtension(void);
 };
 
@@ -495,7 +496,37 @@ void checkVectorEqual(const Vector3& lhs, const Vector3& rhs)
 	CFIXCC_ASSERT_EQUALS(lhs.z, rhs.z);
 }
 
+void Classes::testNumbers(void)
+{
+	vec_t decimal = 0.999999999999999999999f;
+	sint limit = 4294967295;
 
+	for (sint i = -limit; i < limit; i++)
+	{
+		vec_t value = static_cast<vec_t>(i) + decimal;
+		CFIX_ASSERT(isFinite(value));
+		CFIX_ASSERT(!isNaN(value));
+		CFIX_ASSERT(isValid(value));
+	}
+
+	vec_t one = 1.0f;
+	vec_t zero = 0.0f;
+	vec_t positive_infinity = one / zero;
+	vec_t negative_infinity = logvec_t(0.0f);
+	vec_t not_a_number = zero / zero; 
+	
+	CFIX_ASSERT(!isFinite(positive_infinity));
+	CFIX_ASSERT(!isNaN(positive_infinity));
+	CFIX_ASSERT(!isValid(positive_infinity));
+	
+	CFIX_ASSERT(!isFinite(negative_infinity));
+	CFIX_ASSERT(!isNaN(negative_infinity));
+	CFIX_ASSERT(!isValid(negative_infinity));
+	
+	CFIX_ASSERT(isNaN(not_a_number));
+	CFIX_ASSERT(!isValid(not_a_number));
+	CFIX_ASSERT(!isFinite(not_a_number));
+}
 
 void Classes::testVector3(void)
 {
@@ -721,8 +752,10 @@ CFIXCC_BEGIN_CLASS(Classes)
 	CFIXCC_METHOD(test_define_lua_class)
 	CFIXCC_METHOD(test_define_lua_LuaExtendable)
 	CFIXCC_METHOD(test_define_lua_LuaExtendable_by_proxy)
-	CFIXCC_METHOD(testVector3)
 	CFIXCC_METHOD(testLuaExtension)
+
+	CFIXCC_METHOD(testVector3)
+	CFIXCC_METHOD(testNumbers)
 CFIXCC_END_CLASS()
 
 #endif//EXTENDED_BY_LUA
