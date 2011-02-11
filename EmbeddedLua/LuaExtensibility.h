@@ -2,17 +2,17 @@
 #ifndef LUAEXTENSIBILITY_H
 #define LUAEXTENSIBILITY_H
 /** 
-@brief Defines macros to help registration of functions, 
+\brief Defines macros to help registration of functions, 
 libraries, and classes with lua.
 
-@file 
-copyright 2010 Smoke and Mirrors Development
-@author Smoke and Mirrors Development
-smokeandmirrorsdevelopment@gmail.com
-@date 2/23/2010
+\file 
+\email copyright 2010 Smoke and Mirrors Development
+\author Smoke and Mirrors Development
+\email smokeandmirrorsdevelopment@gmail.com
+\date 2/23/2010
 
 example:
-@code
+\code
 // for the .h file
 declare_lua_library(example)
 // would generate: 
@@ -48,7 +48,7 @@ namespace lua_library_example
 register_lua_library(Lua, example);
 // would generate:
 Lua->openLibrary(lua_library_example::luaopen_example);
-@endcode
+\endcode
 
 \note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
 
@@ -62,17 +62,6 @@ typedef sint (*lua_function)(lua_State* L);
 
 namespace luaExtension 
 {
-
-enum LUA_EXPOSURE
-{
-	LUA_EXPOSURE_CLASS				= 1 << 0,
-	LUA_EXPOSURE_CREATE_GLOBAL_MT	= 1 << 1,
-	LUA_EXPOSURE_DERIVED			= 1 << 2,
-	LUA_EXPOSURE_EXTENSIBLE			= 1 << 3,
-	LUA_EXPOSURE_LIBRARY			= 1 << 4,
-}; // end LUA_EXPOSURE
-
-#define NUM_LUA_METAMETHODS (18)
 
 #if !GOLDMASTER
 #define ARGUMENT_ERRORS 1
@@ -425,7 +414,7 @@ run-time directive
 	lua_proxySetMetatableFunction(Class) \
 	
 /**
-@interface LuaExtendable
+\interface LuaExtendable
 Makes it easier to define metamethods on exposed C++ classes.
 */
 class LuaExtendable 
@@ -470,11 +459,10 @@ public:
 	/**
 	__tostring method for the metatable of a class exposed to %Lua.
 	*/
-	static sint				__tostring(lua_State* L);
-	
+	static sint				__tostring(lua_State* L);	
 	/** 
 	helps set a LuaExtendable metatable from script
-	@warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
+	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
 	static sint				callSetMetatable(lua_State* L);
 	/**
@@ -494,8 +482,24 @@ public:
 	static sint				setUserdataMetatable(lua_State* L); 
 	/** defined pure virtual constructor */
 	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
+	/** 
+	a function that classes must implement to make them easier to make into well formed
+	%Lua classes
+	*/
 	virtual const char*		getClassName(void) const=0;
+	/**
+	objects of this type will have a metatable assigned to them when pushed into
+	a lua_State.  %Lua doesn't allow setmetatable calls on userdata pointers
+	from %Lua.  This function will be called via a legal %Lua function call.
+	It is mostly easily implemented in terms of one of the static LuaExtendable
+	functions.
+	*/
 	virtual sint			setMetatable(lua_State* L)=0;
+	/**
+	a to string function is almost always necessary, since so much of %Lua
+	use is simply to make inspection of objects very easy, there is often
+	a lot of information about them printed, logged, or rendered
+	*/
 	virtual const char*		toString(void)=0;
 }; // class LuaExtendable
 
@@ -513,7 +517,7 @@ void printToLua(lua_State* L, const char* string);
 /**
 helper function for pushing a class to %Lua an preserving the ability
 to compare userdata and use them as equivalent table keys
-@see comments in the implementation of void Lua::initializeUserdataStorage(void)
+\see comments in the implementation of void Lua::initializeUserdataStorage(void)
 */
 sint pushRegisteredClass(lua_State* L, void* pushee);
 

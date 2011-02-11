@@ -13,29 +13,6 @@ namespace luaExtension
 	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
 
-// uint testing = LUA_EXPOSURE_LIBRARY & LUA_EXPOSURE_CLASS & LUA_EXPOSURE_CREATE_GLOBAL_MT;
-
-const char*	lua_metamethodNames[NUM_LUA_METAMETHODS] = {
-	"__add",
-	"__call",
-	"__concat",
-	"__div",
-	"__eq",
-	"__gc",
-	"__index",
-	"__le",
-	"__len",
-	"__lt",
-	"__metatable",
-	"__mod",
-	"__mul",
-	"__newindex",
-	"__pow",
-	"__sub",
-	"__unm",
-	"__tostring",
-};
-
 inline bool isInstanceBeingRefreshed(lua_State* L)
 {	//s: userdata, lua_class_mt
 	if (lua_getmetatable(L, -2))

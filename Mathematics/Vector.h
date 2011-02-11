@@ -4,22 +4,23 @@
 /**
 \file Vector.h
 
-2D and 3D vectors, which are exposed to %Lua.
+2D and 3D vectors, which are exposed to %Lua, primarly for use in 
+performance comparison.
 
 \author Smoke and Mirrors Development
 \copyright 2010 Smoke and Mirrors Development
 \email smokeandmirrorsdevelopment@gmail.com
-\ date 2/18/2010
+\date 2/18/2010
 */
 
 /** 
-@defgroup Mathematics Mathematics 
+\defgroup Mathematics Mathematics 
 math classes, constants, functions and formulas
 */
 
 /**
-@defgroup Vectors Vectors
-@ingroup Mathematics
+\defgroup Vectors Vectors
+\ingroup Mathematics
 Vector classes and operations
 */
 
@@ -28,6 +29,7 @@ Vector classes and operations
 
 #include "Build.h"
 #include "Numbers.h"
+#include "NumericalFunctions.h"
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensibility.h"
@@ -41,8 +43,8 @@ class Vector2;
 class Vector3;
 
 /** 
-@defgroup Vector_Directions Directions
-@ingroup Mathematics
+\defgroup Vector_Directions Directions
+\ingroup Mathematics
 directional shortcuts
 @{
 */
@@ -61,8 +63,8 @@ extern const Vector3	up3D;
 /** @} end Vector_Directions */
 
 /**
-@class Vector2
-@ingroup Vectors
+\class Vector2
+\ingroup Vectors
 a 2D Vector class with vec_t elements
 */
 class Vector2 
@@ -75,16 +77,18 @@ public:
 	vec_t x;
 	vec_t y;
 	// construction
-	Vector2() 					{/* empty */}
-	Vector2(const Vector2& v) 
-		: x(v.x), y(v.y) 		{/* empty */}
-	Vector2(vec_t X, vec_t Y) 
-		: x(X), y(Y)  			{/* empty */}
-	Vector2(vec_t scalar) 
-		: x(scalar), y(scalar) 	{/* empty */}
+	Vector2(void) 					
+	{/* empty */}
+	Vector2(const Vector2& v) : x(v.x), y(v.y)  
+	{/* empty */}
+	Vector2(vec_t X, vec_t Y) : x(X), y(Y)
+	{/* empty */}
+	Vector2(vec_t scalar) : x(scalar), y(scalar) 	
+	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
-	virtual ~Vector2(void)		{ /* empty */ };
+	virtual ~Vector2(void)		
+	{ /* empty */ };
 	createLuaExtendableUserdataDefaultFunctions(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
@@ -120,8 +124,8 @@ public:
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
 	// construction (normalized)
-	Vector2(const Vector2& v, bool /* ignored */)
-		: x(v.x), y(v.y) { normalize(); }
+	Vector2(const Vector2& v, bool /* ignored */) : x(v.x), y(v.y) 
+	{ normalize(); }
 	// multiplication & scaling 
 	void			negate(void);
 	void 			scale(vec_t scalar);
@@ -157,16 +161,18 @@ public:
 	vec_t y;
 	vec_t z;
 	// construction 
-	Vector3() 								{/* empty */}
-	Vector3(const Vector3& v) 
-		: x(v.x), y(v.y), z(v.z) 			{/* empty */}
-	Vector3(vec_t X, vec_t Y, vec_t Z) 
-		: x(X), y(Y), z(Z) 					{/* empty */}
-	Vector3(vec_t scalar) 
-		: x(scalar), y(scalar), z(scalar) 	{/* empty */}
+	Vector3(void) 								
+	{/* empty */}
+	Vector3(const Vector3& v) : x(v.x), y(v.y), z(v.z) 			
+	{/* empty */}
+	Vector3(vec_t X, vec_t Y, vec_t Z) : x(X), y(Y), z(Z) 					
+	{/* empty */}
+	Vector3(vec_t scalar) : x(scalar), y(scalar), z(scalar) 	
+	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
-	virtual ~Vector3(void)		{ /* empty */ };
+	virtual ~Vector3(void)		
+	{ /* empty */ };
 	createLuaExtendableUserdataDefaultFunctions(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 
@@ -213,8 +219,8 @@ public:
 	bool			isNormal(void) const;
 	vec_t 			normalize(void);
 	// construction (normalized)
-	Vector3(const Vector3& v, bool /* ignored */)
-		: x(v.x), y(v.y), z(v.z) { normalize(); }
+	Vector3(const Vector3& v, bool /* ignored */) : x(v.x), y(v.y), z(v.z) 
+	{ normalize(); }
 	// multiplication & scaling 
 	void 			negate(void);
 	void 			scale(vec_t scalar);
@@ -242,14 +248,14 @@ public:
 void nativeVectorPerformance(uint iterations);
 
 /** 
-@defgroup Vector_Operations Operations
-@ingroup Vectors
+\defgroup Vector_Operations Operations
+\ingroup Vectors
 standard vector operations
 @{
 */
 
 /** 
-@defgroup Vector_Accessors Acessors
+\defgroup Vector_Accessors Acessors
 array and function accessors 
 @{
 */
@@ -276,7 +282,7 @@ inline vec_t& Vector3::operator[](uint i)
 /** @} end Vector_Access */
 
 /** 
-@defgroup Vector_Addition Addition
+\defgroup Vector_Addition Addition
 vector and scalar addition operations 
 @{
 */
@@ -329,8 +335,8 @@ inline Vector3& Vector3::operator+=(const Vector3& v)
 /** @} end Vector_Addition */
 
 /** 
-@defgroup Vector_CrossProduct Cross Product
-@ingroup Vector_Operations
+\defgroup Vector_CrossProduct Cross Product
+\ingroup Vector_Operations
 Vector Cross Product
 @{
 */
@@ -363,8 +369,8 @@ inline void Vector3::perpendicular(void)
 /** @} end Vector_CrossProduct */
 
 /** 
-@defgroup Vector_Distance Distance
-@ingroup Vector_Operations
+\defgroup Vector_Distance Distance
+\ingroup Vector_Operations
 distance to another vector
 @{
 */
@@ -448,8 +454,8 @@ inline bool Vector3::isNearXY(const Vector3& v, vec_t farthest_range) const
 
 
 /** 
-@defgroup Vector_Dot_Product Dot Product
-@ingroup Vector_Operations
+\defgroup Vector_Dot_Product Dot Product
+\ingroup Vector_Operations
 Vector dot product
 @{
 */
@@ -464,8 +470,8 @@ inline vec_t Vector3::dot(const Vector3& v) const
 /** @} end Vector_Dot_Product */
 
 /** 
-@defgroup Vector_Division Division
-@ingroup Vector_Operations
+\defgroup Vector_Division Division
+\ingroup Vector_Operations
 scalar and per element division
 @{
 */
@@ -520,8 +526,8 @@ inline Vector3& Vector3::operator/=(const Vector3& v)
 /** @} end Vector_Division */
 
 /** 
-@defgroup Vector_Equality Equality
-@ingroup Vector_Operations
+\defgroup Vector_Equality Equality
+\ingroup Vector_Operations
 equality testing
 @{
 */
@@ -568,8 +574,8 @@ inline bool Vector3::operator!=(const Vector3& v) const
 /** @} end Vector_Equality */
 
 /** 
-@defgroup Vector_Magnitude Magnitude
-@ingroup Vector_Operations
+\defgroup Vector_Magnitude Magnitude
+\ingroup Vector_Operations
 vector magnitude
 @{
 */
@@ -600,8 +606,8 @@ inline vec_t Vector3::magnitudeXYSqr(void) const
 /** @} end Vector_Magnitude */
 
 /** 
-@defgroup Vector_Normalization Normalization
-@ingroup Vector_Operations
+\defgroup Vector_Normalization Normalization
+\ingroup Vector_Operations
 Vector Normalization
 @{
 */
@@ -637,8 +643,8 @@ inline vec_t Vector3::normalize(void)
 /** @} Vector_Normalization */
 
 /** 
-@defgroup Vector_Scaling Scaling
-@ingroup Vector_Operations
+\defgroup Vector_Scaling Scaling
+\ingroup Vector_Operations
 multiplication & scaling 
 @{
 */
@@ -704,8 +710,8 @@ inline void Vector3::negate(void)
 /** @} end Vector_Scaling */
 
 /** 
-@defgroup Vector_Substraction Substraction
-@ingroup Vector_Operations
+\defgroup Vector_Substraction Substraction
+\ingroup Vector_Operations
 Vector Substraction
 @{
 */
@@ -758,8 +764,8 @@ inline Vector3& Vector3::operator-=(const Vector3& v)
 /** @} Vector_Substraction */
 
 /** 
-@defgroup Vector_Mutatators Mutatators
-@ingroup Vector_Operations
+\defgroup Vector_Mutatators Mutatators
+\ingroup Vector_Operations
 Vector Mutatators
 @{
 */
@@ -833,8 +839,8 @@ inline void Vector3::set(uint index, vec_t scalar)
 }
 /** @} end Vector_Mutators */
 /** 
-@defgroup Vector_Zero Zero
-@ingroup Vector_Operations
+\defgroup Vector_Zero Zero
+\ingroup Vector_Operations
 Vector Mutatators
 @{
 */

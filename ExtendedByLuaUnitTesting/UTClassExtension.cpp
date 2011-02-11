@@ -5,6 +5,7 @@
 
 #include "UTTools.h"
 #include "Vector.h"
+#include "NumericalFunctions.h"
 
 #if EXTENDED_BY_LUA
 
@@ -297,7 +298,7 @@ void Classes::test_define_lua_LuaExtendable()
 
 // BEGIN PROXY
 /**
-@class
+\class
 demonstrates full inheritance tree and proxy useage
 */
 class Grandparent 
@@ -364,7 +365,7 @@ lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandpar
 end_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
 
 /**
-@class
+\class
 
 demonstrates full inheritance tree and proxy useage
 */
@@ -394,7 +395,7 @@ lua_named_entry("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent:
 end_lua_LuaExtendable_by_proxy(Parent, Grandparent) 
 
 /**
-@class
+\class
 
 demonstrates full inheritance tree and proxy usesage
 */

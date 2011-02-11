@@ -2,14 +2,14 @@
 #ifndef LUAINCLUSIONS_H
 #define LUAINCLUSIONS_H
 /**
-@brief Provides necessary includes to compile calls to the
+\brief Provides necessary includes to compile calls to the
 Lua api.  
-@file 
+\file 
 
 copyright 2010 Smoke and Mirrors Development
-@author Smoke and Mirrors Development
+\author Smoke and Mirrors Development
 smokeandmirrorsdevelopment@gmail.com
-@date 2/23/2010
+\date 2/23/2010
 */
 #include "lua.hpp"
 #include <lauxlib.h>

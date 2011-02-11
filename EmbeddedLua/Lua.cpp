@@ -113,7 +113,7 @@ void Lua::initializeInterpretation(void) const
 void Lua::initializeUserdataStorage(void) const
 {	/**
 	solves this problem: http://lua-users.org/lists/lua-l/2007-01/msg00126.html
-	@see also "Binding C/C++ Objects to Lua", Waldemar Celes, Luiz Henrique de Figueiredo, Roberto Ierusalimschy
+	\see also "Binding C/C++ Objects to Lua", Waldemar Celes, Luiz Henrique de Figueiredo, Roberto Ierusalimschy
 	in "Game Programming Gems 6".
 
 	basically, allows us to prevent duplication of exposed objects, and allows them to be

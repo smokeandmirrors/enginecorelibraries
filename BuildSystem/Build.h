@@ -2,7 +2,7 @@
 #ifndef BUILD_H
 #define BUILD_H
 /**
-@brief Defines typdefs, macros for the foundation for programming in
+\brief Defines typdefs, macros for the foundation for programming in
 and building this project.
 
 This file should contain one of the few properties that reside in the 
@@ -10,11 +10,11 @@ global namespace.
 
 It should really only contain fundamental typdefs and macros.
 
-@file 
-copyright 2011 Smoke and Mirrors Development
-@author Smoke and Mirrors Development
-smokeandmirrorsdevelopment@gmail.com
-@date 1/20/2011
+\file 
+\copyright 2011 Smoke and Mirrors Development
+\author Smoke and Mirrors Development
+\email smokeandmirrorsdevelopment@gmail.com
+\date 1/20/2011
 */
 
 #include <assert.h>

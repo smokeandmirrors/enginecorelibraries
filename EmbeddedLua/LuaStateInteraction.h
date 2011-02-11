@@ -198,30 +198,122 @@ inline sint pushTrue(lua_State* L)
 }
 
 /**
-static functions
+template functions to make it easer to expose static and class
+functions to %Lua.  I only use the goofy syntax of splitting up the
+template<> arguments on each line to make it easier to discern
+which types of functions all ready have a template defined.
+
+\todo document the naming scheme for these functions
 */
-template<typename ARG_1, void(* function)(ARG_1)>
-inline sint staticReturn0Param1(lua_State* L)
+
+/**
+static function wrappers
+*/
+/**
+void function wrappers
+*/
+/** to wrap: void anyfunction(void); */
+template
+<
+void(* function)(void)
+>
+inline sint staticReturn0Param0(lua_State* L)
 {
-	ARG_1 arg1 = to<ARG_1>(L, -1);
-	(*function)(arg1);
+	(*function)();
 	return 0;
 }
 
-template<typename RET_1, RET_1(* function)(void)>
+/** to wrap: void anyfunction(T arg); */
+template
+<
+typename ARG_1, 
+void(* function)(ARG_1)
+>
+inline sint staticReturn0Param1(lua_State* L)
+{
+	(*function)(to<ARG_1>(L, -1));
+	return 0;
+}
+
+/** to wrap: void anyfunction(T arg, T arg); */
+template
+<
+typename ARG_1,
+typename ARG_2,
+void(* function)(ARG_1, ARG_2)
+>
+inline sint staticReturn0Param2(lua_State* L)
+{
+	(*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+	return 0;
+}
+
+/** to wrap: void anyfunction(T arg, T arg, T arg); */
+template
+<
+typename ARG_1,
+typename ARG_2,
+typename ARG_3,
+void(* function)(ARG_1, ARG_2, ARG_3)
+>
+inline sint staticReturn0Param3(lua_State* L)
+{
+	(*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+	return 0;
+}
+
+/** to wrap: void anyfunction(T arg, T arg, T arg, T arg); */
+template
+<
+typename ARG_1,
+typename ARG_2,
+typename ARG_3,
+typename ARG_4,
+void(* function)(ARG_1, ARG_2, ARG_3, ARG_4)
+>
+inline sint staticReturn0Param3(lua_State* L)
+{
+	(*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), 
+		to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+	return 0;
+}
+
+/**
+non-void function wrappers 
+*/
+/** to wrap: T anyfunction(void); */
+template
+<
+typename RET_1, 
+RET_1(* function)(void)
+>
 inline sint staticReturn1Param0(lua_State* L)
 {
-	return push(L, (*function)());
+	return push(L, (*function)());	
 }
 
-template<typename RET_1, typename ARG_1, RET_1(* function)(ARG_1)>
+/** to wrap: T anyfunction(T arg); */
+template
+<
+typename RET_1, 
+typename ARG_1, 
+RET_1(* function)(ARG_1)
+>
 inline sint staticReturn1Param1(lua_State* L)
 {
-	ARG_1 arg1 = to<ARG_1>(L, -1);
-	return push(L, (*function)(arg1));	
+	return push(L, (*function)(to<ARG_1>(L, -1)));	
 }
 
-template <typename RET_1, typename RET_2, RET_1(* function)(RET_2&)>
+/**
+multiple return value function wrappers
+*/
+/** to wrap: T anyfunction(T& arg); */
+template
+<
+typename RET_1, 
+typename RET_2, 
+RET_1(* function)(RET_2&)
+>
 inline sint staticReturn2Param0(lua_State* L)
 {
 	RET_2 retval2;
@@ -230,7 +322,14 @@ inline sint staticReturn2Param0(lua_State* L)
 	return num_pushed;
 }
 
-template <typename RET_1, typename RET_2, typename ARG_1, RET_1(* function)(RET_2&, ARG_1)>
+/** to wrap: T anyfunction(T& arg, T arg); */
+template
+<
+typename RET_1, 
+typename RET_2, 
+typename ARG_1, 
+RET_1(* function)(RET_2&, ARG_1)
+>
 inline sint staticReturn2Param1(lua_State* L)
 {
 	RET_2 retval2;
@@ -243,7 +342,14 @@ inline sint staticReturn2Param1(lua_State* L)
 /**
 class functions
 */
-template<typename CLASS, void(CLASS::* function)(void)>
+/** 
+void, volatile function wrappers
+*/
+template
+<
+typename CLASS, 
+void(CLASS::* function)(void)
+>
 inline sint return0Param0(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -1))
@@ -253,7 +359,12 @@ inline sint return0Param0(lua_State* L)
 	return 0;	
 }
 
-template<typename CLASS, typename ARG_1, void(CLASS::* function)(ARG_1)>
+template
+<
+typename CLASS, 
+typename ARG_1, 
+void(CLASS::* function)(ARG_1)
+>
 inline sint return0Param1(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -2))
@@ -263,10 +374,13 @@ inline sint return0Param1(lua_State* L)
 	return 0;	
 }
 
-template<typename CLASS, 
-	typename ARG_1,
-	typename ARG_2,
-	void(CLASS::* function)(ARG_1, ARG_2)>
+template
+<
+typename CLASS, 
+typename ARG_1,
+typename ARG_2,
+void(CLASS::* function)(ARG_1, ARG_2)
+>
 inline sint return0Param2(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -3))
@@ -276,11 +390,14 @@ inline sint return0Param2(lua_State* L)
 	return 0;	
 }
 
-template<typename CLASS, 
-	typename ARG_1,
-	typename ARG_2,
-	typename ARG_3,
-	void(CLASS::* function)(ARG_1, ARG_2, ARG_3)>
+template
+<
+typename CLASS, 
+typename ARG_1,
+typename ARG_2,
+typename ARG_3,
+void(CLASS::* function)(ARG_1, ARG_2, ARG_3)
+>
 inline sint return0Param3(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -4))
@@ -290,7 +407,15 @@ inline sint return0Param3(lua_State* L)
 	return 0;	
 }
 
-template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void)>
+/** 
+non-void, volatile function wrappers
+*/
+template
+<
+typename CLASS, 
+typename RET_1, 
+RET_1(CLASS::* function)(void)
+>
 inline sint return1Param0(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -1))
@@ -300,7 +425,15 @@ inline sint return1Param0(lua_State* L)
 	return 0;
 }
 
-template<typename CLASS, typename RET_1, RET_1(CLASS::* function)(void) const>
+/** 
+non-void, const function wrappers
+*/
+template
+<
+typename CLASS, 
+typename RET_1, 
+RET_1(CLASS::* function)(void) const
+>
 inline sint return1Param0const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -1))
@@ -310,10 +443,13 @@ inline sint return1Param0const(lua_State* L)
 	return 0;
 }
 
-template<typename CLASS, 
-	typename RET_1, 
-	typename ARG_1,  
-	RET_1(CLASS::* function)(ARG_1) const>
+template
+<
+typename CLASS, 
+typename RET_1, 
+typename ARG_1,  
+RET_1(CLASS::* function)(ARG_1) const
+>
 inline sint return1Param1const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -2))
@@ -323,11 +459,14 @@ inline sint return1Param1const(lua_State* L)
 	return 0;
 }
 
-template<typename CLASS, 
-	typename RET_1, 
-	typename ARG_1, 
-	typename ARG_2, 
-	RET_1(CLASS::* function)(ARG_1, ARG_2) const>
+template
+<
+typename CLASS, 
+typename RET_1, 
+typename ARG_1, 
+typename ARG_2, 
+RET_1(CLASS::* function)(ARG_1, ARG_2) const
+>
 inline sint return1Param2const(lua_State* L)
 {
 	if (CLASS* object = to<CLASS*>(L, -3))

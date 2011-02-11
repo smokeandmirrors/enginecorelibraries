@@ -400,11 +400,19 @@
 			Name="3D Math"
 			>
 			<File
+				RelativePath=".\3DMathFunctions.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Numbers.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Numbers.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NumericalFunctions.h"
 				>
 			</File>
 			<File
