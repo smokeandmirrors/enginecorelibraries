@@ -2,16 +2,17 @@
 #ifndef LUAEXTENSIONINCLUSIONS_H
 #define LUAEXTENSIONINCLUSIONS_H
 /**
-\file LuaExentionInclusions.h 
-
+\file LuaExtensionInclusions.h 
 A file to include what will probably be necessary
 to compile use of the embedded %Lua and exposition system.
 
 Unfortunately, this means including lua.h and other files that I didn't 
-want to happen, but that does make for cleaner implementation in all
-other areas.
+want to include all over the place, but that does make for cleaner 
+implementation for much of the required functionality.
 
-\warning Much system is dependent on the use of ObjectOrientedParadigm.lua
+\warning Much of the system is dependent on the use of ObjectOrientedParadigm.lua,
+in order to properly use it, your lua_States must load that chunk before
+processing the run-time directives of this system.
 
 \author Smoke and Mirrors Development
 \htmlonly

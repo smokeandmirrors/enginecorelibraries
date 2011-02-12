@@ -184,58 +184,58 @@ back out of %Lua.
 \note compile-time directive
 */
 #if ARGUMENT_ERRORS
-#define declare_to_LuaExtendables(class_name) \
+#define define_to_LuaExtendables(Class) \
 	namespace luaExtension \
 	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		template<> inline Class* to<Class*>(lua_State* L, sint index) \
 		{ \
 			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
-			class_name* object = dynamic_cast<class_name*>(ud); \
+			Class* object = dynamic_cast<Class*>(ud); \
 			if (object) \
 				return object; \
-			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #class_name); \
+			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #Class); \
 			return NULL; \
 		} \
-		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		template<> inline const Class* to<const Class*>(lua_State* L, sint index) \
 		{ \
-			return to<class_name*>(L, index); \
+			return to<Class*>(L, index); \
 		} \
-		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		template<> inline Class& to<Class&>(lua_State* L, sint index) \
 		{ \
-			class_name* object = to<class_name*>(L, index); \
+			Class* object = to<Class*>(L, index); \
 			assert(object); \
 			return *object; \
 		} \
-		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		template<> inline const Class& to<const Class&>(lua_State* L, sint index) \
 		{ \
-			class_name* object = to<class_name*>(L, index); \
+			Class* object = to<Class*>(L, index); \
 			assert(object); \
 			return *object; \
 		} \
 	}
-// end #define declare_to_LuaExtendables
+// end #define define_to_LuaExtendables
 #else
-#define declare_to_LuaExtendables(class_name) \
+#define define_to_LuaExtendables(Class) \
 	namespace luaExtension \
 	{ \
-		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
+		template<> inline Class* to<Class*>(lua_State* L, sint index) \
 		{ \
-			return static_cast<class_name*>(to<LuaExtendable*>(L, index)); \
+			return static_cast<Class*>(to<LuaExtendable*>(L, index)); \
 		} \
-		template<> inline const class_name* to<const class_name*>(lua_State* L, sint index) \
+		template<> inline const Class* to<const Class*>(lua_State* L, sint index) \
 		{ \
-			return to<class_name*>(L, index); \
+			return to<Class*>(L, index); \
 		} \
-		template<> inline class_name& to<class_name&>(lua_State* L, sint index) \
+		template<> inline Class& to<Class&>(lua_State* L, sint index) \
 		{ \
-			return *to<class_name*>(L, index); \
+			return *to<Class*>(L, index); \
 		} \
-		template<> inline const class_name& to<const class_name&>(lua_State* L, sint index) \
+		template<> inline const Class& to<const Class&>(lua_State* L, sint index) \
 		{ \
-			return *to<class_name*>(L, index); \
+			return *to<Class*>(L, index); \
 		} \
 	}
-// end #define declare_to_LuaExtendables
+// end #define define_to_LuaExtendables
 #endif//ARGUMENT_ERRORS
 
 /**
@@ -244,9 +244,9 @@ Declares a library around a class that implements
 the LuaExtendable interface.
 \note compile-time directive
 */
-#define declare_lua_LuaExtendable(class_name) \
-	declare_lua_library(class_name) \
-	declare_to_LuaExtendables(class_name) 
+#define declare_lua_LuaExtendable(Class) \
+	declare_lua_library(Class) \
+	define_to_LuaExtendables(Class) 
 // end #define declare_lua_LuaExtendable
 
 
@@ -256,9 +256,9 @@ Declares a library around a class in a namespace that implements
 the LuaExtendable interface.
 \note compile-time directive
 */
-#define declare_lua_LuaExtendable_ns(namespace_name, class_name) \
-	declare_lua_library(class_name)	\
-	declare_to_LuaExtendables(namespace_name::class_name)
+#define declare_lua_LuaExtendable_ns(ns, Class) \
+	declare_lua_library(Class)	\
+	define_to_LuaExtendables(ns::Class)
 
 /**
 \def define_lua_LuaExtendable
@@ -267,50 +267,58 @@ class can be created or controlled in %Lua. This also exposes simple
 userdata pointers with all associated C++ and Lua methods, but it doesn't 
 create any ability to added new %Lua fields.  But, this is often never needed.
 This method would be preferable for objects like vectors.
+\param SuperClass the parent class of the LuaExtendable, or the same 
+if it has no parent class
 \note compile-time directive
-\note highly recommended to precede a end_lua_LuaExtendable
-\note adds a __gc method
-\note adds a __new method (calls a no-args constructor)
-\note adds a __setmetatable method
-\note adds a __tostring method
+\note highly recommended to precede an end_lua_LuaExtendable
+\note adds a __gc, calls the destructor on the LuaExtendable
+\note adds a __isnewindexable, returns false
+\note adds a __new, calls the no-args constructor
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define define_lua_LuaExtendable(derived, super) \
-	namespace lua_library_##derived \
+#define define_lua_LuaExtendable(Class, SuperClass) \
+	namespace lua_library_##Class \
 	{ \
-		sint lua_new##derived(lua_State* L) \
+		sint lua_new##Class(lua_State* L) \
 		{ \
-			pushRegisteredClass(L, new derived()); \
+			pushRegisteredClass(L, new Class()); \
 			return 1; \
 		} \
-		static const luaL_reg derived##_library[] = \
+		static const luaL_reg Class##_library[] = \
 		{ \
-			lua_named_entry("__new", lua_new##derived) \
 			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
-			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
-			lua_named_entry("__tostring", LuaExtendable::__tostring) \
+			lua_named_entry("__isnewindexable", luaExtension::pushFalse) \
+			lua_named_entry("__new", lua_new##Class) \
 			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
-			lua_named_entry("__isnewindexable", luaExtension::pushFalse) 
+			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define_lua_LuaExtendable
 
 /**
 \def define_lua_LuaExtendable_noctor
 Define a %Lua library around a class, so that instances of the 
-class can be created or controlled in %Lua. This also exposes simple 
-userdata pointers with all associated C++ and Lua methods, but it doesn't 
-create any ability to added new %Lua fields.  This could be used for 
-objects like singletons.
+controlled in %Lua. This also exposes simple userdata pointers with all 
+associated C++ and Lua methods, but it doesn't create any ability to added 
+new %Lua fields.  It also doesn't supply any constructor or destructor exposure
+to %Lua This could be used for objects like singletons.
+\param SuperClass the parent class of the LuaExtendable, or the same 
+if it has no parent class
 \note compile-time directive
-\note highly recommended to precede a end_lua_LuaExtendable
-\note adds a __gc method
-\note adds a __setmetatable method
-\note adds a __tostring method
+\note highly recommended to precede an end_lua_LuaExtendable
+\note adds a __isnewindexable, returns false
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define define_lua_LuaExtendable_noctor(derived, super) \
-	namespace lua_library_##derived \
+#define define_lua_LuaExtendable_noctor(Class, super) \
+	namespace lua_library_##Class \
 	{ \
-		static const luaL_reg derived##_library[] = \
+		static const luaL_reg Class##_library[] = \
 		{ \
-			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
+			lua_named_entry("__isnewindexable", luaExtension::pushFalse) \
+			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
 			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
 			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define_lua_LuaExtendable
@@ -329,38 +337,52 @@ table.  That's a lot of storage, and it comes with all the associated
 extra table indexing and function calls.  But, it results in ZERO distinction
 between all %Lua classes, and partly C++ classes when operating with them 
 in %Lua.  The extra simplicity and power makes it worth it very valuable.
+\param SuperClass the parent class of the LuaExtendable, or the same 
+if it has no parent class
 \note compile-time directive
-\note highly recommended to precede end_lua_LuaExtendable
+\note highly recommended to precede an end_lua_LuaExtendable
+\note adds a __gc, calls the destructor on the LuaExtendable
+\note adds a __isExtendableByProxy, (used in %Lua) returns true
+\note adds a __isnewindexable, returns false
+\note adds a __new, calls the no-args constructor
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define define_lua_LuaExtendable_by_proxy(derived, super) \
-	namespace lua_library_##derived \
+#define define_lua_LuaExtendable_by_proxy(Class, SuperClass) \
+	namespace lua_library_##Class \
 	{ \
-		sint lua_new##derived(lua_State* L) \
+		sint lua_new##Class(lua_State* L) \
 		{ \
-			pushRegisteredClass(L, new derived()); \
+			pushRegisteredClass(L, new Class()); \
 			return 1; \
 		} \
-		static const luaL_reg derived##_library[] = \
+		static const luaL_reg Class##_library[] = \
 		{ \
-			lua_named_entry("__new", lua_new##derived) \
 			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
-			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
-			lua_named_entry("__tostring", LuaExtendable::__tostring) \
+			lua_named_entry("__isExtendableByProxy", luaExtension::pushTrue) \
 			lua_named_entry("__isnewindexable", luaExtension::pushTrue) \
-			lua_named_entry("__isExtendableByProxy", luaExtension::pushTrue) 
+			lua_named_entry("__new", lua_new##Class) \
+			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define define_lua_LuaExtendable_by_proxy
 
 /**
 \def end_lua_LuaExtendable
+This closes out the luaL_reg and defines the library opener function, 
+which will register the exposed function and declare a %Lua class
+via ObjectOrientedParadgim.lua.
+\param SuperClass the parent class of the LuaExtendable, or the same 
+if it has no parent class
 \note compile-time directive
+\note highly recommended to follow any form of define_lua_LuaExtendable
 */
-#define end_lua_LuaExtendable(derived, super) \
+#define end_lua_LuaExtendable(Class, SuperClass) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
 		{ \
-			luaL_register(L, #derived, derived##_library); \
-			LuaExtendable::declareLuaClass(L, #derived, #super); \
+			luaL_register(L, #Class, Class##_library); \
+			LuaExtendable::declareLuaClass(L, #Class, #SuperClass); \
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
@@ -369,9 +391,11 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 /** 
 \def register_lua_library
 register a library with a lua state 
-\note registration MUST be done in dependency order, or the behavior
+\warning registration MUST be done in dependency order, or the behavior
 is undefined
-run-time directive
+\warning registration MUST be done in class hierarchical order, or the 
+behavior is undefined
+\note run-time directive
 \param lua_object_ptr is class Lua, not struct lua_State 
 \param module of the library without string delimiters
 */
@@ -421,7 +445,9 @@ run-time directive
 
 /**
 \interface LuaExtendable
-Makes it easier to define metamethods on exposed C++ classes.
+Implementing this interface, and defining the methods via the macros above
+or having the virtual methods call the static versions below is probably the
+easiest way to expose a class and all of it's methods to %Lua.
 */
 class LuaExtendable 
 {
