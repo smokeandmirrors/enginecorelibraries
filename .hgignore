@@ -36,3 +36,7 @@ glob:BuildSystem/Debug/Build.obj
 glob:BuildSystem/Debug/BuildSystem.lib
 glob:BuildSystem/Debug/vc80.idb
 glob:BuildSystem/Debug/vc80.pdb
+glob:BuildSystem/Release/Build.obj
+glob:BuildSystem/Release/BuildSystem.lib
+glob:BuildSystem/Release/vc80.idb
+glob:BuildSystem/Release/vc80.pdb
