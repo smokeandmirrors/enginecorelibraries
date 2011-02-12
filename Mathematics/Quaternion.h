@@ -3,12 +3,16 @@
 #define QUATERNION_H
 /**
 \file Quaternion.h
-
-Axis - Angle pairs, which are exposed to %Lua.
+This file defines the Quaternion class, which is exposed to %Lua.
 
 \author Smoke and Mirrors Development
-\copyright 2010 Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 \date 2/18/2011
 */
 
@@ -63,7 +67,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Quaternion(void)
 	{/* empty */}
-	createLuaExtendableUserdataDefaultFunctions(Quaternion)
+	createInlineLuaExtendableUserdataDefaultFunctions(Quaternion)
 #endif//EXTENDED_BY_LUA 
 
 }; // Quaternion

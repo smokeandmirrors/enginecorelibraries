@@ -1,9 +1,19 @@
+#if EXTENDED_BY_LUA
+#include <assert.h>
+#include <string.h>
+#endif//EXTENDED_BY_LUA
+
 #include "Numbers.h"
 #include "Vector.h"
 
-namespace math
-{
+#if EXTENDED_BY_LUA
+#include "LuaExtensionInclusions.h"
+using namespace luaExtension;
+#endif//EXTENDED_BY_LUA
+using namespace math;
 
+namespace math 
+{
 // right handed spidey space
 const Vector2	down2D		( 0.0f, -1.0f);
 const Vector2	left2D		(-1.0f,  0.0f);
@@ -18,18 +28,9 @@ const Vector3	left3D		(-1.0f,  0.0f,  0.0f);
 const Vector3	origin3D	( 0.0f,  0.0f,  0.0f);
 const Vector3	right3D		( 1.0f,  0.0f,  0.0f);
 const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
-
 }
 
 #if EXTENDED_BY_LUA
-#include <assert.h>
-#include <string.h>
-
-#include "LuaExtensionInclusions.h"
-
-using namespace luaExtension;
-using namespace math;
-
 lua_func(__indexVector2)
 {
 	const char* key = to<const char*>(L, -1);
@@ -74,7 +75,7 @@ lua_func(__newindexVector2)
 define_lua_LuaExtendable(Vector2, Vector2)
 		lua_named_entry("__index", __indexVector2)
 		lua_named_entry("__newindex", __newindexVector2)
-		lua_named_entry("__newindexable", luaExtension::pushFalse) 
+		lua_named_entry("__isnewindexable", luaExtension::pushFalse) 
 		lua_named_entry("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
 		lua_final_entry 
 	};	// end function list 
@@ -313,7 +314,7 @@ define_lua_LuaExtendable(Vector3, Vector3)
 		lua_named_entry("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
 		lua_named_entry("__index", __indexVector3)
 		lua_named_entry("__newindex", __newindexVector3) 
-		lua_named_entry("__newindexable", luaExtension::pushFalse)
+		lua_named_entry("__isnewindexable", luaExtension::pushFalse)
 		lua_entry(		 add)
 		lua_named_entry("construct", initialize)
 		lua_entry(		 cross)
@@ -357,10 +358,11 @@ define_lua_LuaExtendable(Vector3, Vector3)
 	} 
 }; // end namespace lua_library_Vector3
 
-
-
 void math::nativeVectorPerformance(uint iterations)
-{
+{	/** 
+	this function simply tries to emulate a %Lua vector performance
+	function as closely as possible for fair comparison 
+	*/
 	Vector3* v = new Vector3(3.0f,2.0f,1.0f);
 	Vector3* w = new Vector3(3.0f,2.0f,1.0f);
 	Vector3* x = new Vector3(1.0f,3.0f,2.0f);

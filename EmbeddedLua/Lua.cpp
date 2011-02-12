@@ -70,9 +70,9 @@ sint Lua::callProtected(lua_State* L, sint num_args, sint num_return_values)
 	lua_insert(L, errorfunc_index);					
 	sint error_code = lua_pcall(L, num_args, num_return_values, errorfunc_index);
 	lua_remove(L, errorfunc_index);					
-	
+
 	if (error_code)
-	{	// in case of error, fully collect %Lua garbarge  
+	{	// in case of error, fully collect %Lua garbage  
 		lua_gc(L, LUA_GCCOLLECT, 0); 
 	}
 	
@@ -105,8 +105,8 @@ void Lua::initializeDefaultProxyMetamethods(void) const
 void Lua::initializeInterpretation(void) const
 {
 #if	DEBUG 
-	// lua_pushboolean(L, 1);
-	// lua_setglobal(L, "DEBUG_INTERPRETATION");
+	lua_pushboolean(L, 1);
+	lua_setglobal(L, "DEBUG_INTERPRETATION");
 #endif//DEBUG 
 }
 
@@ -124,9 +124,12 @@ void Lua::initializeUserdataStorage(void) const
 	t = {}
 	t[a] = 12
 
-	print(a == b)  -- this prints "true"
-	print(t[a])    -- this prints "12"
-	print(t[b])    -- this prints "nil" !!!
+	print(a == b)	-- this prints "true"
+	print(t[a])		-- this prints "12"
+	print(t[b])		-- this prints "nil" !!!BAD!!!
+
+	-- but, with the code below running
+	print(t[b])		-- this prints "12" !!!GOOD!!!
 	*/
 	lua_newtable(L);										//s: table
 	luaL_newmetatable(L, "pusheduserdata_mt");				//s: table, mt

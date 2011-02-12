@@ -8,10 +8,14 @@ The Lua class encapsulates a lua_Struct.  It will allow for easier
 creation of application and library code for %Lua.
 
 \author Smoke and Mirrors Development
-\copyright 2010 Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 \date 2/18/2010
-
 */
 
 #include <stdlib.h>
@@ -29,7 +33,7 @@ class Lua
 {
 public:
 	/**
-	\param num_return_values defaults to LUA_MULTRET
+	calls lua_pcall() on the function at the top of the stack
 	*/
 	static sint			callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
 	/** 
@@ -37,7 +41,6 @@ public:
 	allows for extending of C declared libraries by %Lua files in packages
 	by the same name using require.
 	This needs to be done because luaL_register modifies the package.loaded table.
-	\param module the name of the (loaded) module
 	*/
 	static void			nilLoadedStatus(lua_State* L, const char* module);
 	/**

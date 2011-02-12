@@ -8,8 +8,13 @@
 performance comparison.
 
 \author Smoke and Mirrors Development
-\copyright 2010 Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 \date 2/18/2010
 */
 
@@ -32,8 +37,7 @@ Vector classes and operations
 #include "NumericalFunctions.h"
 
 #if EXTENDED_BY_LUA
-#include "LuaExtensibility.h"
-#include "LuaStateInteraction.h"
+#include "LuaExtensionInclusions.h"
 #endif//EXTENDED_BY_LUA
 
 namespace math
@@ -89,7 +93,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Vector2(void)		
 	{ /* empty */ };
-	createLuaExtendableUserdataDefaultFunctions(Vector2)
+	createInlineLuaExtendableUserdataDefaultFunctions(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
@@ -173,7 +177,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Vector3(void)		
 	{ /* empty */ };
-	createLuaExtendableUserdataDefaultFunctions(Vector3)
+	createInlineLuaExtendableUserdataDefaultFunctions(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 
 	const vec_t& 	operator[](uint i) const;	

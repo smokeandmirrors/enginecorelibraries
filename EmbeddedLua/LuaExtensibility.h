@@ -2,13 +2,17 @@
 #ifndef LUAEXTENSIBILITY_H
 #define LUAEXTENSIBILITY_H
 /** 
+\file 
 \brief Defines macros to help registration of functions, 
 libraries, and classes with lua.
-
-\file 
-\email copyright 2010 Smoke and Mirrors Development
 \author Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 \date 2/23/2010
 
 example:
@@ -69,15 +73,11 @@ namespace luaExtension
 
 /** 
 \def lua_func 
-
 Declares a (static) lua function.  Declares a function that
 takes a single lua_State argument, and returns an integer,
 the number of arguments it has added to the stack.
-
 \note compile-time directive
-
-\param name name of the function that will be declared, 
-without string delimiters
+\param name name of the function that will be declared, without string delimiters
 */
 #define lua_func(name) \
 	static sint name##(lua_State* L)
@@ -85,15 +85,12 @@ without string delimiters
 
 /** 
 \def declare_lua_library
-
 Declares a %Lua library for shared inclusion.  If used for a class,
 instances of the class can be created or controlled in %Lua.  Using this 
 method, the programmer is responsible for the whole system of usage of the 
 class in %Lua, including memory management.  This method does not interact 
 with the module ObjectOrientedParadigm.
-
 \note compile-time directive
-
 \param name name of the library without string delimiters
 */
 #define declare_lua_library(name) \
@@ -129,10 +126,8 @@ add a lua method to a definition by a different name
 
 /** 
 \def define_lua_library
-
 Begin a library definition for registration
 This method is ideal for static classes or libraries.
-
 \note compile-time directive
 \note highly recommended to precede end_lua_library
 \param name name of the library without string delimiters
@@ -146,9 +141,7 @@ This method is ideal for static classes or libraries.
 
 /** 
 \def end_lua_library
-
 end a library definition for registration
-
 \note compile-time directive
 \note highly recommended to follow with define_lua_library
 \param name name of the library without string delimiters
@@ -166,11 +159,9 @@ end a library definition for registration
 
 /** 
 \def end_lua_library_extensible
-
 end a library definition for registration,
 addes shortcut to allow extending the library in %Lua with 
 the require() function.
-
 \note compile-time directive
 \note highly recommended to follow define_lua_library_extensible
 \param name name of the library without string delimiters
@@ -190,9 +181,10 @@ the require() function.
 /**
 defines functions that can be used to get specific class pointers
 back out of %Lua.
+\note compile-time directive
 */
 #if ARGUMENT_ERRORS
-#define declare_to_LuaExtables(class_name) \
+#define declare_to_LuaExtendables(class_name) \
 	namespace luaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
@@ -221,9 +213,9 @@ back out of %Lua.
 			return *object; \
 		} \
 	}
-// end #define declare_to_LuaExtables
+// end #define declare_to_LuaExtendables
 #else
-#define declare_to_LuaExtables(class_name) \
+#define declare_to_LuaExtendables(class_name) \
 	namespace luaExtension \
 	{ \
 		template<> inline class_name* to<class_name*>(lua_State* L, sint index) \
@@ -243,45 +235,44 @@ back out of %Lua.
 			return *to<class_name*>(L, index); \
 		} \
 	}
-// end #define declare_to_LuaExtables
+// end #define declare_to_LuaExtendables
 #endif//ARGUMENT_ERRORS
 
 /**
 \def declare_lua_LuaExtendable
-
 Declares a library around a class that implements
 the LuaExtendable interface.
-
 \note compile-time directive
 */
 #define declare_lua_LuaExtendable(class_name) \
 	declare_lua_library(class_name) \
-	declare_to_LuaExtables(class_name) 
+	declare_to_LuaExtendables(class_name) 
 // end #define declare_lua_LuaExtendable
 
 
 /**
 \def declare_lua_LuaExtendable_ns
-
 Declares a library around a class in a namespace that implements
 the LuaExtendable interface.
-
 \note compile-time directive
 */
 #define declare_lua_LuaExtendable_ns(namespace_name, class_name) \
 	declare_lua_library(class_name)	\
-	declare_to_LuaExtables(namespace_name::class_name)
+	declare_to_LuaExtendables(namespace_name::class_name)
 
 /**
 \def define_lua_LuaExtendable
-
 Define a %Lua library around a class, so that instances of the 
 class can be created or controlled in %Lua. This also exposes simple 
 userdata pointers with all associated C++ and Lua methods, but it doesn't 
 create any ability to added new %Lua fields.  But, this is often never needed.
 This method would be preferable for objects like vectors.
-
 \note compile-time directive
+\note highly recommended to precede a end_lua_LuaExtendable
+\note adds a __gc method
+\note adds a __new method (calls a no-args constructor)
+\note adds a __setmetatable method
+\note adds a __tostring method
 */
 #define define_lua_LuaExtendable(derived, super) \
 	namespace lua_library_##derived \
@@ -293,12 +284,27 @@ This method would be preferable for objects like vectors.
 		} \
 		static const luaL_reg derived##_library[] = \
 		{ \
-			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
 			lua_named_entry("__new", lua_new##derived) \
+			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
 			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
-			lua_named_entry("__tostring", LuaExtendable::__tostring) 
+			lua_named_entry("__tostring", LuaExtendable::__tostring) \
+			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
+			lua_named_entry("__isnewindexable", luaExtension::pushFalse) 
 // end #define_lua_LuaExtendable
 
+/**
+\def define_lua_LuaExtendable_noctor
+Define a %Lua library around a class, so that instances of the 
+class can be created or controlled in %Lua. This also exposes simple 
+userdata pointers with all associated C++ and Lua methods, but it doesn't 
+create any ability to added new %Lua fields.  This could be used for 
+objects like singletons.
+\note compile-time directive
+\note highly recommended to precede a end_lua_LuaExtendable
+\note adds a __gc method
+\note adds a __setmetatable method
+\note adds a __tostring method
+*/
 #define define_lua_LuaExtendable_noctor(derived, super) \
 	namespace lua_library_##derived \
 	{ \
@@ -308,24 +314,6 @@ This method would be preferable for objects like vectors.
 			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
 			lua_named_entry("__tostring", LuaExtendable::__tostring) 
 // end #define_lua_LuaExtendable
-
-/**
-\def end_lua_LuaExtendable
-\note compile-time directive
-*/
-#define end_lua_LuaExtendable(derived_class, super_class) \
-			lua_named_entry("__newindex", LuaExtendable::__newindexError) \
-			lua_named_entry("__newindexable", luaExtension::pushFalse) \
-			lua_final_entry \
-		};	/* end function list */ \
-		sint key(lua_State* L) \
-		{ \
-			luaL_register(L, #derived_class, derived_class##_library); \
-			LuaExtendable::declareLuaClass(L, #derived_class, #super_class); \
-			return 1; \
-		} \
-	}; // end namespace lua_library_##name
-// end #define end_lua_LuaExtendable(derived_class, super_class) 
 
 /**
 \def define_lua_LuaExtendable_by_proxy
@@ -341,20 +329,32 @@ table.  That's a lot of storage, and it comes with all the associated
 extra table indexing and function calls.  But, it results in ZERO distinction
 between all %Lua classes, and partly C++ classes when operating with them 
 in %Lua.  The extra simplicity and power makes it worth it very valuable.
-
 \note compile-time directive
-\note highly recommended to precede end_lua_LuaExtendable_by_proxy
+\note highly recommended to precede end_lua_LuaExtendable
 */
-#define define_lua_LuaExtendable_by_proxy(derived_class, super_class) \
-	define_lua_LuaExtendable(derived_class, super_class) 
+#define define_lua_LuaExtendable_by_proxy(derived, super) \
+	namespace lua_library_##derived \
+	{ \
+		sint lua_new##derived(lua_State* L) \
+		{ \
+			pushRegisteredClass(L, new derived()); \
+			return 1; \
+		} \
+		static const luaL_reg derived##_library[] = \
+		{ \
+			lua_named_entry("__new", lua_new##derived) \
+			lua_named_entry("__gc", LuaExtendable::__gcmetamethod) \
+			lua_named_entry("__setmetatable", LuaExtendable::callSetMetatable) \
+			lua_named_entry("__tostring", LuaExtendable::__tostring) \
+			lua_named_entry("__isnewindexable", luaExtension::pushTrue) \
+			lua_named_entry("__isExtendableByProxy", luaExtension::pushTrue) 
 // end #define define_lua_LuaExtendable_by_proxy
 
 /**
+\def end_lua_LuaExtendable
 \note compile-time directive
 */
-#define end_lua_LuaExtendable_by_proxy(derived, super) \
-			lua_named_entry("__newindexable", luaExtension::pushTrue) \
-			lua_named_entry("__isExtendableByProxy", luaExtension::pushTrue) \
+#define end_lua_LuaExtendable(derived, super) \
 			lua_final_entry \
 		};	/* end function list */ \
 		sint key(lua_State* L) \
@@ -364,7 +364,7 @@ in %Lua.  The extra simplicity and power makes it worth it very valuable.
 			return 1; \
 		} \
 	}; // end namespace lua_library_##name
-// end #define end_lua_LuaExtendable_by_proxy	
+// end #define end_lua_LuaExtendable(derived_class, super_class) 
 
 /** 
 \def register_lua_library
@@ -372,47 +372,53 @@ register a library with a lua state
 \note registration MUST be done in dependency order, or the behavior
 is undefined
 run-time directive
-\param lua_object is class @link Lua @endlink, not struct lua_State 
-\param name of the library without string delimiters
+\param lua_object_ptr is class Lua, not struct lua_State 
+\param module of the library without string delimiters
 */
 #define register_lua_library(lua_object_ptr, module) \
 	lua_object_ptr->openLibrary(lua_library_##module::key)		
 // end #define register_lua_library
 
-#define lua_defaultToString(Class) \
+#define createInlineDefault_toString(Class) \
 	virtual const char* toString(void) \
 	{ \
 		return "This is a " #Class; \
 	}
+// #define createInlineDefault_toString(Class) 
 
-#define lua_getClassName(Class) \
+#define createInlineDefault_getClassName(Class) \
 	virtual const char* getClassName(void) const \
 	{ \
 		return #Class; \
 	}
+// #define createInlineDefault_getClassName(Class) 
 
-#define lua_proxySetMetatableFunction(Class) \
+#define createInlineProxy_setMetatable(Class) \
 	virtual sint setMetatable(lua_State* L) \
 	{ \
 		return setProxyMetatable(L); \
 	}
+// #define createInlineProxy_setMetatable(Class) 
 
-#define lua_userdataSetMetatableFunction(Class) \
+#define createInlineUserdata_setMetatable(Class) \
 	virtual sint setMetatable(lua_State* L) \
 	{ \
 		return setUserdataMetatable(L); \
 	}
+// #define createInlineUserdata_setMetatable(Class) 
+	
+#define createInlineLuaExtendableProxyDefaultFunctions(Class) \
+	createInlineDefault_toString(Class) \
+	createInlineDefault_getClassName(Class) \
+	createInlineProxy_setMetatable(Class) 
+// #define createInlineLuaExtendableProxyDefaultFunctions(Class) 
 
-#define createLuaExtendableUserdataDefaultFunctions(Class) \
-	lua_defaultToString(Class) \
-	lua_getClassName(Class) \
-	lua_userdataSetMetatableFunction(Class) \
-	
-#define createLuaExtendableProxyDefaultFunctions(Class) \
-	lua_defaultToString(Class) \
-	lua_getClassName(Class) \
-	lua_proxySetMetatableFunction(Class) \
-	
+#define createInlineLuaExtendableUserdataDefaultFunctions(Class) \
+	createInlineDefault_toString(Class) \
+	createInlineDefault_getClassName(Class) \
+	createInlineUserdata_setMetatable(Class) 
+// #define createInlineLuaExtendableUserdataDefaultFunctions(Class) 
+
 /**
 \interface LuaExtendable
 Makes it easier to define metamethods on exposed C++ classes.
@@ -437,11 +443,11 @@ public:
 	(without errors, and with the expected results) on the userdata pointer
 	
 	\warning IT IS UP TO YOU TO MAKE SURE THIS IS CORRECT. If userdata[k] = v will 
-	work, make sure that your userdata:__newindexable() returns true, otherwise
-	make sure userdata:__newindexable() returns false in %Lua (and C/C++). This
+	work, make sure that your userdata:__isnewindexable() returns true, otherwise
+	make sure userdata:__isnewindexable() returns false in %Lua (and C/C++). This
 	only needs to be true for if userdata[k] = v must work for any non-nil k, and 
 	any v.  Vectors for example, which only allow userdata[x,y,z] = v, return
-	userdata:__newindexable() returns false
+	userdata:__isnewindexable() returns false
 
 	\note using the given LuaExtendable definitions will make this a lot easier.
 	*/

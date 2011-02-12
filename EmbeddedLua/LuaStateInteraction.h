@@ -2,16 +2,19 @@
 #ifndef LUASTATEINTERACTION_H
 #define LUASTATEINTERACTION_H
 /**
-LuaStateInteraction.h
-
+\file LuaStateInteraction.h
 This file defines function helpers akin to lua_to<type> and
 lua_push<type> to assist in easily extending interaction with
 the %Lua state to include custom types.
 
-\copyright 2010 Smoke and Mirrors Development
 \author Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
-\date 8/21/2010
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 */
 
 #include "Build.h"

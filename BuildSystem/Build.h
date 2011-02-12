@@ -2,27 +2,35 @@
 #ifndef BUILD_H
 #define BUILD_H
 /**
-\brief Defines typdefs, macros for the foundation for programming in
+\file Build.h 
+Defines typdefs, macros for the foundation for programming in
 and building this project.
 
 This file should contain one of the few properties that reside in the 
 global namespace.
-
 It should really only contain fundamental typdefs and macros.
 
-\file 
-\copyright 2011 Smoke and Mirrors Development
 \author Smoke and Mirrors Development
-\email smokeandmirrorsdevelopment@gmail.com
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
 \date 1/20/2011
-*/
 
+\todo 32/64-bit number types, NULL, assert, warn, error
+*/
 #include <assert.h>
 
+/** preprocessor control for unit testing compilation */
 #define BUILD_WITH_UNIT_TESTING 1
 
 /**
-C/C++ types
+\defgroup Global typedefs 
+Adhere to these to enable easier cross-platform development
+@{
 */
 // typedef bool				bool;
 typedef signed char			schar;
@@ -37,7 +45,5 @@ typedef unsigned long		ulong;
 // typedef float				float;
 // typedef double				double;
 typedef long double			ldouble;
-
-// \todo 32/64-bit number types, NULL, assert, warn, error
-
+/**@}*/
 #endif//BUILD_H

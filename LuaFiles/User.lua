@@ -16,7 +16,6 @@ _G.test = function()
 	vpt(1000000)
 end
 
-
 _G.vpt = function(iterations)
 	print'\n\n\n\nStart Lua->Lua!'
 	local script_start = os.clock()

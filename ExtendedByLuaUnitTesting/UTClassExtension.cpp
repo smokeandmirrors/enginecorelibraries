@@ -179,7 +179,7 @@ public:
 		m_other = other; 
 	}
 
-	createLuaExtendableUserdataDefaultFunctions(Simple)
+	createInlineLuaExtendableUserdataDefaultFunctions(Simple)
 
 private:
 	Simple*			m_other;
@@ -191,12 +191,12 @@ bool Simple::everCreated = false;
 declare_lua_LuaExtendable(Simple);
 
 define_lua_LuaExtendable(Simple, Simple)
-lua_named_entry("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
-lua_named_entry("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
-lua_named_entry("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
-lua_named_entry("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
-lua_named_entry("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
-lua_named_entry("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
+	lua_named_entry("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
+	lua_named_entry("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
+	lua_named_entry("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
+	lua_named_entry("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
+	lua_named_entry("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
+	lua_named_entry("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
 end_lua_LuaExtendable(Simple, Simple)
 
 
@@ -226,7 +226,7 @@ public:
 	uint				getDerivation(void) const	{ return 21; }
 	virtual uint		getValue(void) const		{ return 14; }
 
-	createLuaExtendableUserdataDefaultFunctions(Derived)
+	createInlineLuaExtendableUserdataDefaultFunctions(Derived)
 };
 
 uint Derived::numAllocated = 0;
@@ -341,7 +341,7 @@ public:
 		return this == &other; 
 	}
 
-	createLuaExtendableProxyDefaultFunctions(Grandparent)
+	createInlineLuaExtendableProxyDefaultFunctions(Grandparent)
 
 protected:
 	const char*				m_name;
@@ -362,7 +362,7 @@ lua_entry(__call)
 lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
 lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
 lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
-end_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
+end_lua_LuaExtendable(Grandparent, Grandparent)
 
 /**
 \class
@@ -380,7 +380,7 @@ public:
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
-	lua_getClassName(Parent)
+	createInlineDefault_getClassName(Parent)
 
 private:
 	Grandparent*			m_grandParent;			
@@ -392,7 +392,7 @@ define_lua_LuaExtendable_by_proxy(Parent, Grandparent)
 lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
 lua_named_entry("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
-end_lua_LuaExtendable_by_proxy(Parent, Grandparent) 
+end_lua_LuaExtendable(Parent, Grandparent) 
 
 /**
 \class
@@ -417,7 +417,7 @@ public:
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
-	lua_getClassName(Child)
+	createInlineDefault_getClassName(Child)
 
 private:
 	Parent*					m_parent;
@@ -430,7 +430,7 @@ lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
 lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
 lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
 lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
-end_lua_LuaExtendable_by_proxy(Child, Parent)
+end_lua_LuaExtendable(Child, Parent)
 
 // END PROXY
 
@@ -455,7 +455,7 @@ void Classes::test_define_lua_LuaExtendable_by_proxy()
 #include "Vector.h"
 
 /** 
-	// \todo, move to it's own file
+	// \todo, move to its own file
 	CFIXCC_BEGIN_CLASS(UTVector)
 	#if EXTENDED_BY_LUA
 	CFIXCC_METHOD(testLuaExtension)

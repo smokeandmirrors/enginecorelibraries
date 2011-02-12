@@ -223,7 +223,7 @@ end
 if DEBUG_INTERPRETATION then
 getName = function(instance)
 	local tupos = type(instance.name)
-	if tupos == 'number' and instance:__newindexable() then 
+	if tupos == 'number' and instance:__isnewindexable() then 
 		instance.name = instance:getClassName()..' '..instance.name
 		instance.getName = getName2
 	elseif tupos == 'nil' then
@@ -338,7 +338,7 @@ function addCommonClassProperties_PRIVATE(class, super, class_name)
 	class.getSuperclass = OOP.getSuperclass
 	class.IS_A			= _G.IS_A
 	class.IS_EXACTLY_A	= _G.IS_EXACTLY_A
-	class.__newindexable = class.__newindexable or _G.truef
+	class.__isnewindexable = class.__isnewindexable or _G.truef
 	class.toString		= class.__tostring or class.toString or OOP.toString
 	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
 	metatables_PRIVATE[class_name].__tostring = metatables_PRIVATE[class_name].__tostring or class.toString
@@ -526,7 +526,7 @@ function createConstructor_PRIVATE(class, metatable)
 		class.nextInstanceId = class.nextInstanceId + 1
 		addInstanceToRefresh_PRIVATE(constructHierarchy_PRIVATE(class, setMetatable(instance, metatable), ...))
 		if (not instance.name) 
-		and class.__newindexable() 
+		and class.__isnewindexable() 
 		then
 			instance.name = class.nextInstanceId
 		end
