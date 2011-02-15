@@ -34,6 +34,10 @@ class Lua
 public:
 	/**
 	calls lua_pcall() on the function at the top of the stack
+	\param L the %Lua state to call the function
+	\param num_args the number of arguments for the function call
+	\param num_return_values the number of expected returned values, defaults
+	to LUA_MULTIRET
 	*/
 	static sint			callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
 	/** 
@@ -44,7 +48,9 @@ public:
 	*/
 	static void			nilLoadedStatus(lua_State* L, const char* module);
 	/**
-	reports output from the lua_State
+	reports output from the lua_State after a function call
+	\param L the %Lua state in which the function was called
+	\param status the error code from calling the function
 	*/
 	static sint			report(lua_State* L, sint status);
 	/**
@@ -95,7 +101,7 @@ public:
 	*/
 	bool				require(const char* module);
 	/** 
-	quick, hack console for fast testing 
+	quick, low functionality console for fast testing 
 	*/
 	void				runConsole(void) const;
 	
@@ -118,28 +124,25 @@ protected:
 	opens base, package, string, table, and math libraries in %Lua.  
 	in DEBUG builds only, opens the debug library
 	*/
-	void				openStandardLibraries(void) const;
-	
+	void				openStandardLibraries(void) const;	
 	
 private:
 	/** open standard libraries and such */
 	void				initialize(const char* name);
 	/** allocation method, see comments in Lua.cpp */
 	static void*		luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize);
-	/** a function just to test stuff out */
-	void				runSandbox(void) const;	
 	/** The use of this could only be a terrible idea. */
 	Lua& operator=(const Lua&);
 	/** The use of this could only be a terrible idea. */
 	Lua(const Lua&);
 	/** 
 	the %Lua state which this class encapsulates. 
-	\note on readibility and coding standards this is
+	\note on readability and coding standards this is
 	one of the very few times I don't use m_ prefix 
 	for a member variable.
 	*/
 	lua_State*			L; 
-	/** current byte count of lua memory useage */
+	/** current byte count of %Lua memory use */
 	size_t				m_bytes;
 	/** simple identifier */
 	char*				m_name;

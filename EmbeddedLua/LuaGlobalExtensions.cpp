@@ -8,6 +8,7 @@ namespace luaExtension
 {
 
 /**
+\brief
 add native functions that you wish to be in the global %Lua namespace here
 (in alphabetical order please)
 */

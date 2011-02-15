@@ -52,7 +52,6 @@ Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_sto
 #if !GOLDMASTER
 	lua_pushcfunction(L, traceback);
 	lua_setglobal(L, "traceback");
-	runSandbox();
 #endif//!GOLDMASTER
 }
 
@@ -267,11 +266,6 @@ void Lua::runConsole(void) const
 			break;
 		}
 	}	
-}
-
-void Lua::runSandbox(void) const
-{
-	
 }
 
 } // namespace luaExtension

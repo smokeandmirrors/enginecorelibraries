@@ -50,8 +50,9 @@ average lua_istype function being a macro
 #define prevent_compile switch(0){case 0:case 0:;}
 
 /**
-to<T> functions
-returns an object from the specified index in the %Lua stack
+\defgroup luaToFunctions Lua to<T> functions
+returns an object of type T from the specified index in the %Lua stack.
+@{
 */
 template<typename T> inline T to(lua_State* L, sint index)
 {	
@@ -111,12 +112,14 @@ template<> inline const char* to<const char*>(lua_State* L, sint index)
 	assert_lua_argument(lua_isstring, "string", L, index);
 	return lua_tostring(L, index);
 }
+/** @} */
 
 /**
-push<T> functions
-pushes the object on top of the stack, and returns the
+\defgroup luaPushFuntions Lua push(lua_State* L, T t) functions
+pushes the object of type T top of the stack, and returns the
 number of actual %Lua type objects that were placed
-on top of the stack
+on top of the stack (1).
+@{
 */
 inline sint push(lua_State* L, bool value)
 {
@@ -154,6 +157,13 @@ inline sint push(lua_State* L, const char* value)
 	return 1;
 }
 
+/**
+\note when pushing a LueExtendable into %Lua, it might not be because the 
+object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this
+case, if the class has a extra methods defined in %Lua, especially a 'construct'
+method, that %Lua only properties of the object must be initialized the first
+time the object is pushed into %Lua
+*/
 inline sint push(lua_State* L, LuaExtendable* value)
 {
 	pushRegisteredClass(L, value);					//s: ud
@@ -200,13 +210,49 @@ inline sint pushTrue(lua_State* L)
 	return push(L, true);
 }
 
+/** @} */
+
 /**
-template functions to make it easer to expose static and class
+\defgroup luaFunctionTemplates Lua function templates
+Template functions to make it easer to expose static and class
 functions to %Lua.  I only use the goofy syntax of splitting up the
 template<> arguments on each line to make it easier to discern
 which types of functions all ready have a template defined.
 
-\todo document the naming scheme for these functions
+There are 2 major types of template function wrappers:
+1. static (as in static member, or none class member functions)
+2. class member functions (where the first argument is ALWAYS presumed to be
+	an userdata pointer of the type of the class)
+
+The naming convention is as follows
+1. static:	staticReturn<# of return values>Param<# of parameters>
+2. class:	return<# of return values>Param<# of parameters>{const}
+
+example:
+C function:
+\code
+vec_t Vector3::dot(const Vector3& v); // member function, 1 return value, 1 argument
+\endcode
+
+wrapper:
+\code
+return1Param1<Vector3, vec_t, const Vector3&>
+\endcode
+
+%Lua call:
+\code
+local dot_product = v:dot(w)
+\endcode
+
+To return more than one value to %Lua, you wrap a function that has the 2nd
+through Nth return value passed by reference.  The 1st return value to %Lua,
+is the return value of the function.  The 2nd return value is the first 
+argument by reference, and the Nth return value is the (N - 1)th argument
+by reference, etc.  All arguments after the last argument to be returned to
+%Lua will not be returned to %Lua, no matter how they are passed to the 
+C function
+
+@{
 */
 
 /**
@@ -478,7 +524,7 @@ inline sint return1Param2const(lua_State* L)
 	}
 	return 0;
 }
-
+/** @} */
 } // namespace luaExtension
 
 #endif//LUASTATEINTERACTION_H

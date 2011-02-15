@@ -62,6 +62,14 @@ Lua->openLibrary(lua_library_example::luaopen_example);
 struct lua_State;
 struct lua_Debug;
 
+/**
+\defgroup LuaExtension Lua Extension
+macros, classes and functions to 
+aid embedding %Lua in an executable, and exposing libraries and classes
+for use in %Lua.
+@{
+*/
+
 typedef sint (*lua_function)(lua_State* L);
 
 namespace luaExtension 
@@ -71,8 +79,17 @@ namespace luaExtension
 #define ARGUMENT_ERRORS 1
 #endif//!GOLDMASTER
 
+/**
+\defgroup luaCodeWriting  Lua C API Code Writing Help
+\ingroup LuaExtension
+macros to assist (mostly compile-time) protocol for exposing libraries
+to %Lua.  These macros will also help ease integration of future changes
+to %Lua and the %Lua C API.
+@{
+*/
+
 /** 
-\def lua_func 
+\def lua_func
 Declares a (static) lua function.  Declares a function that
 takes a single lua_State argument, and returns an integer,
 the number of arguments it has added to the stack.
@@ -267,8 +284,9 @@ class can be created or controlled in %Lua. This also exposes simple
 userdata pointers with all associated C++ and Lua methods, but it doesn't 
 create any ability to added new %Lua fields.  But, this is often never needed.
 This method would be preferable for objects like vectors.
-\param SuperClass the parent class of the LuaExtendable, or the same 
-if it has no parent class
+\param Class the name of the Class being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
 \note compile-time directive
 \note highly recommended to precede an end_lua_LuaExtendable
 \note adds a __gc, calls the destructor on the LuaExtendable
@@ -303,8 +321,9 @@ controlled in %Lua. This also exposes simple userdata pointers with all
 associated C++ and Lua methods, but it doesn't create any ability to added 
 new %Lua fields.  It also doesn't supply any constructor or destructor exposure
 to %Lua This could be used for objects like singletons.
-\param SuperClass the parent class of the LuaExtendable, or the same 
-if it has no parent class
+\param Class the name of the Class being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
 \note compile-time directive
 \note highly recommended to precede an end_lua_LuaExtendable
 \note adds a __isnewindexable, returns false
@@ -312,7 +331,7 @@ if it has no parent class
 \note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
 \note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define define_lua_LuaExtendable_noctor(Class, super) \
+#define define_lua_LuaExtendable_noctor(Class, SuperClass) \
 	namespace lua_library_##Class \
 	{ \
 		static const luaL_reg Class##_library[] = \
@@ -337,8 +356,9 @@ table.  That's a lot of storage, and it comes with all the associated
 extra table indexing and function calls.  But, it results in ZERO distinction
 between all %Lua classes, and partly C++ classes when operating with them 
 in %Lua.  The extra simplicity and power makes it worth it very valuable.
-\param SuperClass the parent class of the LuaExtendable, or the same 
-if it has no parent class
+\param Class the name of the Class being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
 \note compile-time directive
 \note highly recommended to precede an end_lua_LuaExtendable
 \note adds a __gc, calls the destructor on the LuaExtendable
@@ -371,8 +391,9 @@ if it has no parent class
 This closes out the luaL_reg and defines the library opener function, 
 which will register the exposed function and declare a %Lua class
 via ObjectOrientedParadgim.lua.
-\param SuperClass the parent class of the LuaExtendable, or the same 
-if it has no parent class
+\param Class the name of the Class being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
 \note compile-time directive
 \note highly recommended to follow any form of define_lua_LuaExtendable
 */
@@ -443,11 +464,14 @@ behavior is undefined
 	createInlineUserdata_setMetatable(Class) 
 // #define createInlineLuaExtendableUserdataDefaultFunctions(Class) 
 
+/** @} */
+
 /**
 \interface LuaExtendable
 Implementing this interface, and defining the methods via the macros above
 or having the virtual methods call the static versions below is probably the
 easiest way to expose a class and all of it's methods to %Lua.
+\ingroup LuaExtension
 */
 class LuaExtendable 
 {
@@ -538,11 +562,13 @@ public:
 /**
 completes a %Lua class declaration in case no script accompanied
 the class in %Lua.
+\ingroup LuaExtension
 */
 void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super);
 
 /**
 print the string to the %Lua output
+\ingroup LuaExtension
 */
 void printToLua(lua_State* L, const char* string);
 
@@ -550,14 +576,18 @@ void printToLua(lua_State* L, const char* string);
 helper function for pushing a class to %Lua an preserving the ability
 to compare userdata and use them as equivalent table keys
 \see comments in the implementation of void Lua::initializeUserdataStorage(void)
+\ingroup LuaExtension
 */
 sint pushRegisteredClass(lua_State* L, void* pushee);
 
 /**
 helper function for simply registering global native functions to %Lua
+\ingroup LuaExtension
 */
 void registerGlobalLibrary(lua_State* L);
 
 } // namespace luaExtension 
+
+/** @} */
 
 #endif//LUAEXTENSIBILITY_H
