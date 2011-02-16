@@ -25,7 +25,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 #include <assert.h>
 
 /** preprocessor control for unit testing compilation */
-#define BUILD_WITH_UNIT_TESTING 1
+#define WITH_UNIT_TESTING 1
 
 /**
 \defgroup Global typedefs 

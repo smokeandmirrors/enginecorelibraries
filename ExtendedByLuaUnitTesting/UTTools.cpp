@@ -1,5 +1,5 @@
 #include "Build.h"
-#if BUILD_WITH_UNIT_TESTING
+#if WITH_UNIT_TESTING
 
 #include <cfixcc.h>
 #include <string.h>
@@ -90,4 +90,4 @@ void executeLuaUnitTest(char* module, Lua* lua)
 #endif
 
 } // namespace unitTestingTools
-#endif//BUILD_WITH_UNIT_TESTING
+#endif//WITH_UNIT_TESTING

@@ -1,5 +1,5 @@
 #include "Build.h"
-#if BUILD_WITH_UNIT_TESTING
+#if WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include <string.h>
 
@@ -152,4 +152,4 @@ CFIXCC_BEGIN_CLASS(LibraryExtensionUT)
 	CFIXCC_METHOD(test_staticReturn2Param1)
 CFIXCC_END_CLASS()
 #endif//EXTENDED_BY_LUA
-#endif//BUILD_WITH_UNIT_TESTING
+#endif//WITH_UNIT_TESTING

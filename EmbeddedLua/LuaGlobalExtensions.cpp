@@ -3,7 +3,6 @@
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
-#include "Vector.h"
 namespace luaExtension
 {
 
@@ -13,7 +12,6 @@ add native functions that you wish to be in the global %Lua namespace here
 (in alphabetical order please)
 */
 static const luaL_reg lua_library_Global[] = {
-	lua_named_entry("nativeVectorPerformance", (staticReturn0Param1<uint, &math::nativeVectorPerformance>))
 	lua_final_entry
 };
 

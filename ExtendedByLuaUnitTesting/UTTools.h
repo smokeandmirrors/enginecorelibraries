@@ -3,7 +3,7 @@
 #define UNITTESTINGTOOLS_H
 
 #include "Build.h"
-#if BUILD_WITH_UNIT_TESTING
+#if WITH_UNIT_TESTING
 
 #include "Lua.h"
 
@@ -16,5 +16,5 @@ namespace unitTestingTools
 #endif
 } // namespace unitTestingTools
 
-#endif//BUILD_WITH_UNIT_TESTING
+#endif//WITH_UNIT_TESTING
 #endif//UNITTESTINGTOOLS_H

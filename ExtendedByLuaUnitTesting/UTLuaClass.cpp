@@ -1,5 +1,5 @@
 #include "Build.h"
-#if BUILD_WITH_UNIT_TESTING
+#if WITH_UNIT_TESTING
 #if EXTENDED_BY_LUA
 #include <cfixcc.h>
 #include <stdlib.h>
@@ -110,4 +110,4 @@ CFIXCC_BEGIN_CLASS(LuaClass)
 	CFIXCC_METHOD(callProtected)
 CFIXCC_END_CLASS()
 #endif//EXTENDED_BY_LUA
-#endif//BUILD_WITH_UNIT_TESTING
+#endif//WITH_UNIT_TESTING
