@@ -398,6 +398,10 @@
 			RelativePath=".\Build.h"
 			>
 		</File>
+		<File
+			RelativePath=".\Threads.h"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

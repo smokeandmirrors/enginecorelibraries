@@ -420,6 +420,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Transform.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Vector.cpp"
 				>
 			</File>
