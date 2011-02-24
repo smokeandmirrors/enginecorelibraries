@@ -42,15 +42,11 @@ LUA_FUNC(__indexVector2)
 		return push(L, v[*key - 'x']);
 	}
 	else
-	{	// s:
-		lua_getglobal(L, "getClass");
-		//s: getClass
-		push(L, "Vector2");
-		//s: getClass, "Vector2"
-		lua_call(L, 1, 1);
-		//s: Vector2
-		lua_getfield(L, -1, key);
-		//s: Vector2[key]
+	{									//s:
+		lua_getglobal(L, "getClass");	//s: getClass
+		push(L, "Vector2");				//s: getClass, "Vector2"
+		lua_call(L, 1, 1);				//s: Vector2
+		lua_getfield(L, -1, key);		//s: Vector2[key]
 		return 1;
 	}
 }
@@ -100,15 +96,11 @@ LUA_FUNC(__indexVector3)
 		return push(L, v[*key - 'x']);
 	}
 	else
-	{	// s:
-		lua_getglobal(L, "getClass");
-		//s: getClass
-		push(L, "Vector3");
-		//s: getClass, "Vector3"
-		lua_call(L, 1, 1);
-		//s: Vector3
-		lua_getfield(L, -1, key);
-		//s: Vector3[key]
+	{									//s:
+		lua_getglobal(L, "getClass");	//s: getClass
+		push(L, "Vector3");				//s: getClass, "Vector3"
+		lua_call(L, 1, 1);				//s: Vector3
+		lua_getfield(L, -1, key);		//s: Vector3[key]
 		return 1;
 	}
 }

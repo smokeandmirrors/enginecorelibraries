@@ -46,16 +46,13 @@ average lua_istype function being a macro
 #define assert_lua_argument(lua_istype, type_name, L, index) {}
 #endif//ARGUMENT_ERRORS
 
-#define static_assert(pred) switch(0){case 0:case pred:;}
-#define PREVENT_COMPILE switch(0){case 0:case 0:;}
-
 /**
 \defgroup luaToFunctions Lua to<T> functions
 returns an object of type T from the specified index in the %Lua stack.
 @{
 */
 template<typename T> inline T to(lua_State* L, sint index)
-{	
+{	// never get something out of %Lua without deliberate checking or NOT checking its type
 	PREVENT_COMPILE
 }
 

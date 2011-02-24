@@ -536,8 +536,8 @@ public:
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua.
 	*/
 	static sint				setUserdataMetatable(lua_State* L); 
-	/** defined pure virtual constructor */
-	virtual					~LuaExtendable(void)=0 {} // pure virtual copy ctr(), op=()?
+	/** pure virtual constructor, defined so your linker doesn't complain */
+	virtual					~LuaExtendable(void)=0 {}
 	/** 
 	a function that classes must implement to make them easier to make into well formed
 	%Lua classes
