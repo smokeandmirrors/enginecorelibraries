@@ -5,8 +5,6 @@
 #if WIN32
 #include <process.h>
 #include <windows.h>
+#endif//WIN32
 
-
-
-#endif//Win32
 #endif//THREADS_H

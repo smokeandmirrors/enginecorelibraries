@@ -7,14 +7,156 @@
 This file attempts to make even easier the generation C++ functions
 that are exposed to Lua.
 
-EFL_ here means "Expose Function to Lua.."
+luaFunctionTemplates Lua function templates
+Template functions to make it easer to expose static and class
+functions to %Lua.  I only use the goofy syntax of splitting up the
+template<> arguments on each line to make it easier to discern
+which types of functions all ready have a template defined.
 
+There are 2 major types of template function wrappers:\n
+1. static (as in static member, or none class member functions)\n
+2. class member functions (where the first argument is ALWAYS presumed to be\n
+an userdata pointer of the type of the class)
+
+The naming convention is as follows:\n
+1. static:	staticReturn<# of return values>Param<# of parameters>\n
+2. class:	return<# of return values>Param<# of parameters>{const}\n
+
+The following templates are currently defined by way of the macros below:
+\code
+//////////////////////////////////////////////////////////////////////////
+// static non member functions: 
+template<typename ARG_1, void (* function)(ARG_1)> 
+inline sint staticReturn0Param1(lua_State* L);
+
+template<typename RET_1, RET_1 (* function)(void)>
+inline sint staticReturn1Param0(lua_State* L);
+
+// ... 
+
+template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (*function)(RET_2&, ARG_1, ARG_2)>
+inline sint staticReturn2Param2(lua_State* L);
+
+// ...
+
+template
+<
+typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, 
+typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
+RET_1 (*function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)
+>
+inline sint return5Param5(lua_State* L);
+
+//////////////////////////////////////////////////////////////////////////
+// class member functions: 
+template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1)> 
+inline sint return0Param1(lua_State* L);
+
+template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void)>
+inline sint return1Param0(lua_State* L);
+
+// ... 
+
+template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (CLASS::* function)(RET_2&, ARG_1, ARG_2)>
+inline sint return2Param2(lua_State* L);
+
+// ...
+
+template
+<
+typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, 
+typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
+RET_1 (CLASS::* function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)
+>
+inline sint return5Param5(lua_State* L);
+
+//////////////////////////////////////////////////////////////////////////
+// class member const functions: 
+template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1) const> 
+inline sint return0Param1const(lua_State* L);
+
+template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void) const>
+inline sint return1Param0const(lua_State* L);
+
+// ... 
+
+template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (CLASS::* function)(RET_2&, ARG_1, ARG_2) const>
+inline sint return2Param2const(lua_State* L);
+
+// ...
+
+template
+<
+typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, 
+typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
+RET_1 (CLASS::* function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) const
+>
+inline sint return5Param5const(lua_State* L);
+\endcode
+
+example:
+C function:
+\code
+vec_t Vector3::dot(const Vector3& v) const; // member function, 1 return value, 1 argument
+\endcode
+
+wrapper:
+\code
+return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::dot>
+\endcode
+
+%Lua call:
+\code
+local dot_product = v:dot(w)
+\endcode
+
+To return more than one value to %Lua, you wrap a function that has the 2nd
+through Nth return value passed by reference.  The 1st return value to %Lua,
+is the return value of the function.  The 2nd return value is the first 
+argument by reference, and the Nth return value is the (N - 1)th argument
+by reference, etc.  All arguments after the last argument to be returned to
+%Lua will not be returned to %Lua, no matter how they are passed to the 
+C function
+
+\note on implementation, return 0, arguments 0 are MANUALLY written 
+\note EFL_ here means "Expose Function to Lua.."
+\see the simplest examples below
 */
+
+namespace luaExtension
+{
+	template<void(* function)(void)> 
+	inline sint staticReturn0Param0(lua_State* L)
+	{
+		(*function)();
+		return 0;
+	}
+
+	template<typename CLASS, void(CLASS::* function)(void)>
+	inline sint return0Param0(lua_State* L)
+	{
+		if (CLASS* object = to<CLASS*>(L, -1))
+		{
+			(object->*function)();
+		}
+		return 0;	
+	}
+
+	template<typename CLASS, void(CLASS::* function)(void) const>
+	inline sint return0Param0const(lua_State* L)
+	{
+		if (CLASS* object = to<CLASS*>(L, -1))
+		{
+			(object->*function)();
+		}
+		return 0;	
+	}
+} // namespace luaExtension
+
 #include "Build.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
-
 
 /** template arguments */
 // fill in the template arguments in the declaration
@@ -270,77 +412,9 @@ EFL_ here means "Expose Function to Lua.."
 	EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CONST_CLASS(num_rets, num_args)
 
+
 namespace luaExtension
 {
-/**
-luaFunctionTemplates Lua function templates
-Template functions to make it easer to expose static and class
-functions to %Lua.  I only use the goofy syntax of splitting up the
-template<> arguments on each line to make it easier to discern
-which types of functions all ready have a template defined.
-
-There are 2 major types of template function wrappers:
-1. static (as in static member, or none class member functions)
-2. class member functions (where the first argument is ALWAYS presumed to be
-an userdata pointer of the type of the class)
-
-The naming convention is as follows
-1. static:	staticReturn<# of return values>Param<# of parameters>
-2. class:	return<# of return values>Param<# of parameters>{const}
-
-example:
-C function:
-\code
-vec_t Vector3::dot(const Vector3& v); // member function, 1 return value, 1 argument
-\endcode
-
-wrapper:
-\code
-return1Param1<Vector3, vec_t, const Vector3&>
-\endcode
-
-%Lua call:
-\code
-local dot_product = v:dot(w)
-\endcode
-
-To return more than one value to %Lua, you wrap a function that has the 2nd
-through Nth return value passed by reference.  The 1st return value to %Lua,
-is the return value of the function.  The 2nd return value is the first 
-argument by reference, and the Nth return value is the (N - 1)th argument
-by reference, etc.  All arguments after the last argument to be returned to
-%Lua will not be returned to %Lua, no matter how they are passed to the 
-C function
-
-\note on implementation, return 0, arguments 0 are MANUALLY written 
-*/
-template<void(* function)(void)> 
-inline sint staticReturn0Param0(lua_State* L)
-{
-	(*function)();
-	return 0;
-}
-
-template<typename CLASS, void(CLASS::* function)(void)>
-inline sint return0Param0(lua_State* L)
-{
-	if (CLASS* object = to<CLASS*>(L, -1))
-	{
-		(object->*function)();
-	}
-	return 0;	
-}
-
-template<typename CLASS, void(CLASS::* function)(void) const>
-inline sint return0Param0const(lua_State* L)
-{
-	if (CLASS* object = to<CLASS*>(L, -1))
-	{
-		(object->*function)();
-	}
-	return 0;	
-}
-
 /** static, non-member functions */
 EFL_GENERATE_STATIC_TEMPLATE(0, 1)
 EFL_GENERATE_STATIC_TEMPLATE(0, 2)
