@@ -7,10 +7,7 @@
 #include "UTTools.h"
 
 #if EXTENDED_BY_LUA 
-#include "Lua.h"
-#include "LuaStateInteraction.h"
-#include "LuaExtensibility.h"
-#include "LuaInclusions.h"
+#include "LuaExtensionInclusions.h"
 #endif
 
 namespace unitTestingTools

@@ -45,7 +45,7 @@ sint LuaExtendable::__newindexError(lua_State* L)
 	LuaExtendable* udata = to<LuaExtendable*>(L, -3);
 	// pop values off the stack?
 	return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
-		"Use define_lua_LuaExtendable_by_proxy to expose this class to Lua if that is desired.", udata->toString());
+		"Use DEFINE_LUA_LUAEXTENDABLE_BY_PROXY to expose this class to Lua if that is desired.", udata->toString());
 #else
 	(void*)L;
 	return 0;

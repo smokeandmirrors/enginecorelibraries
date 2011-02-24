@@ -93,7 +93,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Vector2(void)		
 	{ /* empty */ };
-	createInlineLuaExtendableUserdataDefaultFunctions(Vector2)
+	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
 	const vec_t& 	operator[](uint i) const;	
@@ -177,7 +177,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Vector3(void)		
 	{ /* empty */ };
-	createInlineLuaExtendableUserdataDefaultFunctions(Vector3)
+	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 
 	const vec_t& 	operator[](uint i) const;	
@@ -884,8 +884,8 @@ inline void Vector3::zero()
 } // end namespace math
 
 #if EXTENDED_BY_LUA
-declare_lua_LuaExtendable_ns(math, Vector2);
-declare_lua_LuaExtendable_ns(math, Vector3);
+DECLARE_LUA_LUAEXTENDABLE_NS(math, Vector2);
+DECLARE_LUA_LUAEXTENDABLE_NS(math, Vector3);
 #endif//EXTENDED_BY_LUA
 
 #endif//VECTOR_H

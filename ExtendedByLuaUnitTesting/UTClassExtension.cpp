@@ -8,11 +8,7 @@
 #include "NumericalFunctions.h"
 
 #if EXTENDED_BY_LUA
-
-#include "Lua.h"
-#include "LuaInclusions.h"
-#include "LuaExtensibility.h"
-#include "LuaStateInteraction.h"
+#include "LuaExtensionInclusions.h"
 
 using namespace luaExtension;
 
@@ -35,9 +31,9 @@ public:
 	sint increment(sint i) const	{ return i + getValue(); }
 }; // Basic
 
-declare_lua_library(One)
+DECLARE_LUA_LIBRARY(One)
 
-lua_func(newOne)
+LUA_FUNC(newOne)
 {
 	pushRegisteredClass(L, new One());		//s: ud
 	lua_newtable(L);						//s: ud, ud_mt
@@ -47,7 +43,7 @@ lua_func(newOne)
 	return 1;
 }
 
-lua_func(getOne)
+LUA_FUNC(getOne)
 {
 	static One* singleOne(NULL);
 
@@ -68,13 +64,13 @@ lua_func(getOne)
 	return 1;
 }
 
-lua_func(getValueOne)
+LUA_FUNC(getValueOne)
 {
 	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
 	return push(L, one->getValue());						//s: ud, value
 }
 
-lua_func(incrementOne)
+LUA_FUNC(incrementOne)
 {
 	sint argument = to<sint>(L, -1);						//s: ud, arg
 	lua_pop(L, 1);											//s: ud
@@ -82,12 +78,12 @@ lua_func(incrementOne)
 	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
 }
 
-define_lua_library(One)
-	lua_named_entry("new", newOne)
-	lua_named_entry("get", getOne)
-	lua_named_entry("getValue", getValueOne)
-	lua_named_entry("increment", incrementOne)
-end_lua_library(One)
+DEFINE_LUA_LIBRARY(One)
+	LUA_NAMED_ENTRY("new", newOne)
+	LUA_NAMED_ENTRY("get", getOne)
+	LUA_NAMED_ENTRY("getValue", getValueOne)
+	LUA_NAMED_ENTRY("increment", incrementOne)
+END_LUA_LIBRARY(One)
 
 void Classes::test_define_lua_class()
 {
@@ -179,7 +175,7 @@ public:
 		m_other = other; 
 	}
 
-	createInlineLuaExtendableUserdataDefaultFunctions(Simple)
+	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Simple)
 
 private:
 	Simple*			m_other;
@@ -188,16 +184,16 @@ private:
 uint Simple::numAllocated = 0;
 bool Simple::everCreated = false;
 
-declare_lua_LuaExtendable(Simple);
+DECLARE_LUA_LUAEXTENDABLE(Simple);
 
-define_lua_LuaExtendable(Simple, Simple)
-	lua_named_entry("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
-	lua_named_entry("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
-	lua_named_entry("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
-	lua_named_entry("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
-	lua_named_entry("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
-	lua_named_entry("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
-end_lua_LuaExtendable(Simple, Simple)
+DEFINE_LUA_LUAEXTENDABLE(Simple, Simple)
+	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
+	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
+	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
+	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
+END_LUA_LUAEXTENDABLE(Simple, Simple)
 
 
 class Derived
@@ -226,13 +222,13 @@ public:
 	uint				getDerivation(void) const	{ return 21; }
 	virtual uint		getValue(void) const		{ return 14; }
 
-	createInlineLuaExtendableUserdataDefaultFunctions(Derived)
+	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived)
 };
 
 uint Derived::numAllocated = 0;
 bool Derived::everCreated = false;
 
-declare_lua_LuaExtendable(Derived);
+DECLARE_LUA_LUAEXTENDABLE(Derived);
 
 class Unexposed
 	: public Derived
@@ -266,15 +262,15 @@ public:
 uint Unexposed::numAllocated = 0;
 bool Unexposed::everCreated = false;
 
-lua_func(getUnexposed)
+LUA_FUNC(getUnexposed)
 {
 	return push(L, Unexposed::getUnexposed());
 }
 
-define_lua_LuaExtendable(Derived, Simple)
-lua_named_entry("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
-lua_entry(getUnexposed)
-end_lua_LuaExtendable(Derived, Simple)
+DEFINE_LUA_LUAEXTENDABLE(Derived, Simple)
+LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
+LUA_ENTRY(getUnexposed)
+END_LUA_LUAEXTENDABLE(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
 {
@@ -341,7 +337,7 @@ public:
 		return this == &other; 
 	}
 
-	createInlineLuaExtendableProxyDefaultFunctions(Grandparent)
+	INLINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
 
 protected:
 	const char*				m_name;
@@ -350,19 +346,19 @@ protected:
 uint Grandparent::numAllocatedGrandparents = 0;
 bool Grandparent::everCreated = false;
 
-declare_lua_LuaExtendable(Grandparent);
+DECLARE_LUA_LUAEXTENDABLE(Grandparent);
 
-lua_func(__call)
+LUA_FUNC(__call)
 {
 	return push(L, 7);
 }
 
-define_lua_LuaExtendable_by_proxy(Grandparent, Grandparent)
-lua_entry(__call) 
-lua_named_entry("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
-lua_named_entry("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
-lua_named_entry("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
-end_lua_LuaExtendable(Grandparent, Grandparent)
+DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Grandparent, Grandparent)
+LUA_ENTRY(__call) 
+LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
+LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
+LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+END_LUA_LUAEXTENDABLE(Grandparent, Grandparent)
 
 /**
 \class
@@ -380,19 +376,19 @@ public:
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
-	createInlineDefault_getClassName(Parent)
+	INLINE_DEFAULT_GETCLASSNAME(Parent)
 
 private:
 	Grandparent*			m_grandParent;			
 }; // Parent
 
-declare_lua_LuaExtendable(Parent);
+DECLARE_LUA_LUAEXTENDABLE(Parent);
 
-define_lua_LuaExtendable_by_proxy(Parent, Grandparent)
-lua_named_entry("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
-lua_named_entry("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
-lua_named_entry("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
-end_lua_LuaExtendable(Parent, Grandparent) 
+DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Parent, Grandparent)
+LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
+LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
+LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
+END_LUA_LUAEXTENDABLE(Parent, Grandparent) 
 
 /**
 \class
@@ -417,20 +413,20 @@ public:
 	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const char*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
-	createInlineDefault_getClassName(Child)
+	INLINE_DEFAULT_GETCLASSNAME(Child)
 
 private:
 	Parent*					m_parent;
 }; // Child
 
-declare_lua_LuaExtendable(Child);
+DECLARE_LUA_LUAEXTENDABLE(Child);
 
-define_lua_LuaExtendable_by_proxy(Child, Parent)
-lua_named_entry("get",				(staticReturn1Param0<Child*, &Child::get>))
-lua_named_entry("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-lua_named_entry("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
-lua_named_entry("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
-end_lua_LuaExtendable(Child, Parent)
+DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Child, Parent)
+LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
+LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
+LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
+LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
+END_LUA_LUAEXTENDABLE(Child, Parent)
 
 // END PROXY
 

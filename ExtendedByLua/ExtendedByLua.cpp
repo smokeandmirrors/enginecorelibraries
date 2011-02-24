@@ -8,10 +8,7 @@ Defines the entry point for the console application.
 
 #if EXTENDED_BY_LUA
 #pragma message("This executable is compiling with embedded lua.")
-#include "Lua.h"
-#include "LuaStateInteraction.h"
-#include "LuaExtensibility.h"
-#include "LuaInclusions.h"
+#include "LuaExtensionInclusions.h"
 using namespace luaExtension;
 #endif//EXTENDED_BY_LUA
 

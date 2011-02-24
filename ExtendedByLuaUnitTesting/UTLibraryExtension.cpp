@@ -4,11 +4,7 @@
 #include <string.h>
 
 #if EXTENDED_BY_LUA
-#include "Lua.h"
-#include "LuaInclusions.h"
-#include "LuaExtensibility.h"
-#include "LuaStateInteraction.h"
-
+#include "LuaExtensionInclusions.h"
 using namespace luaExtension;
 
 static sint getOne(void)
@@ -33,14 +29,14 @@ static float addAndSubtract(float& subtracted, float operand)
 	return operand + 1.0f;
 }
 
-declare_lua_library(UnitTestLibrary)
+DECLARE_LUA_LIBRARY(UnitTestLibrary)
 
-define_lua_library(UnitTestLibrary)
-	lua_named_entry("getOne",			(staticReturn1Param0<sint, getOne>))
-	lua_named_entry("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
-	lua_named_entry("incrementByOne",	(staticReturn1Param1<float, float, incrementByOne>))
-	lua_named_entry("addAndSubtract",	(staticReturn2Param1<float, float, float, addAndSubtract>))
-end_lua_library(UnitTestLibrary)
+DEFINE_LUA_LIBRARY(UnitTestLibrary)
+	LUA_NAMED_ENTRY("getOne",			(staticReturn1Param0<sint, getOne>))
+	LUA_NAMED_ENTRY("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
+	LUA_NAMED_ENTRY("incrementByOne",	(staticReturn1Param1<float, float, incrementByOne>))
+	LUA_NAMED_ENTRY("addAndSubtract",	(staticReturn2Param1<float, float, float, addAndSubtract>))
+END_LUA_LIBRARY(UnitTestLibrary)
 
 class LibraryExtensionUT : public cfixcc::TestFixture
 {

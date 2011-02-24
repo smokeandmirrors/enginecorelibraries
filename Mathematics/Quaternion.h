@@ -28,8 +28,7 @@ math classes, constants, functions and formulas
 #include "Numbers.h"
 
 #if EXTENDED_BY_LUA
-#include "LuaExtensibility.h"
-#include "LuaStateInteraction.h"
+#include "LuaExtensionInclusions.h"
 #endif//EXTENDED_BY_LUA
 
 namespace math
@@ -67,7 +66,7 @@ public:
 #if EXTENDED_BY_LUA
 	virtual ~Quaternion(void)
 	{/* empty */}
-	createInlineLuaExtendableUserdataDefaultFunctions(Quaternion)
+	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Quaternion)
 #endif//EXTENDED_BY_LUA 
 
 }; // Quaternion

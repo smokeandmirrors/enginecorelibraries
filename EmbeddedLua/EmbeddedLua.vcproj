@@ -453,6 +453,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LuaFunctionExposition.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaStateInteraction.h"
 				>
 			</File>

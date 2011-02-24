@@ -8,6 +8,7 @@
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
+#include "LuaFunctionExposition.h"
 using namespace luaExtension;
 #endif//EXTENDED_BY_LUA
 using namespace math;
@@ -31,7 +32,7 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 }
 
 #if EXTENDED_BY_LUA
-lua_func(__indexVector2)
+LUA_FUNC(__indexVector2)
 {
 	const char* key = to<const char*>(L, -1);
 	const Vector2& v = to<const Vector2&>(L, -2);
@@ -54,7 +55,7 @@ lua_func(__indexVector2)
 	}
 }
 
-lua_func(__newindexVector2)
+LUA_FUNC(__newindexVector2)
 {
 	float value = to<float>(L, -1);
 	const char* key = to<const char*>(L, -2);
@@ -72,12 +73,12 @@ lua_func(__newindexVector2)
 	}
 }
 
-define_lua_LuaExtendable(Vector2, Vector2)
-		lua_named_entry("__index", __indexVector2)
-		lua_named_entry("__newindex", __newindexVector2)
-		lua_named_entry("__isnewindexable", luaExtension::pushFalse) 
-		lua_named_entry("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
-		lua_final_entry 
+DEFINE_LUA_LUAEXTENDABLE(Vector2, Vector2)
+		LUA_NAMED_ENTRY("__index", __indexVector2)
+		LUA_NAMED_ENTRY("__newindex", __newindexVector2)
+		LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse) 
+		LUA_NAMED_ENTRY("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
+		LUA_FINAL_ENTRY 
 	};	// end function list 
 	sint key(lua_State* L) 
 	{ 
@@ -88,7 +89,7 @@ define_lua_LuaExtendable(Vector2, Vector2)
 }; // end namespace lua_library_Vector2
 
 
-lua_func(__indexVector3)
+LUA_FUNC(__indexVector3)
 {
 	const char* key = to<const char*>(L, -1);
 	const Vector3& v = to<const Vector3&>(L, -2);
@@ -112,7 +113,7 @@ lua_func(__indexVector3)
 	}
 }
 
-lua_func(__newindexVector3)
+LUA_FUNC(__newindexVector3)
 {
 	float value = to<float>(L, -1);
 	const char* key = to<const char*>(L, -2);
@@ -133,8 +134,8 @@ lua_func(__newindexVector3)
 
 namespace lua_library_Vector3
 {	
-#define defineVoidVector3Func(opfunc) \
-	lua_func(opfunc) \
+#define DEFINE_VOID_VECTOR3_FUNC(opfunc) \
+	LUA_FUNC(opfunc) \
 	{ \
 		sint stack_size = lua_gettop(L); \
 		switch (stack_size) \
@@ -163,20 +164,20 @@ namespace lua_library_Vector3
 		} \
 		return 0; \
 	} 
-// #define defineVoidVector3Func(opfunc)
+// #define DEFINE_VOID_VECTOR3_FUNC(opfunc)
 
-#define defineVector3Operator(name, opfunc) \
-	lua_func(name) \
+#define DEFINE_VECTOR3_OPERATOR(name, opfunc) \
+	LUA_FUNC(name) \
 	{ \
 		Vector3& lhs = to<Vector3&>(L, -2); \
 		Vector3& rhs = to<Vector3&>(L, -1); \
 		return push(L, new Vector3(lhs opfunc rhs)); \
 	}
-// #define defineVector3Operator(opfunc)  
+// #define DEFINE_VECTOR3_OPERATOR(opfunc)  
 
-defineVoidVector3Func(add)
+DEFINE_VOID_VECTOR3_FUNC(add)
 
-lua_func(cross)
+LUA_FUNC(cross)
 {
 	sint stack_size = lua_gettop(L);
 	switch (stack_size)
@@ -201,9 +202,9 @@ lua_func(cross)
 	return 0;
 }
 
-defineVoidVector3Func(divide)
+DEFINE_VOID_VECTOR3_FUNC(divide)
 
-lua_func(equals)
+LUA_FUNC(equals)
 {
 	sint stack_size = lua_gettop(L); 
 	
@@ -228,7 +229,7 @@ lua_func(equals)
 	return 0; 
 }
 
-lua_func(nearlyEquals)
+LUA_FUNC(nearlyEquals)
 {
 	sint stack_size = lua_gettop(L); 
 
@@ -255,7 +256,7 @@ lua_func(nearlyEquals)
 	return 0; 
 }
 
-lua_func(initialize)
+LUA_FUNC(initialize)
 {
 	sint stack_size = lua_gettop(L);
 	switch (stack_size)
@@ -304,51 +305,51 @@ lua_func(initialize)
 	}
 } // sint set(lua_State* L)
 
-defineVoidVector3Func(scale)
+DEFINE_VOID_VECTOR3_FUNC(scale)
 
-defineVoidVector3Func(subtract)
+DEFINE_VOID_VECTOR3_FUNC(subtract)
 
 } // end namespace lua_library_Vector3
 
-define_lua_LuaExtendable(Vector3, Vector3)
-		lua_named_entry("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
-		lua_named_entry("__index", __indexVector3)
-		lua_named_entry("__newindex", __newindexVector3) 
-		lua_named_entry("__isnewindexable", luaExtension::pushFalse)
-		lua_entry(		 add)
-		lua_named_entry("construct", initialize)
-		lua_entry(		 cross)
-		lua_named_entry("distance", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distance>))
-		lua_named_entry("distanceSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceSqr>))
-		lua_named_entry("distanceXY", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceXY>))
-		lua_named_entry("distanceXYSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceXYSqr>))
-		lua_entry(		 divide)
-		lua_named_entry("dot", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::dot>))
-		lua_entry(		 equals)
-		lua_named_entry("isFar", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isFar>))
-		lua_named_entry("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isFarXY>))
-		lua_named_entry("isNear", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isNear>))
-		lua_named_entry("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isNearXY>))
-		lua_named_entry("isNormal", (return1Param0const<Vector3, bool, &Vector3::isNormal>))
-		lua_named_entry("isZero", (return1Param0const<Vector3, bool, &Vector3::isZero>))
-		lua_named_entry("magnitude", (return1Param0const<Vector3, vec_t, &Vector3::magnitude>))
-		lua_named_entry("magnitudeSqr", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeSqr>))
-		lua_named_entry("magnitudeXY", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXY>))
-		lua_named_entry("magnitudeXYSqr", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXYSqr>))
-		lua_entry(		 nearlyEquals)
-		lua_named_entry("negate", (return0Param0<Vector3, &Vector3::negate>))
-		lua_named_entry("normalize", (return1Param0<Vector3, vec_t, &Vector3::normalize>))
-		lua_named_entry("perpendicular", (return0Param0<Vector3, &Vector3::perpendicular>))
-		lua_entry(		 scale)
-		lua_named_entry("set", initialize)
+DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
+		LUA_NAMED_ENTRY("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
+		LUA_NAMED_ENTRY("__index", __indexVector3)
+		LUA_NAMED_ENTRY("__newindex", __newindexVector3) 
+		LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse)
+		LUA_ENTRY(		 add)
+		LUA_NAMED_ENTRY("construct", initialize)
+		LUA_ENTRY(		 cross)
+		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distance>))
+		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceSqr>))
+		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceXY>))
+		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::distanceXYSqr>))
+		LUA_ENTRY(		 divide)
+		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::dot>))
+		LUA_ENTRY(		 equals)
+		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isFar>))
+		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isFarXY>))
+		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isNear>))
+		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &Vector3::isNearXY>))
+		LUA_NAMED_ENTRY("isNormal", (return1Param0const<Vector3, bool, &Vector3::isNormal>))
+		LUA_NAMED_ENTRY("isZero", (return1Param0const<Vector3, bool, &Vector3::isZero>))
+		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, vec_t, &Vector3::magnitude>))
+		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeSqr>))
+		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXY>))
+		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, vec_t, &Vector3::magnitudeXYSqr>))
+		LUA_ENTRY(		 nearlyEquals)
+		LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &Vector3::negate>))
+		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, vec_t, &Vector3::normalize>))
+		LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &Vector3::perpendicular>))
+		LUA_ENTRY(		 scale)
+		LUA_NAMED_ENTRY("set", initialize)
 		// slightly higher performance options for Lua
-		lua_named_entry("setAll", (return0Param1<Vector3, vec_t, &Vector3::set>))
-		lua_named_entry("setEach", (return0Param3<Vector3, vec_t, vec_t, vec_t, &Vector3::set>))
-		lua_named_entry("setEqual", (return0Param1<Vector3, const Vector3&, &Vector3::set>))
-		lua_named_entry("setIndex", (return0Param2<Vector3, uint, vec_t, &Vector3::set>))
-		lua_entry(		 subtract)
-		lua_named_entry("zero", (return0Param0<Vector3, &Vector3::zero>))
-		lua_final_entry 
+		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, vec_t, &Vector3::set>))
+		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, vec_t, vec_t, vec_t, &Vector3::set>))
+		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &Vector3::set>))
+		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint, vec_t, &Vector3::set>))
+		LUA_ENTRY(		 subtract)
+		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &Vector3::zero>))
+		LUA_FINAL_ENTRY 
 	};	// end function list 
 	sint key(lua_State* L) 
 	{ 

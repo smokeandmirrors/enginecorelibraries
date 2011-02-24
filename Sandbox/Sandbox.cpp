@@ -120,13 +120,8 @@ uint __stdcall screwThemUp(void*)
 	}
 }
 
-
-
-void Sandbox::play()
+void threadsChecking()
 {
-	printf("Playing in the sandbox!\n");
-	CompilerChecks::sizeOfChecks();
-
 	mutex = CreateMutex(NULL, false, NULL);
 	assert(mutex);
 	std::vector<HANDLE> threads;
@@ -140,11 +135,11 @@ void Sandbox::play()
 		ResumeThread(thread);
 		switcher = !switcher;
 	}
-	
+
 	uint thread_id1;
 	HANDLE thread = (HANDLE)(_beginthreadex(NULL,  CREATE_SUSPENDED, screwThemUp, NULL, 0, &thread_id1));
 	ResumeThread(thread);
-	
+
 	while (newThreadIsSuspended) ;
 
 	for (uint i = 0; i < 100; i++)
@@ -153,4 +148,11 @@ void Sandbox::play()
 		SuspendThread(thread);
 		CloseHandle(thread);
 	}
+}
+
+void Sandbox::play()
+{
+	printf("Playing in the sandbox!\n");
+	CompilerChecks::sizeOfChecks();
+	// threadsChecking();
 }
