@@ -4,13 +4,12 @@
 /**
 \file Vector.h
 
-2D and 3D vectors, which are exposed to %Lua, primarly for use in 
+2D and 3D vectors, which are exposed to %Lua, primarily for use in 
 performance comparison.
 
 \author Smoke and Mirrors Development
 \htmlonly
-<A HREF="smokeandmirrorsdevelopment@gmail.com">
-smokeandmirrorsdevelopment@gmail.com</A>
+<A HREF="smokeandmirrorsdevelopment@gmail.com">smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 &copy;2009-2011 Smoke and Mirrors Development
 <BR>
@@ -70,6 +69,7 @@ extern const Vector3	up3D;
 \class Vector2
 \ingroup Vectors
 a 2D Vector class with vec_t elements
+\warning The thread safety of this class is not guaranteed!
 */
 class Vector2 
 #if EXTENDED_BY_LUA
@@ -91,8 +91,6 @@ public:
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
-	virtual ~Vector2(void)		
-	{ /* empty */ };
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
@@ -153,7 +151,9 @@ public:
 	void			zero(void);
 }; // class Vector2
 
-
+/**
+\warning The thread safety of this class is not guaranteed!
+*/
 class Vector3 
 #if EXTENDED_BY_LUA
 	: public luaExtension::LuaExtendable
@@ -175,8 +175,6 @@ public:
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
-	virtual ~Vector3(void)		
-	{ /* empty */ };
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 

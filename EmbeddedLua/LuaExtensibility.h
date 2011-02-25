@@ -471,6 +471,7 @@ behavior is undefined
 Implementing this interface, and defining the methods via the macros above
 or having the virtual methods call the static versions below is probably the
 easiest way to expose a class and all of it's methods to %Lua.
+\warning The thread safety of this class is not guaranteed!
 \ingroup LuaExtension
 */
 class LuaExtendable 
@@ -536,8 +537,8 @@ public:
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua.
 	*/
 	static sint				setUserdataMetatable(lua_State* L); 
-	/** pure virtual constructor, defined so your linker doesn't complain */
-	virtual					~LuaExtendable(void)=0 {}
+	/** empty dtor */
+	virtual					~LuaExtendable(void) {/* empty */};
 	/** 
 	a function that classes must implement to make them easier to make into well formed
 	%Lua classes

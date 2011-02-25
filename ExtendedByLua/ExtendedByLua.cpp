@@ -30,15 +30,17 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//SANDBOX
 
 #if EXTENDED_BY_LUA 
-	luaExtension::Lua lua;
-	registerGlobalLibrary(lua.getState());
-	lua.require("Utilities");
-	lua.require("ObjectOrientedParadigm");
-	register_lua_library((&lua), Vector2);
-	register_lua_library((&lua), Vector3);
-	// get the user file for easier rapid iteration
-	lua.require("User");
-	lua.runConsole();
+	{
+		luaExtension::Lua lua;
+		registerGlobalLibrary(lua.getState());
+		lua.require("Utilities");
+		lua.require("ObjectOrientedParadigm");
+		register_lua_library((&lua), Vector2);
+		register_lua_library((&lua), Vector3);
+		// get the user file for easier rapid iteration
+		lua.require("User");
+		lua.runConsole();
+	}
 #endif//EXTENDED_BY_LUA
 
 	return 0;

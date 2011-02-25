@@ -64,8 +64,6 @@ public:
 	Quaternion(vec_t scalar) : w(scalar), x(scalar), y(scalar), z(scalar)
 	{/* empty */}
 #if EXTENDED_BY_LUA
-	virtual ~Quaternion(void)
-	{/* empty */}
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Quaternion)
 #endif//EXTENDED_BY_LUA 
 

@@ -27,7 +27,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 /** preprocessor control for explicitly preventing code from compiling */
 #define PREVENT_COMPILE switch(0){case 0:case 0:;}
 /** conditional preprocessor control for explicitly preventing code from compiling */
-#define PREVENT_COMPILE_IF(condition) switch(0){case 0: case condition:;}
+#define PREVENT_COMPILE_IF(condition) switch(0){case 1: case condition:;}
 /** preprocessor control for unit testing compilation */
 #define WITH_UNIT_TESTING 1
 

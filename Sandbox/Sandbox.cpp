@@ -7,6 +7,12 @@
 #include "Sandbox.h"
 #include "Threads.h"
 
+
+#if WIN32
+#include <process.h>
+#include <windows.h>
+#endif
+
 bool newThreadIsSuspended(true);
 sint crashOnMe(0);
 uint delta = 100;
@@ -130,14 +136,14 @@ void threadsChecking()
 	for (uint i = 0; i < 100; i++)
 	{
 		uint thread_id1;
-		HANDLE thread = (HANDLE)(_beginthreadex(NULL,  CREATE_SUSPENDED, switcher ? runnable1 : runnable2, NULL, 0, &thread_id1));
+		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, switcher ? runnable1 : runnable2, NULL, CREATE_SUSPENDED, &thread_id1));
 		threads.push_back(thread);
 		ResumeThread(thread);
 		switcher = !switcher;
 	}
 
 	uint thread_id1;
-	HANDLE thread = (HANDLE)(_beginthreadex(NULL,  CREATE_SUSPENDED, screwThemUp, NULL, 0, &thread_id1));
+	HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, screwThemUp, NULL, CREATE_SUSPENDED, &thread_id1));
 	ResumeThread(thread);
 
 	while (newThreadIsSuspended) ;

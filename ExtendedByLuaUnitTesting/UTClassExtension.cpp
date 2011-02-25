@@ -371,7 +371,6 @@ class Parent
 public:
 	typedef Grandparent super;
 	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
-	virtual ~Parent(void)									{ /* empty */ }
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
 	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const char*		getTitle(void) const			{ return "Parent"; }

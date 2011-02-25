@@ -390,18 +390,30 @@
 	<References>
 	</References>
 	<Files>
-		<File
-			RelativePath=".\Build.cpp"
+		<Filter
+			Name="Multithreading"
 			>
-		</File>
-		<File
-			RelativePath=".\Build.h"
+			<File
+				RelativePath=".\Threads.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Threads.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Foundation"
 			>
-		</File>
-		<File
-			RelativePath=".\Threads.h"
-			>
-		</File>
+			<File
+				RelativePath=".\Build.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Build.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
