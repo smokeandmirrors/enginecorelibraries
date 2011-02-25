@@ -414,6 +414,7 @@ namespace luaExtension
 	EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CONST_CLASS(num_rets, num_args)
 
+// define all argument #, parameter # functions of the generation_macro
 #define EFL_GENERATE_ALL(generation_macro) \
 	generation_macro(0, 1) \
 	generation_macro(0, 2) \
@@ -459,7 +460,6 @@ EFL_GENERATE_ALL(EFL_GENERATE_STATIC_TEMPLATE)
 EFL_GENERATE_ALL(EFL_GENERATE_CLASS_TEMPLATE)
 /** const class member functions */
 EFL_GENERATE_ALL(EFL_GENERATE_CLASS_CONST_TEMPLATE)
-
 } // namespace luaExtension
 
 #endif//LUAFUNCTIONEXPOSITION_H
