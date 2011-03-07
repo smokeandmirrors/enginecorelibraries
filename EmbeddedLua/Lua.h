@@ -16,6 +16,8 @@ smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 \endhtmlonly
 \date 2/18/2010
+
+\warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
 */
 
 #include <stdlib.h>

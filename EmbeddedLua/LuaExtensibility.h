@@ -54,7 +54,8 @@ register_lua_library(Lua, example);
 Lua->openLibrary(lua_library_example::luaopen_example);
 \endcode
 
-\note REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
+\warning REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
+\warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
 
 */
 #include "Build.h"

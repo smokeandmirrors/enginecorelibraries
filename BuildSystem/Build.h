@@ -24,6 +24,14 @@ smokeandmirrorsdevelopment@gmail.com</A>
 */
 #include <assert.h>
 
+#ifndef NULL
+#ifdef __cplusplus
+#define NULL    0
+#else
+#define NULL    ((void *)0)
+#endif
+#endif
+
 /** preprocessor control for explicitly preventing code from compiling */
 #define PREVENT_COMPILE switch(0){case 0:case 0:;}
 /** conditional preprocessor control for explicitly preventing code from compiling */

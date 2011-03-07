@@ -25,6 +25,8 @@ namespace multithreading
 		return 0; \
 	}
 
+typedef void(* executableFunction)(void);
+
 class Executable 
 {
 public:

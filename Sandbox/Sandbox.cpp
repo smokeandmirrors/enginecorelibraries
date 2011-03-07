@@ -5,6 +5,7 @@
 #include "Build.h"
 #include "CompilerChecks.h"
 #include "Sandbox.h"
+#include "Scheduling.h"
 #include "Synchronization.h"
 #include "Threads.h"
 
@@ -25,7 +26,6 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
 	Sleep(numberOfThreads * 1000);
 	assert(numberOfThreads == myNumThreads);
 )
-
 
 sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
 sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
@@ -112,4 +112,10 @@ void Sandbox::play()
 	printf("Playing in the sandbox!\n");
 	CompilerChecks::sizeOfChecks();
 	threadsChecking();
+
+	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
+	uint max_threads = scheduler.getMaxThreads();
+	max_threads++;
+
+	multithreading::returnMutex(multithreading::getMutex());
 }

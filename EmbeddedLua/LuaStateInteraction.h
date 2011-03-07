@@ -15,6 +15,8 @@ smokeandmirrorsdevelopment@gmail.com</A>
 &copy;2009-2011 Smoke and Mirrors Development
 <BR>
 \endhtmlonly
+
+\warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
 */
 
 #include "Build.h"
