@@ -1,123 +1,160 @@
 #include "Threads.h"
 
-//#if WIN32
-//#include <process.h>
-//#include <windows.h>
-//
-///** 
-//todo, these themselves might have to be hidden behind even smaller classes for
-//better cross-platform use
-//*/
-//typedef uint			threadID;
-//typedef uint __stdcall (*thread_function)(void*);
-//typedef HANDLE			thread_resource;
-//#endif//WIN32
-//
-//namespace threading
-//{
-//
-//static const DWORD resumeThreadFailure = -1;
-//
-//class Thread;
-//
-//thread_resource createThread(thread_function function, threadID& id);
-//void			endThread(void);
-//bool			startThread(thread_resource, slong& previous_suspension_count);
-//bool			runThread(Thread* object);
-//
-//bool runThread(Thread* object)
-//{
-//	object->runFunction();
-//	delete object;
-//}
-//
-///** 
-//should be an observer or something, there needs to be a way
-//of notifying the thread of the Runnable's destruction 
-//*/
-//class Thread
-//{
-//public:
-//	Thread(Runnable* runnable);
-//	Thread(void(*runnable)(void));
-//	~Thread(void);
-//	bool			start();
-//	// below are deprecated in Java, but remain in C++
-//	// void	stop();
-//	// void	resume();
-//
-//protected:
-//	void			destroyResource();
-//	void			runFunction();
-//
-//private:
-//	/** one inner class for the Runnable*, one for the void(*)(void); */
-//	void(*			m_function)(void);
-//	threadID		m_id;
-//	Runnable*		m_object;
-//	slong			m_suspensionCount;
-//	thread_resource	m_thread;
-//}; // class Thread
-//
-//Thread::Thread(Runnable* runnable);
-//: m_object(runnable)
-//, m_thread(NULL) /** todo, initialize state object */
-//, m_id(0)
-//{ 
-//	assert(m_object); 
-//}
-//
-//Thread::Thread(void(*runnable)(void)) 
-//: m_function(runnable)
-//, m_thread(NULL) /** todo, initialize state object */
-//, m_id(0)
-//{ 
-//	assert(m_function); 
-//}
-//
-//Thread::~Thread(void)
-//{
-//	// inner class->stop()
-//	if (m_thread) // if the thread is still running
-//	{
-//		CloseHandle(m_thread);
-//		// notify observers of destruction
-//	}
-//}
-//
-//bool Thread::start()
-//{
-//	return startThread(thread_resource, m_suspensionCount);
-//}
-//
-//thread_resource createThread(thread_function function, threadID& id)
-//{	/*
-//	calls _beginthreadex with NULL security attributes,
-//	0 stack size, 
-//	thread_function,
-//	no arguments to thread_function,
-//	CREATE_SUSPENDED initflag,
-//	threadID for the thrdaddr
-//	*/
-//	return (HANDLE)(_beginthreadex(NULL, 0, function, NULL, CREATE_SUSPENDED, &id));
-//}
-//
-//bool endThread(void)
-//{
-//	_endthreadex(m_thread);
-//}
-//
-//bool startThread(thread_resource, slong& previous_suspension_count)
-//{
-//	previous_suspension_count = ResumeThread(thread_resource);
-//	return previous_suspension_count != resumeThreadFailure;
-//}
-///*
-//bool stopThread(thread_resource, slong& previous_suspension_count)
-//{
-//	previous_suspension_count = SuspendThread(thread_resource);
-//	return previous_suspension_count != resumeThreadFailure;
-//}
-//*/
+#if WIN32
+#include <process.h>
+#include <windows.h>
 
-//} // namespace threading
+typedef uint(__stdcall*		threadable)(void*);
+typedef uint				threadID;
+typedef void*				threadHandle;
+typedef void(*				executableFunction)(void);
+
+/** 
+todo, these themselves might have to be hidden behind even smaller classes for
+better cross-platform use
+*/
+
+namespace multithreading
+{
+inline threadHandle createThread(threadable function, threadID& id, void* args, sint CPUid=-1);
+inline void endThread(void);
+inline uint GetNumHardwareThreads(void);
+
+#if WIN32
+inline threadHandle createThread(threadable function, threadID& id, void* args, sint/* CPUid*/)
+{	
+	HANDLE newthread = (HANDLE)(_beginthreadex(NULL, 0, function, args, 0, &id));
+	/** 
+	\todo the last parameter is CPUid, allow for setting the processor affinity on a per
+	platform basis
+	DWORD result = SetThreadIdealProcessor(newthread, CPUid);
+	*/
+	return newthread;
+}
+
+inline void endThread(void)
+{
+	uint status(0);
+	_endthreadex(status);
+}
+
+inline uint GetNumHardwareThreads(void)
+{
+	_SYSTEM_INFO system_info;
+	GetSystemInfo(&system_info);
+}
+#endif//WIN32
+
+/** 
+should be an observer or something, there needs to be a way
+of notifying the thread of the Executable's destruction 
+*/
+class Thread
+{
+public:
+	Thread(Executable* runnable, sint CPUid=-1);
+	Thread(executableFunction, sint CPUid=-1);
+	~Thread(void);
+
+protected:
+	void					execute(void);
+
+private:
+	
+	class Executor
+	{
+	public:
+		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid)
+		{
+			handle = multithreading::createThread(Thread::executeThread, id, thread, CPUid);
+		}
+		virtual void execute(void)=0;
+	};
+
+	class ExecutableExecutor : public Executor
+	{
+	public:
+		ExecutableExecutor(Executable* object) 
+		: m_object(object) 
+		{ /* empty */ }
+		
+		void execute(void)
+		{
+			m_object->execute();
+		}					
+		
+		Executable*				m_object;
+	};
+
+	class FunctionExecutor : public Executor
+	{
+	public:		
+		FunctionExecutor(executableFunction function) 
+		: m_function(function) 
+		{ /* empty */ }
+		
+		void execute(void)
+		{
+			(*m_function)();
+		}		
+
+		executableFunction		m_function;
+	};
+	
+	friend class Thread::FunctionExecutor;
+	friend class Thread::Executor;
+	friend class Thread::ExecutableExecutor;
+
+#if WIN32
+	static uint __stdcall executeThread(void* pThread);
+#endif//WIN32
+
+	/** not allowed */
+	Thread(const Thread&);
+	Thread(void);
+	void					initialize(sint CPUid);
+	
+	Executor*				m_executor;
+	threadID				m_id;
+	threadHandle			m_thread;
+}; // class Thread
+
+Thread::Thread(Executable* executable, sint CPUid) 
+: m_executor(new Thread::ExecutableExecutor(executable))
+{ 
+	initialize(CPUid);
+}
+
+Thread::Thread(void(*executable)(void), sint CPUid)
+: m_executor(new Thread::FunctionExecutor(executable))
+{ 
+	initialize(CPUid);
+}
+
+Thread::~Thread(void)
+{	
+	CloseHandle(m_thread);
+	delete m_executor;
+}
+
+void Thread::execute(void)
+{
+	m_executor->execute();
+}
+
+uint Thread::executeThread(void* pThread)
+{
+	static_cast<Thread*>(pThread)->execute();
+	endThread();
+	return 0;
+}
+
+void Thread::initialize(sint CPUid)
+{
+	assert(m_executor);
+	m_executor->initialize(this, m_thread, m_id, CPUid);
+	m_executor->execute();
+}
+
+} // namespace multithreading
+#endif//WIN32

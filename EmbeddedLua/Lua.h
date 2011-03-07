@@ -67,7 +67,7 @@ public:
 	/** 
 	destroys the lua_State and any memory allocated by this object
 	*/
-	~Lua(void);
+	virtual ~Lua(void);
 	/**
 	loads end executes the string as a lua chunk
 	\return the status of the execution

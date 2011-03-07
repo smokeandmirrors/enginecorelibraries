@@ -394,6 +394,22 @@
 			Name="Multithreading"
 			>
 			<File
+				RelativePath=".\Scheduling.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Scheduling.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Synchronization.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Synchronization.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Threads.cpp"
 				>
 			</File>

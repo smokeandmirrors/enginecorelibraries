@@ -83,11 +83,11 @@ public:
 	// construction
 	Vector2(void) 					
 	{/* empty */}
-	Vector2(const Vector2& v) : x(v.x), y(v.y)  
+	explicit Vector2(const Vector2& v) : x(v.x), y(v.y)  
 	{/* empty */}
 	Vector2(vec_t X, vec_t Y) : x(X), y(Y)
 	{/* empty */}
-	Vector2(vec_t scalar) : x(scalar), y(scalar) 	
+	explicit Vector2(vec_t scalar) : x(scalar), y(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
@@ -167,11 +167,11 @@ public:
 	// construction 
 	Vector3(void) 								
 	{/* empty */}
-	Vector3(const Vector3& v) : x(v.x), y(v.y), z(v.z) 			
+	explicit Vector3(const Vector3& v) : x(v.x), y(v.y), z(v.z) 			
 	{/* empty */}
 	Vector3(vec_t X, vec_t Y, vec_t Z) : x(X), y(Y), z(Z) 					
 	{/* empty */}
-	Vector3(vec_t scalar) : x(scalar), y(scalar), z(scalar) 	
+	explicit Vector3(vec_t scalar) : x(scalar), y(scalar), z(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA

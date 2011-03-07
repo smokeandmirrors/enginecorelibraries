@@ -4,25 +4,34 @@
 
 #include "Build.h"
 
-namespace threading
+namespace multithreading
 {
-class Runnable 
+#if WIN32
+#define ARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void* args)
+#define NOARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void*)
+#endif// WIN32
+
+#define DECLARE_NOARGS_EXECUTABLE_FUNCTION(name) NOARGS_EXECUTABLE_FUNCTION(name);
+#define DEFINE_NOARGS_EXECUTABLE_FUNCTION(name, code) NOARGS_EXECUTABLE_FUNCTION(name) \
+	{ \
+		code \
+		return 0; \
+	}
+
+#define DECLARE_ARGS_EXECUTABLE_FUNCTION(name) ARGS_EXECUTABLE_FUNCTION(name);
+#define DEFINE_ARGS_EXECUTABLE_FUNCTION(name, code) ARGS_EXECUTABLE_FUNCTION(name) \
+	{ \
+		code \
+		return 0; \
+	}
+
+class Executable 
 {
 public:
-	virtual	~Runnable(void) {/* empty */}
-	virtual void	run(void)=0;
-}; // class Runnable
+	virtual	~Executable(void) {/* empty */}
+	virtual void execute(void)=0;
+}; // class Executable
 
-/** ? */
-class ThreadPool
-{
-public:
-	static ThreadPool& single(void);
-
-private:
-	ThreadPool(void);
-}; // class ThreadPool
-
-} // threading
+} // multithreading
 
 #endif//THREADS_H

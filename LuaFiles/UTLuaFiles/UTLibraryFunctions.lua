@@ -8,7 +8,6 @@ module(..., package.seeall)
 --	\author Smoke and Mirrors Development
 --	\email smokeandmirrorsdevelopment@gmail.com
 --	\copyright 2010
-require 'OOPUnitTesting'
 local UT = require'UnitTestingFramework'
 require'Utilities'
 

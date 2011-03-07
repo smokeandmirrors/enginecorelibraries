@@ -5,205 +5,106 @@
 #include "Build.h"
 #include "CompilerChecks.h"
 #include "Sandbox.h"
+#include "Synchronization.h"
 #include "Threads.h"
-
 
 #if WIN32
 #include <process.h>
 #include <windows.h>
 #endif
 
-bool newThreadIsSuspended(true);
-bool childThreadsAreActive(true);
-sint crashOnMe(0);
-uint delta = 100;
-static uint iterations(10000);
-HANDLE closedthreadmutex;
-uint closedthreads(0);
 HANDLE mutex;
 
-void getCrashOnMe(sint& out)
-{
-	out = crashOnMe;
-}
+multithreading::Mutex* pMutex;// = multithreading::getMutex();
+int numberOfThreads = 0;
 
-void setCrashOnMe(sint value)
-{
-	crashOnMe = value;
-}
+DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
+	synchronize(pMutex);
+	numberOfThreads++;
+	int myNumThreads = numberOfThreads;
+	Sleep(numberOfThreads * 1000);
+	assert(numberOfThreads == myNumThreads);
+)
 
-uint __stdcall runnable1(void*)
-{
-	_endthreadex(0);
-	while (childThreadsAreActive)
-	{
-		DWORD status = WaitForSingleObject(mutex, 20);
-		if (status == WAIT_OBJECT_0)
-		{
-			sint before;
-			getCrashOnMe(before);
-			iterations++;
-			if (iterations > 100)
-				childThreadsAreActive = false;
-			for (uint i = 0; i < delta; i++)
-			{
-				int during;
-				getCrashOnMe(during); 
-				setCrashOnMe(during - 1);
-			}
-			
-			sint after;
-			getCrashOnMe(after);
-			sint value = before - delta;
 
-			if (value == after)
-			{
-				printf("DECREMENTOR: equal...... %d %d\n", value, after);
-			}
-			else
-			{
-				printf("DECREMENTOR: NOT EQUAL!! %d %d\n", value, after);
-			}
-			
-		}
-		else
-		{
-			printf("runnable1 them up didn't get the mutex!\n");
-		}
-	}
-	while (true)
-	{
-		DWORD status = WaitForSingleObject(closedthreadmutex, INFINITE);
-		if (status == WAIT_OBJECT_0)
-		{
-			closedthreads++;
-			ReleaseMutex(mutex);
-			_endthreadex(0);
-		}
-	}
+sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
+sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
+
+DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
+	sint number_size = 10000;
+	sint number_sort = 1000;
+	sint number;
+	sint* numbers = new sint[number_size];
+	sint* i = numbers;
 	
-	return 0;
-}
-
-uint __stdcall runnable2(void*)
-{
-	_endthreadex(0);
-	while (childThreadsAreActive)
+	for (number = 0; number < number_size; number++)
 	{
-		DWORD status = WaitForSingleObject(mutex, 20);
-		if (status == WAIT_OBJECT_0)
-		{
-			sint before;
-			getCrashOnMe(before);
-			iterations++;
-			if (iterations > 100)
-				childThreadsAreActive = false;
-			for (uint i = 0; i < delta; i++)
-			{
-				int during;
-				getCrashOnMe(during); 
-				setCrashOnMe(during + 1);
-			}
-
-			sint after;
-			getCrashOnMe(after);
-			sint value = before + delta;
-
-			if (value == after)
-			{
-				printf("INCREMENTOR: equal...... %d %d\n", value, after);
-			}
-			else
-			{
-				printf("INCREMENTOR: NOT EQUAL!! %d %d\n", value, after);
-			}
-			ReleaseMutex(mutex);
-		}
-		else
-		{
-			printf("runnable2 them up didn't get the mutex!\n");
-		}
+		*i++ = number;
 	}
-	while (true)
+
+	for (number = 0; number < number_sort; number++)
 	{
-		DWORD status = WaitForSingleObject(closedthreadmutex, INFINITE);
-		if (status == WAIT_OBJECT_0)
-		{
-			closedthreads++;
-			ReleaseMutex(mutex);
-			_endthreadex(0);
-		}
+		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	return 0;
-}
-
-uint __stdcall screwThemUp(void*)
-{
-	_endthreadex(0);
-	while (childThreadsAreActive)
-	{ 
-		DWORD status = WaitForSingleObject(mutex, INFINITE);
-		if (status == WAIT_OBJECT_0)
-		{
-			
-			static bool toggle(false);
-			sint value = toggle ? -999999999 : 999999999;
-			setCrashOnMe(value);
-			toggle = false;
-			printf("SCREWED UP!: value...... %d %d\n", value);
-			iterations++;
-			if (iterations > 100)
-				childThreadsAreActive = false;
-			ReleaseMutex(mutex);
-		}
-		else
-		{
-			printf("Screw them up didn't get the mutex!\n");
-		}
-	}
-	while (true)
-	{
-		DWORD status = WaitForSingleObject(closedthreadmutex, INFINITE);
-		if (status == WAIT_OBJECT_0)
-		{
-			closedthreads++;
-			ReleaseMutex(mutex);
-			_endthreadex(0);
-		}
-	}
-	return 0;
-}
+ 
+	printf("I finished a sort!\n");
+	delete[] numbers;
+)
+//
+//NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort)
+//{
+//	sint number_size = 10000;
+//	sint number_sort = 1000;
+//	sint number;
+//	sint* numbers = new sint[number_size];
+//	sint* i = numbers;
+//	
+//	for (number = 0; number < number_size; number++)
+//	{
+//		*i++ = number;
+//	}
+//
+//	for (number = 0; number < number_sort; number++)
+//	{
+//		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+//		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+//	}
+// 
+//	printf("I finished a sort!\n");
+//	delete[] numbers;
+//	return 0;
+//}
 
 void threadsChecking()
 {
+	pMutex = multithreading::getMutex();
 	mutex = CreateMutex(NULL, false, NULL);
-	assert(mutex);
-	std::vector<HANDLE> threads;
-	bool switcher(true);
-
 	
-	for (uint i = 0; i < 100; i++)
+	std::vector<HANDLE> threads;
+	const uint num_threads = 8;
+	
+	for (uint i = 0; i < num_threads; i++)
 	{
 		uint thread_id1;
-		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, switcher ? runnable1 : runnable2, NULL, CREATE_SUSPENDED, &thread_id1));
+		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, useMutexClass, NULL, CREATE_SUSPENDED, &thread_id1));
+		// HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, doubleQuickSort, NULL, CREATE_SUSPENDED, &thread_id1));
 		threads.push_back(thread);
-		ResumeThread(thread);
-		switcher = !switcher;
 	}
 
-	uint thread_id1;
-	HANDLE s_thread = (HANDLE)(_beginthreadex(NULL, 0, screwThemUp, NULL, CREATE_SUSPENDED, &thread_id1));
-	ResumeThread(s_thread);
-
-	// while (closedthreads != 101) ;
-
-	for (uint i = 0; i < 100; i++)
+	for (uint i = 0; i < num_threads; i++)
 	{
-		HANDLE thread = threads[i];
-		CloseHandle(thread);
+		ResumeThread(threads[i]);
+	}
+	
+	Sleep(3000);
+
+	for (uint i = 0; i < num_threads; i++)
+	{
+		CloseHandle(threads[i]);
 	}
 
-	CloseHandle(s_thread);
+	multithreading::returnMutex(pMutex);
 }
 
 void Sandbox::play()
