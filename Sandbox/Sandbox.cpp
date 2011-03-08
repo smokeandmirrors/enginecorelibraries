@@ -4,6 +4,7 @@
 
 #include "Build.h"
 #include "CompilerChecks.h"
+#include "Observation.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
@@ -13,6 +14,98 @@
 #include <process.h>
 #include <windows.h>
 #endif
+
+
+using namespace design_patterns;
+
+class Testee 
+: public Observable<Testee>
+{
+public:
+	Testee(void)
+	{
+		m_observable = new ObservableHelper<Testee>(*this);
+	}
+
+	~Testee(void)
+	{
+		delete m_observable;
+	}
+
+	void add(Observer<Testee>* observer)
+	{
+		m_observable->add(observer);
+	}
+
+	void update(Testee& aspect)
+	{
+		m_observable->update(aspect);
+	}
+
+	void remove(Observer<Testee>* observer)
+	{
+		printf("I lost an observer!\n");
+		m_observable->remove(observer);
+	}
+
+private:
+	ObservableHelper<Testee>* m_observable;
+};
+
+
+class Tester 
+: public Observer<Testee>
+{
+public:
+	Tester(void)
+	{
+		m_observer = new ObserverHelper<Testee>(*this);
+	}
+
+	~Tester(void)
+	{
+		delete m_observer;
+	}
+
+	void ignore(Observable<Testee>* observable)
+	{
+		m_observer->ignore(observable);
+	}
+	
+	void notify(Observable<Testee>* observable, Testee& aspect)
+	{
+		printf("I observed the Testee!\n");
+	}
+
+	void notifyDestruction( Observable<Testee>* observable)
+	{
+		printf("I observed the Testee's destruction!\n");
+	}
+
+	void observe(Observable<Testee>* observable)
+	{
+		m_observer->observe(observable);
+	}
+
+private:
+	ObserverHelper<Testee>*	m_observer;	
+};
+
+
+void testObservation(void)
+{
+	Tester* tester1 = new Tester();
+	Tester* tester2 = new Tester();
+	Testee* testee = new Testee();
+	tester1->observe(testee);
+	tester2->observe(testee);
+	tester2->observe(testee);
+	testee->update(*testee);
+	delete tester2;
+	delete testee;
+	delete tester1;
+}
+/** */
 
 HANDLE mutex;
 
@@ -107,15 +200,38 @@ void threadsChecking()
 	multithreading::returnMutex(pMutex);
 }
 
+void firstJob(void)
+{
+	sint number_size = 10000;
+	sint number_sort = 1000;
+	sint number;
+	sint* numbers = new sint[number_size];
+	sint* i = numbers;
+
+	for (number = 0; number < number_size; number++)
+	{
+		*i++ = number;
+	}
+
+	for (number = 0; number < number_sort; number++)
+	{
+		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+	}
+
+	printf("I finished a sort in a JOB!\n");
+	delete[] numbers;
+}
+
 void Sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
 	CompilerChecks::sizeOfChecks();
-	threadsChecking();
+	// threadsChecking();
 
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	uint max_threads = scheduler.getMaxThreads();
-	max_threads++;
+	scheduler.enqueue(firstJob);
 
-	multithreading::returnMutex(multithreading::getMutex());
+	testObservation();
 }

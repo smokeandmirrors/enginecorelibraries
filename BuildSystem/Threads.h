@@ -34,6 +34,15 @@ public:
 	virtual void execute(void)=0;
 }; // class Executable
 
+#if WIN32
+#include <process.h>
+#include <windows.h>
+
+typedef uint(__stdcall*		threadable)(void*);
+typedef uint				threadID;
+typedef void*				threadHandle;
+#endif//WIN32
+
 } // multithreading
 
 #endif//THREADS_H

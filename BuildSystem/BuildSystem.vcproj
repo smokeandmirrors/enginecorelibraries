@@ -430,6 +430,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="UtilityLibrary"
+			>
+			<File
+				RelativePath=".\Observation.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
