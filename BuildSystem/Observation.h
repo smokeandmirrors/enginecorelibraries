@@ -7,8 +7,10 @@
 This Observer pattern implementation is somewhat inspired by this article:
 http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 
-\warning THIS FUNCTIONALITY IS NOT THREAD SAFE!
+\todo make an observation manager which handles all the synchronization
+problems
 
+\warning THIS FUNCTIONALITY IS NOT THREAD SAFE!
 */
 
 #include <vector>
@@ -16,45 +18,41 @@ http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 namespace design_patterns 
 {
 
-template<typename SUBJECT, typename ASPECT=SUBJECT>
+template<typename SUBJECT>
 class Observer
 {
 public:
-	virtual ~Observer(void) {}
-
-	virtual void ignore(SUBJECT* observable, ASPECT* aspect=NULL)=0;
-	virtual void observe(SUBJECT* observable, ASPECT* aspect=NULL)=0;
-	virtual void notify(SUBJECT* observable, ASPECT* aspect=NULL)=0;
-	virtual void notifyDestruction(SUBJECT* observable, ASPECT* aspect=NULL)=0;
+	virtual		~Observer(void) {}
+	virtual void ignore(SUBJECT* observable)=0;
+	virtual void notify(SUBJECT* observable)=0;
+	virtual void notifyDestruction(SUBJECT* observable)=0;
+	virtual void observe(SUBJECT* observable)=0;
 }; // class Observer
 
-template<typename SUBJECT, typename ASPECT=SUBJECT>
+template<typename SUBJECT>
 class Observable
 {	
 public:
-	virtual ~Observable(void) {}
-	virtual void add(Observer<SUBJECT, ASPECT>* observer)=0;
-	virtual void remove(Observer<SUBJECT, ASPECT>* observer)=0;
-
-protected:	
-	// call notify() on all observers
-	virtual void update(ASPECT* aspect)=0;
+	virtual		~Observable(void) {}
+	virtual void add(Observer<SUBJECT>* observer)=0;
+	virtual void remove(Observer<SUBJECT>* observer)=0;
+	virtual void update(void)=0; // call notify() on all observers
 }; // class Observable
 
-template<typename SUBJECT, typename ASPECT=SUBJECT>
+template<typename SUBJECT>
 class ObservableHelper 
-: Observable<SUBJECT, ASPECT>
+: Observable<SUBJECT>
 {
 public:
-	explicit ObservableHelper(Observable<SUBJECT, ASPECT>& observable)
+	explicit ObservableHelper(Observable<SUBJECT>& observable)
 	: m_observable(observable)
 	{
-		// empty
+		/* empty */
 	}
 	
 	virtual ~ObservableHelper() 
 	{
-		for (std::vector<Observer<SUBJECT, ASPECT> *>::iterator iter = m_observers.begin();
+		for (std::vector<Observer<SUBJECT> *>::iterator iter = m_observers.begin();
 		iter != m_observers.end();
 		iter++)
 		{
@@ -62,9 +60,10 @@ public:
 		}
 	}
 	
-	virtual void add(Observer<SUBJECT, ASPECT>* observer)
+	// when using the helper, only call OBSERVE, NEVER ADD
+	virtual void add(Observer<SUBJECT>* observer)
 	{
-		for (std::vector<Observer<SUBJECT, ASPECT> *>::iterator iter = m_observers.begin();
+		for (std::vector<Observer<SUBJECT> *>::iterator iter = m_observers.begin();
 		iter != m_observers.end();
 		iter++)
 		{
@@ -77,53 +76,48 @@ public:
 		m_observers.push_back(observer);
 	}
 	
-	virtual void remove(Observer<SUBJECT, ASPECT>* observer)
+	virtual void remove(Observer<SUBJECT>* observer)
 	{
-		for (std::vector<Observer<SUBJECT, ASPECT> *>::iterator iter = m_observers.begin();
+		for (std::vector<Observer<SUBJECT> *>::iterator iter = m_observers.begin();
 		iter != m_observers.end();
 		iter++)
 		{
 			if (*iter == observer)
 			{
-				m_observers.erase(iter);
+				m_observers.erase(iter+0);
 				return;
 			}
 		}
 	}
 
-	virtual void update(ASPECT* aspect)
+	virtual void update(void)
 	{
-		for (std::vector<Observer<SUBJECT, ASPECT> *>::iterator iter = m_observers.begin();
+		for (std::vector<Observer<SUBJECT> *>::iterator iter = m_observers.begin();
 		iter != m_observers.end();
 		iter++)
 		{
-			(*iter)->notify(static_cast<SUBJECT*>(&m_observable), aspect);
+			(*iter)->notify(static_cast<SUBJECT*>(&m_observable));
 		}
 	}
 
 private:
-	ObservableHelper<SUBJECT, ASPECT>(void);
-	ObservableHelper<SUBJECT, ASPECT>(const ObservableHelper<SUBJECT, ASPECT>&);
-	ObservableHelper<SUBJECT, ASPECT> operator=(const ObservableHelper<SUBJECT, ASPECT>&);
+	ObservableHelper<SUBJECT>(void);
+	ObservableHelper<SUBJECT>(const ObservableHelper<SUBJECT>&);
+	ObservableHelper<SUBJECT> operator=(const ObservableHelper<SUBJECT>&);
 
-	Observable<SUBJECT, ASPECT>&				m_observable;
-	std::vector<Observer<SUBJECT, ASPECT> *>	m_observers;
+	Observable<SUBJECT>&				m_observable;
+	std::vector<Observer<SUBJECT> *>	m_observers;
 }; // ObservableHelper
 
-template<typename SUBJECT, typename ASPECT=SUBJECT>
+template<typename SUBJECT>
 class ObserverHelper
-: Observer<SUBJECT, ASPECT>
+: Observer<SUBJECT>
 {
 public:
-	explicit ObserverHelper(Observer<SUBJECT, ASPECT>& observer)
+	explicit ObserverHelper(Observer<SUBJECT>& observer)
 	: m_observer(observer)
 	{
-		for (std::vector<SUBJECT*>::iterator iter(m_observables.begin());
-		iter != m_observables.end();
-		iter++)
-		{
-			(*iter)->remove(this);
-		}		
+		/* empty */
 	}
 	
 	virtual ~ObserverHelper(void) 
@@ -136,7 +130,7 @@ public:
 		}
 	}
 	
-	virtual void ignore(SUBJECT* observable, ASPECT* aspect=NULL)
+	virtual void ignore(SUBJECT* observable)
 	{
 		for (std::vector<SUBJECT*>::iterator iter(m_observables.begin());
 		iter != m_observables.end();
@@ -144,19 +138,20 @@ public:
 		{
 			if (*iter == observable)
 			{
-				observable->remove(this);
+				// move to observation
+				// observable->remove(this);
 				m_observables.erase(iter);
 				return;
 			}
 		}		
 	}
 
-	virtual void notify(SUBJECT* observable, ASPECT* aspect=NULL)
+	virtual void notify(SUBJECT* observable)
 	{
-		m_observer.notify(observable, aspect);
+		m_observer.notify(observable);
 	}
 
-	virtual void notifyDestruction(SUBJECT* observable, ASPECT* aspect=NULL)
+	virtual void notifyDestruction(SUBJECT* observable)
 	{
 		for (std::vector<SUBJECT*>::iterator iter(m_observables.begin());
 		iter != m_observables.end();
@@ -171,7 +166,8 @@ public:
 		}
 	}
 
-	virtual void observe(SUBJECT* observable, ASPECT* aspect=NULL)
+	// when using the helper, only call OBSERVE, NEVER ADD
+	virtual void observe(SUBJECT* observable)
 	{
 		for (std::vector<SUBJECT*>::iterator iter(m_observables.begin());
 		iter != m_observables.end();
@@ -188,12 +184,12 @@ public:
 	}
 
 private:
-	ObserverHelper<SUBJECT, ASPECT>(void);
-	ObserverHelper<SUBJECT, ASPECT>(const ObserverHelper<SUBJECT, ASPECT>&);
-	ObserverHelper<SUBJECT, ASPECT> operator=(const ObserverHelper<SUBJECT, ASPECT>&);
+	ObserverHelper<SUBJECT>(void);
+	ObserverHelper<SUBJECT>(const ObserverHelper<SUBJECT>&);
+	ObserverHelper<SUBJECT> operator=(const ObserverHelper<SUBJECT>&);
 
-	std::vector<SUBJECT*>		m_observables;
-	Observer<SUBJECT, ASPECT>&	m_observer;
+	std::vector<SUBJECT*>	m_observables;
+	Observer<SUBJECT>&		m_observer;
 }; // ObserverHelper
 
 } // namespace design_patterns

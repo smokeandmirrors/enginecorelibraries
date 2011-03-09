@@ -15,6 +15,37 @@
 #include "Synchronization.h"
 #include "Threads.h"
 
+sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
+sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
+
+class QuickSortTester : public multithreading::Executable
+{
+public:
+	virtual void execute(void)
+	{
+		printf("I STARTED a sort in a CLASS!\n");
+		sint number_size = 10000;
+		sint number_sort = 1000;
+		sint number;
+		sint* numbers = new sint[number_size];
+		sint* i = numbers;
+
+		for (number = 0; number < number_size; number++)
+		{
+			*i++ = number;
+		}
+
+		for (number = 0; number < number_sort; number++)
+		{
+			qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+			qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+		}
+
+		printf("I FINISHED a sort in a CLASS!\n");
+		delete[] numbers;
+	}
+}; // QuickSortTester
+
 
 #define TEST_OBSERVATION 1
 #if TEST_OBSERVATION 
@@ -41,9 +72,9 @@ public:
 		m_observable->add(observer);
 	}
 
-	void update(Testee* aspect)
+	void update(void)
 	{
-		m_observable->update(aspect);
+		m_observable->update();
 	}
 
 	void remove(Observer<Testee>* observer)
@@ -70,23 +101,23 @@ public:
 		delete m_observer;
 	}
 
-	void ignore(Testee* observable, Testee* aspect=NULL)
+	void ignore(Testee* observable)
 	{
-		m_observer->ignore(observable, aspect);
+		m_observer->ignore(observable);
 	}
 
-	void observe(Testee* observable, Testee* aspect=NULL)
+	void observe(Testee* observable)
 	{
-		m_observer->observe(observable, aspect);
+		m_observer->observe(observable);
 	}
 
 protected:
-	void notify(Testee* observable, Testee* aspect=NULL)
+	void notify(Testee*)
 	{
 		printf("I observed the Testee!\n");
 	}
 
-	void notifyDestruction(Testee* observable, Testee* aspect=NULL)
+	void notifyDestruction(Testee*)
 	{
 		printf("I observed the Testee's destruction!\n");
 	}
@@ -98,14 +129,18 @@ void testObservation(void)
 {
 	Tester* tester1 = new Tester();
 	Tester* tester2 = new Tester();
+	Tester* tester3 = new Tester();
 	Testee* testee = new Testee();
 	tester1->observe(testee);
 	tester2->observe(testee);
 	tester2->observe(testee);
-	testee->update(testee);
+	tester3->observe(testee);
+	testee->update();
+	tester3->ignore(testee);
 	delete tester2;
 	delete testee;
 	delete tester1;
+	delete tester3;
 }
 #endif// TEST_OBSERVATION
 
@@ -122,9 +157,6 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
 	Sleep(numberOfThreads * 1000);
 	assert(numberOfThreads == myNumThreads);
 )
-
-sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
-sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
 
 DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 	sint number_size = 10000;
@@ -233,11 +265,15 @@ void Sandbox::play()
 	// threadsChecking();
 
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
-	uint max_threads = scheduler.getMaxThreads();
-	scheduler.enqueue(firstJob);
+	// scheduler.enqueue(firstJob);
+	
+	for (uint i = 0; i < 36; i++)
+	{
+		scheduler.enqueue(new QuickSortTester());
+	}
 
 #if TEST_OBSERVATION
-	testObservation();
+	// testObservation();
 #endif//TEST_OBSERVATION
 }
 

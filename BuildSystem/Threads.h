@@ -3,6 +3,7 @@
 #define THREADS_H
 
 #include "Build.h"
+#include "Observation.h"
 
 namespace multithreading
 {
@@ -35,13 +36,142 @@ public:
 }; // class Executable
 
 #if WIN32
-#include <process.h>
-#include <windows.h>
-
 typedef uint(__stdcall*		threadable)(void*);
 typedef uint				threadID;
 typedef void*				threadHandle;
 #endif//WIN32
+
+static sint noThreadPreference(-1);
+
+class Thread
+: public design_patterns::Observable<Thread>
+{
+public:
+	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
+	Thread(Executable* executable, 
+		sint CPUid=noThreadPreference, 
+		design_patterns::Observer<Thread>* observer=NULL) 
+	: m_executor(new Thread::ExecutableExecutor(executable))
+	{ 
+		initialize(CPUid, observer);
+	}
+
+	Thread(executableFunction executable, 
+		sint CPUid=noThreadPreference, 
+		design_patterns::Observer<Thread>* observer=NULL)
+	: m_executor(new Thread::FunctionExecutor(executable))
+	{ 
+		initialize(CPUid, observer);
+	}
+
+	~Thread(void);
+
+	void add(design_patterns::Observer<Thread>* observer)
+	{
+		m_observable->add(observer);
+	}
+	
+	void remove(design_patterns::Observer<Thread>* observer)
+	{
+		m_observable->remove(observer);
+	}
+	
+	void update(void)
+	{
+		m_observable->update();
+	}
+
+private:
+#if WIN32
+	static uint __stdcall executeThread(void* pThread)
+	{
+		static_cast<Thread*>(pThread)->execute();
+		return 0;
+	}
+#endif//WIN32
+
+	class Executor
+	{
+	public:
+		virtual void execute(void)=0;
+		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid);
+	}; // class Executor
+
+	class ExecutableExecutor : public Executor
+	{
+	public:
+		ExecutableExecutor(Executable* object) 
+			: m_object(object) 
+		{ 
+			/* empty */ 
+		}
+
+		void execute(void)
+		{
+			m_object->execute();
+		}					
+
+	private:	
+		Executable*	m_object;
+	}; // class ExecutableExecutor : public Executor
+
+	class FunctionExecutor : public Executor
+	{
+	public:		
+		FunctionExecutor(executableFunction function) 
+			: m_function(function) 
+		{ 
+			/* empty */ 
+		}
+
+		void execute(void)
+		{
+			(*m_function)();
+		}		
+
+	private:
+		executableFunction m_function;
+	}; // class FunctionExecutor : public Executor
+
+	friend class FunctionExecutor;
+	friend class Executor;
+	friend class ExecutableExecutor;
+
+	/** not allowed */
+	Thread(const Thread&);
+	Thread(void);
+
+	void execute(void)
+	{
+		m_executor->execute();
+		notifyTerminated();
+		delete this;
+	}
+
+	void initialize(sint CPUid, design_patterns::Observer<Thread>* observer)
+	{
+		assert(m_executor);
+		m_observable = new design_patterns::ObservableHelper<Thread>(*this);
+
+		if (observer)
+		{
+			observer->observe(this);
+		}
+
+		m_executor->initialize(this, m_thread, m_id, CPUid);
+	}
+
+	void notifyTerminated(void)
+	{
+		m_observable->update();
+	}
+
+	Executor*			m_executor;
+	threadID			m_id;
+	design_patterns::ObservableHelper<Thread>*	
+						m_observable;
+	threadHandle		m_thread;
+};
 
 } // multithreading
 

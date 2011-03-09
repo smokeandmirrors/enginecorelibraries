@@ -9,177 +9,117 @@
 namespace multithreading
 {
 
-/** 
-todo, these themselves might have to be hidden behind even smaller classes for
-better cross-platform use
-*/
-inline threadHandle createThread(threadable function, threadID& id, void* args, sint CPUid=-1);
-inline void endThread(void);
-inline uint GetNumHardwareThreads(void);
-
-#if WIN32
-inline threadHandle createThread(threadable function, threadID& id, void* args, sint/* CPUid*/)
-{	
-	HANDLE newthread = (HANDLE)(_beginthreadex(NULL, 0, function, args, 0, &id));
-	/** 
-	\todo the last parameter is CPUid, allow for setting the processor affinity on a per
-	platform basis
-	DWORD result = SetThreadIdealProcessor(newthread, CPUid);
-	*/
-	return newthread;
-}
-
-inline void endThread(void)
-{
-	uint status(0);
-	_endthreadex(status);
-}
-
-inline uint GetNumHardwareThreads(void)
-{
-	_SYSTEM_INFO system_info;
-	GetSystemInfo(&system_info);
-}
-#endif//WIN32
-
-class Thread
-{
-#if WIN32
-	static uint __stdcall executeThread(void* pThread)
-	{
-		static_cast<Thread*>(pThread)->execute();
-		return 0;
-	}
-#endif//WIN32
-
-	class Executor
-	{
-	public:
-		virtual void execute(void)=0;
-		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid)
-		{
-			handle = multithreading::createThread(Thread::executeThread, id, thread, CPUid);
-		}
-	}; // class Executor
-
-	class ExecutableExecutor : public Executor
-	{
-	public:
-		ExecutableExecutor(Executable* object) 
-			: m_object(object) 
-		{ 
-			/* empty */ 
-		}
-
-		void execute(void)
-		{
-			m_object->execute();
-		}					
-
-	private:	
-		Executable*	m_object;
-	}; // class ExecutableExecutor : public Executor
-
-	class FunctionExecutor : public Executor
-	{
-	public:		
-		FunctionExecutor(executableFunction function) 
-			: m_function(function) 
-		{ 
-			/* empty */ 
-		}
-
-		void execute(void)
-		{
-			(*m_function)();
-		}		
-
-	private:
-		executableFunction m_function;
-	}; // class FunctionExecutor : public Executor
-
-	friend class FunctionExecutor;
-	friend class Executor;
-	friend class ExecutableExecutor;
-
-public:
-	Thread(Executable* executable, sint CPUid=-1) 
-		: m_executor(new Thread::ExecutableExecutor(executable))
-	{ 
-		initialize(CPUid);
-	}
-
-	Thread(executableFunction executable, sint CPUid=-1)
-		: m_executor(new Thread::FunctionExecutor(executable))
-	{ 
-		initialize(CPUid);
-	}
-
-	~Thread(void)
-	{	
-		CloseHandle(m_thread);
-		delete m_executor;
-	}
-
-private:
-	/** not allowed */
-	Thread(const Thread&);
-	Thread(void);
-
-	void execute(void)
-	{
-		m_executor->execute();
-		notifyTerminated();
-	}
-
-	void initialize(sint CPUid)
-	{
-		assert(m_executor);
-		m_executor->initialize(this, m_thread, m_id, CPUid);
-	}
-
-	void notifyTerminated(void)
-	{
-		// Scheduler::single().notifyFinished(this);
-	}
-
-	Executor*				m_executor;
-	threadID				m_id;
-	threadHandle			m_thread;
-}; // class Thread
-
-
+class PendingJobQueue;
 
 class Scheduler 
+: public design_patterns::Observer<Thread>
 {
 public:
-	static Scheduler& single(void);
-	
-	void enqueue(Executable* job, sint ideal_thread=-1);
-	void enqueue(executableFunction job, sint ideal_thread=-1);
+	static Scheduler&	single(void);
+	static void			destroy(void);
+	void enqueue(Executable* job, sint ideal_thread=noThreadPreference);
+	void enqueue(executableFunction job, sint ideal_thread=noThreadPreference);
+	uint getMaxThreads(void) const			{ return m_maxThreads; }
+	uint getMinThreads(void) const			{ return m_minThreads; }
 	void getNumberActiveJobs(void);
 	void getNumberPendingJobs(void);
-	uint getMaxThreads(void) const	{ return m_maxThreads; }
-	uint getMinThreads(void) const	{ return m_minThreads; }
-	void setMaxThreads(uint max)	{ m_maxThreads = max; }
-	void setMinThreads(uint min)	{ m_minThreads = min; }
+	uint getNumberSystemThreads(void) const { return m_numSystemThreads; }
+	void ignore(Thread* observable)
+	{
+		m_observer->ignore(observable);
+	}
+	void notify(Thread* observable)
+	{
+		accountForFinish(observable);
+		startNextJob();
+	}
+	void notifyDestruction(Thread*)
+	{	// should never, ever happen
+		assert(false); 
+	}
+	void observe(Thread* observable)
+	{
+		m_observer->observe(observable);
+	}
+	void setMaxThreads(uint max)			{ m_maxThreads = max; }
+	void setMinThreads(uint min)			{ m_minThreads = min; }
 	
 protected:
-	uint getNumberSystemThreads(void) const;
+	inline void accountForFinish(Thread* job)
+	{
+		sint thread_index = -1;
 
-private:
-	typedef Scheduler& (*schedulerGetter)(void);
-	static Scheduler& getInitializedScheduler(void);
-	static Scheduler& getUninitializedScheduler(void);
-	static Scheduler* singleton;
-	static schedulerGetter getScheduler;
+		for (uint i = 0; i < m_numSystemThreads; i++)
+		{
+			if (m_activeJobs[i] == job)
+			{
+				thread_index = static_cast<sint>(i);
+				break;
+			}
+		}
 
-	Scheduler(void);
-	Scheduler(const Scheduler&);
-	Scheduler operator=(const Scheduler&);
+		assert(thread_index != -1);
+		ignore(job);
+		// delete job;
+		m_activeJobs[thread_index] = NULL;
+		m_numActiveJobs--;
+	}
+
+	inline void accountForNewJob(Thread* job, sint index)
+	{
+		m_activeJobs[index] = job;
+		m_numActiveJobs++;
+	}
 	
+	inline bool getFreeIndex(sint& index)
+	{
+		for (uint i = 0; i < m_numSystemThreads; i++)
+		{
+			if (!m_activeJobs[i])
+			{
+				index = static_cast<sint>(i);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	inline bool getOpenThread(sint& index, sint ideal_thread)
+	{
+		if (ideal_thread != noThreadPreference && !m_activeJobs[ideal_thread])
+		{
+			index = ideal_thread;
+			return true;
+		}
+		else
+		{
+			return getFreeIndex(index);
+		}	
+	}
+
+	void initializeNumberSystemThreads(void);
+	void startNextJob(void);
+	
+private:
+	typedef Scheduler&		(*schedulerGetter)(void);
+	static Scheduler&		getInitializedScheduler(void);
+	static Scheduler&		getUninitializedScheduler(void);
+	static schedulerGetter	getScheduler;
+	static Scheduler*		singleton;
+	
+							Scheduler(void);
+							Scheduler(const Scheduler&);
+							Scheduler operator=(const Scheduler&);
+							~Scheduler(void);
+	
+	Thread**				m_activeJobs;
 	uint					m_maxThreads;
 	uint					m_minThreads;
+	uint					m_numActiveJobs;
+	uint					m_numSystemThreads;
+	design_patterns::ObserverHelper<Thread>* m_observer;
+	PendingJobQueue*		m_pendingJobs;
 }; // class Scheduler
 
 } // multithreading
