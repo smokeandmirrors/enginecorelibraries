@@ -2,6 +2,11 @@
 #include <tchar.h>
 #include <vector>
 
+#if WIN32
+#include <process.h>
+#include <windows.h>
+#endif//WIN32
+
 #include "Build.h"
 #include "CompilerChecks.h"
 #include "Observation.h"
@@ -10,13 +15,12 @@
 #include "Synchronization.h"
 #include "Threads.h"
 
-#if WIN32
-#include <process.h>
-#include <windows.h>
-#endif
 
+#define TEST_OBSERVATION 1
+#if TEST_OBSERVATION 
 
 using namespace design_patterns;
+
 
 class Testee 
 : public Observable<Testee>
@@ -37,7 +41,7 @@ public:
 		m_observable->add(observer);
 	}
 
-	void update(Testee& aspect)
+	void update(Testee* aspect)
 	{
 		m_observable->update(aspect);
 	}
@@ -51,7 +55,6 @@ public:
 private:
 	ObservableHelper<Testee>* m_observable;
 };
-
 
 class Tester 
 : public Observer<Testee>
@@ -67,31 +70,30 @@ public:
 		delete m_observer;
 	}
 
-	void ignore(Observable<Testee>* observable)
+	void ignore(Testee* observable, Testee* aspect=NULL)
 	{
-		m_observer->ignore(observable);
+		m_observer->ignore(observable, aspect);
 	}
-	
-	void notify(Observable<Testee>* observable, Testee& aspect)
+
+	void observe(Testee* observable, Testee* aspect=NULL)
+	{
+		m_observer->observe(observable, aspect);
+	}
+
+protected:
+	void notify(Testee* observable, Testee* aspect=NULL)
 	{
 		printf("I observed the Testee!\n");
 	}
 
-	void notifyDestruction( Observable<Testee>* observable)
+	void notifyDestruction(Testee* observable, Testee* aspect=NULL)
 	{
 		printf("I observed the Testee's destruction!\n");
-	}
-
-	void observe(Observable<Testee>* observable)
-	{
-		m_observer->observe(observable);
 	}
 
 private:
 	ObserverHelper<Testee>*	m_observer;	
 };
-
-
 void testObservation(void)
 {
 	Tester* tester1 = new Tester();
@@ -100,12 +102,13 @@ void testObservation(void)
 	tester1->observe(testee);
 	tester2->observe(testee);
 	tester2->observe(testee);
-	testee->update(*testee);
+	testee->update(testee);
 	delete tester2;
 	delete testee;
 	delete tester1;
 }
-/** */
+#endif// TEST_OBSERVATION
+
 
 HANDLE mutex;
 
@@ -233,5 +236,9 @@ void Sandbox::play()
 	uint max_threads = scheduler.getMaxThreads();
 	scheduler.enqueue(firstJob);
 
+#if TEST_OBSERVATION
 	testObservation();
+#endif//TEST_OBSERVATION
 }
+
+

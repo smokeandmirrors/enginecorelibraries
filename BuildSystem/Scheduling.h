@@ -43,7 +43,6 @@ inline uint GetNumHardwareThreads(void)
 #endif//WIN32
 
 class Thread
-: public Observable<Thread, Thread*>
 {
 #if WIN32
 	static uint __stdcall executeThread(void* pThread)
@@ -122,21 +121,6 @@ public:
 		delete m_executor;
 	}
 
-	void add(Observer<Thread, Thread*>* observer)		
-	{
-		m_observable->add(observer); 
-	}
-	
-	void remove(Observer<Thread, Thread*>* observer)	
-	{ 
-		m_observable->remove(observer); 
-	}
-
-	void update(Thread* aspect)							
-	{ 
-		m_observable->update(observer); 
-	}
-
 private:
 	/** not allowed */
 	Thread(const Thread&);
@@ -151,7 +135,6 @@ private:
 	void initialize(sint CPUid)
 	{
 		assert(m_executor);
-		m_observable = new ObservableHelper<Thread, Thread*>(*this);
 		m_executor->initialize(this, m_thread, m_id, CPUid);
 	}
 
@@ -162,14 +145,12 @@ private:
 
 	Executor*				m_executor;
 	threadID				m_id;
-	ObservableHelper<Thread, Thread*>* m_observable;
 	threadHandle			m_thread;
 }; // class Thread
 
 
 
 class Scheduler 
-: public design_patterns::Observer<Thread, Thread*>
 {
 public:
 	static Scheduler& single(void);
@@ -180,10 +161,6 @@ public:
 	void getNumberPendingJobs(void);
 	uint getMaxThreads(void) const	{ return m_maxThreads; }
 	uint getMinThreads(void) const	{ return m_minThreads; }
-	void ignore(design_patterns::Observable<Thread, Thread*>* observable)					{}
-	void notify(design_patterns::Observable<Thread, Thread*>* observable, Thread* aspect)	{}
-	void notifyDestruction(design_patterns::Observable<Thread, Thread*>* observable)		{}
-	void observe(design_patterns::Observable<Thread, Thread*>* observable)				{}
 	void setMaxThreads(uint max)	{ m_maxThreads = max; }
 	void setMinThreads(uint min)	{ m_minThreads = min; }
 	
@@ -201,7 +178,6 @@ private:
 	Scheduler(const Scheduler&);
 	Scheduler operator=(const Scheduler&);
 	
-	design_patterns::ObserverHelper<Thread, Thread*>* m_observer;
 	uint					m_maxThreads;
 	uint					m_minThreads;
 }; // class Scheduler
