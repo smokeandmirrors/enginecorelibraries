@@ -13,7 +13,12 @@ problems
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE!
 */
 
+#include <hash_map>
+#include <list>
+#include <utility>
 #include <vector>
+
+#include "Singleton.h"
 
 namespace design_patterns 
 {
@@ -36,37 +41,75 @@ public:
 
 /**
 The implicit interface of OBSERVER is void notice(OBSERVABLE* subject);
+
 The implicit interface of OBSERVABLE is void notify(void);
-which is most easily implemented as Observation<OBSERVABLE>::single.notify(this);
+\note which is most easily implemented as Observation<OBSERVABLE>::single.notify(this);
 */
 
 template<typename OBSERVER, typename OBSERVABLE>
-class Observation
+class Observation : public Singleton< Observation<OBSERVER, OBSERVABLE> >
 {
+	typedef std::list<OBSERVABLE*>							observable_list;
+	typedef std::list<OBSERVER*>							observer_list;
+
+	typedef typename std::list<OBSERVABLE*>::iterator		observable_list_iter;
+	typedef typename std::list<OBSERVER*>::iterator			observer_list_iter;
+
+	typedef std::pair<OBSERVER*, observable_list*>			observer_list_pair;
+	typedef std::pair<OBSERVABLE*, observer_list*>			observable_list_pair;
+
+	typedef stdext::hash_map<OBSERVER*, observable_list*>	observer_list_map;
+	typedef stdext::hash_map<OBSERVABLE*, observer_list*>	observable_list_map;
+
 public:
-	void begin(OBSERVABLE* subject, OBSERVER* observer)
+	void begin(OBSERVABLE& subject, OBSERVER& observer)
 	{
 
 	}
 
-	void cease(OBSERVABLE* subject, OBSERVER* observer)
+	void cease(OBSERVABLE& subject, OBSERVER& observer)
 	{
 
 	}
 
-	void cease(OBSERVABLE* subject)
+	void hide(OBSERVABLE& subject)
 	{
 
 	}
 
-	void cease(OBSERVER* observer)
+	void ignore(OBSERVER& observer)
 	{
 
 	}
-	
+
+	void notify(OBSERVABLE& subject)
+	{
+
+	}
+
 protected:
+	void notify(OBSERVABLE& subject, const observer_list& observers) const
+	{
+		observer_list temp = observers;
+		
+		for (observable_list_iter iter(temp.begin()); iter != temp.end(); iter++)
+		{
+			(*iter)->notify(&subject);	
+		}		
+	}
+
+	bool isActive(void) const
+	{
+		
+	}
 
 private:
+	
+
+	observable_list_map m_observableListMap;
+	observer_list_map	m_observerListMap;
+	// container, observer -> observables
+	// container, observable -> observers
 
 }; // class Observation
 

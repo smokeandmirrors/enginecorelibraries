@@ -313,6 +313,22 @@ void firstJob(void)
 	delete[] numbers;
 }
 
+class CObservable
+{
+	void notify()
+	{
+		// design_patterns::Observation::
+	}
+};
+
+class CObserver
+{
+	void notice(CObservable* suject)
+	{
+		printf("I've been notified!");
+	}
+};
+
 void Sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
@@ -323,6 +339,11 @@ void Sandbox::play()
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
 	
+	int one(1);
+	int two(2);
+
+	design_patterns::Observation<int, int>::single().begin(one, two);
+
 	for (uint i = 0; i < 36; i++)
 	{
 		scheduler.enqueue(new QuickSortTester());
