@@ -12,8 +12,63 @@
 #include "Observation.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
+#include "Singleton.h"
 #include "Synchronization.h"
 #include "Threads.h"
+
+
+class TheOne : public design_patterns::Singleton<TheOne>
+{
+public:
+	~TheOne(void)
+	{
+		printf("The One Destroyed!");
+	}
+
+	void decrement(void)
+	{
+		--one;
+	}
+
+	sint get(void) const
+	{
+		return one;
+	}
+
+	void increment(void)
+	{
+		++one;
+	}
+
+private:
+	sint one;
+}; // class TheOne : public design_patterns::Singleton<TheOne>
+
+// TheOne::getter(TheOne::getUninitialized);
+
+template<typename T>
+class TVector3
+{
+public:
+	T x;
+	T y;
+	T z;
+
+	TVector3()
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+
+	void add(const TVector3& other)
+	{
+		x += other.x;
+		y += other.y;
+		z += other.z;
+	}
+};
+
 
 sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
 sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
@@ -261,6 +316,7 @@ void firstJob(void)
 void Sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
+	
 	CompilerChecks::sizeOfChecks();
 	// threadsChecking();
 

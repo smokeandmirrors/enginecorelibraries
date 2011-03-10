@@ -19,6 +19,76 @@ namespace design_patterns
 {
 
 template<typename SUBJECT>
+class IObserver
+{
+public:
+	virtual		~IObserver(void) {}
+	virtual void notice(SUBJECT* observable)=0;
+}; // class IObserver
+
+template<typename SUBJECT>
+class IObservable
+{	
+public:
+	virtual		~IObservable(void) {}
+	virtual void notify(void)=0; // call notice() on all observers
+}; // class IObservable
+
+/**
+The implicit interface of OBSERVER is void notice(OBSERVABLE* subject);
+The implicit interface of OBSERVABLE is void notify(void);
+which is most easily implemented as Observation<OBSERVABLE>::single.notify(this);
+*/
+
+template<typename OBSERVER, typename OBSERVABLE>
+class Observation
+{
+public:
+	void begin(OBSERVABLE* subject, OBSERVER* observer)
+	{
+
+	}
+
+	void cease(OBSERVABLE* subject, OBSERVER* observer)
+	{
+
+	}
+
+	void cease(OBSERVABLE* subject)
+	{
+
+	}
+
+	void cease(OBSERVER* observer)
+	{
+
+	}
+	
+protected:
+
+private:
+
+}; // class Observation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename SUBJECT>
 class Observer
 {
 public:

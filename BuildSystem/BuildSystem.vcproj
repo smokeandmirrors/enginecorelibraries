@@ -431,10 +431,18 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="UtilityLibrary"
+			Name="Utility Library"
+			>
+		</Filter>
+		<Filter
+			Name="Design Patterns"
 			>
 			<File
 				RelativePath=".\Observation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Singleton.h"
 				>
 			</File>
 		</Filter>
