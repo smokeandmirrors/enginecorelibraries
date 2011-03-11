@@ -7,9 +7,6 @@
 This Observer pattern implementation is somewhat inspired by this article:
 http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 
-\todo make an observation manager which handles all the synchronization
-problems
-
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE!
 */
 

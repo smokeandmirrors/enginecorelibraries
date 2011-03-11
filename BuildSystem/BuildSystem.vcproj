@@ -429,6 +429,14 @@
 				RelativePath=".\Build.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Time.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Time.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Utility Library"

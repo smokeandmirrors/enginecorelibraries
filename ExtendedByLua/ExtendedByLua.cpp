@@ -20,10 +20,12 @@ using namespace luaExtension;
 #include "Sandbox.h" 
 #endif//SANDBOX
 
+#include "Time.h"
 #include "Vector.h"
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
+	real_time::initialize();
 #if SANDBOX
 	// just plays with C/C++ compile/runtime functionality
 	Sandbox::play();
@@ -42,7 +44,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
-
 	return 0;
 }
 
