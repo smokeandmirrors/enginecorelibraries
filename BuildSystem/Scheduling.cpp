@@ -21,11 +21,6 @@ inline uint getNumHardwareThreads(void)
 }
 #endif//WIN32
 
-/** scheduler singleton */
-Mutex*						scheduleGetterMutex(getMutex());	// get synchronization
-Scheduler::schedulerGetter	Scheduler::getScheduler(getUninitializedScheduler);
-Scheduler*					Scheduler::singleton(NULL);
-
 class PendingJobQueue
 {
 	class PendingJob 
@@ -213,28 +208,6 @@ Scheduler::~Scheduler(void)
 	delete[] m_activeJobs;
 }
 
-void Scheduler::destroy(void)
-{
-	bool return_mutex(false);
-
-	{
-		synchronize(scheduleGetterMutex);
-
-		if (singleton)
-		{
-			delete singleton;
-			singleton = NULL;
-			getScheduler = getUninitializedScheduler;
-			return_mutex = true;
-		}
-	}
-
-	if (return_mutex)
-	{
-		returnMutex(scheduleGetterMutex);
-	}
-}
-
 void Scheduler::enqueue(Executable* job, sint ideal_thread/* =noThreadPreference */)
 {
 	sint index;
@@ -265,34 +238,6 @@ void Scheduler::enqueue(executableFunction job, sint ideal_thread/* =noThreadPre
 	}
 }
 
-Scheduler& Scheduler::getInitializedScheduler(void)
-{
-	return *singleton;
-}
-
-Scheduler& Scheduler::getUninitializedScheduler(void)
-{
-	bool return_mutex(false);
-	
-	{
-		synchronize(scheduleGetterMutex);
-	
-		if (!singleton)
-		{
-			singleton = new Scheduler();
-			getScheduler = getInitializedScheduler;
-			return_mutex = true;
-		}
-	}
-
-	if (return_mutex)
-	{
-		returnMutex(scheduleGetterMutex);
-	}
-
-	return *singleton;
-}
-
 void Scheduler::initializeNumberSystemThreads(void)
 {
 #if WIN32
@@ -302,11 +247,6 @@ void Scheduler::initializeNumberSystemThreads(void)
 #elif 
 	m_numSystemThreads = 1;
 #endif//WIN32
-}
-
-Scheduler& Scheduler::single(void)
-{
-	return (*getScheduler)();
 }
 
 void Scheduler::startNextJob(void)

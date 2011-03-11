@@ -76,9 +76,9 @@ public:
 		m_observable->remove(observer);
 	}
 	
-	void update(void)
+	void notify(void)
 	{
-		m_observable->update();
+		m_observable->notify();
 	}
 
 private:
@@ -144,7 +144,7 @@ private:
 	void execute(void)
 	{
 		m_executor->execute();
-		notifyTerminated();
+		m_observable->notify();
 		delete this;
 	}
 
@@ -155,15 +155,10 @@ private:
 
 		if (observer)
 		{
-			observer->observe(this);
+			add(observer);
 		}
 
 		m_executor->initialize(this, m_thread, m_id, CPUid);
-	}
-
-	void notifyTerminated(void)
-	{
-		m_observable->update();
 	}
 
 	Executor*			m_executor;

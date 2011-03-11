@@ -127,9 +127,9 @@ public:
 		m_observable->add(observer);
 	}
 
-	void update(void)
+	void notify(void)
 	{
-		m_observable->update();
+		m_observable->notify();
 	}
 
 	void remove(Observer<Testee>* observer)
@@ -146,10 +146,13 @@ class Tester
 : public Observer<Testee>
 {
 public:
-	Tester(void)
+	Tester(uint value)
+		: m_value(value)
 	{
 		m_observer = new ObserverHelper<Testee>(*this);
 	}
+
+	uint m_value;
 
 	~Tester(void)
 	{
@@ -167,14 +170,9 @@ public:
 	}
 
 protected:
-	void notify(Testee*)
+	void notice(Testee*)
 	{
 		printf("I observed the Testee!\n");
-	}
-
-	void notifyDestruction(Testee*)
-	{
-		printf("I observed the Testee's destruction!\n");
 	}
 
 private:
@@ -182,20 +180,27 @@ private:
 };
 void testObservation(void)
 {
-	Tester* tester1 = new Tester();
-	Tester* tester2 = new Tester();
-	Tester* tester3 = new Tester();
+	Tester* tester1 = new Tester(1);
+	Tester* tester2 = new Tester(2);
+	Tester* tester3 = new Tester(3);
+	Tester* tester4 = new Tester(4);
 	Testee* testee = new Testee();
-	tester1->observe(testee);
-	tester2->observe(testee);
-	tester2->observe(testee);
-	tester3->observe(testee);
-	testee->update();
+	
+	testee->add(tester1);
+	tester1->observe(testee); // bad!
+	testee->add(tester2);
+	testee->add(tester4);
+	testee->add(tester2);
+	testee->add(tester3);
+	testee->remove(tester4);
+	testee->notify();
 	tester3->ignore(testee);
+	
 	delete tester2;
 	delete testee;
 	delete tester1;
 	delete tester3;
+	delete tester4;
 }
 #endif// TEST_OBSERVATION
 
@@ -313,22 +318,6 @@ void firstJob(void)
 	delete[] numbers;
 }
 
-class CObservable
-{
-	void notify()
-	{
-		// design_patterns::Observation::
-	}
-};
-
-class CObserver
-{
-	void notice(CObservable* suject)
-	{
-		printf("I've been notified!");
-	}
-};
-
 void Sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
@@ -339,18 +328,13 @@ void Sandbox::play()
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
 	
-	int one(1);
-	int two(2);
-
-	design_patterns::Observation<int, int>::single().begin(one, two);
-
 	for (uint i = 0; i < 36; i++)
 	{
 		scheduler.enqueue(new QuickSortTester());
 	}
 
 #if TEST_OBSERVATION
-	// testObservation();
+	testObservation();
 #endif//TEST_OBSERVATION
 }
 

@@ -4,6 +4,7 @@
 
 #include "Build.h"
 #include "Observation.h"
+#include "Singleton.h"
 #include "Threads.h"
 
 namespace multithreading
@@ -12,11 +13,12 @@ namespace multithreading
 class PendingJobQueue;
 
 class Scheduler 
-: public design_patterns::Observer<Thread>
+: public design_patterns::Singleton<Scheduler>
+, public design_patterns::Observer<Thread>
 {
+	friend class design_patterns::Singleton<Scheduler>;
+
 public:
-	static Scheduler&	single(void);
-	static void			destroy(void);
 	void enqueue(Executable* job, sint ideal_thread=noThreadPreference);
 	void enqueue(executableFunction job, sint ideal_thread=noThreadPreference);
 	uint getMaxThreads(void) const			{ return m_maxThreads; }
@@ -28,14 +30,10 @@ public:
 	{
 		m_observer->ignore(observable);
 	}
-	void notify(Thread* observable)
+	void notice(Thread* observable)
 	{
 		accountForFinish(observable);
 		startNextJob();
-	}
-	void notifyDestruction(Thread*)
-	{	// should never, ever happen
-		assert(false); 
 	}
 	void observe(Thread* observable)
 	{
@@ -45,6 +43,9 @@ public:
 	void setMinThreads(uint min)			{ m_minThreads = min; }
 	
 protected:
+	Scheduler(void);
+	~Scheduler(void);
+	
 	inline void accountForFinish(Thread* job)
 	{
 		sint thread_index = -1;
@@ -59,8 +60,6 @@ protected:
 		}
 
 		assert(thread_index != -1);
-		ignore(job);
-		// delete job;
 		m_activeJobs[thread_index] = NULL;
 		m_numActiveJobs--;
 	}
@@ -102,16 +101,8 @@ protected:
 	void startNextJob(void);
 	
 private:
-	typedef Scheduler&		(*schedulerGetter)(void);
-	static Scheduler&		getInitializedScheduler(void);
-	static Scheduler&		getUninitializedScheduler(void);
-	static schedulerGetter	getScheduler;
-	static Scheduler*		singleton;
-	
-							Scheduler(void);
 							Scheduler(const Scheduler&);
 							Scheduler operator=(const Scheduler&);
-							~Scheduler(void);
 	
 	Thread**				m_activeJobs;
 	uint					m_maxThreads;

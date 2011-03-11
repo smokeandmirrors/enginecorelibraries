@@ -9,8 +9,8 @@
 namespace multithreading
 {
 
-inline threadHandle createThread(threadable function, threadID& id, void* args, sint CPUid=noThreadPreference);
-inline void endThread(void);
+inline threadHandle	createThread(threadable function, threadID& id, void* args, sint CPUid=noThreadPreference);
+inline void			closeThread(threadHandle);
 
 #if WIN32
 inline threadHandle createThread(threadable function, threadID& id, void* args, sint/* CPUid*/)
@@ -27,18 +27,17 @@ inline threadHandle createThread(threadable function, threadID& id, void* args, 
 	return newthread;
 }
 
-inline void endThread(void)
+inline void	closeThread(threadHandle threadHandle)
 {
-	uint status(0);
-	_endthreadex(status);
+	CloseHandle(threadHandle);
 }
 #endif//WIN32
 
 Thread::~Thread(void)
 {
 	delete m_observable;
-	CloseHandle(m_thread);
 	delete m_executor;
+	closeThread(m_thread);
 }
 
 void Thread::Executor::initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid)
