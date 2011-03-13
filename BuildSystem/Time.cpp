@@ -5,8 +5,8 @@
 // static CLOCKS_PER_SEC
 namespace real_time
 {
-const double cyclesToSeconds			(static_cast<double>(1.0) / static_cast<double>(CLOCKS_PER_SEC));
-const double cyclesToMilliseconds		(static_cast<double>(1000.0) / static_cast<double>(CLOCKS_PER_SEC));
+const real8 cyclesToSeconds			(static_cast<real8>(1.0) / static_cast<real8>(CLOCKS_PER_SEC));
+const real8 cyclesToMilliseconds		(static_cast<real8>(1000.0) / static_cast<real8>(CLOCKS_PER_SEC));
 
 time_t			appCalendarStart;
 millisecond		appMillisecondsCurrent	(0);
@@ -37,7 +37,7 @@ void tick(void)
 	/* time_t method
 	time_t current;
 	time(&current);
-	double delta = difftime(current, appCalendarStart);
+	real8 delta = difftime(current, appCalendarStart);
 	appMillisecondsCurrent = static_cast<millisecond>(delta * 1000.0f);
 	appSecondsCurrent = static_cast<second>(delta);
 	*/

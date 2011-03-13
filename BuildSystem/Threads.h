@@ -8,8 +8,8 @@
 namespace multithreading
 {
 #if WIN32
-#define ARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void* args)
-#define NOARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void*)
+#define ARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void* args)
+#define NOARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void*)
 #endif// WIN32
 
 #define DECLARE_NOARGS_EXECUTABLE_FUNCTION(name) NOARGS_EXECUTABLE_FUNCTION(name);
@@ -36,12 +36,12 @@ public:
 }; // class Executable
 
 #if WIN32
-typedef uint(__stdcall*		threadable)(void*);
-typedef uint				threadID;
+typedef uint4(__stdcall*		threadable)(void*);
+typedef uint4				threadID;
 typedef void*				threadHandle;
 #endif//WIN32
 
-static sint noThreadPreference(-1);
+static sint4 noThreadPreference(-1);
 
 class Thread
 : public design_patterns::Observable<Thread>
@@ -49,7 +49,7 @@ class Thread
 public:
 	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
 	Thread(Executable* executable, 
-		sint CPUid=noThreadPreference, 
+		sint4 CPUid=noThreadPreference, 
 		design_patterns::Observer<Thread>* observer=NULL) 
 	: m_executor(new Thread::ExecutableExecutor(executable))
 	{ 
@@ -57,7 +57,7 @@ public:
 	}
 
 	Thread(executableFunction executable, 
-		sint CPUid=noThreadPreference, 
+		sint4 CPUid=noThreadPreference, 
 		design_patterns::Observer<Thread>* observer=NULL)
 	: m_executor(new Thread::FunctionExecutor(executable))
 	{ 
@@ -83,7 +83,7 @@ public:
 
 private:
 #if WIN32
-	static uint __stdcall executeThread(void* pThread)
+	static uint4 __stdcall executeThread(void* pThread)
 	{
 		static_cast<Thread*>(pThread)->execute();
 		return 0;
@@ -94,7 +94,7 @@ private:
 	{
 	public:
 		virtual void execute(void)=0;
-		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid);
+		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint4 CPUid);
 	}; // class Executor
 
 	class ExecutableExecutor : public Executor
@@ -148,7 +148,7 @@ private:
 		delete this;
 	}
 
-	void initialize(sint CPUid, design_patterns::Observer<Thread>* observer)
+	void initialize(sint4 CPUid, design_patterns::Observer<Thread>* observer)
 	{
 		assert(m_executor);
 		m_observable = new design_patterns::ObservableHelper<Thread>(*this);

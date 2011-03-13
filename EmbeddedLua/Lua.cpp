@@ -6,12 +6,12 @@
 
 #include "LuaInclusions.h"
 
-namespace luaExtension 
+namespace lua_extension 
 {
 
 #if !GOLDMASTER
 // \note taken straight from lua.c
-static sint traceback (lua_State* L)
+static sint4 traceback (lua_State* L)
 {
   // if (!lua_isstring(L, 1))  /* 'message' not a string? */
   //  return 1;  /* keep it intact */
@@ -62,12 +62,12 @@ Lua::~Lua(void)
 	delete m_name;
 }
 
-sint Lua::callProtected(lua_State* L, sint num_args, sint num_return_values)
+sint4 Lua::callProtected(lua_State* L, sint4 num_args, sint4 num_return_values)
 {	
-	sint errorfunc_index = lua_gettop(L) - num_args;	
+	sint4 errorfunc_index = lua_gettop(L) - num_args;	
 	lua_getglobal(L, "traceback");			
 	lua_insert(L, errorfunc_index);					
-	sint error_code = lua_pcall(L, num_args, num_return_values, errorfunc_index);
+	sint4 error_code = lua_pcall(L, num_args, num_return_values, errorfunc_index);
 	lua_remove(L, errorfunc_index);					
 
 	if (error_code)
@@ -209,7 +209,7 @@ void Lua::openStandardLibraries(void) const
 }
 
 // \note taken and modified from from lua.c 
-sint Lua::report(lua_State* L, sint error_code)
+sint4 Lua::report(lua_State* L, sint4 error_code)
 {
 	if (error_code && lua_isstring(L, -1)) 
 	{
@@ -248,7 +248,7 @@ void Lua::runConsole(void) const
 		char* d = &quit[0]; 
 		char* s = &buff[0];
 		
-		for (sint i=0; i < 8; i++)
+		for (sint4 i=0; i < 8; i++)
 		{
 			*d++ = *s++;
 		}
@@ -268,4 +268,4 @@ void Lua::runConsole(void) const
 	}	
 }
 
-} // namespace luaExtension
+} // namespace lua_extension

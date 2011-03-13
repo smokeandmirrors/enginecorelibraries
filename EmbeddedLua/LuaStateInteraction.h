@@ -23,7 +23,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 
-namespace luaExtension 
+namespace lua_extension 
 { 
 #if ARGUMENT_ERRORS 
 #pragma message("Compiling with Lua stack argument type checking.")
@@ -33,7 +33,7 @@ average lua_istype function being a macro
 */
 #define assert_lua_argument(lua_istype, expected, L, index) \
 	{ \
-		sint stack_size = lua_gettop(L); \
+		sint4 stack_size = lua_gettop(L); \
 		if (index > stack_size || index < -stack_size) \
 		{ \
 			luaL_error(L, "argument type error! argument at index %d not found, stack size: %d", index, stack_size); \
@@ -48,67 +48,140 @@ average lua_istype function being a macro
 #define assert_lua_argument(lua_istype, type_name, L, index) {}
 #endif//ARGUMENT_ERRORS
 
+inline void lua_assertIndexInStack(lua_State* L, sint4 index)
+{
+	sint4 stack_size = lua_gettop(L); 
+	if (index > stack_size || index < -stack_size) 
+	{ 
+		luaL_error(L, "argument type error! argument at index %d not found, stack size: %d", index, stack_size); 
+	} 
+}
+
 /**
 \defgroup luaToFunctions Lua to<T> functions
 returns an object of type T from the specified index in the %Lua stack.
 @{
 */
-template<typename T> inline T to(lua_State* L, sint index)
+template<typename T> inline T to(lua_State* L, sint4 index)
 {	// never get something out of %Lua without deliberate checking or NOT checking its type
 	PREVENT_COMPILE
 }
 
-template<> inline bool to<bool>(lua_State* L, sint index)
+template<> inline bool to<bool>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isboolean, "boolean", L, index);
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isboolean(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "boolean", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
 	return lua_toboolean(L, index) != 0;
 }
 
-template<> inline sint to<sint>(lua_State* L, sint index)
+template<> inline sint4 to<sint4>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isnumber, "number", L, index);
-	return static_cast<sint>(lua_tonumber(L, index));
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isnumber(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
+	return static_cast<sint4>(lua_tonumber(L, index));
 }
 
-template<> inline uint to<uint>(lua_State* L, sint index)
+template<> inline uint4 to<uint4>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isnumber, "number", L, index);
-	return static_cast<uint>(lua_tonumber(L, index));
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isnumber(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
+	return static_cast<uint4>(lua_tonumber(L, index));
 }
 
-template<> inline float to<float>(lua_State* L, sint index)
+template<> inline real4 to<real4>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isnumber, "number", L, index);
-	return static_cast<float>(lua_tonumber(L, index));
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isnumber(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
+	return static_cast<real4>(lua_tonumber(L, index));
 }
 
-template<> inline double to<double>(lua_State* L, sint index)
+template<> inline real8 to<real8>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isnumber, "number", L, index);
-	return static_cast<double>(lua_tonumber(L, index));
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isnumber(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
+	return static_cast<real8>(lua_tonumber(L, index));
 }
 
-template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint index)
+template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
-	return *static_cast<LuaExtendable**>(lua_touserdata(L, index));
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isuserdata(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "LuaExtendable", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
+	LuaExtendable* ud = *static_cast<LuaExtendable**>(lua_touserdata(L, index));
+	return ud;
 }
 
-template<> inline LuaExtendable& to<LuaExtendable&>(lua_State* L, sint index)
+template<> inline LuaExtendable& to<LuaExtendable&>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isuserdata, "LuaExtendable", L, index);
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isuserdata(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "LuaExtendable", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
 	return **static_cast<LuaExtendable**>(lua_touserdata(L, index));
 }
 
-template<> inline char* to<char*>(lua_State* L, sint index)
+template<> inline char* to<char*>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isstring, "string", L, index);
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isstring(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "string", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
 	return const_cast<char*>(lua_tostring(L, index));
 }
 
-template<> inline const char* to<const char*>(lua_State* L, sint index)
+template<> inline const char* to<const char*>(lua_State* L, sint4 index)
 {
-	assert_lua_argument(lua_isstring, "string", L, index);
+#if ARGUMENT_ERRORS 
+	lua_assertIndexInStack(L, index);
+	if (!lua_isstring(L, index)) 
+	{ 
+		const char* actual = luaL_typename(L, index); 
+		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "string", actual); 
+	} 
+#endif//ARGUMENT_ERRORS 
 	return lua_tostring(L, index);
 }
 /** @} */
@@ -120,37 +193,37 @@ number of actual %Lua type objects that were placed
 on top of the stack (1).
 @{
 */
-inline sint push(lua_State* L, bool value)
+inline sint4 push(lua_State* L, bool value)
 {
 	lua_pushboolean(L, value);
 	return 1;
 }
 
-inline sint push(lua_State* L, sint value)
+inline sint4 push(lua_State* L, sint4 value)
 {
 	lua_pushinteger (L, static_cast<lua_Integer>(value));
 	return 1;
 }
 
-inline sint push(lua_State* L, uint value)
+inline sint4 push(lua_State* L, uint4 value)
 {
 	lua_pushinteger (L, static_cast<lua_Integer>(value));
 	return 1;
 }
 
-inline sint push(lua_State* L, float value)
+inline sint4 push(lua_State* L, real4 value)
 {
 	lua_pushnumber(L, static_cast<lua_Number>(value));
 	return 1;
 }
 
-inline sint push(lua_State* L, double value)
+inline sint4 push(lua_State* L, real8 value)
 {
 	lua_pushnumber(L, static_cast<lua_Number>(value));
 	return 1;
 }
 
-inline sint push(lua_State* L, const char* value)
+inline sint4 push(lua_State* L, const char* value)
 {
 	lua_pushstring(L, value);
 	return 1;
@@ -163,7 +236,7 @@ case, if the class has a extra methods defined in %Lua, especially a 'construct'
 method, that %Lua only properties of the object must be initialized the first
 time the object is pushed into %Lua
 */
-inline sint push(lua_State* L, LuaExtendable* value)
+inline sint4 push(lua_State* L, LuaExtendable* value)
 {
 	pushRegisteredClass(L, value);					//s: ud
 	lua_getglobal(L, "getmetatable");				//s: ud, getmetatable	
@@ -189,18 +262,18 @@ inline sint push(lua_State* L, LuaExtendable* value)
 	return 1;
 }
 
-inline sint pushFalse(lua_State* L)
+inline sint4 pushFalse(lua_State* L)
 {
 	return push(L, false);
 }
 
-inline sint pushTrue(lua_State* L)
+inline sint4 pushTrue(lua_State* L)
 {
 	return push(L, true);
 }
 
 /** @} */
 
-} // namespace luaExtension
+} // namespace lua_extension
 
 #endif//LUASTATEINTERACTION_H

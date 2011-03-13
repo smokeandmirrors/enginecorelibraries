@@ -44,18 +44,20 @@ smokeandmirrorsdevelopment@gmail.com</A>
 Adhere to these to enable easier cross-platform development
 @{
 */
-// typedef bool				bool;
-typedef signed char			schar;
-typedef unsigned char		uchar;
-typedef	wchar_t				wchar;
-typedef signed short		sshort;
-typedef unsigned short		ushort;
-typedef signed int			sint;
-typedef unsigned			uint;
-typedef signed long			slong;
-typedef unsigned long		ulong;
-// typedef float				float;
-// typedef double				double;
-typedef long double			ldouble;
+
+/** integral types */
+typedef char				sint1;
+typedef unsigned char		uint1;
+typedef short				sint2;
+typedef unsigned short		uint2;
+typedef int					sint4;
+typedef unsigned int		uint4;
+typedef long long			sint8;
+typedef unsigned long long	uint8;
+
+/** floating point types */
+typedef float 				real4;
+typedef double				real8;
+
 /**@}*/
 #endif//BUILD_H

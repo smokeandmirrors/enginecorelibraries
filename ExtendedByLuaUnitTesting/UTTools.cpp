@@ -13,22 +13,22 @@
 namespace unitTestingTools
 {
 
-void checkNearEqual(float lhs, float rhs, float tolerance)
+void checkNearEqual(real4 lhs, real4 rhs, real4 tolerance)
 {
 	tolerance = tolerance == 0.0f ? 0.0001f : tolerance;
-	float delta = fabs(lhs - rhs);
+	real4 delta = fabs(lhs - rhs);
 	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
 }
 
-void checkNearEqual(double lhs, double rhs, double tolerance)
+void checkNearEqual(real8 lhs, real8 rhs, real8 tolerance)
 {
 	tolerance = tolerance == 0.0f ? 0.0001 : tolerance;
-	double delta = abs(lhs - rhs);
+	real8 delta = abs(lhs - rhs);
 	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
 }
 
 #if EXTENDED_BY_LUA 
-using namespace luaExtension;
+using namespace lua_extension;
 
 void executeLuaUnitTest(char* module, Lua* lua)
 {
@@ -63,7 +63,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	//s:
 	lua_getglobal(L, "lastUnitTestNumFailures");
 	//s: lastUnitTestNumFailures
-	sint result = to<sint>(L, -1);
+	sint4 result = to<sint4>(L, -1);
 	lua_pop(L, 1);
 	//s:
 	lua_getglobal(L,  "lastUnitTestReport");

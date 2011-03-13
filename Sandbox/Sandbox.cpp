@@ -30,7 +30,7 @@ public:
 		--one;
 	}
 
-	sint get(void) const
+	sint4 get(void) const
 	{
 		return one;
 	}
@@ -41,7 +41,7 @@ public:
 	}
 
 private:
-	sint one;
+	sint4 one;
 }; // class TheOne : public design_patterns::Singleton<TheOne>
 
 // TheOne::getter(TheOne::getUninitialized);
@@ -70,8 +70,8 @@ public:
 };
 
 
-sint sintCompareAscending(const void* a, const void* b)		{ return (*(sint*)(a)) - (*(sint*)(b)); }
-sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
+sint4 sintCompareAscending(const void* a, const void* b)		{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
+sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
 
 class QuickSortTester : public multithreading::Executable
 {
@@ -79,11 +79,11 @@ public:
 	virtual void execute(void)
 	{
 		printf("I STARTED a sort in a CLASS!\n");
-		sint number_size = 10000;
-		sint number_sort = 1000;
-		sint number;
-		sint* numbers = new sint[number_size];
-		sint* i = numbers;
+		sint4 number_size = 10000;
+		sint4 number_sort = 1000;
+		sint4 number;
+		sint4* numbers = new sint4[number_size];
+		sint4* i = numbers;
 
 		for (number = 0; number < number_size; number++)
 		{
@@ -92,8 +92,8 @@ public:
 
 		for (number = 0; number < number_sort; number++)
 		{
-			qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
-			qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+			qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
+			qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
 		}
 
 		printf("I FINISHED a sort in a CLASS!\n");
@@ -146,13 +146,13 @@ class Tester
 : public Observer<Testee>
 {
 public:
-	Tester(uint value)
+	Tester(uint4 value)
 		: m_value(value)
 	{
 		m_observer = new ObserverHelper<Testee>(*this);
 	}
 
-	uint m_value;
+	uint4 m_value;
 
 	~Tester(void)
 	{
@@ -208,22 +208,22 @@ void testObservation(void)
 HANDLE mutex;
 
 multithreading::Mutex* pMutex;// = multithreading::getMutex();
-int numberOfThreads = 0;
+sint4 numberOfThreads = 0;
 
 DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
 	synchronize(pMutex);
 	numberOfThreads++;
-	int myNumThreads = numberOfThreads;
+	sint4 myNumThreads = numberOfThreads;
 	Sleep(numberOfThreads * 1000);
 	assert(numberOfThreads == myNumThreads);
 )
 
 DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
-	sint number_size = 10000;
-	sint number_sort = 1000;
-	sint number;
-	sint* numbers = new sint[number_size];
-	sint* i = numbers;
+	sint4 number_size = 10000;
+	sint4 number_sort = 1000;
+	sint4 number;
+	sint4* numbers = new sint4[number_size];
+	sint4* i = numbers;
 	
 	for (number = 0; number < number_size; number++)
 	{
@@ -232,8 +232,8 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 
 	for (number = 0; number < number_sort; number++)
 	{
-		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
-		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
 	}
  
 	printf("I finished a sort!\n");
@@ -242,11 +242,11 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 //
 //NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort)
 //{
-//	sint number_size = 10000;
-//	sint number_sort = 1000;
-//	sint number;
-//	sint* numbers = new sint[number_size];
-//	sint* i = numbers;
+//	sint4 number_size = 10000;
+//	sint4 number_sort = 1000;
+//	sint4 number;
+//	sint4* numbers = new sint4[number_size];
+//	sint4* i = numbers;
 //	
 //	for (number = 0; number < number_size; number++)
 //	{
@@ -255,8 +255,8 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 //
 //	for (number = 0; number < number_sort; number++)
 //	{
-//		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
-//		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+//		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
+//		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
 //	}
 // 
 //	printf("I finished a sort!\n");
@@ -270,24 +270,24 @@ void threadsChecking()
 	mutex = CreateMutex(NULL, false, NULL);
 	
 	std::vector<HANDLE> threads;
-	const uint num_threads = 8;
+	const uint4 num_threads = 8;
 	
-	for (uint i = 0; i < num_threads; i++)
+	for (uint4 i = 0; i < num_threads; i++)
 	{
-		uint thread_id1;
+		uint4 thread_id1;
 		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, useMutexClass, NULL, CREATE_SUSPENDED, &thread_id1));
 		// HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, doubleQuickSort, NULL, CREATE_SUSPENDED, &thread_id1));
 		threads.push_back(thread);
 	}
 
-	for (uint i = 0; i < num_threads; i++)
+	for (uint4 i = 0; i < num_threads; i++)
 	{
 		ResumeThread(threads[i]);
 	}
 	
 	Sleep(3000);
 
-	for (uint i = 0; i < num_threads; i++)
+	for (uint4 i = 0; i < num_threads; i++)
 	{
 		CloseHandle(threads[i]);
 	}
@@ -297,11 +297,11 @@ void threadsChecking()
 
 void firstJob(void)
 {
-	sint number_size = 10000;
-	sint number_sort = 1000;
-	sint number;
-	sint* numbers = new sint[number_size];
-	sint* i = numbers;
+	sint4 number_size = 10000;
+	sint4 number_sort = 1000;
+	sint4 number;
+	sint4* numbers = new sint4[number_size];
+	sint4* i = numbers;
 
 	for (number = 0; number < number_size; number++)
 	{
@@ -310,25 +310,25 @@ void firstJob(void)
 
 	for (number = 0; number < number_sort; number++)
 	{
-		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
-		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
 	}
 
 	printf("I finished a sort in a JOB!\n");
 	delete[] numbers;
 }
 
-void Sandbox::play()
+void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
 	
-	CompilerChecks::sizeOfChecks();
+	compiler_checks::sizeOfChecks();
 	// threadsChecking();
 
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
 	
-	for (uint i = 0; i < 36; i++)
+	for (uint4 i = 0; i < 36; i++)
 	{
 		scheduler.enqueue(new QuickSortTester());
 	}

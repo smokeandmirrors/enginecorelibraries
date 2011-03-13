@@ -8,9 +8,9 @@
 */
 #include "Build.h"
 
-typedef ulong clock_tick;
-typedef ulong millisecond;
-typedef float second;
+typedef uint8 clock_tick;
+typedef uint8 millisecond;
+typedef real4 second;
 
 namespace real_time
 {

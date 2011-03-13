@@ -10,7 +10,7 @@
 #include "LuaInclusions.h"
 #include "UTTools.h"
 
-using namespace luaExtension;
+using namespace lua_extension;
 
 class LuaClass : public cfixcc::TestFixture
 {
@@ -91,7 +91,7 @@ public:
 		lua_pushnumber(L, 4);
 		Lua::callProtected(L, 1);
 		CFIX_ASSERT(lua_isnumber(L, -1));
-		sint i = static_cast<sint>(lua_tonumber(L, -1));
+		sint4 i = static_cast<sint4>(lua_tonumber(L, -1));
 		CFIX_ASSERT(i == 2);
 		lua_pop(L, 1);
 		lua_getglobal(L, "math");

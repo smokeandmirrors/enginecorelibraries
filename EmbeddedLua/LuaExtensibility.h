@@ -23,7 +23,7 @@ DECLARE_LUA_LIBRARY(example)
 struct lua_State;
 namespace lua_library_example
 {
-	sint luaopen_example(lua_State* L);
+	sint4 luaopen_example(lua_State* L);
 }
 
 // for the .cpp file 
@@ -41,7 +41,7 @@ namespace lua_library_example
 		{NULL, NULL}
 	};
 
-	sint luaopen_example(lua_State* L)
+	sint4 luaopen_example(lua_State* L)
 	{
 		luaL_register(L, "example", example_library);
 		return 1;
@@ -71,9 +71,9 @@ for use in %Lua.
 @{
 */
 
-typedef sint (*lua_function)(lua_State* L);
+typedef sint4 (*lua_function)(lua_State* L);
 
-namespace luaExtension 
+namespace lua_extension 
 {
 
 #if !GOLDMASTER
@@ -98,7 +98,7 @@ the number of arguments it has added to the stack.
 \param name name of the function that will be declared, without string delimiters
 */
 #define LUA_FUNC(name) \
-	static sint name##(lua_State* L)
+	static sint4 name##(lua_State* L)
 // end #define LUA_FUNC
 
 /** 
@@ -115,7 +115,7 @@ with the module ObjectOrientedParadigm.
 	struct lua_State; \
 	namespace lua_library_##name \
 	{ \
-		sint key(lua_State* L); \
+		sint4 key(lua_State* L); \
 	}; // end namespace lua_library_##name
 // end #define begin_lua_library_declaration
 
@@ -167,7 +167,7 @@ end a library definition for registration
 #define END_LUA_LIBRARY(name) \
 			LUA_FINAL_ENTRY \
 		};	/* end function list */ \
-		sint key(lua_State* L) \
+		sint4 key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			return 1; \
@@ -187,7 +187,7 @@ the require() function.
 #define END_LUA_LIBRARY_EXTENSIBLE(name) \
 			LUA_FINAL_ENTRY \
 		};	/* end function list */ \
-		sint key(lua_State* L) \
+		sint4 key(lua_State* L) \
 		{ \
 			luaL_register(L, #name, name##_library); \
 			Lua::nilLoadedStatus(L, #name); \
@@ -200,33 +200,34 @@ the require() function.
 defines functions that can be used to get specific class pointers
 back out of %Lua.
 \note compile-time directive
+
 */
 #if ARGUMENT_ERRORS
 #define DEFINE_TO_LUAEXTENDABLES(Class) \
-	namespace luaExtension \
+	namespace lua_extension \
 	{ \
-		template<> inline Class* to<Class*>(lua_State* L, sint index) \
+		template<> inline Class* to< Class* >(lua_State* L, sint4 index) \
 		{ \
-			LuaExtendable* ud = to<LuaExtendable*>(L, index); \
-			Class* object = dynamic_cast<Class*>(ud); \
+			LuaExtendable* ud = to< LuaExtendable* >(L, index); \
+			Class* object = dynamic_cast< Class* >(ud); \
 			if (object) \
 				return object; \
-			luaL_error(L, "argument type error! #: %d expected: %s actual: unknown", #Class); \
+			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: unknown", index, #Class); \
 			return NULL; \
 		} \
-		template<> inline const Class* to<const Class*>(lua_State* L, sint index) \
+		template<> inline const Class* to< const Class* >(lua_State* L, sint4 index) \
 		{ \
-			return to<Class*>(L, index); \
+			return to< Class* >(L, index); \
 		} \
-		template<> inline Class& to<Class&>(lua_State* L, sint index) \
+		template<> inline Class& to< Class& >(lua_State* L, sint4 index) \
 		{ \
-			Class* object = to<Class*>(L, index); \
+			Class* object = to< Class* >(L, index); \
 			assert(object); \
 			return *object; \
 		} \
-		template<> inline const Class& to<const Class&>(lua_State* L, sint index) \
+		template<> inline const Class& to< const Class& >(lua_State* L, sint4 index) \
 		{ \
-			Class* object = to<Class*>(L, index); \
+			Class* object = to< Class* >(L, index); \
 			assert(object); \
 			return *object; \
 		} \
@@ -234,23 +235,23 @@ back out of %Lua.
 // end #define DEFINE_TO_LUAEXTENDABLES
 #else
 #define DEFINE_TO_LUAEXTENDABLES(Class) \
-	namespace luaExtension \
+	namespace lua_extension \
 	{ \
-		template<> inline Class* to<Class*>(lua_State* L, sint index) \
+		template<> inline Class* to< Class* >(lua_State* L, sint4 index) \
 		{ \
-			return static_cast<Class*>(to<LuaExtendable*>(L, index)); \
+			return static_cast< Class* >(to<LuaExtendable*>(L, index)); \
 		} \
-		template<> inline const Class* to<const Class*>(lua_State* L, sint index) \
+		template<> inline const Class* to< const Class* >(lua_State* L, sint4 index) \
 		{ \
-			return to<Class*>(L, index); \
+			return to< Class* >(L, index); \
 		} \
-		template<> inline Class& to<Class&>(lua_State* L, sint index) \
+		template<> inline Class& to<Class&>(lua_State* L, sint4 index) \
 		{ \
-			return *to<Class*>(L, index); \
+			return *to< Class* >(L, index); \
 		} \
-		template<> inline const Class& to<const Class&>(lua_State* L, sint index) \
+		template<> inline const Class& to< const Class& >(lua_State* L, sint4 index) \
 		{ \
-			return *to<Class*>(L, index); \
+			return *to< Class* >(L, index); \
 		} \
 	}
 // end #define DEFINE_TO_LUAEXTENDABLES
@@ -300,7 +301,7 @@ or the same if it has no parent class
 #define DEFINE_LUA_LUAEXTENDABLE(Class, SuperClass) \
 	namespace lua_library_##Class \
 	{ \
-		sint lua_new##Class(lua_State* L) \
+		sint4 lua_new##Class(lua_State* L) \
 		{ \
 			pushRegisteredClass(L, new Class()); \
 			return 1; \
@@ -308,7 +309,7 @@ or the same if it has no parent class
 		static const luaL_reg Class##_library[] = \
 		{ \
 			LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod) \
-			LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse) \
+			LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) \
 			LUA_NAMED_ENTRY("__new", lua_new##Class) \
 			LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) \
 			LUA_NAMED_ENTRY("__setmetatable", LuaExtendable::callSetMetatable) \
@@ -337,7 +338,7 @@ or the same if it has no parent class
 	{ \
 		static const luaL_reg Class##_library[] = \
 		{ \
-			LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse) \
+			LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) \
 			LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) \
 			LUA_NAMED_ENTRY("__setmetatable", LuaExtendable::callSetMetatable) \
 			LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
@@ -372,7 +373,7 @@ or the same if it has no parent class
 #define DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Class, SuperClass) \
 	namespace lua_library_##Class \
 	{ \
-		sint lua_new##Class(lua_State* L) \
+		sint4 lua_new##Class(lua_State* L) \
 		{ \
 			pushRegisteredClass(L, new Class()); \
 			return 1; \
@@ -380,8 +381,8 @@ or the same if it has no parent class
 		static const luaL_reg Class##_library[] = \
 		{ \
 			LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod) \
-			LUA_NAMED_ENTRY("__isExtendableByProxy", luaExtension::pushTrue) \
-			LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushTrue) \
+			LUA_NAMED_ENTRY("__isExtendableByProxy", lua_extension::pushTrue) \
+			LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushTrue) \
 			LUA_NAMED_ENTRY("__new", lua_new##Class) \
 			LUA_NAMED_ENTRY("__setmetatable", LuaExtendable::callSetMetatable) \
 			LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
@@ -401,7 +402,7 @@ or the same if it has no parent class
 #define END_LUA_LUAEXTENDABLE(Class, SuperClass) \
 			LUA_FINAL_ENTRY \
 		};	/* end function list */ \
-		sint key(lua_State* L) \
+		sint4 key(lua_State* L) \
 		{ \
 			luaL_register(L, #Class, Class##_library); \
 			LuaExtendable::declareLuaClass(L, #Class, #SuperClass); \
@@ -440,14 +441,14 @@ behavior is undefined
 // #define INLINE_DEFAULT_GETCLASSNAME(Class) 
 
 #define INLINE_PROXY_SETMETATABLE(Class) \
-	virtual sint setMetatable(lua_State* L) \
+	virtual sint4 setMetatable(lua_State* L) \
 	{ \
 		return setProxyMetatable(L); \
 	}
 // #define INLINE_PROXY_SETMETATABLE(Class) 
 
 #define INLINE_USERDATA_SETMETATABLE(Class) \
-	virtual sint setMetatable(lua_State* L) \
+	virtual sint4 setMetatable(lua_State* L) \
 	{ \
 		return setUserdataMetatable(L); \
 	}
@@ -483,12 +484,12 @@ public:
 	Using this will cause the C++ object get destroyed when all references to it
 	in a lua_State are destroyed.
 	*/
-	static sint				__gcmetamethod(lua_State* L);
+	static sint4				__gcmetamethod(lua_State* L);
 	/**
 	experimental, trying to get the local proxy table on the top of the 
 	stack
 	*/
-	static sint				__getProxy(lua_State* L);
+	static sint4				__getProxy(lua_State* L);
 	/**
 	\note __newindex methods:
 	returns true if %Lua code like userdata[k] = v will operate correctly 
@@ -508,21 +509,21 @@ public:
 	should be configured to the desired error level for the build.
 	e.g.: throw errors in a debug build, warn in a release build, etc.
 	*/
-	static sint				__newindexError(lua_State* L);
+	static sint4				__newindexError(lua_State* L);
 	/**
 	__newindex method for the metatable of a class exposed to %Lua that will
 	allow it to be assigned new fields
 	*/
-	static sint				__newindexProxy(lua_State* L);
+	static sint4				__newindexProxy(lua_State* L);
 	/**
 	__tostring method for the metatable of a class exposed to %Lua.
 	*/
-	static sint				__tostring(lua_State* L);	
+	static sint4				__tostring(lua_State* L);	
 	/** 
 	helps set a LuaExtendable metatable from script
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
-	static sint				callSetMetatable(lua_State* L);
+	static sint4				callSetMetatable(lua_State* L);
 	/**
 	makes sure that the class is declared declared in the lua OOP system.
 	*/
@@ -531,13 +532,13 @@ public:
 	helps set a userdata metatable from script
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 	*/
-	static sint				setProxyMetatable(lua_State* L);
+	static sint4				setProxyMetatable(lua_State* L);
 	/**
 	helps set a userdata metatable from script, this is a exact C version of the function in %Lua,
 	since you can't call setmetatable on a userdata value in %Lua.
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua.
 	*/
-	static sint				setUserdataMetatable(lua_State* L); 
+	static sint4				setUserdataMetatable(lua_State* L); 
 	/** empty dtor */
 	virtual					~LuaExtendable(void) {/* empty */};
 	/** 
@@ -552,7 +553,7 @@ public:
 	It is mostly easily implemented in terms of one of the static LuaExtendable
 	functions.
 	*/
-	virtual sint			setMetatable(lua_State* L)=0;
+	virtual sint4			setMetatable(lua_State* L)=0;
 	/**
 	a to string function is almost always necessary, since so much of %Lua
 	use is simply to make inspection of objects very easy, there is often
@@ -580,7 +581,7 @@ to compare userdata and use them as equivalent table keys
 \see comments in the implementation of void Lua::initializeUserdataStorage(void)
 \ingroup LuaExtension
 */
-sint pushRegisteredClass(lua_State* L, void* pushee);
+sint4 pushRegisteredClass(lua_State* L, void* pushee);
 
 /**
 helper function for simply registering global native functions to %Lua
@@ -588,7 +589,7 @@ helper function for simply registering global native functions to %Lua
 */
 void registerGlobalLibrary(lua_State* L);
 
-} // namespace luaExtension 
+} // namespace lua_extension 
 
 /** @} */
 

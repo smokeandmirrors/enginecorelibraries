@@ -1,3 +1,4 @@
+#include "Build.h"
 #include "CompilerChecks.h"
 
 namespace 
@@ -6,7 +7,7 @@ namespace
 	class PlainOldClass {};
 } // namespace
 
-namespace CompilerChecks 
+namespace compiler_checks 
 {
 
 void sizeOfChecks(void)
@@ -17,8 +18,9 @@ void sizeOfChecks(void)
 	size_t pocs = sizeof(PlainOldClass*);	// 4
 	size_t total = pos + poc + pops + pocs;
 	total = 0;
+
 	bool* build_me(0);
 	build_me = 0;
 }
 
-} // namespace CompilerChecks 
+} // namespace compiler_checks 

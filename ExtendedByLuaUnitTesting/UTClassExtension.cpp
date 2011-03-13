@@ -10,7 +10,7 @@
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
 
-using namespace luaExtension;
+using namespace lua_extension;
 
 class Classes : public cfixcc::TestFixture
 {
@@ -27,8 +27,8 @@ class One
 {
 public:
 	typedef One super;
-	sint getValue(void) const		{ return 1; }
-	sint increment(sint i) const	{ return i + getValue(); }
+	sint4 getValue(void) const		{ return 1; }
+	sint4 increment(sint4 i) const	{ return i + getValue(); }
 }; // Basic
 
 DECLARE_LUA_LIBRARY(One)
@@ -72,7 +72,7 @@ LUA_FUNC(getValueOne)
 
 LUA_FUNC(incrementOne)
 {
-	sint argument = to<sint>(L, -1);						//s: ud, arg
+	sint4 argument = to<sint4>(L, -1);						//s: ud, arg
 	lua_pop(L, 1);											//s: ud
 	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
 	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
@@ -107,7 +107,7 @@ void Classes::test_define_lua_class()
 	lua_call(L, 1, 1);
 	//s: one 1
 	CFIX_ASSERT(lua_isnumber(L, -1));
-	sint one_value = to<sint>(L, -1);
+	sint4 one_value = to<sint4>(L, -1);
 	//s: one 1
 	CFIX_ASSERT(one_value == 1);
 	lua_pop(L, 1);
@@ -122,7 +122,7 @@ void Classes::test_define_lua_class()
 	//s: one increment one 2
 	lua_call(L, 2, 1);
 	//s: one 3
-	sint three_value = to<sint>(L, -1);
+	sint4 three_value = to<sint4>(L, -1);
 	//s: one 1
 	CFIX_ASSERT(three_value == 3);
 	lua_pop(L, 2);
@@ -137,7 +137,7 @@ void Classes::test_define_lua_class()
 	lua_getglobal(L, "zero");
 	//s: _G.there _G.zero
 	CFIX_ASSERT(lua_isnumber(L, -1));
-	sint zero = to<sint>(L, -1);
+	sint4 zero = to<sint4>(L, -1);
 	CFIX_ASSERT(zero == 0.0f);
 	lua_pop(L, 2);
 }
@@ -147,7 +147,7 @@ class Simple
 {
 private:
 	static bool everCreated;
-	static uint numAllocated;
+	static uint4 numAllocated;
 
 public:
 	Simple(void)
@@ -161,12 +161,12 @@ public:
 		numAllocated--;
 	}
 
-	static uint getNumAllocated(void)	{ return numAllocated; }
+	static uint4 getNumAllocated(void)	{ return numAllocated; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
 public:
 	Simple*			getOther(void) const		{ return m_other; }
-	virtual uint	getValue(void) const		{ return 7; }
+	virtual uint4	getValue(void) const		{ return 7; }
 	bool			isSimple(void) const		{ return true; }
 	Simple*			reproduce() const			{ return new Simple(); }
 
@@ -181,15 +181,15 @@ private:
 	Simple*			m_other;
 };
 
-uint Simple::numAllocated = 0;
+uint4 Simple::numAllocated = 0;
 bool Simple::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Simple);
 
 DEFINE_LUA_LUAEXTENDABLE(Simple, Simple)
-	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint4, &Simple::getValue>))
 	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
-	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint4, &Simple::getValue>))
 	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
 	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
 	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
@@ -201,7 +201,7 @@ class Derived
 {
 private:
 	static bool everCreated;
-	static uint numAllocated;
+	static uint4 numAllocated;
 
 public:
 	Derived(void)
@@ -215,17 +215,17 @@ public:
 		numAllocated--;
 	}
 
-	static uint getNumAllocated(void)		{ return numAllocated; }
+	static uint4 getNumAllocated(void)		{ return numAllocated; }
 	static bool wasEverCreated(void)		{ return everCreated; }
 
 public:
-	uint				getDerivation(void) const	{ return 21; }
-	virtual uint		getValue(void) const		{ return 14; }
+	uint4				getDerivation(void) const	{ return 21; }
+	virtual uint4		getValue(void) const		{ return 14; }
 
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived)
 };
 
-uint Derived::numAllocated = 0;
+uint4 Derived::numAllocated = 0;
 bool Derived::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Derived);
@@ -235,7 +235,7 @@ class Unexposed
 {
 private:
 	static bool everCreated;
-	static uint numAllocated;
+	static uint4 numAllocated;
 
 public:
 	Unexposed(void)
@@ -255,11 +255,11 @@ public:
 		if (!singleton) singleton = new Unexposed();
 		return singleton;
 	}
-	static uint getNumAllocated(void)		{ return numAllocated; }
+	static uint4 getNumAllocated(void)		{ return numAllocated; }
 	static bool wasEverCreated(void)		{ return everCreated; }
 };
 
-uint Unexposed::numAllocated = 0;
+uint4 Unexposed::numAllocated = 0;
 bool Unexposed::everCreated = false;
 
 LUA_FUNC(getUnexposed)
@@ -268,13 +268,13 @@ LUA_FUNC(getUnexposed)
 }
 
 DEFINE_LUA_LUAEXTENDABLE(Derived, Simple)
-LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
+LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint4, &Derived::getDerivation>))
 LUA_ENTRY(getUnexposed)
 END_LUA_LUAEXTENDABLE(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
 {
-	luaExtension::Lua lua; 
+	lua_extension::Lua lua; 
 	register_lua_library((&lua), Simple);
 	register_lua_library((&lua), Derived);
 	unitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
@@ -302,12 +302,12 @@ class Grandparent
 {
 private:
 	static bool everCreated;
-	static uint numAllocatedGrandparents;
+	static uint4 numAllocatedGrandparents;
 	
 public:
 	typedef Grandparent super;
 
-	static uint getNumAllocated(void)	{ return numAllocatedGrandparents; }
+	static uint4 getNumAllocated(void)	{ return numAllocatedGrandparents; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
 	Grandparent(const char* name=NULL) 
@@ -343,7 +343,7 @@ protected:
 	const char*				m_name;
 }; // Grandparent
 
-uint Grandparent::numAllocatedGrandparents = 0;
+uint4 Grandparent::numAllocatedGrandparents = 0;
 bool Grandparent::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Grandparent);
@@ -431,7 +431,7 @@ END_LUA_LUAEXTENDABLE(Child, Parent)
 
 void supportProxyTesting(void)
 {
-	luaExtension::Lua lua; 
+	lua_extension::Lua lua; 
 	register_lua_library((&lua), Grandparent);
 	register_lua_library((&lua), Parent);
 	register_lua_library((&lua), Child);
@@ -495,9 +495,9 @@ void checkVectorEqual(const Vector3& lhs, const Vector3& rhs)
 void Classes::testNumbers(void)
 {
 	vec_t decimal = 0.999999999999999999999f;
-	sint limit = 4294967295;
+	sint4 limit = 4294967295;
 
-	for (sint i = -limit; i < limit; i++)
+	for (sint4 i = -limit; i < limit; i++)
 	{
 		vec_t value = static_cast<vec_t>(i) + decimal;
 		CFIX_ASSERT(isFinite(value));

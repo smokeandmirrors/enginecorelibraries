@@ -2,9 +2,9 @@
 #ifndef COMPILERCHECKS_H
 #define COMPILERCHECKS_H
 
-namespace CompilerChecks 
+namespace compiler_checks 
 {
 	void sizeOfChecks(void);
-} // namespace CompilerChecks
+} // namespace compiler_checks
 
 #endif//COMPILERCHECKS_H

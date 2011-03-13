@@ -73,7 +73,7 @@ a 2D Vector class with vec_t elements
 */
 class Vector2 
 #if EXTENDED_BY_LUA
-	: public luaExtension::LuaExtendable
+	: public lua_extension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
@@ -94,8 +94,8 @@ public:
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
-	const vec_t& 	operator[](uint i) const;	
-	vec_t& 			operator[](uint i);
+	const vec_t& 	operator[](uint4 i) const;	
+	vec_t& 			operator[](uint4 i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y);
@@ -138,7 +138,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y);
 	void 			set(const Vector2& v);
-	void			set(uint index, vec_t scalar);
+	void			set(uint4 index, vec_t scalar);
 	Vector2& 		operator=(const Vector2& v);
 	// substraction 
 	void 			subtract(vec_t scalar);
@@ -156,7 +156,7 @@ public:
 */
 class Vector3 
 #if EXTENDED_BY_LUA
-	: public luaExtension::LuaExtendable
+	: public lua_extension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
@@ -178,8 +178,8 @@ public:
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 
-	const vec_t& 	operator[](uint i) const;	
-	vec_t& 			operator[](uint i);
+	const vec_t& 	operator[](uint4 i) const;	
+	vec_t& 			operator[](uint4 i);
 	// addition 
 	void 			add(vec_t scalar);
 	void 			add(vec_t X, vec_t Y, vec_t Z);
@@ -233,7 +233,7 @@ public:
 	void 			set(vec_t scalar);
 	void 			set(vec_t X, vec_t Y, vec_t Z);
 	void 			set(const Vector3& v);
-	void			set(uint index, vec_t scalar);
+	void			set(uint4 index, vec_t scalar);
 	Vector3&		operator=(const Vector2& v);
 	Vector3& 		operator=(const Vector3& v);
 	// substraction 
@@ -247,7 +247,7 @@ public:
 	void			zero(void);
 }; // class Vector3
 
-void nativeVectorPerformance(uint iterations);
+void nativeVectorPerformance(uint4 iterations);
 
 /** 
 \defgroup Vector_Operations Operations
@@ -261,22 +261,22 @@ standard vector operations
 array and function accessors 
 @{
 */
-inline const vec_t& Vector2::operator[](uint i) const
+inline const vec_t& Vector2::operator[](uint4 i) const
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline vec_t& Vector2::operator[](uint i)
+inline vec_t& Vector2::operator[](uint4 i)
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline const vec_t& Vector3::operator[](uint i) const
+inline const vec_t& Vector3::operator[](uint4 i) const
 {
 	assert(i < 3);
 	return (&x)[i];
 }
-inline vec_t& Vector3::operator[](uint i)
+inline vec_t& Vector3::operator[](uint4 i)
 {
 	assert(i < 3);
 	return (&x)[i];
@@ -791,7 +791,7 @@ inline Vector2& Vector2::operator=(const Vector2& v)
 	y = v.y;
 	return *this;
 }
-inline void Vector2::set(uint index, vec_t scalar)
+inline void Vector2::set(uint4 index, vec_t scalar)
 {
 	switch (index)
 	{
@@ -829,7 +829,7 @@ inline Vector3& Vector3::operator=(const Vector2& v)
 	y = v.y;
 	return *this;
 }
-inline void Vector3::set(uint index, vec_t scalar)
+inline void Vector3::set(uint4 index, vec_t scalar)
 {
 	switch (index)
 	{

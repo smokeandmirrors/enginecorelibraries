@@ -6,7 +6,7 @@
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
-namespace luaExtension
+namespace lua_extension
 {
 
 #define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */\
@@ -26,20 +26,20 @@ inline bool isInstanceBeingRefreshed(lua_State* L)
 	}
 }
 
-sint LuaExtendable::__gcmetamethod(lua_State* L)
+sint4 LuaExtendable::__gcmetamethod(lua_State* L)
 {
 	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	delete udata;
 	return 0;
 }
 
-sint LuaExtendable::__getProxy(lua_State* L)
+sint4 LuaExtendable::__getProxy(lua_State* L)
 {
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: proxy/nil
 	return 1;
 }
 
-sint LuaExtendable::__newindexError(lua_State* L)
+sint4 LuaExtendable::__newindexError(lua_State* L)
 {											//: t, k, v
 #if DEBUG
 	LuaExtendable* udata = to<LuaExtendable*>(L, -3);
@@ -52,7 +52,7 @@ sint LuaExtendable::__newindexError(lua_State* L)
 #endif//DEBUG
 }
 
-sint LuaExtendable::__newindexProxy(lua_State* L) 
+sint4 LuaExtendable::__newindexProxy(lua_State* L) 
 {											//s: ud, k, v 	
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
 	lua_replace(L, -4);						//s: proxy, k, v
@@ -61,14 +61,14 @@ sint LuaExtendable::__newindexProxy(lua_State* L)
 	return 0;
 }
 
-sint LuaExtendable::__tostring(lua_State* L)
+sint4 LuaExtendable::__tostring(lua_State* L)
 {
 	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	lua_pushstring(L, udata->toString());
 	return 1;
 }
 
-sint LuaExtendable::callSetMetatable(lua_State* L)
+sint4 LuaExtendable::callSetMetatable(lua_State* L)
 {
 	LuaExtendable* udata = to<LuaExtendable*>(L, -2);
 	return udata->setMetatable(L);
@@ -100,7 +100,7 @@ void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const cha
 	//s: 
 }
 
-sint LuaExtendable::setProxyMetatable(lua_State* L)
+sint4 LuaExtendable::setProxyMetatable(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
 	function(userdata, class_mt)
@@ -178,7 +178,7 @@ sint LuaExtendable::setProxyMetatable(lua_State* L)
 	return 1;
 }
 
-sint LuaExtendable::setUserdataMetatable(lua_State* L)
+sint4 LuaExtendable::setUserdataMetatable(lua_State* L)
 {								//s: userdata, lua_class_mt
 	lua_setmetatable(L, -2);	//s: userdata/mt
 	return 1;
@@ -247,7 +247,7 @@ void printToLua(lua_State* L, const char* string)
 	lua_call(L, 1, 0);			//s: 
 }
 
-sint pushRegisteredClass(lua_State* L, void* pushee)
+sint4 pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable
 	lua_pushlightuserdata(L, pushee);						//s: pusheduserdatatable, pushee* 
@@ -268,4 +268,4 @@ sint pushRegisteredClass(lua_State* L, void* pushee)
 	return 1;
 }
 
-} // namespace luaExtension
+} // namespace lua_extension

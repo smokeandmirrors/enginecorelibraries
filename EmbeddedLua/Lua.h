@@ -23,7 +23,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 #include <stdlib.h>
 #include "LuaExtensibility.h"
 
-namespace luaExtension 
+namespace lua_extension 
 {
 
 /**
@@ -41,7 +41,7 @@ public:
 	\param num_return_values the number of expected returned values, defaults
 	to LUA_MULTIRET
 	*/
-	static sint			callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
+	static sint4			callProtected(lua_State* L, sint4 num_args=0, sint4 num_return_values=-1);
 	/** 
 	sets package.loaded[module] = nil 
 	allows for extending of C declared libraries by %Lua files in packages
@@ -54,7 +54,7 @@ public:
 	\param L the %Lua state in which the function was called
 	\param status the error code from calling the function
 	*/
-	static sint			report(lua_State* L, sint status);
+	static sint4			report(lua_State* L, sint4 status);
 	/**
 	call require from C++
 	*/
@@ -150,6 +150,6 @@ private:
 	char*				m_name;
 };
 
-} // namespace luaExtension 
+} // namespace lua_extension 
 
 #endif//LUA_H

@@ -9,7 +9,7 @@
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
 #include "LuaFunctionExposition.h"
-using namespace luaExtension;
+using namespace lua_extension;
 #endif//EXTENDED_BY_LUA
 using namespace math;
 
@@ -53,7 +53,7 @@ LUA_FUNC(__indexVector2)
 
 LUA_FUNC(__newindexVector2)
 {
-	float value = to<float>(L, -1);
+	real4 value = to<real4>(L, -1);
 	const char* key = to<const char*>(L, -2);
 	Vector2& v = to<Vector2&>(L, -3);
 	
@@ -72,11 +72,11 @@ LUA_FUNC(__newindexVector2)
 DEFINE_LUA_LUAEXTENDABLE(Vector2, Vector2)
 		LUA_NAMED_ENTRY("__index", __indexVector2)
 		LUA_NAMED_ENTRY("__newindex", __newindexVector2)
-		LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse) 
+		LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) 
 		LUA_NAMED_ENTRY("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
 		LUA_FINAL_ENTRY 
 	};	// end function list 
-	sint key(lua_State* L) 
+	sint4 key(lua_State* L) 
 	{ 
 		luaL_register(L, "Vector2", Vector2_library); 
 		LuaExtendable::declareLuaClass(L, "Vector2", "Vector2"); 
@@ -107,7 +107,7 @@ LUA_FUNC(__indexVector3)
 
 LUA_FUNC(__newindexVector3)
 {
-	float value = to<float>(L, -1);
+	real4 value = to<real4>(L, -1);
 	const char* key = to<const char*>(L, -2);
 	Vector3& v = to<Vector3&>(L, -3);
 	
@@ -129,7 +129,7 @@ namespace lua_library_Vector3
 #define DEFINE_VOID_VECTOR3_FUNC(opfunc) \
 	LUA_FUNC(opfunc) \
 	{ \
-		sint stack_size = lua_gettop(L); \
+		sint4 stack_size = lua_gettop(L); \
 		switch (stack_size) \
 		{ \
 		case 2: \
@@ -171,7 +171,7 @@ DEFINE_VOID_VECTOR3_FUNC(add)
 
 LUA_FUNC(cross)
 {
-	sint stack_size = lua_gettop(L);
+	sint4 stack_size = lua_gettop(L);
 	switch (stack_size)
 	{
 	case 2:
@@ -198,7 +198,7 @@ DEFINE_VOID_VECTOR3_FUNC(divide)
 
 LUA_FUNC(equals)
 {
-	sint stack_size = lua_gettop(L); 
+	sint4 stack_size = lua_gettop(L); 
 	
 	switch (stack_size) 
 	{ 
@@ -223,7 +223,7 @@ LUA_FUNC(equals)
 
 LUA_FUNC(nearlyEquals)
 {
-	sint stack_size = lua_gettop(L); 
+	sint4 stack_size = lua_gettop(L); 
 
 	switch (stack_size) 
 	{ 
@@ -250,7 +250,7 @@ LUA_FUNC(nearlyEquals)
 
 LUA_FUNC(initialize)
 {
-	sint stack_size = lua_gettop(L);
+	sint4 stack_size = lua_gettop(L);
 	switch (stack_size)
 	{
 	case 1:
@@ -279,7 +279,7 @@ LUA_FUNC(initialize)
 	case 3:
 	{
 		Vector3& v = to<Vector3&>(L, -3);
-		v.set(to<sint>(L, -2), to<vec_t>(L, -1));
+		v.set(to<sint4>(L, -2), to<vec_t>(L, -1));
 		lua_pushvalue(L, -3);
 		return 1;
 	}
@@ -295,7 +295,7 @@ LUA_FUNC(initialize)
 		luaL_error(L, "bad parameters to Vector3.set()");
 		return 0;
 	}
-} // sint set(lua_State* L)
+} // sint4 set(lua_State* L)
 
 DEFINE_VOID_VECTOR3_FUNC(scale)
 
@@ -307,7 +307,7 @@ DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
 		LUA_NAMED_ENTRY("__eq", (return1Param1const<Vector3, bool, const Vector3&, &Vector3::operator==>))
 		LUA_NAMED_ENTRY("__index", __indexVector3)
 		LUA_NAMED_ENTRY("__newindex", __newindexVector3) 
-		LUA_NAMED_ENTRY("__isnewindexable", luaExtension::pushFalse)
+		LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse)
 		LUA_ENTRY(		 add)
 		LUA_NAMED_ENTRY("construct", initialize)
 		LUA_ENTRY(		 cross)
@@ -338,12 +338,12 @@ DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
 		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, vec_t, &Vector3::set>))
 		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, vec_t, vec_t, vec_t, &Vector3::set>))
 		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &Vector3::set>))
-		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint, vec_t, &Vector3::set>))
+		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, vec_t, &Vector3::set>))
 		LUA_ENTRY(		 subtract)
 		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &Vector3::zero>))
 		LUA_FINAL_ENTRY 
 	};	// end function list 
-	sint key(lua_State* L) 
+	sint4 key(lua_State* L) 
 	{ 
 		luaL_register(L, "Vector3", Vector3_library); 
 		LuaExtendable::declareLuaClass(L, "Vector3", "Vector3"); 
@@ -351,7 +351,7 @@ DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
 	} 
 }; // end namespace lua_library_Vector3
 
-void math::nativeVectorPerformance(uint iterations)
+void math::nativeVectorPerformance(uint4 iterations)
 {	/** 
 	this function simply tries to emulate a %Lua vector performance
 	function as closely as possible for fair comparison 
@@ -369,7 +369,7 @@ void math::nativeVectorPerformance(uint iterations)
 	Vector3* Yneg = new Vector3( 0,-1, 0);
 	Vector3* Zneg = new Vector3( 0, 0,-1);
 
-	for (uint i(0); i < iterations; i++)
+	for (uint4 i(0); i < iterations; i++)
 	{
 		bool is_true;
 		is_true = w == v;

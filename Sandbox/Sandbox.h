@@ -2,9 +2,9 @@
 #ifndef SANDBOX_H
 #define SANDBOX_H
 
-namespace Sandbox 
+namespace sandbox 
 {
 	void play(void);
-} // namespace Sandbox
+} // namespace sandbox
 
 #endif//SANDBOX

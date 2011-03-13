@@ -9,10 +9,10 @@
 
 namespace unitTestingTools
 {
-	void checkNearEqual(float lhs, float rhs, float tolerance=0.0f);
-	void checkNearEqual(double lhs, double rhs, double tolerance=0.0f);
+	void checkNearEqual(real4 lhs, real4 rhs, real4 tolerance=0.0f);
+	void checkNearEqual(real8 lhs, real8 rhs, real8 tolerance=0.0f);
 #if EXTENDED_BY_LUA 
-	void executeLuaUnitTest(char* module, luaExtension::Lua* lua=NULL);
+	void executeLuaUnitTest(char* module, lua_extension::Lua* lua=NULL);
 #endif
 } // namespace unitTestingTools
 

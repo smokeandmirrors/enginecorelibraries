@@ -411,6 +411,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\UTTemplateExtension.cpp"
+			>
+		</File>
+		<File
 			RelativePath=".\UTTools.cpp"
 			>
 		</File>

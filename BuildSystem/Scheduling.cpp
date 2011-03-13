@@ -14,7 +14,7 @@ namespace multithreading
 {
 
 #if WIN32
-inline uint getNumHardwareThreads(void)
+inline uint4 getNumHardwareThreads(void)
 {
 	_SYSTEM_INFO system_info;
 	GetSystemInfo(&system_info);
@@ -28,22 +28,22 @@ class PendingJobQueue
 	public:
 		virtual ~PendingJob(void) {}
 		
-		virtual sint getIdealThread(void) const
+		virtual sint4 getIdealThread(void) const
 		{
 			return m_idealThread;
 		}
 
-		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)=0;
+		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)=0;
 		virtual void	recycle(PendingJobQueue& queue)=0;
 	
 	protected:
-		sint		m_idealThread;
+		sint4		m_idealThread;
 	}; // PendingJob 
 
 	class PendingObject : public PendingJob
 	{
 	public:
-		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)
+		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
 		{
 			return new Thread(m_job, CPUid, scheduler);
 		}
@@ -53,7 +53,7 @@ class PendingJobQueue
 			queue.m_objectPool.push_back(this);
 		}
 
-		inline void reset(Executable* job=NULL, sint ideal_thread=noThreadPreference)
+		inline void reset(Executable* job=NULL, sint4 ideal_thread=noThreadPreference)
 		{
 			m_job = job;
 			m_idealThread = ideal_thread;
@@ -66,7 +66,7 @@ class PendingJobQueue
 	class PendingFunction : public PendingJob
 	{
 	public:
-		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)
+		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
 		{
 			return new Thread(m_job, CPUid, scheduler);
 		}
@@ -76,7 +76,7 @@ class PendingJobQueue
 			queue.m_functionPool.push_back(this);
 		}
 
-		inline void reset(executableFunction job=NULL, sint ideal_thread=noThreadPreference)
+		inline void reset(executableFunction job=NULL, sint4 ideal_thread=noThreadPreference)
 		{
 			m_job = job;
 			m_idealThread = ideal_thread;
@@ -87,17 +87,17 @@ class PendingJobQueue
 	}; // PendingFunction
 
 public:
-	inline void add(Executable* job, sint ideal_thread=noThreadPreference)
+	inline void add(Executable* job, sint4 ideal_thread=noThreadPreference)
 	{
 		m_pendingJobs.push_back(getFreeJob(job, ideal_thread));
 	}
 	
-	inline void add(executableFunction job, sint ideal_thread=noThreadPreference)
+	inline void add(executableFunction job, sint4 ideal_thread=noThreadPreference)
 	{
 		m_pendingJobs.push_back(getFreeJob(job, ideal_thread));
 	}
 
-	inline bool getNextIdealThread(sint& ideal_thread) const
+	inline bool getNextIdealThread(sint4& ideal_thread) const
 	{
 		if (getNumberPendingJobs())
 		{
@@ -111,12 +111,12 @@ public:
 		}	
 	}
 
-	inline uint getNumberPendingJobs(void) const
+	inline uint4 getNumberPendingJobs(void) const
 	{
-		return static_cast<uint>(m_pendingJobs.size());
+		return static_cast<uint4>(m_pendingJobs.size());
 	}
 
-	inline Thread* startNextJob(Scheduler* scheduler, sint CPUid)
+	inline Thread* startNextJob(Scheduler* scheduler, sint4 CPUid)
 	{
 		if (getNumberPendingJobs())
 		{
@@ -138,7 +138,7 @@ protected:
 		pending->recycle(*this);
 	}
 
-	inline PendingJob* getFreeJob(Executable* job, sint ideal_thread)
+	inline PendingJob* getFreeJob(Executable* job, sint4 ideal_thread)
 	{
 		PendingObject* object;
 		
@@ -156,7 +156,7 @@ protected:
 		return object;
 	}
 
-	inline PendingJob* getFreeJob(executableFunction job, sint ideal_thread)
+	inline PendingJob* getFreeJob(executableFunction job, sint4 ideal_thread)
 	{
 		PendingFunction* object;
 
@@ -193,7 +193,7 @@ Scheduler::Scheduler(void)
 	m_observer = new design_patterns::ObserverHelper<Thread>(*this);
 	m_activeJobs = new Thread*[m_numSystemThreads];
 	
-	for (uint i = 0; i < m_numSystemThreads; i++)
+	for (uint4 i = 0; i < m_numSystemThreads; i++)
 	{
 		m_activeJobs[i] = NULL;
 	}
@@ -208,9 +208,9 @@ Scheduler::~Scheduler(void)
 	delete[] m_activeJobs;
 }
 
-void Scheduler::enqueue(Executable* job, sint ideal_thread/* =noThreadPreference */)
+void Scheduler::enqueue(Executable* job, sint4 ideal_thread/* =noThreadPreference */)
 {
-	sint index;
+	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
@@ -223,9 +223,9 @@ void Scheduler::enqueue(Executable* job, sint ideal_thread/* =noThreadPreference
 	}
 }
 
-void Scheduler::enqueue(executableFunction job, sint ideal_thread/* =noThreadPreference */)
+void Scheduler::enqueue(executableFunction job, sint4 ideal_thread/* =noThreadPreference */)
 {
-	sint index;
+	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
@@ -253,7 +253,7 @@ void Scheduler::startNextJob(void)
 {
 	if (m_pendingJobs->getNumberPendingJobs())
 	{
-		sint thread_index;
+		sint4 thread_index;
 		m_pendingJobs->getNextIdealThread(thread_index);
 		
 		if (thread_index == -1)

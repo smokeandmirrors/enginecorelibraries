@@ -3,6 +3,7 @@
 #define NUMERICALFUNCTIONS_H
 
 #include <float.h>
+
 #include "Build.h"
 #include "Numbers.h"
 
