@@ -19,28 +19,60 @@ class Scheduler
 	friend class design_patterns::Singleton<Scheduler>;
 
 public:
-	void enqueue(Executable* job, sint4 ideal_thread=noThreadPreference);
-	void enqueue(executableFunction job, sint4 ideal_thread=noThreadPreference);
-	uint4 getMaxThreads(void) const			{ return m_maxThreads; }
-	uint4 getMinThreads(void) const			{ return m_minThreads; }
-	void getNumberActiveJobs(void);
-	void getNumberPendingJobs(void);
-	uint4 getNumberSystemThreads(void) const { return m_numSystemThreads; }
+	void			enqueue(Executable* job, 
+						sint4 ideal_thread=noThreadPreference,
+						const sint1* name="un-named");
+
+	void			enqueue(executableFunction job, 
+						sint4 ideal_thread=noThreadPreference,
+						const sint1* name="un-named");
+
+	uint4 getMaxThreads(void) const 
+	{ 
+		return m_maxThreads; 
+	}
+	
+	uint4 getNumberActiveJobs(void) const
+	{
+		return m_numActiveJobs;
+	}
+	
+	uint4			getNumberPendingJobs(void) const;
+	
+	uint4 getNumberSystemThreads(void) const	
+	{ 
+		return m_numSystemThreads; 
+	}
+	
+	bool hasAnyWork(void) const
+	{
+		return getNumberActiveJobs() || getNumberPendingJobs();
+	}
+
 	void ignore(Thread* observable)
 	{
 		m_observer->ignore(observable);
 	}
+
 	void notice(Thread* observable)
 	{
 		accountForFinish(observable);
 		startNextJob();
 	}
+	
 	void observe(Thread* observable)
 	{
 		m_observer->observe(observable);
 	}
-	void setMaxThreads(uint4 max)			{ m_maxThreads = max; }
-	void setMinThreads(uint4 min)			{ m_minThreads = min; }
+	
+	void printState(void) const
+	{
+		std::string output = this->toString();
+		printf(output.c_str());
+	}
+
+	void			setMaxThreads(uint4 max)			{ m_maxThreads = max; }
+	const std::string toString(void) const;
 	
 protected:
 	Scheduler(void);
@@ -62,12 +94,14 @@ protected:
 		assert(thread_index != -1);
 		m_activeJobs[thread_index] = NULL;
 		m_numActiveJobs--;
+		printState();
 	}
 
 	inline void accountForNewJob(Thread* job, sint4 index)
 	{
 		m_activeJobs[index] = job;
 		m_numActiveJobs++;
+		printState();
 	}
 	
 	inline bool getFreeIndex(sint4& index)
@@ -97,19 +131,21 @@ protected:
 		}	
 	}
 
-	void initializeNumberSystemThreads(void);
-	void startNextJob(void);
+	void			initializeNumberSystemThreads(void);
+	void			startNextJob(void);
+	const std::string toStringActiveJob(Thread* job) const;
+	const std::string toStringInactiveJob(void) const;
 	
 private:
-							Scheduler(const Scheduler&);
-							Scheduler operator=(const Scheduler&);
+	Scheduler(const Scheduler&);
+	Scheduler operator=(const Scheduler&);
 	
 	Thread**				m_activeJobs;
 	uint4					m_maxThreads;
-	uint4					m_minThreads;
 	uint4					m_numActiveJobs;
 	uint4					m_numSystemThreads;
-	design_patterns::ObserverHelper<Thread>* m_observer;
+	design_patterns::ObserverHelper<Thread>* 
+							m_observer;
 	PendingJobQueue*		m_pendingJobs;
 }; // class Scheduler
 

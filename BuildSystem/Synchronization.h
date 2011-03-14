@@ -11,25 +11,47 @@
 namespace multithreading
 {
 
-class Mutex;
+class PlatformMutex;
+
+class Mutex 
+{
+public:
+	Mutex(void);
+	~Mutex(void);
+	void acquire(void);
+	void release(void);
+
+protected:
+	PlatformMutex* m_mutex;
+}; // class Mutex
 
 class Synchronizer
 {
 public:
-	Synchronizer(Mutex* mutex);
-	Synchronizer(const Mutex* mutex);
-	~Synchronizer(void);
+	Synchronizer(Mutex& mutex) 
+	: m_mutex(mutex)
+	{
+		m_mutex.acquire();
+	}
+
+	Synchronizer(const Mutex& mutex)
+	: m_mutex(const_cast<Mutex&>(mutex))
+	{
+		m_mutex.acquire();
+	}
+	
+	~Synchronizer(void)
+	{
+		m_mutex.release();
+	}
 
 private:
 	Synchronizer(void);
 	Synchronizer(const Synchronizer&);
 	Synchronizer& operator=(const Synchronizer&);
 
-	Mutex* m_mutex;
+	Mutex& m_mutex;
 }; // class Synchronizer
-
-Mutex*	getMutex(void);
-void	returnMutex(Mutex* mutex);
 
 } // namespace multithreading
 

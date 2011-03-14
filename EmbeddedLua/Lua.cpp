@@ -78,12 +78,12 @@ sint4 Lua::callProtected(lua_State* L, sint4 num_args, sint4 num_return_values)
 	return report(L, error_code);
 }
 
-bool Lua::doString(const char* chunk, const char*)
+bool Lua::doString(const sint1* chunk, const sint1*)
 {
 	return !luaL_dostring(L, chunk);
 }
 
-void Lua::initialize(const char* name)
+void Lua::initialize(const sint1* name)
 {
 	size_t size = strlen(name) + 1;
 	m_name = new char[size];
@@ -168,7 +168,7 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 	}
 }
 
-void Lua::nilLoadedStatus(lua_State* L, const char* module)
+void Lua::nilLoadedStatus(lua_State* L, const sint1* module)
 {
 	if (module)
 	{
@@ -180,7 +180,7 @@ void Lua::nilLoadedStatus(lua_State* L, const char* module)
 	}
 }
 
-void Lua::nilLoadedStatus(const char* module) const
+void Lua::nilLoadedStatus(const sint1* module) const
 {
 	nilLoadedStatus(L, module);
 }
@@ -226,14 +226,14 @@ sint4 Lua::report(lua_State* L, sint4 error_code)
 	return error_code;
 }
 
-bool Lua::require(lua_State* L, const char* module)
+bool Lua::require(lua_State* L, const sint1* module)
 {
 	lua_getglobal(L, "require");
 	lua_pushstring(L, module);
 	return callProtected(L, 1, 1) == 0;
 }
 
-bool Lua::require(const char* module)
+bool Lua::require(const sint1* module)
 {
 	return require(L, module);
 }

@@ -85,7 +85,7 @@ private:
 	/** a pointer to the current getter function */
 	static T& (*					getter)(void);
 	/** a mutex to guard the creation/destruction of the singleton */
-	static multithreading::Mutex*	mutex;
+	static multithreading::Mutex	mutex;
 	/** the static pointer to the only instance of T */
 	static T*						singleton;
 	// not allowed
@@ -95,7 +95,7 @@ private:
 
 // static initialization
 template<typename T> T& (*					Singleton<T>::getter)(void) (Singleton<T>::getUninitialized);
-template<typename T> multithreading::Mutex*	Singleton<T>::mutex(multithreading::getMutex());
+template<typename T> multithreading::Mutex	Singleton<T>::mutex; 
 template<typename T> T*						Singleton<T>::singleton(NULL);
 
 } // namespace design_patterns

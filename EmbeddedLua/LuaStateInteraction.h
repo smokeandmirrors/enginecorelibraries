@@ -40,7 +40,7 @@ average lua_istype function being a macro
 		} \
 		if (!lua_istype(L, index)) \
 		{ \
-			const char* actual = luaL_typename(L, index); \
+			const sint1* actual = luaL_typename(L, index); \
 			luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, expected, actual); \
 		} \
 	}
@@ -73,7 +73,7 @@ template<> inline bool to<bool>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isboolean(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "boolean", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -86,7 +86,7 @@ template<> inline sint4 to<sint4>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isnumber(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -99,7 +99,7 @@ template<> inline uint4 to<uint4>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isnumber(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -112,7 +112,7 @@ template<> inline real4 to<real4>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isnumber(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -125,7 +125,7 @@ template<> inline real8 to<real8>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isnumber(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -138,7 +138,7 @@ template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isuserdata(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "LuaExtendable", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -152,7 +152,7 @@ template<> inline LuaExtendable& to<LuaExtendable&>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isuserdata(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "LuaExtendable", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -165,20 +165,20 @@ template<> inline char* to<char*>(lua_State* L, sint4 index)
 	lua_assertIndexInStack(L, index);
 	if (!lua_isstring(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "string", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
 	return const_cast<char*>(lua_tostring(L, index));
 }
 
-template<> inline const char* to<const char*>(lua_State* L, sint4 index)
+template<> inline const sint1* to<const sint1*>(lua_State* L, sint4 index)
 {
 #if ARGUMENT_ERRORS 
 	lua_assertIndexInStack(L, index);
 	if (!lua_isstring(L, index)) 
 	{ 
-		const char* actual = luaL_typename(L, index); 
+		const sint1* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "string", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
@@ -223,7 +223,7 @@ inline sint4 push(lua_State* L, real8 value)
 	return 1;
 }
 
-inline sint4 push(lua_State* L, const char* value)
+inline sint4 push(lua_State* L, const sint1* value)
 {
 	lua_pushstring(L, value);
 	return 1;

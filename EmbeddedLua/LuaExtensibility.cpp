@@ -74,7 +74,7 @@ sint4 LuaExtendable::callSetMetatable(lua_State* L)
 	return udata->setMetatable(L);
 }
 
-void LuaExtendable::declareLuaClass(lua_State* L, const char* derived, const char* super)
+void LuaExtendable::declareLuaClass(lua_State* L, const sint1* derived, const sint1* super)
 {
 	Lua::nilLoadedStatus(L, derived);
 	Lua::require(L, "ObjectOrientedParadigm"); 
@@ -184,7 +184,7 @@ sint4 LuaExtendable::setUserdataMetatable(lua_State* L)
 	return 1;
 }
 
-void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super)
+void completeLuaClassDeclaration(lua_State* L, const sint1* derived, const sint1* super)
 {
 	lua_getglobal(L, derived);
 	//s: class_def
@@ -240,7 +240,7 @@ void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* 
 	//s:
 }
 
-void printToLua(lua_State* L, const char* string)
+void printToLua(lua_State* L, const sint1* string)
 {	
 	lua_getglobal(L, "print");	//s: print
 	lua_pushstring(L, string);	//s: print, string

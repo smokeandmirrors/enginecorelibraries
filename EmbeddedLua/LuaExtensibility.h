@@ -427,14 +427,14 @@ behavior is undefined
 // end #define register_lua_library
 
 #define INLINE_DEFAULT_TOSTRING(Class) \
-	virtual const char* toString(void) \
+	virtual const sint1* toString(void) \
 	{ \
 		return "This is a " #Class; \
 	}
 // #define INLINE_DEFAULT_TOSTRING(Class) 
 
 #define INLINE_DEFAULT_GETCLASSNAME(Class) \
-	virtual const char* getClassName(void) const \
+	virtual const sint1* getClassName(void) const \
 	{ \
 		return #Class; \
 	}
@@ -527,7 +527,7 @@ public:
 	/**
 	makes sure that the class is declared declared in the lua OOP system.
 	*/
-	static void				declareLuaClass(lua_State* L, const char* derived, const char* super);
+	static void				declareLuaClass(lua_State* L, const sint1* derived, const sint1* super);
 	/**
 	helps set a userdata metatable from script
 	\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
@@ -545,7 +545,7 @@ public:
 	a function that classes must implement to make them easier to make into well formed
 	%Lua classes
 	*/
-	virtual const char*		getClassName(void) const=0;
+	virtual const sint1*		getClassName(void) const=0;
 	/**
 	objects of this type will have a metatable assigned to them when pushed into
 	a lua_State.  %Lua doesn't allow setmetatable calls on userdata pointers
@@ -559,7 +559,7 @@ public:
 	use is simply to make inspection of objects very easy, there is often
 	a lot of information about them printed, logged, or rendered
 	*/
-	virtual const char*		toString(void)=0;
+	virtual const sint1*		toString(void)=0;
 }; // class LuaExtendable
 
 /**
@@ -567,13 +567,13 @@ completes a %Lua class declaration in case no script accompanied
 the class in %Lua.
 \ingroup LuaExtension
 */
-void completeLuaClassDeclaration(lua_State* L, const char* derived, const char* super);
+void completeLuaClassDeclaration(lua_State* L, const sint1* derived, const sint1* super);
 
 /**
 print the string to the %Lua output
 \ingroup LuaExtension
 */
-void printToLua(lua_State* L, const char* string);
+void printToLua(lua_State* L, const sint1* string);
 
 /**
 helper function for pushing a class to %Lua an preserving the ability

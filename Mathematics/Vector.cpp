@@ -34,7 +34,7 @@ const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 #if EXTENDED_BY_LUA
 LUA_FUNC(__indexVector2)
 {
-	const char* key = to<const char*>(L, -1);
+	const sint1* key = to<const sint1*>(L, -1);
 	const Vector2& v = to<const Vector2&>(L, -2);
 	
 	if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
@@ -54,7 +54,7 @@ LUA_FUNC(__indexVector2)
 LUA_FUNC(__newindexVector2)
 {
 	real4 value = to<real4>(L, -1);
-	const char* key = to<const char*>(L, -2);
+	const sint1* key = to<const sint1*>(L, -2);
 	Vector2& v = to<Vector2&>(L, -3);
 	
 	if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
@@ -87,7 +87,7 @@ DEFINE_LUA_LUAEXTENDABLE(Vector2, Vector2)
 
 LUA_FUNC(__indexVector3)
 {
-	const char* key = to<const char*>(L, -1);
+	const sint1* key = to<const sint1*>(L, -1);
 	const Vector3& v = to<const Vector3&>(L, -2);
 	
 	if (key[1] == '\0' 
@@ -108,7 +108,7 @@ LUA_FUNC(__indexVector3)
 LUA_FUNC(__newindexVector3)
 {
 	real4 value = to<real4>(L, -1);
-	const char* key = to<const char*>(L, -2);
+	const sint1* key = to<const sint1*>(L, -2);
 	Vector3& v = to<Vector3&>(L, -3);
 	
 	if (key[1] == '\0' 

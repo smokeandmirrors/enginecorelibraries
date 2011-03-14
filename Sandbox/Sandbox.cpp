@@ -48,7 +48,6 @@ class QuickSortTester : public multithreading::Executable
 public:
 	virtual void execute(void)
 	{
-		printf("I STARTED a sort in a CLASS!\n");
 		sint4 number_size = 10000;
 		sint4 number_sort = 1000;
 		sint4 number;
@@ -66,19 +65,23 @@ public:
 			qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
 		}
 
-		printf("I FINISHED a sort in a CLASS!\n");
 		delete[] numbers;
+
+		multithreading::Scheduler::single().enqueue(
+			new QuickSortTester(),  
+			multithreading::noThreadPreference, 
+			"2nd Gen!");
 	}
 }; // QuickSortTester
 
 
 HANDLE mutex;
 
-multithreading::Mutex* pMutex;// = multithreading::getMutex();
+multithreading::Mutex m_mutex;
 sint4 numberOfThreads = 0;
 
 DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
-	synchronize(pMutex);
+	synchronize(m_mutex);
 	numberOfThreads++;
 	sint4 myNumThreads = numberOfThreads;
 	Sleep(numberOfThreads * 1000);
@@ -133,7 +136,6 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 
 void threadsChecking()
 {
-	pMutex = multithreading::getMutex();
 	mutex = CreateMutex(NULL, false, NULL);
 	
 	std::vector<HANDLE> threads;
@@ -158,8 +160,6 @@ void threadsChecking()
 	{
 		CloseHandle(threads[i]);
 	}
-
-	multithreading::returnMutex(pMutex);
 }
 
 void firstJob(void)
@@ -187,17 +187,32 @@ void firstJob(void)
 
 void sandbox::play()
 {
-	printf("Playing in the sandbox!\n");
-	
-	//compiler_checks::sizeOfChecks();
-	//// threadsChecking();
-	//multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
-	//// scheduler.enqueue(firstJob);
-	//for (uint4 i = 0; i < 8; i++)
-	//{
-	//	scheduler.enqueue(new QuickSortTester());
-	//}
+	printf("Playing in the sandbox!\n");	
 
+	compiler_checks::sizeOfChecks();
+	// threadsChecking();	
+	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
+	// scheduler.enqueue(firstJob);
+	
+	uint4 i = 32;
+	do 
+	{
+		--i;		
+		char buffer[256];
+		int index = 256;
+		do 
+		{
+			index--;
+			buffer[index] = '\0';
+		} 
+		while (index);
+		sprintf_s(buffer, "Quick:%2d", i);
+
+		scheduler.enqueue(new QuickSortTester(),  multithreading::noThreadPreference, buffer);	
+	}
+	while (i);
+
+	/*
 	real_time::Clock man_clock;
 	real_time::Clock backwards;
 	backwards.setRate(-2.0);
@@ -217,7 +232,13 @@ void sandbox::play()
 	timer.stop();
 	millisecond timed_ms = timer.milliseconds();
 	second timed_s = timer.seconds(); 
+	*/
+	
+	while (scheduler.hasAnyWork())
+		/** empty */;
 
+
+	scheduler.printState();
 	printf("Stopped playing in the sandbox!\n");
 }
 

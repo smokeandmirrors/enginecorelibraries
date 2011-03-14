@@ -60,11 +60,8 @@ END_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4)
 sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
-#if SANDBOX
-	sandbox::play();// just plays with C/C++ compile/runtime functionality
-#endif//SANDBOX
-	
-#if EXTENDED_BY_LUA 
+
+#if 0 // EXTENDED_BY_LUA 
 	{
 		lua_extension::Lua lua;
 		registerGlobalLibrary(lua.getState());
@@ -78,6 +75,12 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
+
+#if SANDBOX
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
+#endif//SANDBOX
+
+	
 	return 0;
 }
 

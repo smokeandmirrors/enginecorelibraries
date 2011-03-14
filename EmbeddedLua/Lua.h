@@ -48,7 +48,7 @@ public:
 	by the same name using require.
 	This needs to be done because luaL_register modifies the package.loaded table.
 	*/
-	static void			nilLoadedStatus(lua_State* L, const char* module);
+	static void			nilLoadedStatus(lua_State* L, const sint1* module);
 	/**
 	reports output from the lua_State after a function call
 	\param L the %Lua state in which the function was called
@@ -58,14 +58,14 @@ public:
 	/**
 	call require from C++
 	*/
-	static bool			require(lua_State* L, const char* module);
+	static bool			require(lua_State* L, const sint1* module);
 	/** 
 	public [no-args] constructor.
 	\param name a string identifier
 	\param open_standard_libs if true, the base, package, string, table, and math %Lua libraries will be opened
 	\param initialize_userdata_storage if true, the solution to userdata table indexing will be initialized
 	*/
-	Lua(const char* name="anonymous", bool open_standard_libs=true, bool initialize_userdata_storage=true);
+	Lua(const sint1* name="anonymous", bool open_standard_libs=true, bool initialize_userdata_storage=true);
 	/** 
 	destroys the lua_State and any memory allocated by this object
 	*/
@@ -74,7 +74,7 @@ public:
 	loads end executes the string as a lua chunk
 	\return the status of the execution
 	*/
-	bool				doString(const char* chunk, const char* source="native code");
+	bool				doString(const sint1* chunk, const sint1* source="native code");
 	/**
 	\return the number of bytes allocated by the %Lua state
 	*/
@@ -82,7 +82,7 @@ public:
 	/**
 	\return the string ID of this specific %Lua object
 	*/
-	const char*			getName(void) const		{ return m_name; }
+	const sint1*			getName(void) const		{ return m_name; }
 	/**
 	returns the lua_State encapsulated by this class
 	*/
@@ -93,7 +93,7 @@ public:
 	by the same name using require
 	\param module the name of the (loaded) module
 	*/
-	void				nilLoadedStatus(const char* module) const;
+	void				nilLoadedStatus(const sint1* module) const;
 	/** 
 	Opens %Lua library using the lua_function provided
 	*/
@@ -101,7 +101,7 @@ public:
 	/**
 	require() shortcut
 	*/
-	bool				require(const char* module);
+	bool				require(const sint1* module);
 	/** 
 	quick, low functionality console for fast testing 
 	*/
@@ -130,7 +130,7 @@ protected:
 	
 private:
 	/** open standard libraries and such */
-	void				initialize(const char* name);
+	void				initialize(const sint1* name);
 	/** allocation method, see comments in Lua.cpp */
 	static void*		luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize);
 	/** The use of this could only be a terrible idea. */

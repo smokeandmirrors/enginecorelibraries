@@ -310,7 +310,7 @@ public:
 	static uint4 getNumAllocated(void)	{ return numAllocatedGrandparents; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
-	Grandparent(const char* name=NULL) 
+	Grandparent(const sint1* name=NULL) 
 		: m_name(name) 
 	{
 		everCreated = true;
@@ -322,12 +322,12 @@ public:
 		numAllocatedGrandparents--;
 	}
 
-	const char* getFamilyName(void) const 
+	const sint1* getFamilyName(void) const 
 	{ 
 		return "Curran"; 
 	}
 
-	virtual const char* getTitle(void) const 
+	virtual const sint1* getTitle(void) const 
 	{ 
 		return "Grandparent"; 
 	}
@@ -340,7 +340,7 @@ public:
 	INLINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
 
 protected:
-	const char*				m_name;
+	const sint1*				m_name;
 }; // Grandparent
 
 uint4 Grandparent::numAllocatedGrandparents = 0;
@@ -355,8 +355,8 @@ LUA_FUNC(__call)
 
 DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Grandparent, Grandparent)
 LUA_ENTRY(__call) 
-LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const char*, &Grandparent::getFamilyName>))
-LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const char*, &Grandparent::getTitle>))
+LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const sint1*, &Grandparent::getFamilyName>))
+LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const sint1*, &Grandparent::getTitle>))
 LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 END_LUA_LUAEXTENDABLE(Grandparent, Grandparent)
 
@@ -372,8 +372,8 @@ public:
 	typedef Grandparent super;
 	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
-	const char*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
-	virtual const char*		getTitle(void) const			{ return "Parent"; }
+	const sint1*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
+	virtual const sint1*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
 	INLINE_DEFAULT_GETCLASSNAME(Parent)
 
@@ -385,7 +385,7 @@ DECLARE_LUA_LUAEXTENDABLE(Parent);
 
 DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Parent, Grandparent)
 LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
-LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const char*, &Parent::getGrandparentName>))
+LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const sint1*, &Parent::getGrandparentName>))
 LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
 END_LUA_LUAEXTENDABLE(Parent, Grandparent) 
 
@@ -409,8 +409,8 @@ public:
 	}
 
 	Parent*					getParent(void) const		{ return m_parent; }
-	const char*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
-	virtual const char*		getTitle(void) const		{ return "Child"; }
+	const sint1*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
+	virtual const sint1*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
 	INLINE_DEFAULT_GETCLASSNAME(Child)
 
@@ -423,7 +423,7 @@ DECLARE_LUA_LUAEXTENDABLE(Child);
 DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Child, Parent)
 LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
 LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const char*, &Child::getParentName>))
+LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const sint1*, &Child::getParentName>))
 LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 END_LUA_LUAEXTENDABLE(Child, Parent)
 

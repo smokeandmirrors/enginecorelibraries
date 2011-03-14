@@ -54,16 +54,20 @@ public:
 	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
 	Thread(Executable* executable, 
 		sint4 CPUid=noThreadPreference, 
-		design_patterns::Observer<Thread>* observer=NULL) 
+		design_patterns::Observer<Thread>* observer=NULL,
+		const sint1* name="un-named") 
 	: m_executor(new Thread::ExecutableExecutor(executable))
+	, m_name(name)
 	{ 
 		initialize(CPUid, observer);
 	}
 
 	Thread(executableFunction executable, 
 		sint4 CPUid=noThreadPreference, 
-		design_patterns::Observer<Thread>* observer=NULL)
+		design_patterns::Observer<Thread>* observer=NULL,
+		const sint1* name="un-named")
 	: m_executor(new Thread::FunctionExecutor(executable))
+	, m_name(name)
 	{ 
 		initialize(CPUid, observer);
 	}
@@ -75,15 +79,20 @@ public:
 		m_observable->add(observer);
 	}
 	
-	void remove(design_patterns::Observer<Thread>* observer)
-	{
-		m_observable->remove(observer);
-	}
-	
 	void notify(void)
 	{
 		m_observable->notify();
 	}
+
+	void remove(design_patterns::Observer<Thread>* observer)
+	{
+		m_observable->remove(observer);
+	}
+
+	const std::string toString(void) const 
+	{ 
+		return m_name; 
+	} 
 
 private:
 #if WIN32
@@ -169,6 +178,7 @@ private:
 
 	Executor*			m_executor;
 	threadID			m_id;
+	std::string			m_name;
 	design_patterns::ObservableHelper<Thread>*	
 						m_observable;
 	threadHandle		m_thread;

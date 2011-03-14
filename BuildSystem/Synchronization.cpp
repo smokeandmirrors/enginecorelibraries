@@ -13,26 +13,26 @@ typedef CRITICAL_SECTION criticalSection;
 	PREVENT_COMPILE
 #endif//WIN32
 
-class Mutex 
+class PlatformMutex 
 {
 public:
 #if WIN32
-	Mutex(void)
+	inline PlatformMutex(void)
 	{
 		InitializeCriticalSection(&m_criticalsection);
 	}
 
-	~Mutex(void)
+	inline ~PlatformMutex(void)
 	{
 		DeleteCriticalSection(&m_criticalsection);
 	}
 
-	void enter(void)
+	inline void acquire(void)
 	{
 		EnterCriticalSection(&m_criticalsection);
 	}
 	
-	void exit(void)
+	inline void release(void)
 	{
 		LeaveCriticalSection(&m_criticalsection);
 	}
@@ -42,35 +42,28 @@ protected:
 #else
 	PREVENT_COMPILE
 #endif//WIN32
-}; // class Mutex
+}; // class PlatformMutex
 
-Synchronizer::Synchronizer(Mutex* mutex) 
-: m_mutex(mutex)
+Mutex::Mutex(void)
+: m_mutex(new PlatformMutex())
 {
-	assert(mutex);
-	m_mutex->enter();
+	/* empty */
 }
 
-Synchronizer::Synchronizer(const Mutex* mutex) 
-: m_mutex(const_cast<Mutex*>(mutex))
+Mutex::~Mutex(void)
 {
-	assert(mutex);
-	m_mutex->enter();
+	delete m_mutex;
 }
 
-Synchronizer::~Synchronizer(void)
+void Mutex::acquire(void)
 {
-	m_mutex->exit();
+	m_mutex->acquire();
 }
 
-Mutex* getMutex(void) 
+void Mutex::release(void)
 {
-	return new Mutex();
+	m_mutex->release();
 }
 
-void returnMutex(Mutex* mutex)
-{
-	delete mutex;
-}
 
 } // namespace multithreading

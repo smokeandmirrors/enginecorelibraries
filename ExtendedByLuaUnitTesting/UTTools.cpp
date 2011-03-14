@@ -68,7 +68,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	//s:
 	lua_getglobal(L,  "lastUnitTestReport");
 	//s: lastUnitTestReport
-	const char* report = to<const char*>(L, -1);
+	const sint1* report = to<const sint1*>(L, -1);
 	lua_pop(L, 1);
 	//s:
 	// Convert to a wchar_t*

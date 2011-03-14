@@ -13,6 +13,7 @@ http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 #include <vector>
 
 #include "Singleton.h"
+#include "Synchronization.h"
 
 namespace design_patterns 
 {
@@ -95,8 +96,9 @@ private:
 	ObservableHelper<SUBJECT>(const ObservableHelper<SUBJECT>&);
 	ObservableHelper<SUBJECT> operator=(const ObservableHelper<SUBJECT>&);
 
-	SUBJECT&		m_observable;
-	observer_list	m_observers;
+	multithreading::Mutex	m_mutex;
+	SUBJECT&				m_observable;
+	observer_list			m_observers;
 }; // ObservableHelper
 
 template<typename SUBJECT>
@@ -169,8 +171,9 @@ private:
 	ObserverHelper<SUBJECT>(const ObserverHelper<SUBJECT>&);
 	ObserverHelper<SUBJECT> operator=(const ObserverHelper<SUBJECT>&);
 	
-	observable_list		m_observables;
-	Observer<SUBJECT>&	m_observer;
+	multithreading::Mutex	m_mutex;
+	observable_list			m_observables;
+	Observer<SUBJECT>&		m_observer;
 }; // ObserverHelper
 
 } // namespace design_patterns
