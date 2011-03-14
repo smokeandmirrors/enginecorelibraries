@@ -208,8 +208,7 @@ back out of %Lua.
 	{ \
 		template<> inline Class* to< Class* >(lua_State* L, sint4 index) \
 		{ \
-			LuaExtendable* ud = to< LuaExtendable* >(L, index); \
-			Class* object = dynamic_cast< Class* >(ud); \
+			Class* object = dynamic_cast< Class* >(to< LuaExtendable* >(L, index)); \
 			if (object) \
 				return object; \
 			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: unknown", index, #Class); \

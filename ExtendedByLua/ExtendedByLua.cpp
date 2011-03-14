@@ -23,13 +23,12 @@ using namespace lua_extension;
 #include "Time.h"
 #include "Vector.h"
 /**
-
 \todo, better support for Template class exports to %Lua
-
+*/
 template<typename T>
 class Value 
 #if EXTENDED_BY_LUA 
-: LuaExtendable
+: public LuaExtendable
 #endif//EXTENDED_BY_LUA 
 {
 public:
@@ -50,8 +49,6 @@ DEFINE_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4)
 	LUA_NAMED_ENTRY("setValue", (return0Param1<Value_sint4, sint4, &Value<sint4>::setValue>))
 END_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4) 
 
-*/
-
 #if WIN32
 #include <process.h>
 #include <windows.h>
@@ -61,7 +58,7 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
 
-#if 0 // EXTENDED_BY_LUA 
+#if EXTENDED_BY_LUA 
 	{
 		lua_extension::Lua lua;
 		registerGlobalLibrary(lua.getState());
@@ -69,7 +66,7 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		lua.require("ObjectOrientedParadigm");
 		register_lua_library((&lua), Vector2);
 		register_lua_library((&lua), Vector3);
-		// register_lua_library((&lua), Value_sint4);
+		register_lua_library((&lua), Value_sint4);
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		lua.runConsole();

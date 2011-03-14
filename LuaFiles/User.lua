@@ -10,10 +10,17 @@ _G.u = function()
 end
 
 _G.test = function()
+	local v = new'Value_sint4'
+	v:setValue(7)
+	assert(v:getValue() == 7)
+	print(v:getValue())
+
+--[[
 	vpt(1000)
 	vpt(10000)
 	vpt(100000)
 	vpt(1000000)
+--]]
 end
 
 _G.vpt = function(iterations)

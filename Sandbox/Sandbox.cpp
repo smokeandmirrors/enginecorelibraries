@@ -16,30 +16,6 @@
 #include "Time.h"
 #include "Threads.h"
 
-template<typename T>
-class TVector3
-{
-public:
-	T x;
-	T y;
-	T z;
-
-	TVector3()
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-	}
-
-	void add(const TVector3& other)
-	{
-		x += other.x;
-		y += other.y;
-		z += other.z;
-	}
-};
-
-
 sint4 sintCompareAscending(const void* a, const void* b)		{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
 
