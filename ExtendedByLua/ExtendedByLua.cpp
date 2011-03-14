@@ -52,14 +52,18 @@ END_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4)
 
 */
 
+#if WIN32
+#include <process.h>
+#include <windows.h>
+#endif//WIN32
+
 sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
 #if SANDBOX
-	// just plays with C/C++ compile/runtime functionality
-	sandbox::play();
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
 #endif//SANDBOX
-
+	
 #if EXTENDED_BY_LUA 
 	{
 		lua_extension::Lua lua;

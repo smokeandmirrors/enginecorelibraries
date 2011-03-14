@@ -12,39 +12,9 @@
 #include "Observation.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
-#include "Singleton.h"
 #include "Synchronization.h"
+#include "Time.h"
 #include "Threads.h"
-
-
-class TheOne : public design_patterns::Singleton<TheOne>
-{
-public:
-	~TheOne(void)
-	{
-		printf("The One Destroyed!");
-	}
-
-	void decrement(void)
-	{
-		--one;
-	}
-
-	sint4 get(void) const
-	{
-		return one;
-	}
-
-	void increment(void)
-	{
-		++one;
-	}
-
-private:
-	sint4 one;
-}; // class TheOne : public design_patterns::Singleton<TheOne>
-
-// TheOne::getter(TheOne::getUninitialized);
 
 template<typename T>
 class TVector3
@@ -100,109 +70,6 @@ public:
 		delete[] numbers;
 	}
 }; // QuickSortTester
-
-
-#define TEST_OBSERVATION 1
-#if TEST_OBSERVATION 
-
-using namespace design_patterns;
-
-
-class Testee 
-: public Observable<Testee>
-{
-public:
-	Testee(void)
-	{
-		m_observable = new ObservableHelper<Testee>(*this);
-	}
-
-	~Testee(void)
-	{
-		delete m_observable;
-	}
-
-	void add(Observer<Testee>* observer)
-	{
-		m_observable->add(observer);
-	}
-
-	void notify(void)
-	{
-		m_observable->notify();
-	}
-
-	void remove(Observer<Testee>* observer)
-	{
-		printf("I lost an observer!\n");
-		m_observable->remove(observer);
-	}
-
-private:
-	ObservableHelper<Testee>* m_observable;
-};
-
-class Tester 
-: public Observer<Testee>
-{
-public:
-	Tester(uint4 value)
-		: m_value(value)
-	{
-		m_observer = new ObserverHelper<Testee>(*this);
-	}
-
-	uint4 m_value;
-
-	~Tester(void)
-	{
-		delete m_observer;
-	}
-
-	void ignore(Testee* observable)
-	{
-		m_observer->ignore(observable);
-	}
-
-	void observe(Testee* observable)
-	{
-		m_observer->observe(observable);
-	}
-
-protected:
-	void notice(Testee*)
-	{
-		printf("I observed the Testee!\n");
-	}
-
-private:
-	ObserverHelper<Testee>*	m_observer;	
-};
-void testObservation(void)
-{
-	Tester* tester1 = new Tester(1);
-	Tester* tester2 = new Tester(2);
-	Tester* tester3 = new Tester(3);
-	Tester* tester4 = new Tester(4);
-	Testee* testee = new Testee();
-	
-	testee->add(tester1);
-	tester1->observe(testee); // bad!
-	testee->add(tester2);
-	testee->add(tester4);
-	testee->add(tester2);
-	testee->add(tester3);
-	testee->remove(tester4);
-	testee->notify();
-	tester3->ignore(testee);
-	
-	delete tester2;
-	delete testee;
-	delete tester1;
-	delete tester3;
-	delete tester4;
-}
-#endif// TEST_OBSERVATION
 
 
 HANDLE mutex;
@@ -322,20 +189,36 @@ void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");
 	
-	compiler_checks::sizeOfChecks();
-	// threadsChecking();
+	//compiler_checks::sizeOfChecks();
+	//// threadsChecking();
+	//multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
+	//// scheduler.enqueue(firstJob);
+	//for (uint4 i = 0; i < 8; i++)
+	//{
+	//	scheduler.enqueue(new QuickSortTester());
+	//}
 
-	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
-	// scheduler.enqueue(firstJob);
-	
-	for (uint4 i = 0; i < 36; i++)
-	{
-		scheduler.enqueue(new QuickSortTester());
-	}
+	real_time::Clock man_clock;
+	real_time::Clock backwards;
+	backwards.setRate(-2.0);
+	real_time::StopWatch timer(backwards);
+	cycle before = real_time::cycles();
+	Sleep(3000);
+	cycle after = real_time::cycles();
+	cycle delta = after - before;
+	millicycle mhz = real_time::millihertz();
+	millicycle delta_mcylc = delta/mhz;
+	man_clock.tick();
+	millisecond man_ms = man_clock.milliseconds();
+	second man_seconds = man_clock.seconds();
+	backwards.tick();
+	millisecond back_ms = backwards.milliseconds();
+	second back_s = backwards.seconds();
+	timer.stop();
+	millisecond timed_ms = timer.milliseconds();
+	second timed_s = timer.seconds(); 
 
-#if TEST_OBSERVATION
-	testObservation();
-#endif//TEST_OBSERVATION
+	printf("Stopped playing in the sandbox!\n");
 }
 
 

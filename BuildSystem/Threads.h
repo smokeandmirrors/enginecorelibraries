@@ -10,7 +10,9 @@ namespace multithreading
 #if WIN32
 #define ARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void* args)
 #define NOARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void*)
-#endif// WIN32
+#else
+	PREVENT_COMPILE
+#endif//WIN32
 
 #define DECLARE_NOARGS_EXECUTABLE_FUNCTION(name) NOARGS_EXECUTABLE_FUNCTION(name);
 #define DEFINE_NOARGS_EXECUTABLE_FUNCTION(name, code) NOARGS_EXECUTABLE_FUNCTION(name) \
@@ -39,8 +41,10 @@ public:
 typedef uint4(__stdcall*		threadable)(void*);
 typedef uint4				threadID;
 typedef void*				threadHandle;
+#else
+	PREVENT_COMPILE
 #endif//WIN32
-
+		
 static sint4 noThreadPreference(-1);
 
 class Thread
@@ -88,6 +92,8 @@ private:
 		static_cast<Thread*>(pThread)->execute();
 		return 0;
 	}
+#else
+	PREVENT_COMPILE
 #endif//WIN32
 
 	class Executor

@@ -3,12 +3,15 @@
 #if WIN32
 #include <process.h>
 #include <windows.h>
-
-typedef CRITICAL_SECTION criticalSection;
 #endif//WIN32
 
 namespace multithreading
 {
+#if WIN32
+typedef CRITICAL_SECTION criticalSection;
+#else
+	PREVENT_COMPILE
+#endif//WIN32
 
 class Mutex 
 {
@@ -36,6 +39,8 @@ public:
 
 protected:
 	criticalSection	m_criticalsection;
+#else
+	PREVENT_COMPILE
 #endif//WIN32
 }; // class Mutex
 

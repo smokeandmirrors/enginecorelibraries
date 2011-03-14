@@ -19,6 +19,8 @@ inline uint4 getNumHardwareThreads(void)
 	_SYSTEM_INFO system_info;
 	GetSystemInfo(&system_info);
 }
+#else
+	PREVENT_COMPILE
 #endif//WIN32
 
 class PendingJobQueue
@@ -244,8 +246,8 @@ void Scheduler::initializeNumberSystemThreads(void)
 	SYSTEM_INFO windows_info;
 	GetSystemInfo(&windows_info);
 	m_numSystemThreads = windows_info.dwNumberOfProcessors;
-#elif 
-	m_numSystemThreads = 1;
+#else
+	PREVENT_COMPILE
 #endif//WIN32
 }
 

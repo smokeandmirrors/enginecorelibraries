@@ -1,50 +1,85 @@
 #include <ctime>
 #include <time.h>
 
+#if WIN32
+#include <windows.h>
+#endif//WIN32
+
 #include "Time.h"
 // static CLOCKS_PER_SEC
+namespace 
+{
+
+bool		system_is_initialized(false);
+cycle		systemCycleStart;
+cycle		systemHertz;
+millicycle	systemMillihertz;
+
+inline cycle getCycles(void)
+{
+	assert(system_is_initialized);
+#if WIN32
+	LARGE_INTEGER perf_query;
+	int success = QueryPerformanceCounter(&perf_query);
+	assert(success);
+	return perf_query.QuadPart - systemCycleStart;
+#else
+	PREVENT_COMPILE
+#endif//WIN32	
+} // inline cycle getCycles(void)
+
+} // namespace 
+
 namespace real_time
 {
-const real8 cyclesToSeconds			(static_cast<real8>(1.0) / static_cast<real8>(CLOCKS_PER_SEC));
-const real8 cyclesToMilliseconds		(static_cast<real8>(1000.0) / static_cast<real8>(CLOCKS_PER_SEC));
 
-time_t			appCalendarStart;
-millisecond		appMillisecondsCurrent	(0);
-second			appSecondsCurrent		(0);
-
-inline clock_tick clockTicks(void)
+cycle cycles(void)
 {
-	return clock();
-} // clock_tick clockTicks(void)
+	assert(system_is_initialized);
+	return getCycles();
+}
+
+cycle hertz(void)
+{
+	assert(system_is_initialized);
+	return systemHertz;
+}
 
 void initialize(void)
 {
-	time(&appCalendarStart);
+	if (system_is_initialized)
+		return;
+#if WIN32
+	LARGE_INTEGER perf_query;
+	int success = QueryPerformanceCounter(&perf_query);
+	assert(success);
+	systemCycleStart = perf_query.QuadPart;
+	success = QueryPerformanceFrequency(&perf_query);
+	assert(success);
+	systemHertz = static_cast<cycle>(perf_query.QuadPart);
+	systemMillihertz = static_cast<millicycle>(systemHertz) / static_cast<millicycle>(1000);
+#else
+	PREVENT_COMPILE
+#endif//WIN32	
+	system_is_initialized = true;
+}
+
+millicycle millihertz(void)
+{
+	assert(system_is_initialized);
+	return systemMillihertz;
 }
 
 millisecond milliseconds(void)
 {
-	return appMillisecondsCurrent;
+	assert(system_is_initialized);
+	return static_cast<millisecond>(getCycles()) / static_cast<millisecond>(systemMillihertz);	
 }
 
 second seconds(void)
 {
-	return appSecondsCurrent;
-}
-
-void tick(void)
-{
-	/* time_t method
-	time_t current;
-	time(&current);
-	real8 delta = difftime(current, appCalendarStart);
-	appMillisecondsCurrent = static_cast<millisecond>(delta * 1000.0f);
-	appSecondsCurrent = static_cast<second>(delta);
-	*/
-	// clock() method
-	clock_tick cycles = clockTicks();
-	appMillisecondsCurrent = static_cast<millisecond>(cycles * cyclesToMilliseconds);
-	appSecondsCurrent = static_cast<second>(cycles * cyclesToSeconds);
+	assert(system_is_initialized);
+	return static_cast<second>(getCycles()) / static_cast<second>(systemHertz);
 }
 
 } // namespace time
