@@ -15,7 +15,6 @@
 #include "Synchronization.h"
 #include "Time.h"
 #include "Threads.h"
-#include "TVector.h"
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }

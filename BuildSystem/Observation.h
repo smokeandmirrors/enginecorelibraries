@@ -47,6 +47,8 @@ public:
 	
 	virtual ~ObservableHelper() 
 	{
+		synchronize(m_mutex)
+
 		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
 		{
 			(*iter)->ignore(&m_observable);
@@ -55,6 +57,8 @@ public:
 	
 	virtual void add(Observer<SUBJECT>* observer)
 	{
+		synchronize(m_mutex)
+
 		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
 		{
 			if (*iter == observer)
@@ -69,6 +73,7 @@ public:
 	
 	virtual void remove(Observer<SUBJECT>* observer)
 	{
+		synchronize(m_mutex)
 		observer->ignore(&m_observable);
 
 		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
@@ -83,6 +88,7 @@ public:
 
 	virtual void notify(void)
 	{	// notification might cause the observer to remove itself from the observable
+		synchronize(m_mutex)
 		observer_list copy(m_observers);
 
 		for (observer_iter iter(copy.begin()); iter != copy.end(); iter++)
@@ -127,6 +133,7 @@ public:
 	
 	virtual ~ObserverHelper(void) 
 	{
+		synchronize(m_mutex)
 		observable_list copy(m_observables);
 		m_observables.clear();
 
@@ -138,6 +145,8 @@ public:
 	
 	virtual void ignore(SUBJECT* observable)
 	{
+		synchronize(m_mutex)
+			
 		for (observable_iter iter(m_observables.begin()); iter != m_observables.end(); iter++)
 		{
 			if (*iter == observable)
@@ -155,6 +164,8 @@ public:
 
 	virtual void observe(SUBJECT* observable)
 	{
+		synchronize(m_mutex)
+		
 		for (observable_iter iter(m_observables.begin()); iter != m_observables.end(); iter++)
 		{
 			if (*iter == observable)
