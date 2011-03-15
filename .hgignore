@@ -40,3 +40,11 @@ glob:BuildSystem/Release/Build.obj
 glob:BuildSystem/Release/BuildSystem.lib
 glob:BuildSystem/Release/vc80.idb
 glob:BuildSystem/Release/vc80.pdb
+glob:BuildSystem/Debug/Scheduling.obj
+glob:BuildSystem/Debug/Synchronization.obj
+glob:BuildSystem/Debug/Threads.obj
+glob:BuildSystem/Debug/Time.obj
+glob:BuildSystem/Release/Scheduling.obj
+glob:BuildSystem/Release/Synchronization.obj
+glob:BuildSystem/Release/Threads.obj
+glob:Mathematics/vsluaplugin_log.txt

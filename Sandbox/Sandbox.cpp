@@ -15,6 +15,7 @@
 #include "Synchronization.h"
 #include "Time.h"
 #include "Threads.h"
+#include "TVector.h"
 
 sint4 sintCompareAscending(const void* a, const void* b)		{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
@@ -216,6 +217,11 @@ void sandbox::play()
 
 	scheduler.printState();
 	printf("Stopped playing in the sandbox!\n");
+
+	math::V2<float> v(0.0f, 1.0f); 
+	math::V2<float> w(0.0f, 1.0f);
+	v += w;
+	return;
 }
 
 
