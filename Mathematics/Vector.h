@@ -42,8 +42,11 @@ Vector classes and operations
 namespace math
 {
 
-class Vector2;
-class Vector3;
+template<typename T> class V2; 
+template<typename T> class V3; 
+
+typedef V2<float> Vector2;
+typedef V3<float> Vector3;
 
 /** 
 \defgroup Vector_Directions Directions
@@ -68,183 +71,185 @@ extern const Vector3	up3D;
 /**
 \class Vector2
 \ingroup Vectors
-a 2D Vector class with vec_t elements
+a 2D Vector class with T elements
 \warning The thread safety of this class is not guaranteed!
 */
-class Vector2 
+template<typename T>
+class V2 
 #if EXTENDED_BY_LUA
 	: public lua_extension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
 	// data
-	vec_t x;
-	vec_t y;
+	T x;
+	T y;
 	// construction
-	Vector2(void) 					
+	V2(void) 					
 	{/* empty */}
-	explicit Vector2(const Vector2& v) : x(v.x), y(v.y)  
+	explicit V2(const V2<T>& v) : x(v.x), y(v.y)  
 	{/* empty */}
-	Vector2(vec_t X, vec_t Y) : x(X), y(Y)
+	V2(T X, T Y) : x(X), y(Y)
 	{/* empty */}
-	explicit Vector2(vec_t scalar) : x(scalar), y(scalar) 	
+	explicit V2(T scalar) : x(scalar), y(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector2)
 #endif//EXTENDED_BY_LUA
 	// access
-	const vec_t& 	operator[](uint4 i) const;	
-	vec_t& 			operator[](uint4 i);
+	const T& 	operator[](uint4 i) const;	
+	T& 			operator[](uint4 i);
 	// addition 
-	void 			add(vec_t scalar);
-	void 			add(vec_t X, vec_t Y);
-	void 			add(const Vector2& v);
-	Vector2& 		operator+=(const Vector2& v);
+	void 		add(T scalar);
+	void 		add(T X, T Y);
+	void 		add(const V2<T>& v);
+	V2<T>& 		operator+=(const V2<T>& v);
 	// distance to another
-	vec_t			distance(const Vector2& v) const;
-	vec_t 			distanceSqr(const Vector2& v) const;
-	bool			isFar(const Vector2& v, vec_t closest_range) const;
-	bool			isNear(const Vector2& v, vec_t farthest_range) const;
+	T			distance(const V2<T>& v) const;
+	T 			distanceSqr(const V2<T>& v) const;
+	bool		isFar(const V2<T>& v, T closest_range) const;
+	bool		isNear(const V2<T>& v, T farthest_range) const;
 	// division
-	void 			divide(vec_t scalar);
-	void 			divide(vec_t X, vec_t Y);
-	void 			divide(const Vector2& v);
-	Vector2& 		operator/=(const Vector2& v);
+	void 		divide(T scalar);
+	void 		divide(T X, T Y);
+	void 		divide(const V2<T>& v);
+	V2<T>& 		operator/=(const V2<T>& v);
 	// dot product 
-	vec_t 			dot(const Vector2& v) const;
+	T 			dot(const V2<T>& v) const;
 	// equality 
-	bool 			equals(vec_t X, vec_t Y) const;
-	bool			nearlyEquals(const Vector2& v, vec_t epsilon=vectorTolerance) const;
-	bool 			notEquals(vec_t X, vec_t Y) const;
-	bool 			operator==(const Vector2& v) const;
-	bool			operator!=(const Vector2& v) const;
+	bool 		equals(T X, T Y) const;
+	bool		nearlyEquals(const V2<T>& v, T epsilon=vectorTolerance) const;
+	bool 		notEquals(T X, T Y) const;
+	bool 		operator==(const V2<T>& v) const;
+	bool		operator!=(const V2<T>& v) const;
 	// magnitude 
-	vec_t 			magnitude(void) const;
-	vec_t 			magnitudeSqr(void) const;
+	T 			magnitude(void) const;
+	T 			magnitudeSqr(void) const;
 	// normalization 
-	bool			isNormal(void) const;
-	vec_t 			normalize(void);
+	bool		isNormal(void) const;
+	T 			normalize(void);
 	// construction (normalized)
-	Vector2(const Vector2& v, bool /* ignored */) : x(v.x), y(v.y) 
+	V2(const V2<T>& v, bool /* ignored */) : x(v.x), y(v.y) 
 	{ normalize(); }
 	// multiplication & scaling 
-	void			negate(void);
-	void 			scale(vec_t scalar);
-	void 			scale(vec_t X, vec_t Y);
-	void 			scale(const Vector2& v);
-	Vector2& 		operator*=(const Vector2& v);
+	void		negate(void);
+	void 		scale(T scalar);
+	void 		scale(T X, T Y);
+	void 		scale(const V2<T>& v);
+	V2<T>& 		operator*=(const V2<T>& v);
 	// mutation 
-	void 			set(vec_t scalar);
-	void 			set(vec_t X, vec_t Y);
-	void 			set(const Vector2& v);
-	void			set(uint4 index, vec_t scalar);
-	Vector2& 		operator=(const Vector2& v);
+	void 		set(T scalar);
+	void 		set(T X, T Y);
+	void 		set(const V2<T>& v);
+	void		set(uint4 index, T scalar);
+	V2<T>& 		operator=(const V2<T>& v);
 	// substraction 
-	void 			subtract(vec_t scalar);
-	void 			subtract(vec_t X, vec_t Y);
-	void 			subtract(const Vector2& v);
-	Vector2& 		operator-=(const Vector2& v);
+	void 		subtract(T scalar);
+	void 		subtract(T X, T Y);
+	void 		subtract(const V2<T>& v);
+	V2<T>& 		operator-=(const V2<T>& v);
 	// zero, infinity and NaN
-	bool			isValid(void) const;
-	bool			isZero(void) const;
-	void			zero(void);
+	bool		isValid(void) const;
+	bool		isZero(void) const;
+	void		zero(void);
 }; // class Vector2
 
 /**
 \warning The thread safety of this class is not guaranteed!
 */
-class Vector3 
+template<typename T>
+class V3 
 #if EXTENDED_BY_LUA
 	: public lua_extension::LuaExtendable
 #endif//EXTENDED_BY_LUA
 {
 public:
 	// data 
-	vec_t x;
-	vec_t y;
-	vec_t z;
+	T x;
+	T y;
+	T z;
 	// construction 
-	Vector3(void) 								
+	V3(void) 								
 	{/* empty */}
-	explicit Vector3(const Vector3& v) : x(v.x), y(v.y), z(v.z) 			
+	explicit V3(const V3<T>& v) : x(v.x), y(v.y), z(v.z) 			
 	{/* empty */}
-	Vector3(vec_t X, vec_t Y, vec_t Z) : x(X), y(Y), z(Z) 					
+	V3(T X, T Y, T Z) : x(X), y(Y), z(Z) 					
 	{/* empty */}
-	explicit Vector3(vec_t scalar) : x(scalar), y(scalar), z(scalar) 	
+	explicit V3(T scalar) : x(scalar), y(scalar), z(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
 #if EXTENDED_BY_LUA
 	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector3)
 #endif//EXTENDED_BY_LUA	
 	// access 
-	const vec_t& 	operator[](uint4 i) const;	
-	vec_t& 			operator[](uint4 i);
+	const T& 	operator[](uint4 i) const;	
+	T& 			operator[](uint4 i);
 	// addition 
-	void 			add(vec_t scalar);
-	void 			add(vec_t X, vec_t Y, vec_t Z);
-	void 			add(const Vector3& v);	
-	Vector3& 		operator+=(const Vector3& v);
+	void 		add(T scalar);
+	void 		add(T X, T Y, T Z);
+	void 		add(const V3<T>& v);	
+	V3<T>& 		operator+=(const V3<T>& v);
 	// cross product 
-	void 			cross(const Vector3& v);
-	void 			cross(const Vector3& a, const Vector3& b);
+	void 		cross(const V3<T>& v);
+	void 		cross(const V3<T>& a, const V3<T>& b);
 	// perpendicular 
-	void			perpendicular(void);
+	void		perpendicular(void);
 	// distance to another 
-	vec_t			distance(const Vector3& v) const;
-	vec_t 			distanceSqr(const Vector3& v) const;
-	vec_t 			distanceXY(const Vector3& v) const;
-	vec_t 			distanceXYSqr(const Vector3& v) const;
-	bool			isFar(const Vector3& v, vec_t closest_range) const;
-	bool			isFarXY(const Vector3& v, vec_t closest_range) const;
-	bool			isNear(const Vector3& v, vec_t farthest_range) const;
-	bool			isNearXY(const Vector3& v, vec_t farthest_range) const;
+	T			distance(const V3<T>& v) const;
+	T 			distanceSqr(const V3<T>& v) const;
+	T 			distanceXY(const V3<T>& v) const;
+	T 			distanceXYSqr(const V3<T>& v) const;
+	bool		isFar(const V3<T>& v, T closest_range) const;
+	bool		isFarXY(const V3<T>& v, T closest_range) const;
+	bool		isNear(const V3<T>& v, T farthest_range) const;
+	bool		isNearXY(const V3<T>& v, T farthest_range) const;
 	// division 
-	void 			divide(vec_t scalar);
-	void 			divide(vec_t X, vec_t Y, vec_t Z);
-	void 			divide(const Vector3& v);
-	Vector3& 		operator/=(const Vector3& v);
+	void 		divide(T scalar);
+	void 		divide(T X, T Y, T Z);
+	void 		divide(const V3<T>& v);
+	V3<T>& 		operator/=(const V3<T>& v);
 	// dot product 
-	vec_t 			dot(const Vector3& v) const;
+	T 			dot(const V3<T>& v) const;
 	// equality 
-	bool 			equals(vec_t X, vec_t Y, vec_t Z) const;
-	bool			nearlyEquals(const Vector3& v, vec_t epsilon=vectorTolerance) const;
-	bool			notEquals(vec_t X, vec_t Y, vec_t Z) const;
-	bool 			operator==(const Vector3& v) const;
-	bool 			operator!=(const Vector3& v) const;
+	bool 		equals(T X, T Y, T Z) const;
+	bool		nearlyEquals(const V3<T>& v, T epsilon=vectorTolerance) const;
+	bool		notEquals(T X, T Y, T Z) const;
+	bool 		operator==(const V3<T>& v) const;
+	bool 		operator!=(const V3<T>& v) const;
 	// magnitude 
-	vec_t 			magnitude(void) const;
-	vec_t 			magnitudeSqr(void) const;
-	vec_t 			magnitudeXY(void) const;
-	vec_t 			magnitudeXYSqr(void) const;
+	T 			magnitude(void) const;
+	T 			magnitudeSqr(void) const;
+	T 			magnitudeXY(void) const;
+	T 			magnitudeXYSqr(void) const;
 	// normalization
-	bool			isNormal(void) const;
-	vec_t 			normalize(void);
+	bool		isNormal(void) const;
+	T 			normalize(void);
 	// construction (normalized)
-	Vector3(const Vector3& v, bool /* ignored */) : x(v.x), y(v.y), z(v.z) 
+	V3(const V3<T>& v, bool /* ignored */) : x(v.x), y(v.y), z(v.z) 
 	{ normalize(); }
 	// multiplication & scaling 
-	void 			negate(void);
-	void 			scale(vec_t scalar);
-	void 			scale(vec_t X, vec_t Y, vec_t Z);
-	void 			scale(const Vector3& v);
-	Vector3& 		operator*=(const Vector3& v);
+	void 		negate(void);
+	void 		scale(T scalar);
+	void 		scale(T X, T Y, T Z);
+	void 		scale(const V3<T>& v);
+	V3<T>& 		operator*=(const V3<T>& v);
 	// mutation 
-	void 			set(vec_t scalar);
-	void 			set(vec_t X, vec_t Y, vec_t Z);
-	void 			set(const Vector3& v);
-	void			set(uint4 index, vec_t scalar);
-	Vector3&		operator=(const Vector2& v);
-	Vector3& 		operator=(const Vector3& v);
+	void 		set(T scalar);
+	void 		set(T X, T Y, T Z);
+	void 		set(const V3<T>& v);
+	void		set(uint4 index, T scalar);
+	V3<T>&		operator=(const V2<T>& v);
+	V3<T>& 		operator=(const V3<T>& v);
 	// substraction 
-	void 			subtract(vec_t scalar);
-	void 			subtract(vec_t X, vec_t Y, vec_t Z);
-	void 			subtract(const Vector3& v);
-	Vector3& 		operator-=(const Vector3& v);
+	void 		subtract(T scalar);
+	void 		subtract(T X, T Y, T Z);
+	void 		subtract(const V3<T>& v);
+	V3<T>& 		operator-=(const V3<T>& v);
 	// zero
-	bool			isValid(void) const;
-	bool			isZero(void) const;
-	void			zero(void);
+	bool		isValid(void) const;
+	bool		isZero(void) const;
+	void		zero(void);
 }; // class Vector3
 
 void nativeVectorPerformance(uint4 iterations);
@@ -261,22 +266,22 @@ standard vector operations
 array and function accessors 
 @{
 */
-inline const vec_t& Vector2::operator[](uint4 i) const
+template<typename T> inline const T& V2<T>::operator[](uint4 i) const
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline vec_t& Vector2::operator[](uint4 i)
+template<typename T> inline T& V2<T>::operator[](uint4 i)
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-inline const vec_t& Vector3::operator[](uint4 i) const
+template<typename T> inline const T& V3<T>::operator[](uint4 i) const
 {
 	assert(i < 3);
 	return (&x)[i];
 }
-inline vec_t& Vector3::operator[](uint4 i)
+template<typename T> inline T& V3<T>::operator[](uint4 i)
 {
 	assert(i < 3);
 	return (&x)[i];
@@ -288,46 +293,46 @@ inline vec_t& Vector3::operator[](uint4 i)
 vector and scalar addition operations 
 @{
 */
-inline void Vector2::add(vec_t scalar)
+template<typename T> inline void V2<T>::add(T scalar)
 {
 	x += scalar;
 	y += scalar;
 }
-inline void Vector2::add(vec_t X, vec_t Y)
+template<typename T> inline void V2<T>::add(T X, T Y)
 {
 	x += X;
 	y += Y;
 }
-inline void Vector2::add(const Vector2& v)
+template<typename T> inline void V2<T>::add(const V2<T>& v)
 {
 	x += v.x;
 	y += v.y;
 }
-inline Vector2& Vector2::operator+=(const Vector2& v)
+template<typename T> inline V2<T>& V2<T>::operator+=(const V2<T>& v)
 {
 	x += v.x;
 	y += v.y;
 	return *this;
 }
-inline void Vector3::add(vec_t scalar)
+template<typename T> inline void V3<T>::add(T scalar)
 {
 	x += scalar;
 	y += scalar;
 	z += scalar;
 }
-inline void Vector3::add(vec_t X, vec_t Y, vec_t Z)
+template<typename T> inline void V3<T>::add(T X, T Y, T Z)
 {
 	x += X;
 	y += Y;
 	z += Z;
 }
-inline void Vector3::add(const Vector3& v)
+template<typename T> inline void V3<T>::add(const V3<T>& v)
 {
 	x += v.x;
 	y += v.y;
 	z += v.z;
 }
-inline Vector3& Vector3::operator+=(const Vector3& v)
+template<typename T> inline V3<T>& V3<T>::operator+=(const V3<T>& v)
 {
 	x += v.x;
 	y += v.y;
@@ -342,22 +347,22 @@ inline Vector3& Vector3::operator+=(const Vector3& v)
 Vector Cross Product
 @{
 */
-inline void Vector3::cross(const Vector3& v)
+template<typename T> inline void V3<T>::cross(const V3<T>& v)
 {
-	vec_t a = y * v.z - z * v.y;
-	vec_t b = z * v.x - x * v.z;
-	vec_t c = x * v.y - y * v.x;
+	T a = y * v.z - z * v.y;
+	T b = z * v.x - x * v.z;
+	T c = x * v.y - y * v.x;
 	x = a;
 	y = b;
 	z = c;
 }
-inline void Vector3::cross(const Vector3& a, const Vector3& b)
+template<typename T> inline void V3<T>::cross(const V3<T>& a, const V3<T>& b)
 {
 	x = a.y * b.z - a.z * b.y;
 	y = a.z * b.x - a.x * b.z;
 	z = a.x * b.y - a.y * b.x;
 }
-inline void Vector3::perpendicular(void)
+template<typename T> inline void V3<T>::perpendicular(void)
 {
 	if (x != 0.0f || y != 0.0f)
 	{
@@ -376,80 +381,80 @@ inline void Vector3::perpendicular(void)
 distance to another vector
 @{
 */
-inline vec_t Vector2::distance(const Vector2& v) const
+template<typename T> inline T V2<T>::distance(const V2<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
 }
-inline vec_t Vector2::distanceSqr(const Vector2& v) const
+template<typename T> inline T V2<T>::distanceSqr(const V2<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return x_dist * x_dist + y_dist * y_dist;
 }
-inline bool Vector2::isFar(const Vector2& v, vec_t closest_range) const
+template<typename T> inline bool V2<T>::isFar(const V2<T>& v, T closest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) > (closest_range * closest_range);
 }
-inline bool Vector2::isNear(const Vector2& v, vec_t farthest_range) const
+template<typename T> inline bool V2<T>::isNear(const V2<T>& v, T farthest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) <= (farthest_range * farthest_range);
 }
-inline vec_t Vector3::distance(const Vector3& v) const
+template<typename T> inline T V3<T>::distance(const V3<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
-	vec_t z_dist = v.z - z;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
+	T z_dist = v.z - z;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
 }
-inline vec_t Vector3::distanceSqr(const Vector3& v) const
+template<typename T> inline T V3<T>::distanceSqr(const V3<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
-	vec_t z_dist = v.z - z;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
+	T z_dist = v.z - z;
 	return x_dist * x_dist + y_dist * y_dist + z_dist * z_dist;
 }
-inline vec_t Vector3::distanceXY(const Vector3& v) const
+template<typename T> inline T V3<T>::distanceXY(const V3<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
 }
-inline vec_t Vector3::distanceXYSqr(const Vector3& v) const
+template<typename T> inline T V3<T>::distanceXYSqr(const V3<T>& v) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return x_dist * x_dist + y_dist * y_dist;
 }
-inline bool Vector3::isFar(const Vector3& v, vec_t closest_range) const
+template<typename T> inline bool V3<T>::isFar(const V3<T>& v, T closest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
-	vec_t z_dist = v.z - z;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
+	T z_dist = v.z - z;
 	return (x_dist * x_dist + y_dist * y_dist + z_dist * z_dist) > (closest_range * closest_range);
 }
-inline bool Vector3::isFarXY(const Vector3& v, vec_t closest_range) const
+template<typename T> inline bool V3<T>::isFarXY(const V3<T>& v, T closest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) > (closest_range * closest_range);
 }
-inline bool Vector3::isNear(const Vector3& v, vec_t farthest_range) const
+template<typename T> inline bool V3<T>::isNear(const V3<T>& v, T farthest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
-	vec_t z_dist = v.z - z;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
+	T z_dist = v.z - z;
 	return (x_dist * x_dist + y_dist * y_dist + z_dist * z_dist) <= (farthest_range * farthest_range);
 }
-inline bool Vector3::isNearXY(const Vector3& v, vec_t farthest_range) const
+template<typename T> inline bool V3<T>::isNearXY(const V3<T>& v, T farthest_range) const
 {
-	vec_t x_dist = v.x - x;
-	vec_t y_dist = v.y - y;
+	T x_dist = v.x - x;
+	T y_dist = v.y - y;
 	return (x_dist * x_dist + y_dist * y_dist) <= (farthest_range * farthest_range);
 }
 /** @} end Vector_Distance */
@@ -461,11 +466,11 @@ inline bool Vector3::isNearXY(const Vector3& v, vec_t farthest_range) const
 Vector dot product
 @{
 */
-inline vec_t Vector2::dot(const Vector2& v) const
+template<typename T> inline T V2<T>::dot(const V2<T>& v) const
 {
 	return x * v.x + y * v.y;
 }
-inline vec_t Vector3::dot(const Vector3& v) const
+template<typename T> inline T V3<T>::dot(const V3<T>& v) const
 {
 	return x * v.x + y * v.y + z * v.z;
 }
@@ -477,48 +482,48 @@ inline vec_t Vector3::dot(const Vector3& v) const
 scalar and per element division
 @{
 */
-inline void Vector2::divide(vec_t scalar)
+template<typename T> inline void V2<T>::divide(T scalar)
 {
 	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
 }
-inline void Vector2::divide(vec_t X, vec_t Y)
+template<typename T> inline void V2<T>::divide(T X, T Y)
 {
 	x /= X;
 	y /= Y;
 }
-inline void Vector2::divide(const Vector2& v)
+template<typename T> inline void V2<T>::divide(const V2<T>& v)
 {
 	x /= v.x;
 	y /= v.y;
 }
-inline Vector2& Vector2::operator/=(const Vector2& v)
+template<typename T> inline V2<T>& V2<T>::operator/=(const V2<T>& v)
 {
 	x /= v.x;
 	y /= v.y;
 	return *this;
 }
-inline void Vector3::divide(vec_t scalar)
+template<typename T> inline void V3<T>::divide(T scalar)
 {
 	scalar = 1.0f / scalar; 
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;
 }
-inline void Vector3::divide(vec_t X, vec_t Y, vec_t Z)
+template<typename T> inline void V3<T>::divide(T X, T Y, T Z)
 {
 	x /= X;
 	y /= Y;
 	z /= Z;
 }
-inline void Vector3::divide(const Vector3& v)
+template<typename T> inline void V3<T>::divide(const V3<T>& v)
 {
 	x /= v.x;
 	y /= v.y;
 	z /= v.z;
 }
-inline Vector3& Vector3::operator/=(const Vector3& v)
+template<typename T> inline V3<T>& V3<T>::operator/=(const V3<T>& v)
 {
 	x /= v.x;
 	y /= v.y;
@@ -533,43 +538,43 @@ inline Vector3& Vector3::operator/=(const Vector3& v)
 equality testing
 @{
 */
-inline bool Vector2::equals(vec_t X, vec_t Y) const
+template<typename T> inline bool V2<T>::equals(T X, T Y) const
 {
 	return x == X && y == Y;
 }
-inline bool Vector2::nearlyEquals(const Vector2& v, vec_t epsilon) const
+template<typename T> inline bool V2<T>::nearlyEquals(const V2<T>& v, T epsilon) const
 {
 	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon;
 }
-inline bool Vector2::notEquals(vec_t X, vec_t Y) const
+template<typename T> inline bool V2<T>::notEquals(T X, T Y) const
 {
 	return x != X || y != Y;
 }
-inline bool Vector2::operator==(const Vector2& v) const
+template<typename T> inline bool V2<T>::operator==(const V2<T>& v) const
 {	
 	return x == v.x && y == v.y;
 }
-inline bool Vector2::operator!=(const Vector2& v) const
+template<typename T> inline bool V2<T>::operator!=(const V2<T>& v) const
 {	
 	return x != v.x || y != v.y;
 }
-inline bool Vector3::equals(vec_t X, vec_t Y, vec_t Z) const
+template<typename T> inline bool V3<T>::equals(T X, T Y, T Z) const
 {
 	return x == X && y == Y && z == Z;
 }
-inline bool Vector3::nearlyEquals(const Vector3& v, vec_t epsilon) const
+template<typename T> inline bool V3<T>::nearlyEquals(const V3<T>& v, T epsilon) const
 {
 	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon && absvec_t(z - v.z) <= epsilon;
 }
-inline bool Vector3::notEquals(vec_t X, vec_t Y, vec_t Z) const
+template<typename T> inline bool V3<T>::notEquals(T X, T Y, T Z) const
 {
 	return x != X || y != Y || z != Z;
 }
-inline bool Vector3::operator==(const Vector3& v) const
+template<typename T> inline bool V3<T>::operator==(const V3<T>& v) const
 {	
 	return x == v.x && y == v.y && z == v.z;
 }
-inline bool Vector3::operator!=(const Vector3& v) const
+template<typename T> inline bool V3<T>::operator!=(const V3<T>& v) const
 {	
 	return x != v.x || y != v.y || z != v.z;
 }
@@ -581,27 +586,27 @@ inline bool Vector3::operator!=(const Vector3& v) const
 vector magnitude
 @{
 */
-inline vec_t Vector2::magnitude(void) const
+template<typename T> inline T V2<T>::magnitude(void) const
 {
 	return sqrtvec_t(x * x + y * y);
 }
-inline vec_t Vector2::magnitudeSqr(void) const
+template<typename T> inline T V2<T>::magnitudeSqr(void) const
 {
 	return x * x + y * y;
 }
-inline vec_t Vector3::magnitude(void) const
+template<typename T> inline T V3<T>::magnitude(void) const
 {
 	return sqrtvec_t(x * x + y * y + z * z);
 }
-inline vec_t Vector3::magnitudeSqr(void) const
+template<typename T> inline T V3<T>::magnitudeSqr(void) const
 {
 	return x * x + y * y + z * z;
 }
-inline vec_t Vector3::magnitudeXY(void) const
+template<typename T> inline T V3<T>::magnitudeXY(void) const
 {
 	return sqrtvec_t(x * x + y * y);
 }
-inline vec_t Vector3::magnitudeXYSqr(void) const
+template<typename T> inline T V3<T>::magnitudeXYSqr(void) const
 {
 	return x * x + y * y;
 }
@@ -614,29 +619,29 @@ Vector Normalization
 @{
 */
 /** check for unit length of one */
-inline bool Vector2::isNormal(void) const
+template<typename T> inline bool V2<T>::isNormal(void) const
 {
 	return x * x + y * y == 1.0f;
 }
 /** check for unit length of one */
-inline bool Vector3::isNormal(void) const
+template<typename T> inline bool V3<T>::isNormal(void) const
 {
 	return x * x + y * y + z * z == 1.0f;
 }
 /** set unit length to one */
-inline vec_t Vector2::normalize(void)
+template<typename T> inline T V2<T>::normalize(void)
 {
-	vec_t magnitude = sqrtvec_t(x * x + y * y);
-	const vec_t scalar = 1.0f / magnitude;
+	T magnitude = sqrtvec_t(x * x + y * y);
+	const T scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;
 	return magnitude;
 }
 /** set unit length to one */
-inline vec_t Vector3::normalize(void)
+template<typename T> inline T V3<T>::normalize(void)
 {
-	vec_t magnitude = sqrtvec_t(x * x + y * y + z * z);
-	const vec_t scalar = 1.0f / magnitude;
+	T magnitude = sqrtvec_t(x * x + y * y + z * z);
+	const T scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;
@@ -650,52 +655,52 @@ inline vec_t Vector3::normalize(void)
 multiplication & scaling 
 @{
 */
-inline void Vector2::scale(vec_t scalar)
+template<typename T> inline void V2<T>::scale(T scalar)
 {
 	x *= scalar;
 	y *= scalar;
 }
-inline void Vector2::scale(vec_t X, vec_t Y)
+template<typename T> inline void V2<T>::scale(T X, T Y)
 {
 	x *= X;
 	y *= Y;
 }
-inline void Vector2::scale(const Vector2& v)
+template<typename T> inline void V2<T>::scale(const V2<T>& v)
 {
 	x *= v.x;
 	y *= v.y;
 }
-inline Vector2& Vector2::operator*=(const Vector2& v)
+template<typename T> inline V2<T>& V2<T>::operator*=(const V2<T>& v)
 {
 	x *= v.x;
 	y *= v.y;
 	return *this;
 }
 /** scale by -1 */
-inline void Vector2::negate(void)
+template<typename T> inline void V2<T>::negate(void)
 {
 	x *= -1.0f;
 	y *= -1.0f;
 }
-inline void Vector3::scale(vec_t scalar)
+template<typename T> inline void V3<T>::scale(T scalar)
 {
 	x *= scalar;
 	y *= scalar;
 	z *= scalar;
 }
-inline void Vector3::scale(vec_t X, vec_t Y, vec_t Z)
+template<typename T> inline void V3<T>::scale(T X, T Y, T Z)
 {
 	x *= X;
 	y *= Y;
 	z *= Z;
 }
-inline void Vector3::scale(const Vector3& v)
+template<typename T> inline void V3<T>::scale(const V3<T>& v)
 {
 	x *= v.x;
 	y *= v.y;
 	z *= v.z;
 }
-inline Vector3& Vector3::operator*=(const Vector3& v)
+template<typename T> inline V3<T>& V3<T>::operator*=(const V3<T>& v)
 {
 	x *= v.x;
 	y *= v.y;
@@ -703,7 +708,7 @@ inline Vector3& Vector3::operator*=(const Vector3& v)
 	return *this;
 }
 /** scale by -1 */
-inline void Vector3::negate(void)
+template<typename T> inline void V3<T>::negate(void)
 {
 	x *= -1.0f;
 	y *= -1.0f;
@@ -717,46 +722,46 @@ inline void Vector3::negate(void)
 Vector Substraction
 @{
 */
-inline void Vector2::subtract(vec_t scalar)
+template<typename T> inline void V2<T>::subtract(T scalar)
 {
 	x -= scalar;
 	y -= scalar;
 }
-inline void Vector2::subtract(vec_t X, vec_t Y)
+template<typename T> inline void V2<T>::subtract(T X, T Y)
 {
 	x -= X;
 	y -= Y;
 }
-inline void Vector2::subtract(const Vector2& v)
+template<typename T> inline void V2<T>::subtract(const V2<T>& v)
 {
 	x -= v.x;
 	y -= v.y;
 }
-inline Vector2& Vector2::operator-=(const Vector2& v)
+template<typename T> inline V2<T>& V2<T>::operator-=(const V2<T>& v)
 {
 	x -= v.x;
 	y -= v.y;
 	return *this;
 }
-inline void Vector3::subtract(vec_t scalar)
+template<typename T> inline void V3<T>::subtract(T scalar)
 {
 	x -= scalar;
 	y -= scalar;
 	z -= scalar;
 }
-inline void Vector3::subtract(vec_t X, vec_t Y, vec_t Z)
+template<typename T> inline void V3<T>::subtract(T X, T Y, T Z)
 {
 	x -= X;
 	y -= Y;
 	z -= Z;
 }
-inline void Vector3::subtract(const Vector3& v)
+template<typename T> inline void V3<T>::subtract(const V3<T>& v)
 {
 	x -= v.x;
 	y -= v.y;
 	z -= v.z;
 }
-inline Vector3& Vector3::operator-=(const Vector3& v)
+template<typename T> inline V3<T>& V3<T>::operator-=(const V3<T>& v)
 {
 	x -= v.x;
 	y -= v.y;
@@ -771,27 +776,27 @@ inline Vector3& Vector3::operator-=(const Vector3& v)
 Vector Mutatators
 @{
 */
-inline void Vector2::set(vec_t scalar)
+template<typename T> inline void V2<T>::set(T scalar)
 {
 	x = scalar;
 	y = scalar;
 }
-inline void Vector2::set(vec_t X, vec_t Y)
+template<typename T> inline void V2<T>::set(T X, T Y)
 {
 	x = X;
 	y = Y;
 }
-inline void Vector2::set(const Vector2& v)
+template<typename T> inline void V2<T>::set(const V2<T>& v)
 {
 	*this = v;
 }
-inline Vector2& Vector2::operator=(const Vector2& v) 
+template<typename T> inline V2<T>& V2<T>::operator=(const V2<T>& v) 
 {
 	x = v.x;
 	y = v.y;
 	return *this;
 }
-inline void Vector2::set(uint4 index, vec_t scalar)
+template<typename T> inline void V2<T>::set(uint4 index, T scalar)
 {
 	switch (index)
 	{
@@ -800,36 +805,36 @@ inline void Vector2::set(uint4 index, vec_t scalar)
 	default: assert(false);
 	}
 }
-inline void Vector3::set(vec_t scalar)
+template<typename T> inline void V3<T>::set(T scalar)
 {
 	x = scalar;
 	y = scalar;
 	z = scalar;
 }
-inline void Vector3::set(vec_t X, vec_t Y, vec_t Z)
+template<typename T> inline void V3<T>::set(T X, T Y, T Z)
 {
 	x = X;
 	y = Y;
 	z = Z;
 }
-inline void Vector3::set(const Vector3& v)
+template<typename T> inline void V3<T>::set(const V3<T>& v)
 {
 	*this = v;
 }
-inline Vector3& Vector3::operator=(const Vector3& v) 
+template<typename T> inline V3<T>& V3<T>::operator=(const V3<T>& v) 
 {
 	x = v.x;
 	y = v.y;
 	z = v.z;
 	return *this;
 }
-inline Vector3& Vector3::operator=(const Vector2& v)
+template<typename T> inline V3<T>& V3<T>::operator=(const V2<T>& v)
 {
 	x = v.x;
 	y = v.y;
 	return *this;
 }
-inline void Vector3::set(uint4 index, vec_t scalar)
+template<typename T> inline void V3<T>::set(uint4 index, T scalar)
 {
 	switch (index)
 	{
@@ -846,33 +851,33 @@ inline void Vector3::set(uint4 index, vec_t scalar)
 Vector Mutatators
 @{
 */
-inline bool Vector2::isValid() const
+template<typename T> inline bool V2<T>::isValid() const
 {
 	return math::isValid(x) 
 		&& math::isValid(y);
 }
-inline bool Vector3::isValid() const
+template<typename T> inline bool V3<T>::isValid() const
 {
 	return math::isValid(x) 
 		&& math::isValid(y) 
 		&& math::isValid(z);
 }
-inline bool Vector2::isZero() const
+template<typename T> inline bool V2<T>::isZero() const
 {
 	return x == 0.0f 
 		&& y == 0.0f;
 }
-inline bool Vector3::isZero() const
+template<typename T> inline bool V3<T>::isZero() const
 {
 	return x == 0.0f 
 		&& y == 0.0f 
 		&& z == 0.0f;
 }
-inline void Vector2::zero() 
+template<typename T> inline void V2<T>::zero() 
 {
 	y = x = 0.0f;
 }
-inline void Vector3::zero() 
+template<typename T> inline void V3<T>::zero() 
 {
 	z = y = x = 0.0f;
 }

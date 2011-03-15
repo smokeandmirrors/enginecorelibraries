@@ -17,7 +17,7 @@
 #include "Threads.h"
 #include "TVector.h"
 
-sint4 sintCompareAscending(const void* a, const void* b)		{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
+sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
 
 class QuickSortTester : public multithreading::Executable
@@ -185,7 +185,7 @@ void sandbox::play()
 		while (index);
 		sprintf_s(buffer, "Quick:%2d", i);
 
-		scheduler.enqueue(new QuickSortTester(),  multithreading::noThreadPreference, buffer);	
+	// 	scheduler.enqueue(new QuickSortTester(),  multithreading::noThreadPreference, buffer);	
 	}
 	while (i);
 
@@ -217,10 +217,22 @@ void sandbox::play()
 
 	scheduler.printState();
 	printf("Stopped playing in the sandbox!\n");
+// 
+// 	math::V2<float> fv2(0.0f, 1.0f); 
+// 	math::V2<float> fw2(0.0f, 1.0f);
+// 	math::V2<int>	iv2(1, 0);
+// 	math::V2<int>	iw2(0, 1);
+// 
+// 	math::V3<float> fv3(0.0f, 1.0f, 2.0f); 
+// 	math::V3<float> fw3(2.0f, 1.0f, 0.0f);
+// 	math::V3<int>	iv3(1, 0, 1);
+// 	math::V3<int>	iw3(0, 1, 0);
+// 
+// 	fv2 += fw2;
+// 	iv2 += iw2;
+// 	fv3 += fw3;
+// 	iv3 += iw3;
 
-	math::V2<float> v(0.0f, 1.0f); 
-	math::V2<float> w(0.0f, 1.0f);
-	v += w;
 	return;
 }
 
