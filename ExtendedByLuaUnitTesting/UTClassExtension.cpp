@@ -471,14 +471,14 @@ void Classes::testLuaExtension(void)
 	unitTestingTools::executeLuaUnitTest("UTVector", &lua);	
 }
 
-void checkVector(const Vector3& v, vec_t x, vec_t y, vec_t z)
+void checkVector(const Vector3& v, real4 x, real4 y, real4 z)
 {
 	CFIXCC_ASSERT_EQUALS(v.x, x);
 	CFIXCC_ASSERT_EQUALS(v.y, y);
 	CFIXCC_ASSERT_EQUALS(v.z, z);
 }
 
-void checkVector(const Vector3& v, vec_t x, vec_t y, vec_t z, vec_t tolerance)
+void checkVector(const Vector3& v, real4 x, real4 y, real4 z, real4 tolerance)
 {
 	checkNearEqual(v.x, x, tolerance);
 	checkNearEqual(v.y, y, tolerance);
@@ -494,22 +494,22 @@ void checkVectorEqual(const Vector3& lhs, const Vector3& rhs)
 
 void Classes::testNumbers(void)
 {
-	vec_t decimal = 0.999999999999999999999f;
+	real4 decimal = 0.999999999999999999999f;
 	sint4 limit = 4294967295;
 
 	for (sint4 i = -limit; i < limit; i++)
 	{
-		vec_t value = static_cast<vec_t>(i) + decimal;
+		real4 value = static_cast<real4>(i) + decimal;
 		CFIX_ASSERT(isFinite(value));
 		CFIX_ASSERT(!isNaN(value));
 		CFIX_ASSERT(isValid(value));
 	}
 
-	vec_t one = 1.0f;
-	vec_t zero = 0.0f;
-	vec_t positive_infinity = one / zero;
-	vec_t negative_infinity = logvec_t(0.0f);
-	vec_t not_a_number = zero / zero; 
+	real4 one = 1.0f;
+	real4 zero = 0.0f;
+	real4 positive_infinity = one / zero;
+	real4 negative_infinity = log(0.0f);
+	real4 not_a_number = zero / zero; 
 	
 	CFIX_ASSERT(!isFinite(positive_infinity));
 	CFIX_ASSERT(!isNaN(positive_infinity));
@@ -551,10 +551,10 @@ void Classes::testVector3(void)
 	v.subtract(x);
 	checkVector(v,3,2,1);
 	checkVector(w,3,2,1);
-	v.set(math::pi, math::pi/2, math::pi/3);
-	checkVector(v,math::pi, math::pi/2, math::pi/3);
-	v.set(math::pi/4);
-	checkVector(v,math::pi/4, math::pi/4, math::pi/4);
+	v.set(math::real4_pi, math::real4_pi/2, math::real4_pi/3);
+	checkVector(v,math::real4_pi, math::real4_pi/2, math::real4_pi/3);
+	v.set(math::real4_pi/4);
+	checkVector(v,math::real4_pi/4, math::real4_pi/4, math::real4_pi/4);
 	v.set(w);
 	checkVector(v,3,2,1);
 	checkVector(w,3,2,1);
@@ -606,8 +606,8 @@ void Classes::testVector3(void)
 	checkVector(v,1,2,3,0.0f);
 	z.set(-1,-2,-3);
 	checkVector(z,-1,-2,-3,0.0f);
-	vec_t v_dot_z = v.dot(z);
-	vec_t z_dot_v = z.dot(v);
+	real4 v_dot_z = v.dot(z);
+	real4 z_dot_v = z.dot(v);
 	CFIXCC_ASSERT_EQUALS(v_dot_z, z_dot_v);
 	CFIXCC_ASSERT_EQUALS(v_dot_z, -14.0f);
 	CFIXCC_ASSERT_EQUALS(z_dot_v, -14.0f);
@@ -672,7 +672,7 @@ void Classes::testVector3(void)
 	z.set(0.0f,0.0f,2.00001f);
 	CFIX_ASSERT(! (v == z));
 	CFIX_ASSERT(v != z);
-	CFIX_ASSERT(v.nearlyEquals(z));
+	CFIX_ASSERT(v.nearlyEquals(z, 0.001f));
 	v.set(2,3,4);
 	checkVector(v,2,3,4,0.0f);
 	v.negate();

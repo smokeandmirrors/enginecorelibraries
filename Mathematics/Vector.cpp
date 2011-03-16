@@ -137,7 +137,7 @@ namespace lua_library_Vector3
 				Vector3& v = to<Vector3&>(L, -2); \
 				if (lua_isnumber(L, -1)) \
 				{ \
-					v.opfunc(to<vec_t>(L, -1)); \
+					v.opfunc(to<real4>(L, -1)); \
 				} \
 				else \
 				{ \
@@ -148,7 +148,7 @@ namespace lua_library_Vector3
 		case 4: \
 			{ \
 				Vector3& v = to<Vector3&>(L, -4); \
-				v.opfunc(to<vec_t>(L, -3), to<vec_t>(L, -2), to<vec_t>(L, -1)); \
+				v.opfunc(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1)); \
 			} \
 			break; \
 		default: \
@@ -212,7 +212,7 @@ LUA_FUNC(equals)
 	case 4: 
 	{ 
 		Vector3& v = to<Vector3&>(L, -4); 
-		return push(L, v.equals(to<vec_t>(L, -3), to<vec_t>(L, -2), to<vec_t>(L, -1))); 
+		return push(L, v.equals(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1))); 
 	} 
 	break; 
 		default: 
@@ -231,14 +231,14 @@ LUA_FUNC(nearlyEquals)
 		{ 
 			Vector3& lhs = to<Vector3&>(L, -2); 
 			Vector3& rhs = to<Vector3&>(L, -1);
-			return push(L, lhs.nearlyEquals(rhs)); 
+			return push(L, lhs.nearlyEquals(rhs, 0.001f)); 
 		} 
 		break; 
 	case 3: 
 		{ 
 			Vector3& lhs = to<Vector3&>(L, -3); 
 			Vector3& rhs = to<Vector3&>(L, -4);
-			vec_t epsilon = to<vec_t>(L, -1);
+			real4 epsilon = to<real4>(L, -1);
 			return push(L, lhs.nearlyEquals(rhs, epsilon)); 
 		} 
 		break; 
@@ -266,7 +266,7 @@ LUA_FUNC(initialize)
 		Vector3& v = to<Vector3&>(L, -2);
 		if (lua_isnumber(L, -1))
 		{
-			v.set(to<vec_t>(L, -1));
+			v.set(to<real4>(L, -1));
 		}
 		else
 		{
@@ -279,14 +279,14 @@ LUA_FUNC(initialize)
 	case 3:
 	{
 		Vector3& v = to<Vector3&>(L, -3);
-		v.set(to<sint4>(L, -2), to<vec_t>(L, -1));
+		v.set(to<sint4>(L, -2), to<real4>(L, -1));
 		lua_pushvalue(L, -3);
 		return 1;
 	}
 	case 4:
 	{
 		Vector3& v = to<Vector3&>(L, -4);
-		v.set(to<vec_t>(L, -3), to<vec_t>(L, -2), to<vec_t>(L, -1));
+		v.set(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1));
 		lua_pushvalue(L, -4);
 		return 1;
 	}
@@ -311,34 +311,34 @@ DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
 		LUA_ENTRY(		 add)
 		LUA_NAMED_ENTRY("construct", initialize)
 		LUA_ENTRY(		 cross)
-		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, vec_t, const Vector3&, &V3<float>::distance>))
-		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &V3<float>::distanceSqr>))
-		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, vec_t, const Vector3&, &V3<float>::distanceXY>))
-		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, vec_t, const Vector3&, &V3<float>::distanceXYSqr>))
+		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distance>))
+		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceSqr>))
+		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXY>))
+		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXYSqr>))
 		LUA_ENTRY(		 divide)
-		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, vec_t, const Vector3&, &V3<float>::dot>))
+		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::dot>))
 		LUA_ENTRY(		 equals)
-		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &V3<float>::isFar>))
-		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &V3<float>::isFarXY>))
-		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &V3<float>::isNear>))
-		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, vec_t, &V3<float>::isNearXY>))
+		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFar>))
+		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFarXY>))
+		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNear>))
+		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNearXY>))
 		LUA_NAMED_ENTRY("isNormal", (return1Param0const<Vector3, bool, &V3<float>::isNormal>))
 		LUA_NAMED_ENTRY("isZero", (return1Param0const<Vector3, bool, &V3<float>::isZero>))
-		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, vec_t, &V3<float>::magnitude>))
-		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, vec_t, &V3<float>::magnitudeSqr>))
-		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, vec_t, &V3<float>::magnitudeXY>))
-		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, vec_t, &V3<float>::magnitudeXYSqr>))
+		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, real4, &V3<float>::magnitude>))
+		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeSqr>))
+		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXY>))
+		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXYSqr>))
 		LUA_ENTRY(		 nearlyEquals)
 		LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &V3<float>::negate>))
-		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, vec_t, &V3<float>::normalize>))
+		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, real4, &V3<float>::normalize>))
 		LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &V3<float>::perpendicular>))
 		LUA_ENTRY(		 scale)
 		LUA_NAMED_ENTRY("set", initialize)
 		// slightly higher performance options for Lua
-		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, vec_t, &V3<float>::set>))
-		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, vec_t, vec_t, vec_t, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, real4, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, real4, real4, real4, &V3<float>::set>))
 		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &V3<float>::set>))
-		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, vec_t, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, real4, &V3<float>::set>))
 		LUA_ENTRY(		 subtract)
 		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &V3<float>::zero>))
 		LUA_FINAL_ENTRY 
@@ -376,8 +376,8 @@ void math::nativeVectorPerformance(uint4 iterations)
 		is_true = v == w;
 		v->add(*x);
 		v->subtract(*x);
-		v->set(pi, pi/2, pi/3);
-		v->set(pi/4);
+		v->set(real4_pi, real4_pi/2, real4_pi/3);
+		v->set(real4_pi/4);
 		v->set(*w);
 		v->set(10,0,0);
 		v->distance(*z);
@@ -413,8 +413,8 @@ void math::nativeVectorPerformance(uint4 iterations)
 		v->divide(50, 25, 10);
 		v->set(1,2,3);
 		z->set(-1,-2,-3);
-		vec_t v_dot_z = v->dot(*z);
-		vec_t z_dot_v = z->dot(*v);
+		real4 v_dot_z = v->dot(*z);
+		real4 z_dot_v = z->dot(*v);
 		v_dot_z = z_dot_v;
 		v->set(*w);
 		*v == *w;
@@ -462,7 +462,7 @@ void math::nativeVectorPerformance(uint4 iterations)
 		z->set(0,0,2.00001f);
 		is_true = *v == *z;
 		is_true = *v == *z;
-		v->nearlyEquals(*z);
+		v->nearlyEquals(*z, 0.001f);
 		v->set(2,3,4);
 		v->negate();
 		v->negate();

@@ -4,7 +4,9 @@
 
 #include "Build.h"
 #include "Observation.h"
-
+/**
+\warning WORK IN-PROGRESS! 
+*/
 namespace multithreading
 {
 #if WIN32

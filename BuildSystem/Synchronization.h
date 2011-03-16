@@ -7,7 +7,10 @@
 #define UNIQUE_SYNCHRONIZATION(sychronized) UNIQUE_AUX_1(sychronized, __COUNTER__)
 
 #define synchronize(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
-
+/**
+\warning WORK IN-PROGRESS! 
+\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+*/
 namespace multithreading
 {
 

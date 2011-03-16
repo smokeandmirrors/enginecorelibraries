@@ -213,7 +213,7 @@ public:
 	T 			dot(const V3<T>& v) const;
 	// equality 
 	bool 		equals(T X, T Y, T Z) const;
-	bool		nearlyEquals(const V3<T>& v, T epsilon=vectorTolerance) const;
+	bool		nearlyEquals(const V3<T>& v, T epsilon) const;
 	bool		notEquals(T X, T Y, T Z) const;
 	bool 		operator==(const V3<T>& v) const;
 	bool 		operator!=(const V3<T>& v) const;
@@ -385,7 +385,7 @@ template<typename T> inline T V2<T>::distance(const V2<T>& v) const
 {
 	T x_dist = v.x - x;
 	T y_dist = v.y - y;
-	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
+	return sqrt(x_dist * x_dist + y_dist * y_dist);
 }
 template<typename T> inline T V2<T>::distanceSqr(const V2<T>& v) const
 {
@@ -410,7 +410,7 @@ template<typename T> inline T V3<T>::distance(const V3<T>& v) const
 	T x_dist = v.x - x;
 	T y_dist = v.y - y;
 	T z_dist = v.z - z;
-	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
+	return sqrt(x_dist * x_dist + y_dist * y_dist + z_dist * z_dist);
 }
 template<typename T> inline T V3<T>::distanceSqr(const V3<T>& v) const
 {
@@ -423,7 +423,7 @@ template<typename T> inline T V3<T>::distanceXY(const V3<T>& v) const
 {
 	T x_dist = v.x - x;
 	T y_dist = v.y - y;
-	return sqrtvec_t(x_dist * x_dist + y_dist * y_dist);
+	return sqrt(x_dist * x_dist + y_dist * y_dist);
 }
 template<typename T> inline T V3<T>::distanceXYSqr(const V3<T>& v) const
 {
@@ -544,7 +544,7 @@ template<typename T> inline bool V2<T>::equals(T X, T Y) const
 }
 template<typename T> inline bool V2<T>::nearlyEquals(const V2<T>& v, T epsilon) const
 {
-	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon;
+	return abs(x - v.x) <= epsilon && abs(y - v.y) <= epsilon;
 }
 template<typename T> inline bool V2<T>::notEquals(T X, T Y) const
 {
@@ -564,7 +564,7 @@ template<typename T> inline bool V3<T>::equals(T X, T Y, T Z) const
 }
 template<typename T> inline bool V3<T>::nearlyEquals(const V3<T>& v, T epsilon) const
 {
-	return absvec_t(x - v.x) <= epsilon && absvec_t(y - v.y) <= epsilon && absvec_t(z - v.z) <= epsilon;
+	return abs(x - v.x) <= epsilon && abs(y - v.y) <= epsilon && abs(z - v.z) <= epsilon;
 }
 template<typename T> inline bool V3<T>::notEquals(T X, T Y, T Z) const
 {
@@ -588,7 +588,7 @@ vector magnitude
 */
 template<typename T> inline T V2<T>::magnitude(void) const
 {
-	return sqrtvec_t(x * x + y * y);
+	return sqrt(x * x + y * y);
 }
 template<typename T> inline T V2<T>::magnitudeSqr(void) const
 {
@@ -596,7 +596,7 @@ template<typename T> inline T V2<T>::magnitudeSqr(void) const
 }
 template<typename T> inline T V3<T>::magnitude(void) const
 {
-	return sqrtvec_t(x * x + y * y + z * z);
+	return sqrt(x * x + y * y + z * z);
 }
 template<typename T> inline T V3<T>::magnitudeSqr(void) const
 {
@@ -604,7 +604,7 @@ template<typename T> inline T V3<T>::magnitudeSqr(void) const
 }
 template<typename T> inline T V3<T>::magnitudeXY(void) const
 {
-	return sqrtvec_t(x * x + y * y);
+	return sqrt(x * x + y * y);
 }
 template<typename T> inline T V3<T>::magnitudeXYSqr(void) const
 {
@@ -631,7 +631,7 @@ template<typename T> inline bool V3<T>::isNormal(void) const
 /** set unit length to one */
 template<typename T> inline T V2<T>::normalize(void)
 {
-	T magnitude = sqrtvec_t(x * x + y * y);
+	T magnitude = sqrt(x * x + y * y);
 	const T scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;
@@ -640,7 +640,7 @@ template<typename T> inline T V2<T>::normalize(void)
 /** set unit length to one */
 template<typename T> inline T V3<T>::normalize(void)
 {
-	T magnitude = sqrtvec_t(x * x + y * y + z * z);
+	T magnitude = sqrt(x * x + y * y + z * z);
 	const T scalar = 1.0f / magnitude;
 	x *= scalar;
 	y *= scalar;

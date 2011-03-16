@@ -6,7 +6,10 @@
 #include "Observation.h"
 #include "Singleton.h"
 #include "Threads.h"
-
+/**
+\warning WORK IN-PROGRESS! 
+\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+*/
 namespace multithreading
 {
 

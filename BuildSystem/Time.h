@@ -4,7 +4,8 @@
 /**
 \file Time.h
 
-\todo investigate OS vs. C std library time functions.
+\warning WORK IN-PROGRESS! 
+\note EXPERIMENTAL!  NOT INTENDED FOR USE!
 */
 #include "Build.h"
 

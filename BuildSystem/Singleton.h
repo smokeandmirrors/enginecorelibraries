@@ -13,8 +13,10 @@ smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 \endhtmlonly
 \date 3/10/2011
-*/
 
+\warning WORK IN-PROGRESS! 
+\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+*/
 #include "Build.h"
 #include "Synchronization.h"
 

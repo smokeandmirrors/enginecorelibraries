@@ -97,12 +97,12 @@ inline sint4 return5Param5const(lua_State* L);
 example:
 C function:
 \code
-vec_t Vector3::dot(const Vector3& v) const; // member function, 1 return value, 1 argument
+real4 Vector3::dot(const Vector3& v) const; // member function, 1 return value, 1 argument
 \endcode
 
 wrapper:
 \code
-return1Param1const<Vector3, vec_t, const Vector3&, &Vector3::dot>
+return1Param1const<Vector3, real4, const Vector3&, &Vector3::dot>
 \endcode
 
 %Lua call:

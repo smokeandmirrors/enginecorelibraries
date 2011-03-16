@@ -7,7 +7,8 @@
 This Observer pattern implementation is somewhat inspired by this article:
 http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 
-\warning THIS FUNCTIONALITY IS NOT THREAD SAFE!
+\warning WORK IN-PROGRESS! 
+\note EXPERIMENTAL!  NOT INTENDED FOR USE!
 */
 
 #include <vector>
