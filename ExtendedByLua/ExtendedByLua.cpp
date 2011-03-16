@@ -23,7 +23,9 @@ using namespace lua_extension;
 #include "Time.h"
 #include "Vector.h"
 /**
-\todo, better support for Template class exports to %Lua
+\todo find/create a decent set of containers
+\todo global bit packing investigation
+\todo run-time set path ability for LUA_PATH
 */
 template<typename T>
 class Value 

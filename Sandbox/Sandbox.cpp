@@ -1,3 +1,4 @@
+#include <list>
 #include <stdio.h>
 #include <tchar.h>
 #include <vector>
@@ -16,6 +17,178 @@
 #include "Time.h"
 #include "Threads.h"
 #include "Vector.h"
+
+class EngineLoop;
+class FrameRequirement;
+
+
+// make an interface
+class FrameRequirement
+	: public design_patterns::Observable<FrameRequirement>
+	, public design_patterns::Observer<EngineLoop>
+{
+public:
+	void ignore(EngineLoop* observable);
+
+	void notice(EngineLoop* observable);
+
+	bool isCompleted(void) const;
+
+	void observe(EngineLoop* observable);
+
+private:
+	bool	m_isCompleted;
+	design_patterns::ObserverHelper<EngineLoop> 
+		m_observer;
+}; // class FrameRequirement
+
+class EngineLoop
+: public design_patterns::Observable<EngineLoop>
+, public design_patterns::Observer<FrameRequirement>
+{
+	typedef std::list<FrameRequirement*>	requirements;
+	typedef requirements::iterator			requirements_iter;
+public:
+	void add(design_patterns::Observer<EngineLoop>* observer)
+	{
+		m_observable.add(observer);
+	}
+	
+	void addFrameRequirement(FrameRequirement* observable)
+	{
+		m_incomplete.push_back(observable);
+	}
+
+	uint8 getFrameNumber(void) const 
+	{ 
+		return m_frameNumber; 
+	}
+
+	void ignore(FrameRequirement* observable)
+	{
+		m_observer.ignore(observable);
+	}
+
+	void notice(FrameRequirement* observable)
+	{	// really this would always be true
+		if (observable->isCompleted())
+		{
+			markRequirementCompleted(observable);	
+		}
+
+		synchronize(m_mutex);
+		
+		if (isFrameCompleted())
+		{
+			markFrameCompleted();
+		}
+	}
+	
+	void notify(void)
+	{
+		m_observable.notify();
+	}
+	
+	void observe(FrameRequirement* observable)
+	{
+		m_observer.observe(observable);
+	}
+	
+	void removeFrameRequirement(FrameRequirement* observable)
+	{
+		removeFromList(observable, m_completed, m_completeMutex);
+		removeFromList(observable, m_incomplete, m_incompleteMutex);
+	}
+	
+	void remove(design_patterns::Observer<EngineLoop>* observer)
+	{
+		m_observable.remove(observer);
+	}
+
+protected:
+	void addToList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
+	{
+		synchronize(mutex)
+		reqs_list.push_back(req);
+	}
+
+	bool isFrameCompleted(void) const
+	{
+		return m_incomplete.empty();
+	}
+	
+	void markFrameCompleted(void)
+	{
+		m_frameNumber++;
+		notify();
+		markRequirementsIncomplete();
+	}
+	
+	void markRequirementCompleted(FrameRequirement* requirement)
+	{
+		removeFromList(requirement, m_incomplete, m_incompleteMutex);
+		addToList(requirement, m_completed, m_completeMutex);
+	}
+	
+	void markRequirementsIncomplete(void)
+	{
+		synchronize(m_completeMutex)
+		synchronize(m_incompleteMutex)
+		assert(m_incomplete.empty());
+		m_incomplete = m_completed;
+		m_completed.resize(0);
+		assert(m_completed.empty());
+	}
+
+	void removeFromList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
+	{
+		synchronize(mutex)
+		for (requirements_iter iter = reqs_list.begin(); iter != reqs_list.end(); iter++)
+		{
+			if (*iter == req)
+			{
+				reqs_list.erase(iter);
+				return;
+			}
+		}
+	}
+	
+private:
+	requirements					m_completed;
+	multithreading::Mutex			m_completeMutex;
+	uint8							m_frameNumber;
+	requirements					m_incomplete;
+	multithreading::Mutex			m_incompleteMutex;
+	multithreading::Mutex			m_mutex;
+	design_patterns::ObservableHelper<EngineLoop>		
+									m_observable;
+	design_patterns::ObserverHelper<FrameRequirement>	
+									m_observer;
+}; // class EngineLoop
+
+void FrameRequirement::ignore(EngineLoop* observable)
+{
+	m_observer.ignore(observable);
+}
+
+void FrameRequirement::notice(EngineLoop* observable)
+{
+	// if the engine loop is complete..
+	// then queue up some more work 
+	// on the scheduler?
+	// if (lastFrameLoop < currentFrameLoop)
+	// {}
+}
+
+bool FrameRequirement::isCompleted(void) const
+{
+	return m_isCompleted;
+}
+
+void FrameRequirement::observe(EngineLoop* observable)
+{
+	m_observer.observe(observable);
+}
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }

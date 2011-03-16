@@ -19,6 +19,7 @@ http://en.wikipedia.org/wiki/Math.h
 
 namespace math
 {
+
 template<typename T> inline T abs(T number);
 template<typename T> inline T acos(T number);
 template<typename T> inline T asin(T number);
@@ -43,6 +44,7 @@ template<typename T> inline T sinh(T number);
 template<typename T> inline T sqrt(T square);
 template<typename T> inline T tan(T number);
 template<typename T> inline T tanh(T number);
+
 } // namespace math
 
 template<> inline sint4 math::abs<sint4>(sint4 number)
