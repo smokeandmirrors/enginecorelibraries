@@ -1,6 +1,8 @@
 #include <float.h>
 #include <limits.h>
 #include <math.h>
+#include <cmath>
+#include <stdlib.h>
 #include "Numbers.h"
 
 namespace math 
@@ -22,26 +24,17 @@ const uint8 uint8_max						= ULLONG_MAX;
 /** real numbers */
 const real4 real4_epsilon					= FLT_EPSILON; 
 const real4 real4_max						= FLT_MAX;
-const real4 real4_max_negative				= 0.0f - real4_epsilon;
+const real4 real4_max_negative				= 0.0f - FLT_EPSILON; // _nextafterf(0.0f, -1.0f);
 const real4 real4_min						= FLT_MIN;
-const real4 real4_min_positive				= -real4_max;
+const real4 real4_min_positive				= 0.0f + FLT_EPSILON; // _nextafterf(0.0f, 1.0f);
 
 const real8 real8_epsilon					= DBL_EPSILON; 
 const real8 real8_max						= DBL_MAX;
-const real8 real8_max_negative				= 0.0f - real8_epsilon;
+const real8 real8_max_negative				= 0.0 - DBL_EPSILON; // _nextafter(0.0, -1.0);
 const real8 real8_min						= DBL_MIN;
-const real8 real8_min_positive				= -real8_max;
+const real8 real8_min_positive				= 0.0 + DBL_EPSILON; // _nextafter(0.0, 1.0);
 
 /** real pi numbers */
-const real8 real8_2_inverse_pi				= 0.636619772367581343076;
-const real8 real8_2_inverse_root_pi			= 1.12837916709551257390;
-const real8 real8_degree_to_radian			= 3.14159265358979323846 / 180.0;
-const real8 real8_inverse_pi				= 0.318309886183790671538;
-const real8 real8_half_pi					= 1.57079632679489661923;
-const real8 real8_pi						= 3.14159265358979323846;
-const real8 real8_qrtr_pi					= 0.785398163397448309616;
-const real8 real8_radians_to_degrees		= 3.14159265358979323846 / 180.0;
-
 const real4 real4_2_inverse_pi				= static_cast<real4>(0.636619772367581343076);
 const real4 real4_2_inverse_root_pi			= static_cast<real4>(1.12837916709551257390);
 const real4 real4_degree_to_radian			= static_cast<real4>(3.14159265358979323846 / 180.0);
@@ -51,23 +44,32 @@ const real4 real4_pi						= static_cast<real4>(3.14159265358979323846);
 const real4 real4_qrtr_pi					= static_cast<real4>(0.785398163397448309616);
 const real4 real4_radians_to_degrees		= static_cast<real4>(3.14159265358979323846 / 180.0);
 
+const real8 real8_2_inverse_pi				= 0.636619772367581343076;
+const real8 real8_2_inverse_root_pi			= 1.12837916709551257390;
+const real8 real8_degree_to_radian			= 3.14159265358979323846 / 180.0;
+const real8 real8_inverse_pi				= 0.318309886183790671538;
+const real8 real8_half_pi					= 1.57079632679489661923;
+const real8 real8_pi						= 3.14159265358979323846;
+const real8 real8_qrtr_pi					= 0.785398163397448309616;
+const real8 real8_radians_to_degrees		= 3.14159265358979323846 / 180.0;
+
 /** real logarithm numbers */
-//const real8 real8_e;
-//const real8 real8_log2_e;
-//const real8 real8_log10_e;
-//const real8 real8_ln_2;
-//const real8 real8_ln_10;
-//
-//const real4 real4_e;
-//const real4 real4_log2_e;
-//const real4 real4_log10_e;
-//const real4 real4_ln_2;
-//const real4 real4_ln_10;
-//
-///** real square root numbers */
-//const real8 real8_root_2;
-//const real8 real8_inverse_root_2;
-//
-//const real4 real4_root_2;
-//const real4 real4_inverse_root_2;
+const real4 real4_e							= static_cast<real4>(2.71828182845904523536);
+const real4 real4_log2_e					= static_cast<real4>(1.44269504088896340736);
+const real4 real4_log10_e					= static_cast<real4>(0.434294481903251827651);
+const real4 real4_ln_2						= static_cast<real4>(0.693147180559945309417);
+const real4 real4_ln_10						= static_cast<real4>(2.30258509299404568402);
+
+const real8 real8_e							= 2.71828182845904523536;
+const real8 real8_log2_e					= 1.44269504088896340736;
+const real8 real8_log10_e					= 0.434294481903251827651;
+const real8 real8_ln_2						= 0.693147180559945309417;
+const real8 real8_ln_10						= 2.30258509299404568402;
+
+/** real square root numbers */
+const real4 real4_root_2					= static_cast<real4>(1.41421356237309504880);
+const real4 real4_inverse_root_2			= static_cast<real4>(0.707106781186547524401);
+
+const real8 real8_root_2					= 1.41421356237309504880;
+const real8 real8_inverse_root_2			= 0.707106781186547524401;
 } // namespace math

@@ -180,6 +180,20 @@ void testVectors(T epsilon)
 	}
 }
 
+void playNumericalFunctions(void)
+{
+	real8 f8;
+	real4 f4;
+	sint8 si8;
+	sint4 si4;
+
+	printf("%f", math::abs<real8>(f8));
+	printf("%f", math::ln<real4>(f4));
+	printf("%f", abs(f8));
+	printf("%f", abs(f4));
+
+}
+
 
 void sandbox::play()
 {
@@ -241,6 +255,9 @@ void sandbox::play()
 	testVectors<real4>(1.0f);
 	testVectors<sint1>(1);
 	testVectors<uint2>(1);
+
+	playNumericalFunctions();
+
 	return;
 }
 
