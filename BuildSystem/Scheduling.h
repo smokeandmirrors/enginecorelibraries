@@ -22,10 +22,18 @@ class Scheduler
 	friend class design_patterns::Singleton<Scheduler>;
 
 public:
+	/** 
+	\todo expose an optional direct callback mechanism for when the job
+	is finished 
+	*/
 	void			enqueue(Executable* job, 
 						sint4 ideal_thread=noThreadPreference,
 						const sint1* name="un-named");
 
+	/** 
+	\todo expose an optional direct callback mechanism for when the job
+	is finished 
+	*/
 	void			enqueue(executableFunction job, 
 						sint4 ideal_thread=noThreadPreference,
 						const sint1* name="un-named");

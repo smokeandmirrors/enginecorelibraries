@@ -14,23 +14,22 @@
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
-#include "Time.h"
 #include "Threads.h"
+#include "Time.h"
 #include "Vector.h"
 
 class EngineLoop;
 class FrameRequirement;
 
-
 // make an interface
 class FrameRequirement
-	: public design_patterns::Observable<FrameRequirement>
-	, public design_patterns::Observer<EngineLoop>
+: public design_patterns::Observable<FrameRequirement>
+, public design_patterns::Observer<EngineLoop>
 {
 public:
 	void ignore(EngineLoop* observable);
 
-	void notice(EngineLoop* observable);
+	void notice(EngineLoop* observable)=0;
 
 	bool isCompleted(void) const;
 
@@ -48,6 +47,7 @@ class EngineLoop
 {
 	typedef std::list<FrameRequirement*>	requirements;
 	typedef requirements::iterator			requirements_iter;
+
 public:
 	void add(design_patterns::Observer<EngineLoop>* observer)
 	{
@@ -170,15 +170,15 @@ void FrameRequirement::ignore(EngineLoop* observable)
 {
 	m_observer.ignore(observable);
 }
-
-void FrameRequirement::notice(EngineLoop* observable)
-{
-	// if the engine loop is complete..
-	// then queue up some more work 
-	// on the scheduler?
-	// if (lastFrameLoop < currentFrameLoop)
-	// {}
-}
+ 
+// void FrameRequirement::notice(EngineLoop* observable)
+// {
+// 	// if the engine loop is complete..
+// 	// then queue up some more work 
+// 	// on the scheduler?
+// 	// if (lastFrameLoop < currentFrameLoop)
+// 	// {}
+// }
 
 bool FrameRequirement::isCompleted(void) const
 {
@@ -189,6 +189,67 @@ void FrameRequirement::observe(EngineLoop* observable)
 {
 	m_observer.observe(observable);
 }
+
+
+class Physical
+: public multithreading::Executable
+{
+public:
+	Physical(millisecond work_time, Physical* next=NULL)
+	: m_workTime(work_time)
+	, m_next(next)
+	{
+		/* empty */
+	}
+	
+	void execute(void)
+	{
+		multithreading::sleep(m_workTime);
+		
+		if (m_next)
+		{
+			multithreading::Scheduler::single().enqueue(m_next);
+		}
+	}
+
+protected:
+	Physical*	m_next;
+	millisecond	m_workTime;
+};
+
+
+Physical	physOne(1000);
+Physical	physTwo(2000);
+Physical	physThree(3000, &physOne);
+Physical	physFour(4000, &physTwo);
+
+class Physics 
+: public FrameRequirement
+, public multithreading::Executable
+{
+public:
+	void execute(void)
+	{
+		multithreading::Scheduler::single().enqueue(&physFour);
+		multithreading::Scheduler::single().enqueue(&physThree);
+	}
+
+	void notice(EngineLoop* observable)
+	{
+		uint8 current_frame = observable->getFrameNumber();
+
+		if (current_frame > m_lastFrame)
+		{
+			// queue up some work
+			m_lastFrame = current_frame;
+
+		}
+	}
+
+private:
+	uint8 m_lastFrame;
+}; // class Physics
+
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
@@ -224,7 +285,6 @@ public:
 	}
 }; // QuickSortTester
 
-
 HANDLE mutex;
 
 multithreading::Mutex m_mutex;
@@ -234,7 +294,7 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
 	synchronize(m_mutex);
 	numberOfThreads++;
 	sint4 myNumThreads = numberOfThreads;
-	Sleep(numberOfThreads * 1000);
+	multithreading::sleep(numberOfThreads * 1000);
 	assert(numberOfThreads == myNumThreads);
 )
 
@@ -304,7 +364,7 @@ void threadsChecking()
 		ResumeThread(threads[i]);
 	}
 	
-	Sleep(3000);
+	multithreading::sleep(3000);
 
 	for (uint4 i = 0; i < num_threads; i++)
 	{
@@ -401,7 +461,7 @@ void sandbox::play()
 	backwards.setRate(-2.0);
 	real_time::StopWatch timer(backwards);
 	cycle before = real_time::cycles();
-	Sleep(3000);
+	multithreading::sleep(3000);
 	cycle after = real_time::cycles();
 	cycle delta = after - before;
 	millicycle mhz = real_time::millihertz();

@@ -4,6 +4,8 @@
 
 #include "Build.h"
 #include "Observation.h"
+#include "Time.h"
+
 /**
 \warning WORK IN-PROGRESS! 
 */
@@ -32,6 +34,10 @@ namespace multithreading
 
 typedef void(* executableFunction)(void);
 
+extern const sint4 noThreadPreference; 
+
+void sleep(millisecond milliseconds);
+
 class Executable 
 {
 public:
@@ -47,8 +53,6 @@ typedef void*				threadHandle;
 	PREVENT_COMPILE
 #endif//WIN32
 		
-static sint4 noThreadPreference(-1);
-
 class Thread
 : public design_patterns::Observable<Thread>
 {

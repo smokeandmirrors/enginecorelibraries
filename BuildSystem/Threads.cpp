@@ -9,8 +9,17 @@
 namespace multithreading
 {
 
-inline threadHandle	createThread(threadable function, threadID& id, void* args, sint4 CPUid=noThreadPreference);
+const sint4 noThreadPreference(-1);
+
+void sleep(millisecond milliseconds)
+{
+#if WIN32
+	Sleep(static_cast<uint4>(milliseconds));
+#endif//WIN32
+}
+
 inline void			closeThread(threadHandle);
+inline threadHandle	createThread(threadable function, threadID& id, void* args, sint4 CPUid=noThreadPreference);
 
 #if WIN32
 inline threadHandle createThread(threadable function, threadID& id, void* args, sint4/* CPUid*/)
