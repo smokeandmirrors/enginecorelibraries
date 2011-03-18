@@ -27,18 +27,71 @@ class FrameRequirement
 , public design_patterns::Observer<EngineLoop>
 {
 public:
-	void ignore(EngineLoop* observable);
+	FrameRequirement(void)
+	{
+		m_observer = new design_patterns::ObserverHelper<EngineLoop>(*this);
+		m_observable = new design_patterns::ObservableHelper<FrameRequirement>(*this);
+	}
+	
+	~FrameRequirement(void)
+	{
+		delete m_observable;
+		delete m_observer;
+	}
+
+	void add(Observer<FrameRequirement>* observer)
+	{
+		m_observable->add(observer);
+	}
+	
+	bool isCompleted(void) const
+	{
+		return m_isCompleted;
+	}
+
+	virtual bool isFinishedQueueingWork(void) const=0;
+
+	void ignore(EngineLoop* observable)
+	{
+		m_observer->ignore(observable);
+	}
 
 	void notice(EngineLoop* observable)=0;
 
-	bool isCompleted(void) const;
+	void notify(void)
+	{
+		m_observable->notify();
+	}
 
-	void observe(EngineLoop* observable);
+	void observe(EngineLoop* observable)
+	{
+		m_observer->observe(observable);
+	}
+
+	virtual void queueWork(void)=0;
+
+	void remove(Observer<FrameRequirement>* observer)
+	{
+		m_observable->remove(observer);
+	}
+
+protected:
+	void markCompleted(void)
+	{
+		m_isCompleted = true;
+	}
+
+	void markIncomplete(void)
+	{
+		m_isCompleted = false;
+	}	
 
 private:
 	bool	m_isCompleted;
-	design_patterns::ObserverHelper<EngineLoop> 
+	design_patterns::ObserverHelper<EngineLoop>* 
 		m_observer;
+	design_patterns::ObservableHelper<FrameRequirement>*
+		m_observable;
 }; // class FrameRequirement
 
 class EngineLoop
@@ -49,14 +102,24 @@ class EngineLoop
 	typedef requirements::iterator			requirements_iter;
 
 public:
+	EngineLoop(void)
+	: m_isRunning(false)
+	, m_frameNumber(0)
+	{
+		m_observer = new design_patterns::ObserverHelper<FrameRequirement>(*this);
+		m_observable = new design_patterns::ObservableHelper<EngineLoop>(*this);
+	}
+
 	void add(design_patterns::Observer<EngineLoop>* observer)
 	{
-		m_observable.add(observer);
+		m_observable->add(observer);
 	}
 	
-	void addFrameRequirement(FrameRequirement* observable)
+	void addFrameRequirement(FrameRequirement* requirement)
 	{
-		m_incomplete.push_back(observable);
+		requirement->add(this);
+		add(requirement);
+		m_incomplete.push_back(requirement);
 	}
 
 	uint8 getFrameNumber(void) const 
@@ -66,43 +129,88 @@ public:
 
 	void ignore(FrameRequirement* observable)
 	{
-		m_observer.ignore(observable);
+		m_observer->ignore(observable);
+	}
+
+	bool isRunning(void) const
+	{
+		return m_isRunning;
 	}
 
 	void notice(FrameRequirement* observable)
 	{	// really this would always be true
+		synchronize(m_mutex);
+		
+		if (observable->isFinishedQueueingWork())
+		{
+			bool queue_next(false);
+
+			for (requirements_iter iter = m_incomplete.begin(); iter != m_incomplete.end(); iter++)
+			{
+				if (queue_next)
+				{
+					(*iter)->queueWork();
+					break;
+				}
+
+				if (*iter == observable)
+				{
+					queue_next = true;
+				}
+			}
+		}
+		
 		if (observable->isCompleted())
 		{
 			markRequirementCompleted(observable);	
-		}
-
-		synchronize(m_mutex);
-		
-		if (isFrameCompleted())
-		{
-			markFrameCompleted();
-		}
+			
+			if (isFrameCompleted())
+			{
+				markFrameCompleted();
+			}
+		}	
 	}
 	
 	void notify(void)
 	{
-		m_observable.notify();
+		m_observable->notify();
 	}
 	
 	void observe(FrameRequirement* observable)
 	{
-		m_observer.observe(observable);
+		m_observer->observe(observable);
 	}
 	
-	void removeFrameRequirement(FrameRequirement* observable)
+	void removeFrameRequirement(FrameRequirement* requirement)
 	{
-		removeFromList(observable, m_completed, m_completeMutex);
-		removeFromList(observable, m_incomplete, m_incompleteMutex);
+		removeFromList(requirement, m_completed, m_completeMutex);
+		removeFromList(requirement, m_incomplete, m_incompleteMutex);
+		remove(requirement);
+		requirement->remove(this);
 	}
 	
 	void remove(design_patterns::Observer<EngineLoop>* observer)
 	{
-		m_observable.remove(observer);
+		m_observable->remove(observer);
+	}
+
+	void start(void)
+	{
+		synchronize(m_incompleteMutex)
+		if (!m_isRunning)
+		{
+			m_isRunning = true;
+			startFrame();	
+		}
+	}
+
+	void stop(void)
+	{
+		if (m_isRunning)
+		{
+			m_isRunning = false;
+			notify();
+		}
 	}
 
 protected:
@@ -120,8 +228,9 @@ protected:
 	void markFrameCompleted(void)
 	{
 		m_frameNumber++;
-		notify();
 		markRequirementsIncomplete();
+		notify();
+		startFrame();
 	}
 	
 	void markRequirementCompleted(FrameRequirement* requirement)
@@ -138,6 +247,14 @@ protected:
 		m_incomplete = m_completed;
 		m_completed.resize(0);
 		assert(m_completed.empty());
+	}
+
+	void startFrame(void)
+	{
+		if (!m_incomplete.empty())
+		{
+			(*m_incomplete.front()).queueWork();
+		}
 	}
 
 	void removeFromList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
@@ -159,45 +276,22 @@ private:
 	uint8							m_frameNumber;
 	requirements					m_incomplete;
 	multithreading::Mutex			m_incompleteMutex;
+	bool							m_isRunning;
 	multithreading::Mutex			m_mutex;
-	design_patterns::ObservableHelper<EngineLoop>		
+	design_patterns::ObservableHelper<EngineLoop>*		
 									m_observable;
-	design_patterns::ObserverHelper<FrameRequirement>	
+	design_patterns::ObserverHelper<FrameRequirement>*	
 									m_observer;
 }; // class EngineLoop
-
-void FrameRequirement::ignore(EngineLoop* observable)
-{
-	m_observer.ignore(observable);
-}
- 
-// void FrameRequirement::notice(EngineLoop* observable)
-// {
-// 	// if the engine loop is complete..
-// 	// then queue up some more work 
-// 	// on the scheduler?
-// 	// if (lastFrameLoop < currentFrameLoop)
-// 	// {}
-// }
-
-bool FrameRequirement::isCompleted(void) const
-{
-	return m_isCompleted;
-}
-
-void FrameRequirement::observe(EngineLoop* observable)
-{
-	m_observer.observe(observable);
-}
-
 
 class Physical
 : public multithreading::Executable
 {
 public:
-	Physical(millisecond work_time, Physical* next=NULL)
+	Physical(millisecond work_time, Physical* next=NULL, void(*callback)(void)=NULL)
 	: m_workTime(work_time)
 	, m_next(next)
+	, m_callBack(callback)
 	{
 		/* empty */
 	}
@@ -206,49 +300,101 @@ public:
 	{
 		multithreading::sleep(m_workTime);
 		
+		if (m_callBack)
+		{
+			(*m_callBack)();
+		}				
+
 		if (m_next)
 		{
-			multithreading::Scheduler::single().enqueue(m_next);
+			static bool first(true);
+		
+			if (first)
+			{
+				multithreading::Scheduler::single().enqueue(m_next, multithreading::noThreadPreference, "Phyics 1");
+				first = false;
+			}
+			else
+			{
+				multithreading::Scheduler::single().enqueue(m_next, multithreading::noThreadPreference, "Phyics 2");
+			}
 		}
 	}
 
 protected:
+	void(*		m_callBack)(void);
 	Physical*	m_next;
 	millisecond	m_workTime;
 };
 
+void physicsComplete(void);
 
-Physical	physOne(1000);
-Physical	physTwo(2000);
-Physical	physThree(3000, &physOne);
-Physical	physFour(4000, &physTwo);
+Physical	physOne(1000, NULL, physicsComplete);
+Physical	physTwo(2000, NULL, physicsComplete);
+Physical	physThree(3000, &physOne, physicsComplete);
+Physical	physFour(4000, &physTwo, physicsComplete);
 
 class Physics 
 : public FrameRequirement
-, public multithreading::Executable
 {
 public:
-	void execute(void)
+	Physics(void)
+	: m_isDoneQueuingWork(false)
 	{
-		multithreading::Scheduler::single().enqueue(&physFour);
-		multithreading::Scheduler::single().enqueue(&physThree);
+
+	}
+
+	void testMarkFunctionComplete(void)
+	{
+		markCompleted();
+	}
+
+	bool isFinishedQueueingWork(void) const
+	{
+		return m_isDoneQueuingWork;
 	}
 
 	void notice(EngineLoop* observable)
 	{
 		uint8 current_frame = observable->getFrameNumber();
 
-		if (current_frame > m_lastFrame)
-		{
-			// queue up some work
+		if (current_frame > m_lastFrame && observable->isRunning())
+		{	// queue up some work
 			m_lastFrame = current_frame;
-
+			markIncomplete();
 		}
 	}
 
+	void queueWork(void)
+	{
+		multithreading::Scheduler::single().enqueue(&physFour, multithreading::noThreadPreference, "Physics 4");
+		multithreading::Scheduler::single().enqueue(&physThree, multithreading::noThreadPreference, "Physics 3");
+		m_isDoneQueuingWork = true;
+		notify();
+	}
+
 private:
-	uint8 m_lastFrame;
+	bool	m_isDoneQueuingWork;
+	uint8	m_lastFrame;
 }; // class Physics
+
+
+Physics		physics;
+uint1		physicsCompletions(0);
+multithreading::Mutex physicsMutex;
+
+void physicsComplete(void)
+{
+	synchronize(physicsMutex);
+
+	physicsCompletions++;
+
+	if (physicsCompletions == 4)
+	{
+		physics.testMarkFunctionComplete();
+		physicsCompletions = 0;
+	}
+}
 
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
@@ -415,16 +561,19 @@ void testVectors(T epsilon)
 
 void playNumericalFunctions(void)
 {
-	real8 f8;
-	real4 f4;
-	sint8 si8;
-	sint4 si4;
-
+	/*
+	real8 f8(0);
+	real4 f4(0);
+	sint8 si8(0);
+	sint4 si4(0);
+	
 	printf("%f", math::abs<real8>(f8));
 	printf("%f", math::ln<real4>(f4));
 	printf("%f", abs(f8));
-	printf("%f", abs(f4));
-
+	printf("%f", abs(f4));	
+	printf("%d", math::abs<sint4>(si4));
+	printf("%d", math::abs<sint8>(si8));
+	*/
 }
 
 
@@ -490,6 +639,18 @@ void sandbox::play()
 	testVectors<uint2>(1);
 
 	playNumericalFunctions();
+
+	EngineLoop loop;
+	
+	loop.addFrameRequirement(&physics);
+	loop.start();
+
+	while (loop.getFrameNumber() < 100)
+	{
+
+	};
+
+	loop.stop();
 
 	return;
 }

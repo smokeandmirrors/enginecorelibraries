@@ -102,6 +102,8 @@ protected:
 			}
 		}
 
+		printf("Accounting for finish of %s", job->toString().c_str());
+
 		assert(thread_index != -1);
 		m_activeJobs[thread_index] = NULL;
 		m_numActiveJobs--;

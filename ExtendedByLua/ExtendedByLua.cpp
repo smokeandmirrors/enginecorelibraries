@@ -71,7 +71,7 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		register_lua_library((&lua), Value_sint4);
 		// get the user file for easier rapid iteration
 		lua.require("User");
-		lua.runConsole();
+		// lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 
