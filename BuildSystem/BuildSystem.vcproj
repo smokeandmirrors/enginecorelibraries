@@ -450,7 +450,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Signals.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sigslot.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Singleton.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Code Writing"
+			>
+			<File
+				RelativePath=".\TemplateArguments.h"
 				>
 			</File>
 		</Filter>

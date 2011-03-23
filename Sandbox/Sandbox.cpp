@@ -29,19 +29,13 @@ class FrameRequirement
 public:
 	FrameRequirement(void)
 	{
-		m_observer = new design_patterns::ObserverHelper<EngineLoop>(*this);
-		m_observable = new design_patterns::ObservableHelper<FrameRequirement>(*this);
+		m_observer.setObserver(this);
+		m_observable.setObservable(this);
 	}
 	
-	~FrameRequirement(void)
-	{
-		delete m_observable;
-		delete m_observer;
-	}
-
 	void add(Observer<FrameRequirement>* observer)
 	{
-		m_observable->add(observer);
+		m_observable.add(observer);
 	}
 	
 	bool isCompleted(void) const
@@ -53,26 +47,26 @@ public:
 
 	void ignore(EngineLoop* observable)
 	{
-		m_observer->ignore(observable);
+		m_observer.ignore(observable);
 	}
 
 	void notice(EngineLoop* observable)=0;
 
 	void notify(void)
 	{
-		m_observable->notify();
+		m_observable.notify();
 	}
 
 	void observe(EngineLoop* observable)
 	{
-		m_observer->observe(observable);
+		m_observer.observe(observable);
 	}
 
 	virtual void queueWork(void)=0;
 
 	void remove(Observer<FrameRequirement>* observer)
 	{
-		m_observable->remove(observer);
+		m_observable.remove(observer);
 	}
 
 protected:
@@ -87,10 +81,11 @@ protected:
 	}	
 
 private:
-	bool	m_isCompleted;
-	design_patterns::ObserverHelper<EngineLoop>* 
+	bool	
+		m_isCompleted;
+	design_patterns::ObserverMember<EngineLoop>
 		m_observer;
-	design_patterns::ObservableHelper<FrameRequirement>*
+	design_patterns::ObservableMember<FrameRequirement>
 		m_observable;
 }; // class FrameRequirement
 
@@ -106,13 +101,13 @@ public:
 	: m_isRunning(false)
 	, m_frameNumber(0)
 	{
-		m_observer = new design_patterns::ObserverHelper<FrameRequirement>(*this);
-		m_observable = new design_patterns::ObservableHelper<EngineLoop>(*this);
+		m_observer.setObserver(this);
+		m_observable.setObservable(this);
 	}
 
 	void add(design_patterns::Observer<EngineLoop>* observer)
 	{
-		m_observable->add(observer);
+		m_observable.add(observer);
 	}
 	
 	void addFrameRequirement(FrameRequirement* requirement)
@@ -129,7 +124,7 @@ public:
 
 	void ignore(FrameRequirement* observable)
 	{
-		m_observer->ignore(observable);
+		m_observer.ignore(observable);
 	}
 
 	bool isRunning(void) const
@@ -140,8 +135,17 @@ public:
 	void notice(FrameRequirement* observable)
 	{	// really this would always be true
 		synchronize(m_mutex);
-		
-		if (observable->isFinishedQueueingWork())
+
+		if (observable->isCompleted())
+		{
+			markRequirementCompleted(observable);	
+
+			if (isFrameCompleted())
+			{
+				markFrameCompleted();
+			}
+		}
+		else if (observable->isFinishedQueueingWork())
 		{
 			bool queue_next(false);
 
@@ -158,27 +162,17 @@ public:
 					queue_next = true;
 				}
 			}
-		}
-		
-		if (observable->isCompleted())
-		{
-			markRequirementCompleted(observable);	
-			
-			if (isFrameCompleted())
-			{
-				markFrameCompleted();
-			}
-		}	
+		}		
 	}
 	
 	void notify(void)
 	{
-		m_observable->notify();
+		m_observable.notify();
 	}
 	
 	void observe(FrameRequirement* observable)
 	{
-		m_observer->observe(observable);
+		m_observer.observe(observable);
 	}
 	
 	void removeFrameRequirement(FrameRequirement* requirement)
@@ -191,7 +185,7 @@ public:
 	
 	void remove(design_patterns::Observer<EngineLoop>* observer)
 	{
-		m_observable->remove(observer);
+		m_observable.remove(observer);
 	}
 
 	void start(void)
@@ -278,11 +272,13 @@ private:
 	multithreading::Mutex			m_incompleteMutex;
 	bool							m_isRunning;
 	multithreading::Mutex			m_mutex;
-	design_patterns::ObservableHelper<EngineLoop>*		
+	design_patterns::ObservableMember<EngineLoop>		
 									m_observable;
-	design_patterns::ObserverHelper<FrameRequirement>*	
+	design_patterns::ObserverMember<FrameRequirement>
 									m_observer;
 }; // class EngineLoop
+
+multithreading::Mutex physicalMutex;
 
 class Physical
 : public multithreading::Executable
@@ -307,6 +303,7 @@ public:
 
 		if (m_next)
 		{
+			synchronize(physicalMutex)
 			static bool first(true);
 		
 			if (first)
@@ -347,6 +344,7 @@ public:
 	void testMarkFunctionComplete(void)
 	{
 		markCompleted();
+		notify();
 	}
 
 	bool isFinishedQueueingWork(void) const
@@ -575,13 +573,21 @@ void playNumericalFunctions(void)
 	printf("%d", math::abs<sint8>(si8));
 	*/
 }
+// 
+// class WhatsUp
+// {
+// public:
+// 	void callOne(void) { printf("Whats UP one!")}
+// };
 
+// void disconnect(RECEIVER* object, void (RECEIVER::*function)() = NULL)
 
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
 
 	compiler_checks::sizeOfChecks();
+	compiler_checks::execute();
 	// threadsChecking();	
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
@@ -645,7 +651,7 @@ void sandbox::play()
 	loop.addFrameRequirement(&physics);
 	loop.start();
 
-	while (loop.getFrameNumber() < 100)
+	while (loop.getFrameNumber() < 4)
 	{
 
 	};

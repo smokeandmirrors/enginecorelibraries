@@ -44,7 +44,6 @@ inline void	closeThread(threadHandle threadHandle)
 
 Thread::~Thread(void)
 {
-	delete m_observable;
 	delete m_executor;
 	closeThread(m_thread);
 }

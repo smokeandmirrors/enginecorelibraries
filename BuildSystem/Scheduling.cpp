@@ -209,7 +209,7 @@ Scheduler::Scheduler(void)
 {
 	initializeNumberSystemThreads();
 	m_maxThreads = getNumberSystemThreads();
-	m_observer = new design_patterns::ObserverHelper<Thread>(*this);
+	m_observer.setObserver(this);
 	m_activeJobs = new Thread*[m_numSystemThreads];
 	
 	for (uint4 i = 0; i < m_numSystemThreads; i++)
@@ -222,7 +222,6 @@ Scheduler::Scheduler(void)
 
 Scheduler::~Scheduler(void)
 {
-	delete m_observer;
 	delete m_pendingJobs;
 	delete[] m_activeJobs;
 }
@@ -311,7 +310,7 @@ const std::string Scheduler::toString(void) const
 	} 
 	while (index);
 	
-	sprintf_s(buffer, "\n*** Scheduler state ***\n"
+	sprintf_s(buffer, "\n\n*** Scheduler state ***\n"
 		"System Threads: %d\n"
 		"Max Threads: %d\n"
 		, m_numSystemThreads

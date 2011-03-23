@@ -125,6 +125,12 @@ C function
 \todo document the necessary steps to add another function of args # or params # not present
 */
 
+#include "Build.h"
+#include "LuaExtensibility.h"
+#include "LuaInclusions.h"
+#include "LuaStateInteraction.h"
+#include "TemplateArguments.h"
+
 namespace lua_extension
 {
 	template<void(* function)(void)> 
@@ -155,112 +161,8 @@ namespace lua_extension
 	}
 } // namespace lua_extension
 
-#include "Build.h"
-#include "LuaExtensibility.h"
-#include "LuaInclusions.h"
-#include "LuaStateInteraction.h"
-
-/** template arguments */
-// fill in the template arguments in the declaration
-#define EFL_TEMPLATE_ARGS_RETS_0_ARGS_1 typename ARG_1,
-#define EFL_TEMPLATE_ARGS_RETS_0_ARGS_2 typename ARG_1, typename ARG_2, 
-#define EFL_TEMPLATE_ARGS_RETS_0_ARGS_3 typename ARG_1, typename ARG_2, typename ARG_3,
-#define EFL_TEMPLATE_ARGS_RETS_0_ARGS_4 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_0_ARGS_5 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_0 typename RET_1, 
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_1 typename RET_1, typename ARG_1, 
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_2 typename RET_1, typename ARG_1, typename ARG_2,
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_3 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_4 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_1_ARGS_5 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_0 typename RET_1, typename RET_2, 
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_1 typename RET_1, typename RET_2, typename ARG_1, 
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_2 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2,
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_3 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_4 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_2_ARGS_5 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_0 typename RET_1, typename RET_2, typename RET_3, 
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, 
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2,
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_3_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4,
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, 
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2,
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_4_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5,
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, 
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2,
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define EFL_TEMPLATE_ARGS_RETS_5_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
-
-// fill in the template arguments in the template function 
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_0 void
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_1 RET_1
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_2 RET_1
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_3 RET_1
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_4 RET_1
-#define EFL_TEMPLATE_RETURN_SIGNATURE_RETS_5 RET_1
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1 ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_2 ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_3 ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_4 ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_5 ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_0 void
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_1 ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_2 ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_3 ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_4 ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_1_ARGS_5 ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_0 RET_2&
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_1 RET_2&, ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_2 RET_2&, ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_3 RET_2&, ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_4 RET_2&, ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_2_ARGS_5 RET_2&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_0 RET_2&, RET_3&
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_1 RET_2&, RET_3&, ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_2 RET_2&, RET_3&, ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_3 RET_2&, RET_3&, ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_4 RET_2&, RET_3&, ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_3_ARGS_5 RET_2&, RET_3&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_0 RET_2&, RET_3&, RET_4&
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_1 RET_2&, RET_3&, RET_4&, ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_2 RET_2&, RET_3&, RET_4&, ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_3 RET_2&, RET_3&, RET_4&, ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_4 RET_2&, RET_3&, RET_4&, ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_4_ARGS_5 RET_2&, RET_3&, RET_4&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
-
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_0 RET_2&, RET_3&, RET_4&, RET_5&
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_1 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_2 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_3 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_4 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4
-#define EFL_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_5 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
 
 /** function implementation */
-// declare the return values that get passed by reference into the function
-#define EFL_DECLARE_RETS_0 ;
-#define EFL_DECLARE_RETS_1 ;	
-#define EFL_DECLARE_RETS_2 RET_2 ret2;
-#define EFL_DECLARE_RETS_3 RET_2 ret2; RET_3 ret3;
-#define EFL_DECLARE_RETS_4 RET_2 ret2; RET_3 ret3; RET_4 ret4;
-#define EFL_DECLARE_RETS_5 RET_2 ret2; RET_3 ret3; RET_4 ret4; RET_5 ret5;
-
 // fill in the arguments in the run-time function call
 #define EFL_GET_ARGS_0 ;
 #define EFL_GET_ARGS_1 ARG_1 arg1 = to<ARG_1>(L, -1);
@@ -268,57 +170,6 @@ namespace lua_extension
 #define EFL_GET_ARGS_3 ARG_1 arg1 = to<ARG_1>(L, -3); ARG_2 arg2 = to<ARG_2>(L, -2); ARG_3 arg3 = to<ARG_3>(L, -1);
 #define EFL_GET_ARGS_4 ARG_1 arg1 = to<ARG_1>(L, -4); ARG_2 arg2 = to<ARG_2>(L, -3); ARG_3 arg3 = to<ARG_3>(L, -2); ARG_4 arg4 = to<ARG_4>(L, -1);
 #define EFL_GET_ARGS_5 ARG_1 arg1 = to<ARG_1>(L, -5); ARG_2 arg2 = to<ARG_2>(L, -4); ARG_3 arg3 = to<ARG_3>(L, -3); ARG_4 arg4 = to<ARG_4>(L, -2); ARG_5 arg5 = to<ARG_5>(L, -1);
-
-// assign the value of the function
-#define EFL_ASSIGN_RETS_0
-#define EFL_ASSIGN_RETS_1 RET_1 ret1 = 
-#define EFL_ASSIGN_RETS_2 RET_1 ret1 = 
-#define EFL_ASSIGN_RETS_3 RET_1 ret1 = 
-#define EFL_ASSIGN_RETS_4 RET_1 ret1 = 
-#define EFL_ASSIGN_RETS_5 RET_1 ret1 = 
-
-// pass in the arguments to the function
-#define EFL_CALL_RETS_0_ARGS_0 
-#define EFL_CALL_RETS_0_ARGS_1 arg1
-#define EFL_CALL_RETS_0_ARGS_2 arg1, arg2
-#define EFL_CALL_RETS_0_ARGS_3 arg1, arg2, arg3
-#define EFL_CALL_RETS_0_ARGS_4 arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_0_ARGS_5 arg1, arg2, arg3, arg4, arg5
-
-#define EFL_CALL_RETS_1_ARGS_0 
-#define EFL_CALL_RETS_1_ARGS_1 arg1
-#define EFL_CALL_RETS_1_ARGS_2 arg1, arg2
-#define EFL_CALL_RETS_1_ARGS_3 arg1, arg2, arg3
-#define EFL_CALL_RETS_1_ARGS_4 arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_1_ARGS_5 arg1, arg2, arg3, arg4, arg5
-
-#define EFL_CALL_RETS_2_ARGS_0 ret2
-#define EFL_CALL_RETS_2_ARGS_1 ret2, arg1
-#define EFL_CALL_RETS_2_ARGS_2 ret2, arg1, arg2
-#define EFL_CALL_RETS_2_ARGS_3 ret2, arg1, arg2, arg3
-#define EFL_CALL_RETS_2_ARGS_4 ret2, arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_2_ARGS_5 ret2, arg1, arg2, arg3, arg4, arg5
-
-#define EFL_CALL_RETS_3_ARGS_0 ret2, ret3
-#define EFL_CALL_RETS_3_ARGS_1 ret2, ret3, arg1
-#define EFL_CALL_RETS_3_ARGS_2 ret2, ret3, arg1, arg2
-#define EFL_CALL_RETS_3_ARGS_3 ret2, ret3, arg1, arg2, arg3
-#define EFL_CALL_RETS_3_ARGS_4 ret2, ret3, arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_3_ARGS_5 ret2, ret3, arg1, arg2, arg3, arg4, arg5
-
-#define EFL_CALL_RETS_4_ARGS_0 ret2, ret3, ret4 
-#define EFL_CALL_RETS_4_ARGS_1 ret2, ret3, ret4, arg1
-#define EFL_CALL_RETS_4_ARGS_2 ret2, ret3, ret4, arg1, arg2
-#define EFL_CALL_RETS_4_ARGS_3 ret2, ret3, ret4, arg1, arg2, arg3
-#define EFL_CALL_RETS_4_ARGS_4 ret2, ret3, ret4, arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_4_ARGS_5 ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5
-
-#define EFL_CALL_RETS_5_ARGS_0 ret2, ret3, ret4, ret5
-#define EFL_CALL_RETS_5_ARGS_1 ret2, ret3, ret4, ret5, arg1
-#define EFL_CALL_RETS_5_ARGS_2 ret2, ret3, ret4, ret5, arg1, arg2
-#define EFL_CALL_RETS_5_ARGS_3 ret2, ret3, ret4, ret5, arg1, arg2, arg3
-#define EFL_CALL_RETS_5_ARGS_4 ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4
-#define EFL_CALL_RETS_5_ARGS_5 ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5
 
 // push the appropriate number of values back to %Lua
 #define EFL_PUSH_RETS_0 ;
@@ -346,15 +197,15 @@ namespace lua_extension
 
 // end the static function template declaration
 #define EFL_END_STATIC_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (* function)(EFL_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
 
 // end the class member function template declaration
 #define EFL_END_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(EFL_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
 
 // end the class const member function template declaration
 #define EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(EFL_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) const>
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) const>
 
 // and implement the class member function
 #define EFL_CLASS_IMPLEMENTATION(num_rets, num_args) \
@@ -362,9 +213,9 @@ namespace lua_extension
 		if (CLASS* object = EFL_GET_INSTANCE_ARGS_##num_args) \
 		{ \
 			sint4 pushed(0); \
-			EFL_DECLARE_RETS_##num_rets \
+			CW_DECLARE_RETS_##num_rets \
 			EFL_GET_ARGS_##num_args \
-			EFL_ASSIGN_RETS_##num_rets (object->*function)(EFL_CALL_RETS_##num_rets##_ARGS_##num_args); \
+			CW_ASSIGN_RETS_##num_rets (object->*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
 			EFL_PUSH_RETS_##num_rets \
 			return pushed; \
 		} \
@@ -376,9 +227,9 @@ namespace lua_extension
 	inline sint4 staticReturn##num_rets##Param##num_args##(lua_State* L) \
 	{ \
 		sint4 pushed(0); \
-		EFL_DECLARE_RETS_##num_rets \
+		CW_DECLARE_RETS_##num_rets \
 		EFL_GET_ARGS_##num_args \
-		EFL_ASSIGN_RETS_##num_rets (*function)(EFL_CALL_RETS_##num_rets##_ARGS_##num_args); \
+		CW_ASSIGN_RETS_##num_rets (*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
 		EFL_PUSH_RETS_##num_rets \
 		return pushed; \
 	}
@@ -396,21 +247,21 @@ namespace lua_extension
 // define a static function with the specified number of arguments
 #define EFL_GENERATE_STATIC_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_STATIC_TEMPLATE_ARGS \
-	EFL_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
 	EFL_END_STATIC_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_STATIC(num_rets, num_args)
 
 // define a class member function with the specified number of arguments
 #define EFL_GENERATE_CLASS_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	EFL_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
 	EFL_END_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CLASS(num_rets, num_args)
 
 // define a class const member function with the specified number of arguments
 #define EFL_GENERATE_CLASS_CONST_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	EFL_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
 	EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CONST_CLASS(num_rets, num_args)
 

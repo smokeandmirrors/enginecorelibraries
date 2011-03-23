@@ -1,15 +1,3 @@
-#include <stdio.h>
-
-#include "Build.h"
-#include "CompilerChecks.h"
-
-namespace 
-{
-	struct PlainOldStruct {};
-	class PlainOldClass {};
-} // namespace
-
-
 // sigslot.h: Signal/Slot classes
 // 
 // Written by Sarah Thompson (sarah@telergy.com) 2002.
@@ -317,7 +305,6 @@ namespace sigslot {
 		virtual void emit() = 0;
 		virtual _connection_base0* clone() = 0;
 		virtual _connection_base0* duplicate(has_slots<mt_policy>* pnewdest) = 0;
-		virtual ~_connection_base0(void)=0 {};
 	};
 
 	template<class arg1_type, class mt_policy>
@@ -429,7 +416,7 @@ namespace sigslot {
 	{
 	private:
 		typedef std::set<_signal_base<mt_policy> *> sender_set;
-		typedef typename sender_set::const_iterator const_iterator;
+		typedef sender_set::const_iterator const_iterator;
 
 	public:
 		has_slots()
@@ -1513,19 +1500,12 @@ namespace sigslot {
 		{
 			pobject = NULL;
 			pmemfun = NULL;
-			printf("\nConnection 0 is created\n");
-		}
-
-		~_connection0()
-		{
-			printf("\nConnection 0 is deleted\n");
 		}
 
 		_connection0(dest_type* pobject, void (dest_type::*pmemfun)())
 		{
 			m_pobject = pobject;
 			m_pmemfun = pmemfun;
-			printf("\nConnection 0 is created\n");
 		}
 
 		virtual _connection_base0<mt_policy>* clone()
@@ -2515,63 +2495,3 @@ namespace sigslot {
 
 #endif // SIGSLOT_H__
 
-using namespace sigslot;
-
-class Switch
-{
-public:
-	signal0<>		delegate0;
-	signal1<sint4>	delegate1;
-
-	void run(void)
-	{
-		delegate0();
-		delegate1(7);
-	}
-};
-
-class Light : public has_slots<>
-{
-public:
-	void turnOff(void)			{ printf("Turned Off!"); }
-	void setWatts(sint4 watts)	{ printf("Set watts to %d", watts); }
-};
-
-class Microwave : public has_slots<>
-{
-public:
-	void turnOff(void)			{ printf("Microwave turned Off!"); }
-	void setWatts(sint4 watts)	{ printf("Microwave set watts to %d", watts); }
-};
-
-namespace compiler_checks 
-{
-
-void execute(void)
-{
-	Switch switch1;
-	Microwave microwave;
-	Light light;
-
-	switch1.delegate0.connect(&light, &Light::turnOff);
-	switch1.delegate1.connect(&light, &Light::setWatts);
-	switch1.delegate0.connect(&microwave, &Microwave::turnOff);
-	switch1.delegate1.connect(&microwave, &Microwave::setWatts);
-
-	switch1.run();
-}
-
-void sizeOfChecks(void)
-{
-	size_t pos = sizeof(PlainOldStruct);	// 1
-	size_t poc = sizeof(PlainOldClass);		// 1
-	size_t pops = sizeof(PlainOldStruct*);	// 4
-	size_t pocs = sizeof(PlainOldClass*);	// 4
-	size_t total = pos + poc + pops + pocs;
-	total = 0;
-
-	bool* build_me(0);
-	build_me = 0;
-}
-
-} // namespace compiler_checks 

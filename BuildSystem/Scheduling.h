@@ -48,7 +48,7 @@ public:
 		return m_numActiveJobs;
 	}
 	
-	uint4			getNumberPendingJobs(void) const;
+	uint4 			getNumberPendingJobs(void) const;
 	
 	uint4 getNumberSystemThreads(void) const	
 	{ 
@@ -62,7 +62,7 @@ public:
 
 	void ignore(Thread* observable)
 	{
-		m_observer->ignore(observable);
+		m_observer.ignore(observable);
 	}
 
 	void notice(Thread* observable)
@@ -73,7 +73,7 @@ public:
 	
 	void observe(Thread* observable)
 	{
-		m_observer->observe(observable);
+		m_observer.observe(observable);
 	}
 	
 	void printState(void) const
@@ -157,7 +157,7 @@ private:
 	uint4					m_maxThreads;
 	uint4					m_numActiveJobs;
 	uint4					m_numSystemThreads;
-	design_patterns::ObserverHelper<Thread>* 
+	design_patterns::ObserverMember<Thread>
 							m_observer;
 	PendingJobQueue*		m_pendingJobs;
 }; // class Scheduler

@@ -82,17 +82,17 @@ public:
 
 	void add(design_patterns::Observer<Thread>* observer)
 	{
-		m_observable->add(observer);
+		m_observable.add(observer);
 	}
 	
 	void notify(void)
 	{
-		m_observable->notify();
+		m_observable.notify();
 	}
 
 	void remove(design_patterns::Observer<Thread>* observer)
 	{
-		m_observable->remove(observer);
+		m_observable.remove(observer);
 	}
 
 	const std::string toString(void) const 
@@ -165,14 +165,15 @@ private:
 	void execute(void)
 	{
 		m_executor->execute();
-		m_observable->notify();
+		m_observable.notify();
 		delete this;
 	}
 
 	void initialize(sint4 CPUid, design_patterns::Observer<Thread>* observer)
 	{
 		assert(m_executor);
-		m_observable = new design_patterns::ObservableHelper<Thread>(*this);
+		
+		m_observable.setObservable(this);
 
 		if (observer)
 		{
@@ -185,7 +186,7 @@ private:
 	Executor*			m_executor;
 	threadID			m_id;
 	std::string			m_name;
-	design_patterns::ObservableHelper<Thread>*	
+	design_patterns::ObservableMember<Thread>	
 						m_observable;
 	threadHandle		m_thread;
 };
