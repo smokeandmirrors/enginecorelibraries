@@ -573,14 +573,18 @@ void playNumericalFunctions(void)
 	printf("%d", math::abs<sint8>(si8));
 	*/
 }
-// 
-// class WhatsUp
-// {
-// public:
-// 	void callOne(void) { printf("Whats UP one!")}
-// };
 
-// void disconnect(RECEIVER* object, void (RECEIVER::*function)() = NULL)
+class WhatsUp
+{
+public:
+	void callOne(void) { printf("Whats UP one!"); }
+};
+
+void callOnWhatsUp(WhatsUp* object, void (WhatsUp::*function)(void) = NULL)
+{
+	if (function)
+		(object->*function)();
+}
 
 void sandbox::play()
 {
@@ -592,6 +596,10 @@ void sandbox::play()
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
 	
+	WhatsUp wtf;
+	callOnWhatsUp(&wtf);
+	callOnWhatsUp(&wtf, &WhatsUp::callOne);
+
 	uint4 i = 32;
 	do 
 	{

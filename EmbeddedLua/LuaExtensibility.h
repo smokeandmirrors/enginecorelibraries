@@ -539,7 +539,7 @@ public:
 	*/
 	static sint4				setUserdataMetatable(lua_State* L); 
 	/** empty dtor */
-	virtual					~LuaExtendable(void) {/* empty */};
+	virtual					~LuaExtendable(void)=0 {/* empty */};
 	/** 
 	a function that classes must implement to make them easier to make into well formed
 	%Lua classes

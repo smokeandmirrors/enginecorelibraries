@@ -9,6 +9,7 @@ http://www.codeproject.com/KB/architecture/observer_with_templates.aspx
 
 \warning WORK IN-PROGRESS! 
 \note EXPERIMENTAL!  NOT INTENDED FOR USE!
+\todo make it
 */
 
 #include <assert.h>
@@ -38,14 +39,62 @@ template<typename SUBJECT>
 class ObserverMember;
 
 template<typename SUBJECT>
-class Observable
-{	
+void begin(Observer<SUBJECT>* observer, SUBJECT* observable)
+{
+	observable->add(observer);
+	observer->observe(observable);
+}
+
+template<typename SUBJECT>
+void cease(Observer<SUBJECT>* observer, SUBJECT* observable)
+{
+	observable->remove(observer);
+	observer->ignore(observable);
+}
+
+template<typename SUBJECT>
+void ignore(Observer<SUBJECT>* observer, SUBJECT* observable)
+{
+	observer->ignore(observable);
+}
+
+template<typename SUBJECT>
+void remove(SUBJECT* observable, Observer<SUBJECT>* observer)
+{
+	observable->remove(observer);
+}
+
+template<typename SUBJECT>
+class Observable 
+{
+	friend void design_patterns::begin(Observer<SUBJECT>* observer, SUBJECT* observable);
+	friend void design_patterns::cease(Observer<SUBJECT>* observer, SUBJECT* observable);
+	friend void design_patterns::remove(SUBJECT* observable, Observer<SUBJECT>* observer);
+
 public:
-	virtual		~Observable(void) {}
-	virtual void add(Observer<SUBJECT>* observer)=0;
+	virtual		~Observable(void)=0 {}
 	virtual void notify(void)=0; 
+
+protected:
+	virtual void add(Observer<SUBJECT>* observer)=0;
 	virtual void remove(Observer<SUBJECT>* observer)=0;
 }; // class Observable
+
+template<typename SUBJECT>
+class Observer
+{
+	friend void design_patterns::begin(Observer<SUBJECT>* observer, SUBJECT* observable);
+	friend void design_patterns::cease(Observer<SUBJECT>* observer, SUBJECT* observable);
+	friend void design_patterns::ignore(Observer<SUBJECT>* observer, SUBJECT* observable);
+
+public:
+	virtual		~Observer(void)=0 {}
+	virtual void notice(SUBJECT* observable)=0;
+
+protected:
+	virtual void ignore(SUBJECT* observable)=0;
+	virtual void observe(SUBJECT* observable)=0;
+}; // class Observer
 
 template<typename SUBJECT>
 class ObservableBase 
@@ -58,18 +107,36 @@ public:
 	virtual ~ObservableBase() 
 	{
 		synchronize(m_mutex);
+		observer_iter sentinel(m_observers.end());
+		observer_iter iter(m_observers.begin());
 
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
-			(*iter)->ignore(this);
+			ignore(*iter, this);
 		}
 	}
 
+	virtual void notify(void)
+	{	// notification might cause the observer to remove itself from the observable
+		synchronize(m_mutex);
+		observer_list copy(m_observers);
+		observer_iter iter(copy.begin());
+		observer_iter sentinel(copy.end());
+
+		for (iter; iter != sentinel; iter++)
+		{
+			(*iter)->notice(this);
+		}
+	}
+
+protected:
 	virtual void add(Observer<SUBJECT>* observer)
 	{
 		synchronize(m_mutex);
+		observer_iter sentinel(m_observers.end());
+		observer_iter iter(m_observers.begin());
 
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observer)
 			{
@@ -78,26 +145,15 @@ public:
 		}
 
 		m_observers.push_back(observer);
-		observer->observe(this);
-	}
-
-	virtual void notify(void)
-	{	// notification might cause the observer to remove itself from the observable
-		synchronize(m_mutex);
-		observer_list copy(m_observers);
-
-		for (observer_iter iter(copy.begin()); iter != copy.end(); iter++)
-		{
-			(*iter)->notice(this);
-		}
 	}
 
 	virtual void remove(Observer<SUBJECT>* observer)
 	{
 		synchronize(m_mutex);
-		observer->ignore(this);
+		observer_iter sentinel(m_observers.end());
+		observer_iter iter(m_observers.begin());
 
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observer)
 			{
@@ -125,7 +181,7 @@ class ObservableMember
 public:
 #if DEBUG
 	ObservableMember(void)
-	: m_observable(NULL)
+		: m_observable(NULL)
 	{
 		/* empty */
 	}
@@ -135,19 +191,42 @@ public:
 	{
 		synchronize(m_mutex);
 		assert(m_observable);
+		observer_iter iter(m_observers.begin());
+		observer_iter sentinel(m_observers.end());
 		
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
-			(*iter)->ignore(m_observable);
+			design_patterns::ignore(*iter, m_observable);
 		}
 	}
-	
+
+	virtual void notify(void)
+	{	// notification might cause the observer to remove itself from the observable
+		synchronize(m_mutex);
+		assert(m_observable);
+		observer_list copy(m_observers);
+		observer_iter iter(copy.begin());
+		observer_iter sentinel(copy.end());
+
+		for (iter; iter != sentinel; iter++)
+		{
+			(*iter)->notice(m_observable);
+		}
+	}
+
+	void setObservable(SUBJECT* observable)
+	{
+		m_observable = observable;
+	}
+
 	virtual void add(Observer<SUBJECT>* observer)
 	{
 		synchronize(m_mutex);
 		assert(m_observable);
+		observer_iter iter(m_observers.begin());
+		observer_iter sentinel(m_observers.end());
 
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observer)
 			{
@@ -156,28 +235,16 @@ public:
 		}
 
 		m_observers.push_back(observer);
-		observer->observe(m_observable);
-	}
-	
-	virtual void notify(void)
-	{	// notification might cause the observer to remove itself from the observable
-		synchronize(m_mutex);
-		assert(m_observable);
-		observer_list copy(m_observers);
-
-		for (observer_iter iter(copy.begin()); iter != copy.end(); iter++)
-		{
-			(*iter)->notice(m_observable);
-		}
 	}
 
 	virtual void remove(Observer<SUBJECT>* observer)
 	{
 		synchronize(m_mutex);
 		assert(m_observable);
-		observer->ignore(m_observable);
+		observer_iter iter(m_observers.begin());
+		observer_iter sentinel(m_observers.end());
 
-		for (observer_iter iter(m_observers.begin()); iter != m_observers.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observer)
 			{
@@ -187,11 +254,6 @@ public:
 		}
 	}	
 
-	void setObservable(SUBJECT* observable)
-	{
-		m_observable = observable;
-	}
-
 private:
 	ObservableMember<SUBJECT>(const ObservableMember<SUBJECT>&);
 	ObservableMember<SUBJECT> operator=(const ObservableMember<SUBJECT>&);
@@ -200,16 +262,6 @@ private:
 	SUBJECT*				m_observable;
 	observer_list			m_observers;
 }; // ObservableMember
-
-template<typename SUBJECT>
-class Observer
-{
-public:
-	virtual		~Observer(void) {}
-	virtual void ignore(SUBJECT* observable)=0;
-	virtual void notice(SUBJECT* observable)=0;
-	virtual void observe(SUBJECT* observable)=0;
-}; // class Observer
 
 template<typename SUBJECT>
 class ObserverBase
@@ -224,13 +276,16 @@ public:
 		synchronize(m_mutex);
 		observable_list copy(m_observables);
 		m_observables.clear();
+		observable_iter iter(copy.begin());
+		observable_iter sentinel(copy.end());
 
-		for (observable_iter iter(copy.begin()); iter != copy.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
-			(*iter)->remove(this);
+			remove(*iter, this);
 		}
 	}
 
+protected:
 	virtual void ignore(SUBJECT* observable)
 	{
 		synchronize(m_mutex);
@@ -278,7 +333,7 @@ class ObserverMember
 public:
 #if DEBUG
 	ObserverMember(void)
-		: m_observer(NULL)
+	: m_observer(NULL)
 	{
 		/* empty */
 	}
@@ -290,18 +345,33 @@ public:
 		assert(m_observer);
 		observable_list copy(m_observables);
 		m_observables.clear();
+		observable_iter iter(copy.begin());
+		observable_iter sentinel(copy.end());
 
-		for (observable_iter iter(copy.begin()); iter != copy.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
-			(*iter)->remove(m_observer);
+			remove(*iter, m_observer);
 		}
+	}
+
+	virtual void notice(SUBJECT* observable)
+	{
+		assert(m_observer);
+		m_observer->notice(observable);
+	}
+
+	void setObserver(Observer<SUBJECT>* observer)
+	{
+		m_observer = observer;
 	}
 
 	virtual void ignore(SUBJECT* observable)
 	{
 		synchronize(m_mutex);
+		observable_iter iter(m_observables.begin());
+		observable_iter sentinel(m_observables.end());
 
-		for (observable_iter iter(m_observables.begin()); iter != m_observables.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observable)
 			{
@@ -311,17 +381,13 @@ public:
 		}		
 	}
 
-	virtual void notice(SUBJECT* observable)
-	{
-		assert(m_observer);
-		m_observer->notice(observable);
-	}
-
 	virtual void observe(SUBJECT* observable)
 	{
 		synchronize(m_mutex);
+		observable_iter iter(m_observables.begin());
+		observable_iter sentinel(m_observables.end());
 
-		for (observable_iter iter(m_observables.begin()); iter != m_observables.end(); iter++)
+		for (iter; iter != sentinel; iter++)
 		{
 			if (*iter == observable)
 			{
@@ -331,12 +397,7 @@ public:
 
 		m_observables.push_back(observable);
 	}
-
-	void setObserver(Observer<SUBJECT>* observer)
-	{
-		m_observer = observer;
-	}
-
+	
 private:
 	ObserverMember<SUBJECT>(const ObserverMember<SUBJECT>&);
 	ObserverMember<SUBJECT> operator=(const ObserverMember<SUBJECT>&);

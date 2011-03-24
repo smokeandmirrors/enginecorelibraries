@@ -174,10 +174,10 @@ private:
 		assert(m_executor);
 		
 		m_observable.setObservable(this);
-
+		
 		if (observer)
 		{
-			add(observer);
+			design_patterns::begin(observer, this);
 		}
 
 		m_executor->initialize(this, m_thread, m_id, CPUid);

@@ -27,20 +27,20 @@ namespace signals
 	class Receiver 
 	{
 	private:
-		typedef std::set<Transmitter*>		sender_set;
-		typedef sender_set::const_iterator	const_iterator;
+		typedef std::set<Transmitter*>			transmitter_set;
+		typedef transmitter_set::const_iterator	const_iterator;
 
 	public:
 		Receiver(const Receiver& hs)
 		{
 			synchronize(m_mutex);
-			const_iterator iter = hs.m_senders.begin();
-			const_iterator sentinel = hs.m_senders.end();
+			const_iterator iter = hs.m_transmitters.begin();
+			const_iterator sentinel = hs.m_transmitters.end();
 
 			while (iter != sentinel)
 			{
 				(*iter)->duplicate(&hs, this);
-				m_senders.insert(*iter);
+				m_transmitters.insert(*iter);
 				++iter;
 			}
 		} 
@@ -53,28 +53,28 @@ namespace signals
 		void connect(Transmitter* sender)
 		{
 			synchronize(m_mutex);
-			m_senders.insert(sender);
+			m_transmitters.insert(sender);
 		}
 
 		void disconnect(Transmitter* sender)
 		{
 			synchronize(m_mutex);
-			m_senders.erase(sender);
+			m_transmitters.erase(sender);
 		}
 
 		void disconnect(void)
 		{
 			synchronize(m_mutex);
 			disconnectAll();
-			m_senders.erase(m_senders.begin(), m_senders.end());
+			m_transmitters.erase(m_transmitters.begin(), m_transmitters.end());
 		}
 
 	protected:
 		inline void disconnectAll(void)
 		{
 			synchronize(m_mutex);
-			const_iterator iter = m_senders.begin();
-			const_iterator sentinel = m_senders.end();
+			const_iterator iter = m_transmitters.begin();
+			const_iterator sentinel = m_transmitters.end();
 
 			while (iter != sentinel)
 			{
@@ -85,7 +85,7 @@ namespace signals
 
 	private:
 		multithreading::Mutex	m_mutex;
-		sender_set				m_senders;
+		transmitter_set				m_transmitters;
 	};
 
 	class Transmitter0 : public Transmitter
@@ -182,14 +182,12 @@ namespace signals
 			{
 				if ((*iter)->getReceiver() == object)
 				{
-					delete *iter;
-					m_receivers.erase(iter);
-					object->disconnect(this);
 					return;
 				}
 
 				++iter;
 			}
+
 			m_receivers.push_back(new Connection0Base<RECEIVER>(object, function));
 			object->connect(this);
 		}
@@ -202,7 +200,7 @@ namespace signals
 		}
 
 		template<class RECEIVER>
-		void disconnect(RECEIVER* object, void (RECEIVER::*function)() = NULL)
+		void disconnect(RECEIVER* object)
 		{
 			synchronize(m_mutex);
 			connections_list::iterator iter = m_receivers.begin();
@@ -210,11 +208,13 @@ namespace signals
 
 			while (iter != sentinel)
 			{
-				if ((*iter)->getReceiver() == object)
+				Connection0* connection = *iter;
+				
+				if (connection->getReceiver() == object)
 				{
-					delete *iter;
 					m_receivers.erase(iter);
 					object->disconnect(this);
+					delete connection;
 					return;
 				}
 
