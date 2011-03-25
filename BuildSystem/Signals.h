@@ -12,9 +12,12 @@
 \todo fix the memory leak of the connection objects
 \warning THERE IS A MEMORY LEAK HERE
 */
-
+#if 0
 namespace signals
 {
+	// \todo have a transmitterInitiatedDisconnect
+	// \todo have a recieverInitiatedDisconnect
+
 	class Receiver;
 
 	class Transmitter
@@ -31,6 +34,11 @@ namespace signals
 		typedef transmitter_set::const_iterator	const_iterator;
 
 	public:
+		Receiver(void)
+		{
+			/* empty */
+		}
+
 		Receiver(const Receiver& hs)
 		{
 			synchronize(m_mutex);
@@ -85,52 +93,59 @@ namespace signals
 
 	private:
 		multithreading::Mutex	m_mutex;
-		transmitter_set				m_transmitters;
+		transmitter_set			m_transmitters;
 	};
 
-	class Transmitter0 : public Transmitter
+	class Transmitter0Generic 
+	: public Transmitter
 	{
-		class Connection0
+	protected:
+		class Connection0Generic
 		{
 		public:
-			virtual ~Connection0(void)=0 {}
-			virtual Connection0*	clone()=0;
-			virtual Connection0*	duplicate(Receiver* receiver)=0;
+			virtual ~Connection0Generic(void)=0 {}
+			virtual Connection0Generic*	clone()=0;
+			virtual Connection0Generic*	duplicate(Receiver* receiver)=0;
 			virtual Receiver*		getReceiver() const=0;
 			virtual void			send()=0;		
 		};
 
 		template<class RECEIVER>
-		class Connection0Base : public Connection0
+		class Connection0 : public Connection0Generic
 		{
 		public:
-			Connection0Base(void)
+			Connection0(void)
 			: m_receiver(NULL)
 			, m_function(NULL)
 			{
 				/* empty */
 			}
 
-			Connection0Base(RECEIVER* receiver, void (RECEIVER::*function)(void))
+			Connection0(RECEIVER* receiver, void (RECEIVER::* function)(void))
 			: m_receiver(receiver)
 			, m_function(function)
 			{
 				/* empty */
 			}
 
-			~Connection0Base(void)
+			~Connection0(void)
 			{
 				printf("Connection is getting deleted!");
 			}
 
-			virtual Connection0* clone(void)
+			virtual Connection0Generic* clone(void)
 			{
-				return new Connection0Base<RECEIVER>(*this);
+				return new Connection0<RECEIVER>(*this);
 			}
 
-			virtual Connection0* duplicate(Receiver* receiver)
+			virtual Connection0Generic* duplicate(Receiver* receiver)
 			{
-				return new Connection0Base<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+				return new Connection0<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+			}
+
+			virtual void(RECEIVER::* getFunction(void))(void)  const
+			{
+				return m_function;
 			}
 
 			virtual Receiver* getReceiver(void) const
@@ -148,11 +163,15 @@ namespace signals
 			void (RECEIVER::* m_function)(void);
 		};
 
-		typedef std::list<Connection0 *>  connections_list;
-
 	public:
-		Transmitter0(const Transmitter0& s)
-		: Transmitter(s)
+		typedef std::list<Connection0Generic *>  connections_list;
+
+		Transmitter0Generic(void)
+		{ 
+			/* empty */
+		}
+
+		Transmitter0Generic(const Transmitter0Generic& s)
 		{
 			synchronize(m_mutex);
 			connections_list::const_iterator iter = s.m_receivers.begin();
@@ -166,13 +185,57 @@ namespace signals
 			}
 		}
 
+		~Transmitter0Generic(void)
+		{
+			disconnectAll();
+		}
+			
+		void disconnect(void)
+		{
+			synchronize(m_mutex);
+			disconnectAll();
+			m_receivers.erase(m_receivers.begin(), m_receivers.end());
+		}
+	protected:
+		void disconnectAll(void)
+		{
+			synchronize(m_mutex);
+			connections_list::const_iterator iter = m_receivers.begin();
+			connections_list::const_iterator sentinel = m_receivers.end();
+
+			while (iter != sentinel)
+			{
+				Connection0Generic* connection = *iter;
+				++iter;
+				connection->getReceiver()->disconnect(this);
+				delete connection;
+			}
+		}
+
+	private:
+		connections_list		m_receivers;   
+		multithreading::Mutex	m_mutex;	
+	};
+
+	class Transmitter0 
+	: public Transmitter0Generic
+	{
+		
+
+	public:
+		Transmitter0(const Transmitter0& s)
+		: Transmitter(s)
+		{
+			
+		}
+
 		~Transmitter0(void)
 		{
 			disconnectAll();
 		}
 
 		template<class RECEIVER>
-		void connect(RECEIVER* object, void (RECEIVER::*function)())
+		void connect(RECEIVER* object, void (RECEIVER::* function)(void))
 		{
 			synchronize(m_mutex);
 			connections_list::iterator iter = m_receivers.begin();
@@ -180,7 +243,8 @@ namespace signals
 
 			while (iter != sentinel)
 			{
-				if ((*iter)->getReceiver() == object)
+				if ((*iter)->getReceiver() == object
+				&& (*iter)->getFunction() == function)
 				{
 					return;
 				}
@@ -188,15 +252,8 @@ namespace signals
 				++iter;
 			}
 
-			m_receivers.push_back(new Connection0Base<RECEIVER>(object, function));
+			m_receivers.push_back(new Connection0<RECEIVER>(object, function));
 			object->connect(this);
-		}
-
-		void disconnect(void)
-		{
-			synchronize(m_mutex);
-			disconnectAll()
-			m_receivers.erase(m_receivers.begin(), m_receivers.end());
 		}
 
 		template<class RECEIVER>
@@ -205,20 +262,23 @@ namespace signals
 			synchronize(m_mutex);
 			connections_list::iterator iter = m_receivers.begin();
 			connections_list::iterator sentinel = m_receivers.end();
+			bool connected(true);
 
 			while (iter != sentinel)
 			{
-				Connection0* connection = *iter;
-				
+				Connection0Generic* connection = *iter;
+				++iter;
+
 				if (connection->getReceiver() == object)
 				{
 					m_receivers.erase(iter);
-					object->disconnect(this);
-					delete connection;
-					return;
+					
+					if (connected)
+					{
+						connected = false;
+						object->disconnect(this);
+					}
 				}
-
-				++iter;
 			}
 		}
 
@@ -256,29 +316,10 @@ namespace signals
 		void operator()(void)
 		{
 			send();
-		}
-
-	protected:
-		void disconnectAll(void)
-		{
-			synchronize(m_mutex);
-			connections_list::const_iterator iter = m_receivers.begin();
-			connections_list::const_iterator sentinel = m_receivers.end();
-
-			while (iter != sentinel)
-			{
-				Connection0* connection = *iter;
-				++iter;
-				connection->getReceiver()->disconnect(this);
-				delete connection;
-			}
-		}
-
-	private:
-		connections_list		m_receivers;   
-		multithreading::Mutex	m_mutex;	
+		}	
 	};
-
 } // Signals
+
+#endif// 0
 
 #endif//SIGNALS_H

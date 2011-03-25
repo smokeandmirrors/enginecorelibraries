@@ -14,6 +14,7 @@
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
+#include "Signals.h"
 #include "Threads.h"
 #include "Time.h"
 #include "Vector.h"
@@ -574,21 +575,86 @@ void playNumericalFunctions(void)
 	*/
 }
 
-class WhatsUp
+template<typename OWNER>
+class Component
 {
 public:
-	void callOne(void) { printf("Whats UP one!"); }
-};
+	static uint4 
+		getComponentID(void); // return __COUNTER__; ???
 
-void callOnWhatsUp(WhatsUp* object, void (WhatsUp::*function)(void) = NULL)
+	Component<OWNER>*
+		addShared(void);
+
+	void 
+		attachTo(OWNER& owner);
+	
+	void 
+		detach(void);
+	
+	const OWNER* 
+		getOwner(void) const;
+
+private:
+	OWNER*	m_owner;
+}; // Component
+ 
+template<typename OWNER>
+class Composite // interface/base/member
 {
-	if (function)
-		(object->*function)();
-}
+public:
+	void add(Component<OWNER>* component);
+	void remove(Component<OWNER>* component);
+	
+	template<typename COMPONENT>
+	COMPONENT* get(bool construct=false)
+	{
+		uint4 id = COMPONENT::getComponentID();
+		// if (container[id]) =
+		return NULL;
+	}
+
+	template<typename COMPONENT>
+	bool hasA(void)
+	{
+		uint4 id = COMPONENT::getComponentID();
+		return false;
+	}
+
+}; // Composite
+
+
+
+//using namespace signals;
+//
+//class trns
+//{
+//public:
+//	Transmitter0<> onHello;
+//	
+//	void hello(void)
+//	{
+//		printf("trns says 'Hello'!\n");
+//	}
+//};
+//
+//class rcvr 
+//: public Receiver<>
+//{
+//public:
+//	void goodbye(void)
+//	{
+//		printf("rcvr says 'Goodbye'!\n");
+//	}
+//};
 
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
+	/*
+	trns helloer;
+	rcvr goodbye;
+
+	helloer.onHello.connect(&goodbye, &rcvr::goodbye);*/
 
 	compiler_checks::sizeOfChecks();
 	compiler_checks::execute();
@@ -596,10 +662,6 @@ void sandbox::play()
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
 	
-	WhatsUp wtf;
-	callOnWhatsUp(&wtf);
-	callOnWhatsUp(&wtf, &WhatsUp::callOne);
-
 	uint4 i = 32;
 	do 
 	{
