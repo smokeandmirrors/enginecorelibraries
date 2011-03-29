@@ -391,7 +391,7 @@ void physicsComplete(void)
 	if (physicsCompletions == 4)
 	{
 		physics.testMarkFunctionComplete();
-		physicsCompletions = 0;
+		physicsCompletions=0;
 	}
 }
 
@@ -410,12 +410,12 @@ public:
 		sint4* numbers = new sint4[number_size];
 		sint4* i = numbers;
 
-		for (number = 0; number < number_size; number++)
+		for (number=0; number < number_size; number++)
 		{
 			*i++ = number;
 		}
 
-		for (number = 0; number < number_sort; number++)
+		for (number=0; number < number_sort; number++)
 		{
 			qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
 			qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
@@ -433,7 +433,7 @@ public:
 HANDLE mutex;
 
 multithreading::Mutex m_mutex;
-sint4 numberOfThreads = 0;
+sint4 numberOfThreads=0;
 
 DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
 	synchronize(m_mutex);
@@ -450,12 +450,12 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 	sint4* numbers = new sint4[number_size];
 	sint4* i = numbers;
 	
-	for (number = 0; number < number_size; number++)
+	for (number=0; number < number_size; number++)
 	{
 		*i++ = number;
 	}
 
-	for (number = 0; number < number_sort; number++)
+	for (number=0; number < number_sort; number++)
 	{
 		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
@@ -473,12 +473,12 @@ DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
 //	sint4* numbers = new sint4[number_size];
 //	sint4* i = numbers;
 //	
-//	for (number = 0; number < number_size; number++)
+//	for (number=0; number < number_size; number++)
 //	{
 //		*i++ = number;
 //	}
 //
-//	for (number = 0; number < number_sort; number++)
+//	for (number=0; number < number_sort; number++)
 //	{
 //		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
 //		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
@@ -496,7 +496,7 @@ void threadsChecking()
 	std::vector<HANDLE> threads;
 	const uint4 num_threads = 8;
 	
-	for (uint4 i = 0; i < num_threads; i++)
+	for (uint4 i=0; i < num_threads; i++)
 	{
 		uint4 thread_id1;
 		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, useMutexClass, NULL, CREATE_SUSPENDED, &thread_id1));
@@ -504,14 +504,14 @@ void threadsChecking()
 		threads.push_back(thread);
 	}
 
-	for (uint4 i = 0; i < num_threads; i++)
+	for (uint4 i=0; i < num_threads; i++)
 	{
 		ResumeThread(threads[i]);
 	}
 	
 	multithreading::sleep(3000);
 
-	for (uint4 i = 0; i < num_threads; i++)
+	for (uint4 i=0; i < num_threads; i++)
 	{
 		CloseHandle(threads[i]);
 	}
@@ -525,12 +525,12 @@ void firstJob(void)
 	sint4* numbers = new sint4[number_size];
 	sint4* i = numbers;
 
-	for (number = 0; number < number_size; number++)
+	for (number=0; number < number_size; number++)
 	{
 		*i++ = number;
 	}
 
-	for (number = 0; number < number_sort; number++)
+	for (number=0; number < number_sort; number++)
 	{
 		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
@@ -624,40 +624,82 @@ public:
 
 
 
-//using namespace signals;
-//
-//class trns
-//{
-//public:
-//	Transmitter0<> onHello;
-//	
-//	void hello(void)
-//	{
-//		printf("trns says 'Hello'!\n");
-//	}
-//};
-//
-//class rcvr 
-//: public Receiver<>
-//{
-//public:
-//	void goodbye(void)
-//	{
-//		printf("rcvr says 'Goodbye'!\n");
-//	}
-//};
+using namespace signals;
+
+class Switch
+{
+public:
+	// Transmitter0		delegate0;
+	Transmitter0 delegate0;
+	void run(void)
+	{
+		delegate0();
+	}
+};
+
+class Light : public ReceiverBase
+{
+public:
+	void turnOff(void)			{ printf("Turned Off!"); }
+	void setWatts(sint4 watts)	{ printf("Set watts to %d", watts); }
+};
+
+class Microwave : public Receiver
+{
+public:
+	void turnOff(void) const	{ printf("Microwave turned Off!"); }
+	void setWatts(sint4 watts)	{ printf("Microwave set watts to %d", watts); }
+	void disconnect(void)
+	{
+		m_receiver.disconnect();
+	}
+
+	void onConnect(Transmitter* sender)
+	{
+		m_receiver.onConnect(sender);
+	}
+
+	void onDisconnect(Transmitter* sender)
+	{
+		m_receiver.onDisconnect(sender);
+	}
+protected:
+
+private:
+	signals::ReceiverMember m_receiver;
+};
 
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
-	/*
-	trns helloer;
-	rcvr goodbye;
+	Switch switch1;
+	Microwave microwave;
+	Light light;
 
-	helloer.onHello.connect(&goodbye, &rcvr::goodbye);*/
+	Microwave* delete_microwave = new Microwave();;
+	Light* delete_light = new Light();
 
-	compiler_checks::sizeOfChecks();
-	compiler_checks::execute();
+	
+	switch1.delegate0.connect(&light, &Light::turnOff);
+	switch1.delegate0.connect(delete_light, &Light::turnOff);
+	// switch1.delegate1.connect(&light, &Light::setWatts);
+	switch1.delegate0.connect(&microwave, &Microwave::turnOff);
+	switch1.delegate0.connect(delete_microwave, &Microwave::turnOff);
+	// switch1.delegate1.connect(&microwave, &Microwave::setWatts);
+
+	switch1.run();
+	delete delete_microwave;
+	delete delete_light;
+
+	Switch* delete_switch = new Switch();
+	delete_switch->delegate0.connect(&light, &Light::turnOff);
+	delete_switch->delegate0.connect(&microwave, &Microwave::turnOff);
+	delete_switch->run();
+	delete delete_switch;
+	
+
+	// compiler_checks::sizeOfChecks();
+	// compiler_checks::execute();
 	// threadsChecking();	
 	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
 	// scheduler.enqueue(firstJob);
@@ -730,5 +772,4 @@ void sandbox::play()
 
 	return;
 }
-
 
