@@ -8,11 +8,6 @@
 #include "Synchronization.h"
 #include "TemplateArguments.h"
 
-/**
-\todo fix the memory leak of the connection objects
-\warning THERE IS A MEMORY LEAK HERE
-*/
-
 namespace signals
 {
 class Receiver;
@@ -29,13 +24,22 @@ protected:
 	virtual void replicate(const Receiver* receiver, Receiver* new_receiver)=0;
 };
 
+#define DECLARE_TRANSMITTER_FRIEND(NUM_ARGS) \
+	template < CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > friend class Transmitter##NUM_ARGS;
+
+#define DECLARE_TRANSMITTER_FRIENDS \
+	DECLARE_TRANSMITTER_FRIEND(1) \
+	DECLARE_TRANSMITTER_FRIEND(2) \
+	DECLARE_TRANSMITTER_FRIEND(3) \
+	DECLARE_TRANSMITTER_FRIEND(4) \
+	DECLARE_TRANSMITTER_FRIEND(5) \
+
 class Receiver
 {
 public:
 	friend class Transmitter;
-	friend class TransmitterGeneric;
 	friend class Transmitter0;
-	friend class Transmitter1;
+	DECLARE_TRANSMITTER_FRIENDS 
 
 	virtual ~Receiver(void)=0 {}
 	virtual void disconnect(void)=0;
@@ -52,9 +56,8 @@ class ReceiverBase
 : public Receiver
 {
 	friend class Transmitter;
-	friend class TransmitterGeneric;
 	friend class Transmitter0;
-	friend class Transmitter1;
+	DECLARE_TRANSMITTER_FRIENDS 
 
 public:
 	ReceiverBase(void)
@@ -121,10 +124,11 @@ private:
 
 
 class ReceiverMember
-	: public Receiver
+: public Receiver
 {
 	friend class Transmitter;
 	friend class Transmitter0;
+	template<typename ARG_1> friend class Transmitter1;
 
 public:
 	ReceiverMember(void)
@@ -197,320 +201,44 @@ private:
 	sender_set				m_senders;
 };
 
-class TransmitterGeneric : public Transmitter
+class Transmitter0 
+: public Transmitter
 {
 private:
-	class ConnectionGeneric
+	class Connection
 	{
 	public:
-		virtual ~ConnectionGeneric(void)=0 {};
-		virtual ConnectionGeneric*	clone(void)=0;
-		virtual ConnectionGeneric*	duplicate(Receiver* receiver)=0;
-		virtual Receiver*		getReceiver(void) const=0;
-		virtual void			send(void)=0;
+		virtual ~Connection(void)=0 {};
+		virtual Connection*	clone(void)=0;
+		virtual Connection*	duplicate(Receiver* receiver)=0;
+		virtual Receiver*	getReceiver(void) const=0;
+		virtual void		send(void) const=0;
 	};
-
+	
 	template<class RECEIVER>
-	class volatileGeneric : public ConnectionGeneric
-	{
-	public:
-		volatileGeneric(void)
-		: m_object(NULL)
-		, m_function(NULL)
-		{
-			/* empty */
-		}
-
-		volatileGeneric(RECEIVER* object, void (RECEIVER::* function)(void))
-		: m_object(object)
-		, m_function(function)
-		{
-			/* empty */
-		}
-
-		virtual ConnectionGeneric* clone(void)
-		{
-			return new volatileGeneric<RECEIVER>(*this);
-		}
-
-		virtual ConnectionGeneric* duplicate(Receiver* receiver)
-		{
-			return new volatileGeneric<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
-		}
-
-		virtual Receiver* getReceiver(void) const
-		{
-			return m_object;
-		}
-
-		virtual void send(void)
-		{
-			(m_object->*m_function)();
-		}
-
-	private:
-		RECEIVER*			m_object;
-		void (RECEIVER::*	m_function)(void);
-	};
-
-	template<class RECEIVER>
-	class constGeneric : public ConnectionGeneric
-	{
-	public:
-		constGeneric(void)
-		: m_object(NULL)
-		, m_function(NULL)
-		{
-			/* empty */
-		}
-
-		constGeneric(RECEIVER* object, void (RECEIVER::* function)(void) const)
-		: m_object(object)
-		, m_function(function)
-		{
-			/* empty */
-		}
-
-		virtual ConnectionGeneric* clone(void)
-		{
-			return new constGeneric<RECEIVER>(*this);
-		}
-
-		virtual ConnectionGeneric* duplicate(Receiver* receiver)
-		{
-			return new constGeneric<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
-		}
-
-		virtual Receiver* getReceiver(void) const
-		{
-			return m_object;
-		}
-
-		virtual void send(void)
-		{
-			(m_object->*m_function)();
-		}
-
-	private:
-		RECEIVER*			m_object;
-		void (RECEIVER::*	m_function)(void) const;
-	};
-
-public:
-	typedef std::list<ConnectionGeneric *>  connections_list;
-
-	TransmitterGeneric(void)
-	{
-		/* empty */
-	}
-
-	TransmitterGeneric(const TransmitterGeneric& s)
-	: Transmitter(s)
-	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = s.m_receivers.begin();
-		connections_list::const_iterator sentinel = s.m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->getReceiver()->onConnect(this);
-			m_receivers.push_back((*iter)->clone());
-
-			++iter;
-		}
-	}
-
-	~TransmitterGeneric(void)
-	{
-		disconnectAll();
-	}
-
-	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void))
-	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = m_receivers.begin();
-		connections_list::const_iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
-			{
-				return;
-			}
-
-			++iter;
-		}
-
-		m_receivers.push_back(new volatileGeneric<RECEIVER>(receiver, function));
-		receiver->onConnect(this);
-	}
-
-	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void) const)
-	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = m_receivers.begin();
-		connections_list::const_iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
-			{
-				return;
-			}
-
-			++iter;
-		}
-
-		m_receivers.push_back(new constGeneric<RECEIVER>(receiver, function));
-		receiver->onConnect(this);
-	}
-
-	void disconnect(void)
-	{
-		synchronize(m_mutex);
-		disconnectAll();
-		m_receivers.erase(m_receivers.begin(), m_receivers.end());
-	}
-
-	void disconnect(Receiver* receiver)
-	{
-		synchronize(m_mutex);
-		connections_list::iterator iter = m_receivers.begin();
-		connections_list::iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			ConnectionGeneric* connection = *iter;
-
-			if (connection->getReceiver() == receiver)
-			{
-				receiver->onDisconnect(this);
-				delete connection;
-				m_receivers.erase(iter);
-				return;
-			}
-
-			++iter;
-		}
-	}
-
-	void replicate(const Receiver* receiver, Receiver* new_receiver)
-	{
-		synchronize(m_mutex);
-		connections_list::iterator iter = m_receivers.begin();
-		connections_list::iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			if ((*iter)->getReceiver() == receiver)
-			{
-				m_receivers.push_back((*iter)->duplicate(new_receiver));
-				return;
-			}
-
-			++iter;
-		}
-	}
-
-	void send(void)
-	{
-		synchronize(m_mutex);
-		connections_list copy(m_receivers);
-		connections_list::const_iterator iter = copy.begin();
-		connections_list::const_iterator sentinel = copy.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->send();
-			++iter;
-		}
-	}
-
-	void operator()(void)
-	{
-		send();
-	}
-
-protected:
-	void disconnectAll(void)
-	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = m_receivers.begin();
-		connections_list::const_iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->getReceiver()->onDisconnect(this);
-			delete *iter;
-			++iter;
-		}
-	}
-
-	void onDisconnect(Receiver* receiver)
-	{
-		synchronize(m_mutex);
-		connections_list::iterator iter = m_receivers.begin();
-		connections_list::iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			ConnectionGeneric* connection = *iter;
-
-			if (connection->getReceiver() == receiver)
-			{
-				delete connection;
-				m_receivers.erase(iter);
-				return;
-			}
-
-			++iter;
-		}
-	}
-
-private:
-	connections_list		m_receivers;   
-	multithreading::Mutex	m_mutex;
-};
-
-class Transmitter0 : public Transmitter
-{
-private:
-	class Connection0
-	{
-	public:
-		virtual ~Connection0(void)=0 {};
-		virtual Connection0*	clone(void)=0;
-		virtual Connection0*	duplicate(Receiver* receiver)=0;
-		virtual Receiver*		getReceiver(void) const=0;
-		virtual void			send(void)=0;
-	};
-
-	template<class RECEIVER>
-	class volatile0 : public Connection0
+	class volatile0 : public Connection
 	{
 	public:
 		volatile0(void)
-			: m_object(NULL)
-			, m_function(NULL)
+		: m_object(NULL)
+		, m_function(NULL)
 		{
 			/* empty */
 		}
 
 		volatile0(RECEIVER* object, void (RECEIVER::* function)(void))
-			: m_object(object)
-			, m_function(function)
+		: m_object(object)
+		, m_function(function)
 		{
 			/* empty */
 		}
 
-		virtual Connection0* clone(void)
+		virtual Connection* clone(void)
 		{
 			return new volatile0<RECEIVER>(*this);
 		}
 
-		virtual Connection0* duplicate(Receiver* receiver)
+		virtual Connection* duplicate(Receiver* receiver)
 		{
 			return new volatile0<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
@@ -520,7 +248,7 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void)
+		virtual void send(void) const
 		{
 			(m_object->*m_function)();
 		}
@@ -531,29 +259,29 @@ private:
 	};
 
 	template<class RECEIVER>
-	class const0 : public Connection0
+	class const0 : public Connection
 	{
 	public:
 		const0(void)
-			: m_object(NULL)
-			, m_function(NULL)
+		: m_object(NULL)
+		, m_function(NULL)
 		{
 			/* empty */
 		}
 
 		const0(RECEIVER* object, void (RECEIVER::* function)(void) const)
-			: m_object(object)
-			, m_function(function)
+		: m_object(object)
+		, m_function(function)
 		{
 			/* empty */
 		}
 
-		virtual Connection0* clone(void)
+		virtual Connection* clone(void)
 		{
 			return new const0<RECEIVER>(*this);
 		}
 
-		virtual Connection0* duplicate(Receiver* receiver)
+		virtual Connection* duplicate(Receiver* receiver)
 		{
 			return new const0<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
@@ -563,7 +291,7 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void)
+		virtual void send(void) const
 		{
 			(m_object->*m_function)();
 		}
@@ -574,7 +302,7 @@ private:
 	};
 
 public:
-	typedef std::list<Connection0 *>  connections_list;
+	typedef std::list<Connection *>  connections_list;
 
 	Transmitter0(void)
 	{
@@ -582,7 +310,7 @@ public:
 	}
 
 	Transmitter0(const Transmitter0& s)
-		: Transmitter(s)
+	: Transmitter(s)
 	{
 		synchronize(m_mutex);
 		connections_list::const_iterator iter = s.m_receivers.begin();
@@ -659,7 +387,7 @@ public:
 
 		while (iter != sentinel)
 		{
-			Connection0* connection = *iter;
+			Connection* connection = *iter;
 
 			if (connection->getReceiver() == receiver)
 			{
@@ -691,7 +419,7 @@ public:
 		}
 	}
 
-	void send(void)
+	void send(void) const
 	{
 		synchronize(m_mutex);
 		connections_list copy(m_receivers);
@@ -705,7 +433,7 @@ public:
 		}
 	}
 
-	void operator()(void)
+	inline void operator()(void) const
 	{
 		send();
 	}
@@ -733,7 +461,7 @@ protected:
 
 		while (iter != sentinel)
 		{
-			Connection0* connection = *iter;
+			Connection* connection = *iter;
 
 			if (connection->getReceiver() == receiver)
 			{
@@ -747,49 +475,50 @@ protected:
 	}
 
 private:
-	connections_list		m_receivers;   
-	multithreading::Mutex	m_mutex;
+	connections_list				m_receivers;   
+	mutable multithreading::Mutex	m_mutex;
 };
 
-class Transmitter1 : public Transmitter
+/*
+template<typename ARG_1>
+class Transmitter1 
+: public Transmitter
 {
 private:
-	class Connection1
+	template<typename ARG_1>
+	class Connection
 	{
 	public:
-		virtual ~Connection1(void)=0 {};
-		virtual Connection1*	clone(void)=0;
-		virtual Connection1*	duplicate(Receiver* receiver)=0;
-		virtual Receiver*		getReceiver(void) const=0;
-		virtual void			send(void)=0;
-	};
-
-	template<class RECEIVER>
-	class volatile1 : public Connection1
+		virtual ~Connection(void)=0 {};
+		virtual Connection<ARG_1>*	clone(void)=0;
+		virtual Connection<ARG_1>*	duplicate(Receiver* receiver)=0;
+		virtual Receiver*			getReceiver(void) const=0;
+		virtual void				send(ARG_1) const=0;
+	};	
+	
+	template<class RECEIVER, typename ARG_1>
+	class volatile1 
+	: public Connection<ARG_1>
 	{
 	public:
 		volatile1(void)
-			: m_object(NULL)
-			, m_function(NULL)
+		: m_object(NULL)
+		, m_function(NULL)
+		{}
+
+		volatile1(RECEIVER* object, void (RECEIVER::* function)(ARG_1))
+		: m_object(object)
+		, m_function(function)
+		{}
+
+		virtual Connection* clone(void)
 		{
-			/* empty */
+			return new volatile1<RECEIVER, ARG_1>(*this);
 		}
 
-		volatile1(RECEIVER* object, void (RECEIVER::* function)(void))
-			: m_object(object)
-			, m_function(function)
+		virtual Connection* duplicate(Receiver* receiver)
 		{
-			/* empty */
-		}
-
-		virtual Connection1* clone(void)
-		{
-			return new volatile1<RECEIVER>(*this);
-		}
-
-		virtual Connection1* duplicate(Receiver* receiver)
-		{
-			return new volatile1<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+			return new volatile1<RECEIVER, ARG_1>(static_cast<RECEIVER*>(receiver), m_function);
 		}
 
 		virtual Receiver* getReceiver(void) const
@@ -797,42 +526,39 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void)
+		virtual void send(ARG_1 arg1) const
 		{
-			(m_object->*m_function)();
+			(m_object->*m_function)(arg1);
 		}
 
 	private:
 		RECEIVER*			m_object;
-		void (RECEIVER::*	m_function)(void);
+		void (RECEIVER::*	m_function)(ARG_1);
 	};
 
-	template<class RECEIVER>
-	class const1 : public Connection1
+	template<class RECEIVER, typename ARG_1>
+	class const1 
+	: public Connection<ARG_1>
 	{
 	public:
 		const1(void)
-			: m_object(NULL)
-			, m_function(NULL)
+		: m_object(NULL)
+		, m_function(NULL)
+		{}
+
+		const1(RECEIVER* object, void (RECEIVER::* function)(ARG_1) const)
+		: m_object(object)
+		, m_function(function)
+		{}
+
+		virtual Connection* clone(void)
 		{
-			/* empty */
+			return new volatile1<RECEIVER, ARG_1>(*this);
 		}
 
-		const1(RECEIVER* object, void (RECEIVER::* function)(void) const)
-			: m_object(object)
-			, m_function(function)
+		virtual Connection* duplicate(Receiver* receiver)
 		{
-			/* empty */
-		}
-
-		virtual Connection1* clone(void)
-		{
-			return new const1<RECEIVER>(*this);
-		}
-
-		virtual Connection1* duplicate(Receiver* receiver)
-		{
-			return new const1<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+			return new volatile1<RECEIVER, ARG_1>(static_cast<RECEIVER*>(receiver), m_function);
 		}
 
 		virtual Receiver* getReceiver(void) const
@@ -840,26 +566,24 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void)
+		virtual void send(ARG_1 arg1) const
 		{
-			(m_object->*m_function)();
+			(m_object->*m_function)(arg1);
 		}
 
 	private:
 		RECEIVER*			m_object;
-		void (RECEIVER::*	m_function)(void) const;
+		void (RECEIVER::*	m_function)(ARG_1) const;
 	};
 
 public:
-	typedef std::list<Connection1 *>  connections_list;
+	typedef std::list<Connection<ARG_1> *>  connections_list;
 
 	Transmitter1(void)
-	{
-		/* empty */
-	}
+	{}
 
 	Transmitter1(const Transmitter1& s)
-		: Transmitter(s)
+	: Transmitter(s)
 	{
 		synchronize(m_mutex);
 		connections_list::const_iterator iter = s.m_receivers.begin();
@@ -880,7 +604,7 @@ public:
 	}
 
 	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void))
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1))
 	{
 		synchronize(m_mutex);
 		connections_list::const_iterator iter = m_receivers.begin();
@@ -896,12 +620,12 @@ public:
 			++iter;
 		}
 
-		m_receivers.push_back(new volatile1<RECEIVER>(receiver, function));
+		m_receivers.push_back(new volatile1<RECEIVER, ARG_1>(receiver, function));
 		receiver->onConnect(this);
 	}
 
 	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void) const)
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1) const)
 	{
 		synchronize(m_mutex);
 		connections_list::const_iterator iter = m_receivers.begin();
@@ -917,7 +641,7 @@ public:
 			++iter;
 		}
 
-		m_receivers.push_back(new const1<RECEIVER>(receiver, function));
+		m_receivers.push_back(new const1<RECEIVER, ARG_1>(receiver, function));
 		receiver->onConnect(this);
 	}
 
@@ -936,7 +660,7 @@ public:
 
 		while (iter != sentinel)
 		{
-			Connection1* connection = *iter;
+			Connection<ARG_1>* connection = *iter;
 
 			if (connection->getReceiver() == receiver)
 			{
@@ -968,7 +692,7 @@ public:
 		}
 	}
 
-	void send(void)
+	void send(ARG_1 arg1) const
 	{
 		synchronize(m_mutex);
 		connections_list copy(m_receivers);
@@ -977,14 +701,14 @@ public:
 
 		while (iter != sentinel)
 		{
-			(*iter)->send();
+			(*iter)->send(arg1);
 			++iter;
 		}
 	}
 
-	void operator()(void)
+	inline void operator()(ARG_1 arg1) const
 	{
-		send();
+		send(arg1);
 	}
 
 protected:
@@ -1010,7 +734,7 @@ protected:
 
 		while (iter != sentinel)
 		{
-			Connection1* connection = *iter;
+			Connection<ARG_1>* connection = *iter;
 
 			if (connection->getReceiver() == receiver)
 			{
@@ -1024,9 +748,243 @@ protected:
 	}
 
 private:
-	connections_list		m_receivers;   
-	multithreading::Mutex	m_mutex;
+	connections_list				m_receivers;   
+	mutable multithreading::Mutex	m_mutex;
 };
+*/
+
+#define SIGNALS_DECLARE_TRANSMITTER(NUM_ARGS) \
+	template < CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > \
+	class Transmitter##NUM_ARGS : public Transmitter \
+	{ \
+	private: \
+		template< CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > \
+		class Connection \
+		{ \
+		public: \
+			virtual ~Connection(void)=0 {}; \
+			virtual Connection < CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS >* clone(void)=0; \
+			virtual Connection< CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS >* duplicate(Receiver* receiver)=0; \
+			virtual Receiver* getReceiver(void) const=0; \
+			virtual void send( CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS ) const=0; \
+		}; \
+		template< class RECEIVER, CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > \
+		class volatile##NUM_ARGS \
+		: public Connection< CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS > \
+		{ \
+		public: \
+			volatile##NUM_ARGS(void) \
+			: m_object(NULL) \
+			, m_function(NULL) \
+			{} \
+			volatile##NUM_ARGS(RECEIVER* object, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS)) \
+			: m_object(object) \
+			, m_function(function) \
+			{} \
+			virtual Connection* clone(void) \
+			{ \
+				return new volatile##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(*this); \
+			} \
+			virtual Connection* duplicate(Receiver* receiver) \
+			{ \
+				return new volatile##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(static_cast<RECEIVER*>(receiver), m_function); \
+			} \
+			virtual Receiver* getReceiver(void) const \
+			{ \
+				return m_object; \
+			} \
+			virtual void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+			{ \
+				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+			} \
+		private: \
+			RECEIVER*			m_object; \
+			void (RECEIVER::*	m_function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS); \
+		}; \
+		template<class RECEIVER, CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS> \
+		class const##NUM_ARGS \
+		: public Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS> \
+		{ \
+		public: \
+			const##NUM_ARGS(void) \
+			: m_object(NULL) \
+			, m_function(NULL) \
+			{} \
+			const##NUM_ARGS(RECEIVER* object, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS) const) \
+			: m_object(object) \
+			, m_function(function) \
+			{} \
+			virtual Connection* clone(void) \
+			{ \
+				return new const##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(*this); \
+			} \
+			virtual Connection* duplicate(Receiver* receiver) \
+			{ \
+				return new const##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(static_cast<RECEIVER*>(receiver), m_function); \
+			} \
+			virtual Receiver* getReceiver(void) const \
+			{ \
+				return m_object; \
+			} \
+			virtual void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+			{ \
+				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+			} \
+		private: \
+			RECEIVER*			m_object; \
+			void (RECEIVER::*	m_function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS) const; \
+		}; \
+	public: \
+		typedef std::list<Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS> *> connections_list; \
+		Transmitter##NUM_ARGS(void) \
+		{} \
+		Transmitter##NUM_ARGS(const Transmitter##NUM_ARGS& s) \
+		: Transmitter(s) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::const_iterator iter = s.m_receivers.begin(); \
+			connections_list::const_iterator sentinel = s.m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				(*iter)->getReceiver()->onConnect(this); \
+				m_receivers.push_back((*iter)->clone()); \
+				++iter; \
+			} \
+		} \
+		~Transmitter##NUM_ARGS(void) \
+		{ \
+			disconnectAll(); \
+		} \
+		template<class RECEIVER> \
+		void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS)) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::const_iterator iter = m_receivers.begin(); \
+			connections_list::const_iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+				{ \
+					return; \
+				} \
+				++iter; \
+			} \
+			m_receivers.push_back(new volatile##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
+			receiver->onConnect(this); \
+		} \
+		template<class RECEIVER> \
+		void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS) const) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::const_iterator iter = m_receivers.begin(); \
+			connections_list::const_iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+				{ \
+					return; \
+				} \
+				++iter; \
+			} \
+			m_receivers.push_back(new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
+			receiver->onConnect(this); \
+		} \
+		void disconnect(void) \
+		{ \
+			synchronize(m_mutex); \
+			disconnectAll(); \
+			m_receivers.erase(m_receivers.begin(), m_receivers.end()); \
+		} \
+		void disconnect(Receiver* receiver) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::iterator iter = m_receivers.begin(); \
+			connections_list::iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>* connection = *iter; \
+				if (connection->getReceiver() == receiver) \
+				{ \
+					receiver->onDisconnect(this); \
+					delete connection; \
+					m_receivers.erase(iter); \
+					return; \
+				} \
+				++iter; \
+			} \
+		} \
+		void replicate(const Receiver* receiver, Receiver* new_receiver) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::iterator iter = m_receivers.begin(); \
+			connections_list::iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				if ((*iter)->getReceiver() == receiver) \
+				{ \
+					m_receivers.push_back((*iter)->duplicate(new_receiver)); \
+					return; \
+				} \
+				++iter; \
+			} \
+		} \
+		void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		{ \
+			synchronize(m_mutex); \
+			connections_list copy(m_receivers); \
+			connections_list::const_iterator iter = copy.begin(); \
+			connections_list::const_iterator sentinel = copy.end(); \
+			while (iter != sentinel) \
+			{ \
+				(*iter)->send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+				++iter; \
+			} \
+		} \
+		inline void operator()(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		{ \
+			send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+		} \
+	protected: \
+		void disconnectAll(void) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::const_iterator iter = m_receivers.begin(); \
+			connections_list::const_iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				(*iter)->getReceiver()->onDisconnect(this); \
+				delete *iter; \
+				++iter; \
+			} \
+		} \
+		void onDisconnect(Receiver* receiver) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::iterator iter = m_receivers.begin(); \
+			connections_list::iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>* connection = *iter; \
+				if (connection->getReceiver() == receiver) \
+				{ \
+					delete connection; \
+					m_receivers.erase(iter); \
+					return; \
+				} \
+				++iter; \
+			} \
+		} \
+	private: \
+		connections_list				m_receivers; \
+		mutable multithreading::Mutex	m_mutex; \
+	};
+
+SIGNALS_DECLARE_TRANSMITTER(1);
+SIGNALS_DECLARE_TRANSMITTER(2);
+SIGNALS_DECLARE_TRANSMITTER(3);
+SIGNALS_DECLARE_TRANSMITTER(4);
+SIGNALS_DECLARE_TRANSMITTER(5);
 
 }
+
 #endif//SIGNALS_H

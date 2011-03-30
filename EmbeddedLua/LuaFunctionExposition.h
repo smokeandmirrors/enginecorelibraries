@@ -247,21 +247,21 @@ namespace lua_extension
 // define a static function with the specified number of arguments
 #define EFL_GENERATE_STATIC_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_STATIC_TEMPLATE_ARGS \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
 	EFL_END_STATIC_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_STATIC(num_rets, num_args)
 
 // define a class member function with the specified number of arguments
 #define EFL_GENERATE_CLASS_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
 	EFL_END_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CLASS(num_rets, num_args)
 
 // define a class const member function with the specified number of arguments
 #define EFL_GENERATE_CLASS_CONST_TEMPLATE(num_rets, num_args) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args \
+	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
 	EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
 	EFL_CONST_CLASS(num_rets, num_args)
 

@@ -18,46 +18,46 @@ Macros to help assist auto-writing template functions/classes.
 
 /** template arguments */
 // fill in the template arguments in the declaration
-#define CW_TEMPLATE_ARGS_RETS_0_ARGS_1 typename ARG_1,
-#define CW_TEMPLATE_ARGS_RETS_0_ARGS_2 typename ARG_1, typename ARG_2, 
-#define CW_TEMPLATE_ARGS_RETS_0_ARGS_3 typename ARG_1, typename ARG_2, typename ARG_3,
-#define CW_TEMPLATE_ARGS_RETS_0_ARGS_4 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_0_ARGS_5 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_0_ARGS_1 typename ARG_1
+#define CW_TEMPLATE_ARGS_RETS_0_ARGS_2 typename ARG_1, typename ARG_2 
+#define CW_TEMPLATE_ARGS_RETS_0_ARGS_3 typename ARG_1, typename ARG_2, typename ARG_3
+#define CW_TEMPLATE_ARGS_RETS_0_ARGS_4 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_0_ARGS_5 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_0 typename RET_1, 
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_1 typename RET_1, typename ARG_1, 
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_2 typename RET_1, typename ARG_1, typename ARG_2,
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_3 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_4 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_1_ARGS_5 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_0 typename RET_1 
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_1 typename RET_1, typename ARG_1
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_2 typename RET_1, typename ARG_1, typename ARG_2
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_3 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_4 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_1_ARGS_5 typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_0 typename RET_1, typename RET_2, 
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_1 typename RET_1, typename RET_2, typename ARG_1, 
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_2 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2,
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_3 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_4 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_2_ARGS_5 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_0 typename RET_1, typename RET_2
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_1 typename RET_1, typename RET_2, typename ARG_1
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_2 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_3 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3 
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_4 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_2_ARGS_5 typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_0 typename RET_1, typename RET_2, typename RET_3, 
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, 
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2,
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_3_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_0 typename RET_1, typename RET_2, typename RET_3
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename ARG_1 
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_3_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4,
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, 
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2,
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_4_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_4_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5,
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, 
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2,
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, 
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4,
-#define CW_TEMPLATE_ARGS_RETS_5_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5,
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_0 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_1 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1 
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_2 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_3 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3 
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_4 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4
+#define CW_TEMPLATE_ARGS_RETS_5_ARGS_5 typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5
 
 // fill in the template arguments in the template function 
 #define CW_TEMPLATE_RETURN_SIGNATURE_RETS_0 void
@@ -108,7 +108,15 @@ Macros to help assist auto-writing template functions/classes.
 #define CW_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_4 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4
 #define CW_TEMPLATE_ARGS_SIGNATURE_RETS_5_ARGS_5 RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5
 
-/** funciton implementation */
+/** function implementation */
+// declare the function signature
+#define CW_DECLARE_FUNCTION_ARGS_0 
+#define CW_DECLARE_FUNCTION_ARGS_1 ARG_1 arg1
+#define CW_DECLARE_FUNCTION_ARGS_2 ARG_1 arg1, ARG_2 arg2
+#define CW_DECLARE_FUNCTION_ARGS_3 ARG_1 arg1, ARG_2 arg2, ARG_3 arg3
+#define CW_DECLARE_FUNCTION_ARGS_4 ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4
+#define CW_DECLARE_FUNCTION_ARGS_5 ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5
+
 // declare the return values that get passed by reference into the function
 #define CW_DECLARE_RETS_0 ;
 #define CW_DECLARE_RETS_1 ;	

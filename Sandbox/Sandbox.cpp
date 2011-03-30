@@ -629,26 +629,47 @@ using namespace signals;
 class Switch
 {
 public:
-	// Transmitter0		delegate0;
-	Transmitter0 delegate0;
+	Transmitter0				delegate0;
+	Transmitter1<sint4>			delegate1;
+	Transmitter2<sint4, real4>	delegate2;
+	
 	void run(void)
 	{
 		delegate0();
 	}
+
+	void run(sint4 how_much)
+	{
+		delegate1(how_much);
+	}
+
+	void run(sint4 how_many_ints, real4 how_many_floats)
+	{
+		delegate2(how_many_ints, how_many_floats);
+	}	
 };
 
 class Light : public ReceiverBase
 {
 public:
-	void turnOff(void)			{ printf("Turned Off!"); }
-	void setWatts(sint4 watts)	{ printf("Set watts to %d", watts); }
+	void turnOff(void)			{ printf("Turned Off!\n"); }
+	void setWatts(sint4 watts)	{ printf("Set watts to %d\n", watts); }
+	void calibrate(sint4 watts, real4 luminosity) 
+	{
+		printf("Set watts to %d and luminosity to %f\n", watts, luminosity);
+	}
 };
 
 class Microwave : public Receiver
 {
 public:
-	void turnOff(void) const	{ printf("Microwave turned Off!"); }
-	void setWatts(sint4 watts)	{ printf("Microwave set watts to %d", watts); }
+	void turnOff(void) const	{ printf("Microwave turned Off!\n"); }
+	void setWatts(sint4 watts)	{ printf("Microwave set watts to %d\n", watts); }
+	void calibrate(sint4 watts, real4 luminosity) 
+	{
+		printf("Microwave Set watts to %d and luminosity to %f\n", watts, luminosity);
+	}
+
 	void disconnect(void)
 	{
 		m_receiver.disconnect();
@@ -682,12 +703,15 @@ void sandbox::play()
 	
 	switch1.delegate0.connect(&light, &Light::turnOff);
 	switch1.delegate0.connect(delete_light, &Light::turnOff);
-	// switch1.delegate1.connect(&light, &Light::setWatts);
+	switch1.delegate1.connect(&light, &Light::setWatts);
+	switch1.delegate2.connect(&light, &Light::calibrate);
 	switch1.delegate0.connect(&microwave, &Microwave::turnOff);
 	switch1.delegate0.connect(delete_microwave, &Microwave::turnOff);
-	// switch1.delegate1.connect(&microwave, &Microwave::setWatts);
-
+	switch1.delegate1.connect(&microwave, &Microwave::setWatts);
+	switch1.delegate2.connect(&microwave, &Microwave::calibrate);
+	
 	switch1.run();
+	switch1.run(5);
 	delete delete_microwave;
 	delete delete_light;
 
@@ -695,6 +719,7 @@ void sandbox::play()
 	delete_switch->delegate0.connect(&light, &Light::turnOff);
 	delete_switch->delegate0.connect(&microwave, &Microwave::turnOff);
 	delete_switch->run();
+	delete_switch->delegate0.disconnect(&light);
 	delete delete_switch;
 	
 
