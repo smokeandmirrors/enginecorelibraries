@@ -454,10 +454,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sigslot.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Singleton.h"
 				>
 			</File>
