@@ -649,6 +649,35 @@ public:
 	}	
 };
 
+class Switch2
+{
+public:
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void))
+	{
+		delegate0.connect(receiver, function);
+	}
+
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void) const)
+	{
+		delegate0.connect(receiver, function);
+	}
+
+	void disconnect(Receiver* receiver)
+	{
+		delegate0.disconnect(receiver);
+	}
+
+	void run(void)
+	{
+		delegate0();
+	}
+
+private:
+	Transmitter0 delegate0;
+};
+
 class Light : public ReceiverBase
 {
 public:
@@ -690,16 +719,26 @@ private:
 	signals::ReceiverMember m_receiver;
 };
 
+class Foo
+{
+public:
+	void bar(void)
+	{}
+};
+
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
 	Switch switch1;
 	Microwave microwave;
 	Light light;
+	Switch2 switch2;
 
 	Microwave* delete_microwave = new Microwave();;
 	Light* delete_light = new Light();
-
+	
+	switch2.connect(&microwave, &Microwave::turnOff);
+	switch2.connect(delete_microwave, &Microwave::turnOff);
 	
 	switch1.delegate0.connect(&light, &Light::turnOff);
 	switch1.delegate0.connect(delete_light, &Light::turnOff);
@@ -709,6 +748,8 @@ void sandbox::play()
 	switch1.delegate0.connect(delete_microwave, &Microwave::turnOff);
 	switch1.delegate1.connect(&microwave, &Microwave::setWatts);
 	switch1.delegate2.connect(&microwave, &Microwave::calibrate);
+	
+	switch2.run();
 	
 	switch1.run();
 	switch1.run(5);
