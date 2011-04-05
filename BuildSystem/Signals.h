@@ -9,21 +9,11 @@ inspiration, and much (if not most) of its implementaion to Sarah Thompson
 and her work here: http://sigslot.sourceforge.net/
 */
 
+#include <list>
 #include <set>
-#include <vector>
 
 #include "Synchronization.h"
 #include "TemplateArguments.h"
-
-#define DECLARE_TRANSMITTER_FRIEND(NUM_ARGS) \
-	template < CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > friend class Transmitter##NUM_ARGS;
-
-#define DECLARE_TRANSMITTER_FRIENDS \
-	DECLARE_TRANSMITTER_FRIEND(1) \
-	DECLARE_TRANSMITTER_FRIEND(2) \
-	DECLARE_TRANSMITTER_FRIEND(3) \
-	DECLARE_TRANSMITTER_FRIEND(4) \
-	DECLARE_TRANSMITTER_FRIEND(5) \
 
 #define SIGNALS_DECLARE_TRANSMITTER(NUM_ARGS) \
 	template < CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > \
@@ -123,43 +113,49 @@ and her work here: http://sigslot.sourceforge.net/
 				++iter; \
 			} \
 		} \
-		~Transmitter##NUM_ARGS(void) \
+		virtual ~Transmitter##NUM_ARGS(void) \
 		{ \
 			disconnectAll(); \
 		} \
 		template<class RECEIVER> \
 		void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS)) \
 		{ \
-			synchronize(m_mutex); \
-			connections_list::const_iterator iter = m_receivers.begin(); \
-			connections_list::const_iterator sentinel = m_receivers.end(); \
-			while (iter != sentinel) \
+			if (receiver && function) \
 			{ \
-				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+				synchronize(m_mutex); \
+				connections_list::const_iterator iter = m_receivers.begin(); \
+				connections_list::const_iterator sentinel = m_receivers.end(); \
+				while (iter != sentinel) \
 				{ \
-					return; \
+					if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+					{ \
+						return; \
+					} \
+					++iter; \
 				} \
-				++iter; \
+				m_receivers.push_back(new volatile##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
+				receiver->onConnect(this); \
 			} \
-			m_receivers.push_back(new volatile##NUM_ARGS<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
-			receiver->onConnect(this); \
 		} \
 		template<class RECEIVER> \
 		void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS) const) \
 		{ \
-			synchronize(m_mutex); \
-			connections_list::const_iterator iter = m_receivers.begin(); \
-			connections_list::const_iterator sentinel = m_receivers.end(); \
-			while (iter != sentinel) \
+			if (receiver && function) \
 			{ \
-				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+				synchronize(m_mutex); \
+				connections_list::const_iterator iter = m_receivers.begin(); \
+				connections_list::const_iterator sentinel = m_receivers.end(); \
+				while (iter != sentinel) \
 				{ \
-					return; \
+					if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) \
+					{ \
+						return; \
+					} \
+					++iter; \
 				} \
-				++iter; \
+				m_receivers.push_back(new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
+				receiver->onConnect(this); \
 			} \
-			m_receivers.push_back(new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS>(receiver, function)); \
-			receiver->onConnect(this); \
 		} \
 		void disconnect(void) \
 		{ \
@@ -185,38 +181,6 @@ and her work here: http://sigslot.sourceforge.net/
 				++iter; \
 			} \
 		} \
-		void replicate(const Receiver* receiver, Receiver* new_receiver) \
-		{ \
-			synchronize(m_mutex); \
-			connections_list::iterator iter = m_receivers.begin(); \
-			connections_list::iterator sentinel = m_receivers.end(); \
-			while (iter != sentinel) \
-			{ \
-				if ((*iter)->getReceiver() == receiver) \
-				{ \
-					m_receivers.push_back((*iter)->duplicate(new_receiver)); \
-					return; \
-				} \
-				++iter; \
-			} \
-		} \
-		void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
-		{ \
-			synchronize(m_mutex); \
-			connections_list copy(m_receivers); \
-			connections_list::const_iterator iter = copy.begin(); \
-			connections_list::const_iterator sentinel = copy.end(); \
-			while (iter != sentinel) \
-			{ \
-				(*iter)->send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
-				++iter; \
-			} \
-		} \
-		inline void operator()(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
-		{ \
-			send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
-		} \
-	protected: \
 		void disconnectAll(void) \
 		{ \
 			synchronize(m_mutex); \
@@ -246,6 +210,38 @@ and her work here: http://sigslot.sourceforge.net/
 				++iter; \
 			} \
 		} \
+		void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		{ \
+			synchronize(m_mutex); \
+			connections_list copy(m_receivers); \
+			connections_list::const_iterator iter = copy.begin(); \
+			connections_list::const_iterator sentinel = copy.end(); \
+			while (iter != sentinel) \
+			{ \
+				(*iter)->send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+				++iter; \
+			} \
+		} \
+		inline void operator()(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		{ \
+			send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+		} \
+	protected: \
+		void replicate(const Receiver* receiver, Receiver* new_receiver) \
+		{ \
+			synchronize(m_mutex); \
+			connections_list::iterator iter = m_receivers.begin(); \
+			connections_list::iterator sentinel = m_receivers.end(); \
+			while (iter != sentinel) \
+			{ \
+				if ((*iter)->getReceiver() == receiver) \
+				{ \
+					m_receivers.push_back((*iter)->duplicate(new_receiver)); \
+					return; \
+				} \
+				++iter; \
+			} \
+		} \
 	private: \
 		connections_list				m_receivers; \
 		mutable multithreading::Mutex	m_mutex; \
@@ -262,6 +258,8 @@ public:
 	friend class ReceiverBase;
 	friend class ReceiverMember;
 
+	virtual ~Transmitter(void)=0 {}
+
 protected:
 	virtual void onDisconnect(Receiver* receiver)=0;
 	virtual void replicate(const Receiver* receiver, Receiver* new_receiver)=0;
@@ -270,17 +268,11 @@ protected:
 class Receiver
 {
 public:
-	friend class Transmitter;
-	friend class Transmitter0;
-	DECLARE_TRANSMITTER_FRIENDS 
-
-	virtual ~Receiver(void)=0 {}
-	virtual void disconnect(void)=0;
-
-protected:
 	typedef std::set<Transmitter *> sender_set;
 	typedef sender_set::const_iterator const_iterator;
 
+	virtual ~Receiver(void)=0 {}
+	virtual void ceaseReception(void)=0;
 	virtual void onConnect(Transmitter* sender)=0;
 	virtual void onDisconnect(Transmitter* sender)=0;
 }; // 
@@ -288,10 +280,6 @@ protected:
 class ReceiverBase
 : public Receiver
 {
-	friend class Transmitter;
-	friend class Transmitter0;
-	DECLARE_TRANSMITTER_FRIENDS 
-
 public:
 	ReceiverBase(void)
 	{ /* empty */ }
@@ -315,14 +303,13 @@ public:
 		disconnectAll();
 	}
 
-	void disconnect(void)
+	void ceaseReception(void)
 	{
 		synchronize(m_mutex);
 		disconnectAll();
 		m_senders.erase(m_senders.begin(), m_senders.end());
 	}
 
-protected:
 	void disconnectAll(void)
 	{
 		synchronize(m_mutex);
@@ -357,10 +344,6 @@ private:
 class ReceiverMember
 : public Receiver
 {
-	friend class Transmitter;
-	friend class Transmitter0;
-	template<typename ARG_1> friend class Transmitter1;
-
 public:
 	ReceiverMember(void)
 	: m_receiver(NULL)
@@ -386,11 +369,24 @@ public:
 		disconnectAll();
 	}
 
-	void disconnect(void)
+	void ceaseReception(void)
 	{
 		synchronize(m_mutex);
 		disconnectAll();
 		m_senders.erase(m_senders.begin(), m_senders.end());
+	}
+
+	void disconnectAll(void)
+	{
+		synchronize(m_mutex);
+		const_iterator iter = m_senders.begin();
+		const_iterator sentinel = m_senders.end();
+
+		while (iter != sentinel)
+		{
+			(*iter)->onDisconnect(m_receiver);
+			++iter;
+		}
 	}
 
 	void onConnect(Transmitter* sender)
@@ -408,20 +404,6 @@ public:
 	void setReceiver(Receiver* receiver)
 	{
 		m_receiver = receiver;
-	}
-
-protected:
-	void disconnectAll(void)
-	{
-		synchronize(m_mutex);
-		const_iterator iter = m_senders.begin();
-		const_iterator sentinel = m_senders.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->onDisconnect(m_receiver);
-			++iter;
-		}
 	}
 
 private:
@@ -552,26 +534,52 @@ public:
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void))
 	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = m_receivers.begin();
-		connections_list::const_iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
+		if (receiver && function)
 		{
-			if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
+			synchronize(m_mutex);
+			connections_list::const_iterator iter = m_receivers.begin();
+			connections_list::const_iterator sentinel = m_receivers.end();
+
+			while (iter != sentinel)
 			{
-				return;
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
+				{
+					return;
+				}
+
+				++iter;
 			}
 
-			++iter;
+			m_receivers.push_back(new volatile0<RECEIVER>(receiver, function));
+			receiver->onConnect(this);
 		}
-
-		m_receivers.push_back(new volatile0<RECEIVER>(receiver, function));
-		receiver->onConnect(this);
 	}
 
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void) const)
+	{
+		if (receiver && function)
+		{
+			synchronize(m_mutex);
+			connections_list::const_iterator iter = m_receivers.begin();
+			connections_list::const_iterator sentinel = m_receivers.end();
+
+			while (iter != sentinel)
+			{
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
+				{
+					return;
+				}
+
+				++iter;
+			}
+
+			m_receivers.push_back(new const0<RECEIVER>(receiver, function));
+			receiver->onConnect(this);
+		}
+	}
+
+	void disconnectAll(void)
 	{
 		synchronize(m_mutex);
 		connections_list::const_iterator iter = m_receivers.begin();
@@ -579,16 +587,10 @@ public:
 
 		while (iter != sentinel)
 		{
-			if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver))
-			{
-				return;
-			}
-
+			(*iter)->getReceiver()->onDisconnect(this);
+			delete *iter;
 			++iter;
 		}
-
-		m_receivers.push_back(new const0<RECEIVER>(receiver, function));
-		receiver->onConnect(this);
 	}
 
 	void disconnect(void)
@@ -600,6 +602,31 @@ public:
 
 	void disconnect(Receiver* receiver)
 	{
+		if (receiver)
+		{
+			synchronize(m_mutex);
+			connections_list::iterator iter = m_receivers.begin();
+			connections_list::iterator sentinel = m_receivers.end();
+
+			while (iter != sentinel)
+			{
+				Connection* connection = *iter;
+
+				if (connection->getReceiver() == receiver)
+				{
+					receiver->onDisconnect(this);
+					delete connection;
+					m_receivers.erase(iter);
+					return;
+				}
+
+				++iter;
+			}
+		}
+	}
+
+	void onDisconnect(Receiver* receiver)
+	{
 		synchronize(m_mutex);
 		connections_list::iterator iter = m_receivers.begin();
 		connections_list::iterator sentinel = m_receivers.end();
@@ -610,27 +637,8 @@ public:
 
 			if (connection->getReceiver() == receiver)
 			{
-				receiver->onDisconnect(this);
 				delete connection;
 				m_receivers.erase(iter);
-				return;
-			}
-
-			++iter;
-		}
-	}
-
-	void replicate(const Receiver* receiver, Receiver* new_receiver)
-	{
-		synchronize(m_mutex);
-		connections_list::iterator iter = m_receivers.begin();
-		connections_list::iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			if ((*iter)->getReceiver() == receiver)
-			{
-				m_receivers.push_back((*iter)->duplicate(new_receiver));
 				return;
 			}
 
@@ -658,21 +666,7 @@ public:
 	}
 
 protected:
-	void disconnectAll(void)
-	{
-		synchronize(m_mutex);
-		connections_list::const_iterator iter = m_receivers.begin();
-		connections_list::const_iterator sentinel = m_receivers.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->getReceiver()->onDisconnect(this);
-			delete *iter;
-			++iter;
-		}
-	}
-
-	void onDisconnect(Receiver* receiver)
+	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		synchronize(m_mutex);
 		connections_list::iterator iter = m_receivers.begin();
@@ -680,12 +674,9 @@ protected:
 
 		while (iter != sentinel)
 		{
-			Connection* connection = *iter;
-
-			if (connection->getReceiver() == receiver)
+			if ((*iter)->getReceiver() == receiver)
 			{
-				delete connection;
-				m_receivers.erase(iter);
+				m_receivers.push_back((*iter)->duplicate(new_receiver));
 				return;
 			}
 

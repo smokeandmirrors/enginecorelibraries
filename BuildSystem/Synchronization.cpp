@@ -61,7 +61,7 @@ void Mutex::acquire(void)
 }
 
 void Mutex::release(void)
-{
+{ 
 	m_mutex->release();
 }
 

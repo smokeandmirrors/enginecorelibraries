@@ -6,7 +6,6 @@
 #include <windows.h>
 #endif//WIN32
 
-#include "Observation.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
 #include "Threads.h"
@@ -51,7 +50,7 @@ class PendingJobQueue
 	public:
 		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
 		{
-			return new Thread(m_job, CPUid, scheduler, m_name.c_str());
+			return new Thread(m_job, CPUid, scheduler, &Scheduler::onComplete, m_name.c_str());
 		}
 
 		virtual void recycle(PendingJobQueue& queue)
@@ -77,7 +76,7 @@ class PendingJobQueue
 	public:
 		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
 		{
-			return new Thread(m_job, CPUid, scheduler, m_name.c_str());
+			return new Thread(m_job, CPUid, scheduler, &Scheduler::onComplete, m_name.c_str());
 		}
 
 		virtual void recycle(PendingJobQueue& queue)
@@ -207,9 +206,9 @@ private:
 Scheduler::Scheduler(void)
 : m_numActiveJobs(0)
 {
+	m_receiver.setReceiver(this);
 	initializeNumberSystemThreads();
 	m_maxThreads = getNumberSystemThreads();
-	m_observer.setObserver(this);
 	m_activeJobs = new Thread*[m_numSystemThreads];
 	
 	for (uint4 i = 0; i < m_numSystemThreads; i++)
@@ -230,11 +229,12 @@ void Scheduler::enqueue(Executable* job,
 	sint4 ideal_thread/* =noThreadPreference */, 
 	const sint1* name/* ="un-named" */)
 {
+	synchronize(m_mutex);
 	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
-		Thread* thread = new Thread(job, index, this, name);
+		Thread* thread = new Thread(job, index, this, &Scheduler::onComplete, name);
 		accountForNewJob(thread, index);
 	}
 	else
@@ -248,11 +248,12 @@ void Scheduler::enqueue(executableFunction job,
 	sint4 ideal_thread/* =noThreadPreference */, 
 	const sint1* name/* ="un-named" */)
 {
+	synchronize(m_mutex);
 	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
-		Thread* thread = new Thread(job, index, this, name);
+		Thread* thread = new Thread(job, index, this, &Scheduler::onComplete, name);
 		accountForNewJob(thread, index);
 	}
 	else
@@ -264,6 +265,7 @@ void Scheduler::enqueue(executableFunction job,
 
 uint4 Scheduler::getNumberPendingJobs(void) const
 {
+	synchronize(m_mutex);
 	return m_pendingJobs->getNumber();
 }
 
@@ -280,6 +282,8 @@ void Scheduler::initializeNumberSystemThreads(void)
 
 void Scheduler::startNextJob(void)
 {
+	synchronize(m_mutex);
+		
 	if (getNumberPendingJobs())
 	{
 		sint4 thread_index;
@@ -337,7 +341,7 @@ const std::string Scheduler::toString(void) const
 			buffer[index] = '\0';
 		} 
 		while (index);
-		sprintf_s(buffer, "| %2d: ", hardware_index);
+		sprintf_s(buffer, "|%1d: ", hardware_index);
 		output += buffer;
 		
 		if (m_activeJobs[hardware_index])
@@ -367,7 +371,7 @@ const std::string Scheduler::toStringActiveJob(Thread* job) const
 		active_job[index] = '\0';
 	} 
 	while (index);
-	sprintf_s(active_job, "%8s", job->toString().c_str());
+	sprintf_s(active_job, "%11s", job->toString().c_str());
 	
 	std::string output(active_job);
 	return output;
@@ -375,7 +379,7 @@ const std::string Scheduler::toStringActiveJob(Thread* job) const
 
 const std::string Scheduler::toStringInactiveJob(void) const
 {
-	return std::string("inactive");
+	return std::string(" inactive. ");
 }
 
 } // namespace multithreading

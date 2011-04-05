@@ -44,7 +44,7 @@
 				PreprocessorDefinitions="_MT;WIN32;DEBUG;EXTENDED_BY_LUA;_WINDOWS;_USRDLL;EXTENDEDBYLUAUNITTESTING_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="2"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="LuaLib.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\BuildSystem\&amp;(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\BuildSystem\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;"
 				IgnoreDefaultLibraryNames="libc.lib;libcmt.lib;msvcrt.lib;libcd.lib;msvcrtd.lib"
 				GenerateDebugInformation="true"
 				AssemblyDebug="1"
@@ -335,12 +335,48 @@
 	</References>
 	<Files>
 		<Filter
-			Name="UTLuaFiles"
+			Name="Math"
+			>
+		</Filter>
+		<Filter
+			Name="BuildSystem"
+			>
+			<File
+				RelativePath=".\UTSignals.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="EmbeddedLua"
 			>
 			<File
 				RelativePath="..\LuaFiles\UnitTestingFramework.lua"
 				>
 			</File>
+			<File
+				RelativePath=".\UTClassExtension.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UTLibraryExtension.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UTLuaClass.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UTLuaFiles.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UTTemplateExtension.cpp"
+				>
+			</File>
+			<Filter
+				Name="UTLuaFiles"
+				>
+			</Filter>
 			<Filter
 				Name="UTSupport"
 				>
@@ -390,30 +426,6 @@
 				</Filter>
 			</Filter>
 		</Filter>
-		<Filter
-			Name="Math"
-			>
-		</Filter>
-		<File
-			RelativePath=".\UTClassExtension.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UTLibraryExtension.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UTLuaClass.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UTLuaFiles.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\UTTemplateExtension.cpp"
-			>
-		</File>
 		<File
 			RelativePath=".\UTTools.cpp"
 			>

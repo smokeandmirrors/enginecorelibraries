@@ -10,7 +10,6 @@
 
 #include "Build.h"
 #include "CompilerChecks.h"
-#include "Observation.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
@@ -19,80 +18,191 @@
 #include "Time.h"
 #include "Vector.h"
 
+sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
+sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
+
+inline void doWork(millisecond milliseconds)
+{
+	sint4 number_size = 1000;
+	sint4 numbers[1000];// = new sint4[number_size];
+	sint4* i = numbers;
+	
+	for (sint4 number = 0; number < number_size; number++)
+	{
+		*i++ = number;
+	}
+
+	millisecond start = real_time::milliseconds();
+		
+	do 
+	{
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
+	}
+	while (real_time::milliseconds() - start < milliseconds);
+
+	// delete[] numbers;
+}
+
+typedef enum  
+{
+	eFR_AI=0,
+	eFR_Animation,
+	eFR_Audio,
+	eFR_Events,
+	eFR_Gameplay,
+	eFR_GarbageCollection,
+	eFR_Lighting,
+	eFR_Networking,
+	eFR_PhysicsAsync,
+	eFR_PhysicsSync,
+	eFR_Rendering,
+} 
+eFrameRequirementID; 
+
+const char* 
+frameReqName(eFrameRequirementID frameReqID)
+{
+	switch (frameReqID)
+	{
+		case eFR_AI: 
+			return "A. I...."; 
+		case eFR_Animation: 
+			return "Animate."; 
+		case eFR_Audio: 
+			return "AudioFX."; 
+		case eFR_Events: 
+			return "Events.."; 
+		case eFR_Gameplay: 
+			return "Gameplay"; 
+		case eFR_GarbageCollection: 
+			return "GarbageC"; 
+		case eFR_Lighting: 
+			return "Lighting"; 
+		case eFR_Networking: 
+			return "Network."; 
+		case eFR_PhysicsAsync: 
+			return "PhysicsA"; 
+		case eFR_PhysicsSync: 
+			return "PhysicsS"; 
+		case eFR_Rendering: 
+			return "VisualFX";
+		default:
+			assert(false);
+			return NULL;
+	};
+}
+
 class EngineLoop;
 class FrameRequirement;
 
 // make an interface
 class FrameRequirement
-: public design_patterns::Observable<FrameRequirement>
-, public design_patterns::Observer<EngineLoop>
+: public signals::Transmitter1<FrameRequirement*>
+, public signals::Receiver
 {
 public:
 	FrameRequirement(void)
 	{
-		m_observer.setObserver(this);
-		m_observable.setObservable(this);
+		m_receiver.setReceiver(this);
+	}
+
+	virtual ~FrameRequirement(void) 
+	{
+
+	}
+
+	void ceaseReception()
+	{
+		m_receiver.ceaseReception();
+	}
+
+	void disconnect(void)
+	{
+		m_onComplete.disconnect();
+		m_onQueuedWork.disconnect();
 	}
 	
-	void add(Observer<FrameRequirement>* observer)
+	void noticeNextFrame(EngineLoop*)
 	{
-		m_observable.add(observer);
+		
 	}
+
+	template<class RECEIVER>
+	void onCompleteConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
+	{
+		m_onComplete.connect(receiver, function);
+	}
+
+	template<class RECEIVER>
+	void onCompleteConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
+	{
+		m_onComplete.connect(receiver, function);
+	}
+
+	void onCompleteDisconnect(signals::Receiver* receiver)
+	{
+		m_onComplete.disconnect(receiver);
+	}
+
+	void onConnect(signals::Transmitter* sender)
+	{
+		m_receiver.onConnect(sender);
+	}
+
+	void onDisconnect(signals::Transmitter* sender)
+	{
+		m_receiver.onDisconnect(sender);
+	}
+
+	template<class RECEIVER>
+	void onQueuedWorkConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
+	{
+		m_onQueuedWork.connect(receiver, function);
+	}
+
+	template<class RECEIVER>
+	void onQueuedWorkConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
+	{
+		m_onQueuedWork.connect(receiver, function);
+	}
+
+	void onQueuedWorkDisconnect(signals::Receiver* receiver)
+	{
+		m_onQueuedWork.disconnect(receiver);
+	}
+
+	void queueWork(void)
+	{
+		onQueueWork();
+		m_onQueuedWork(this);
+	}
+
+protected:	
+	void notifyComplete(void) 
+	{
+		m_onComplete(this);
+	}
+
+	virtual void onQueueWork(void)=0;
 	
-	bool isCompleted(void) const
-	{
-		return m_isCompleted;
-	}
-
-	virtual bool isFinishedQueueingWork(void) const=0;
-
-	void ignore(EngineLoop* observable)
-	{
-		m_observer.ignore(observable);
-	}
-
-	void notice(EngineLoop* observable)=0;
-
-	void notify(void)
-	{
-		m_observable.notify();
-	}
-
-	void observe(EngineLoop* observable)
-	{
-		m_observer.observe(observable);
-	}
-
-	virtual void queueWork(void)=0;
-
-	void remove(Observer<FrameRequirement>* observer)
-	{
-		m_observable.remove(observer);
-	}
-
-protected:
-	void markCompleted(void)
-	{
-		m_isCompleted = true;
-	}
-
-	void markIncomplete(void)
-	{
-		m_isCompleted = false;
-	}	
-
 private:
 	bool	
 		m_isCompleted;
-	design_patterns::ObserverMember<EngineLoop>
-		m_observer;
-	design_patterns::ObservableMember<FrameRequirement>
-		m_observable;
+	
+	signals::ReceiverMember	
+		m_receiver;
+	
+	signals::Transmitter1<FrameRequirement*> 
+		m_onComplete;
+
+	signals::Transmitter1<FrameRequirement*> 
+		m_onQueuedWork;
 }; // class FrameRequirement
 
 class EngineLoop
-: public design_patterns::Observable<EngineLoop>
-, public design_patterns::Observer<FrameRequirement>
+: public signals::Transmitter1<EngineLoop*>
+, public signals::Receiver
 {
 	typedef std::list<FrameRequirement*>	requirements;
 	typedef requirements::iterator			requirements_iter;
@@ -102,20 +212,48 @@ public:
 	: m_isRunning(false)
 	, m_frameNumber(0)
 	{
-		m_observer.setObserver(this);
-		m_observable.setObservable(this);
+		m_receiver.setReceiver(this);
 	}
 
-	void add(design_patterns::Observer<EngineLoop>* observer)
+	virtual ~EngineLoop(void) 
 	{
-		m_observable.add(observer);
+
 	}
-	
+
 	void addFrameRequirement(FrameRequirement* requirement)
 	{
-		requirement->add(this);
-		add(requirement);
+		synchronize(m_mutex);
+		m_onComplete.connect(requirement, &FrameRequirement::noticeNextFrame);
+		requirement->onCompleteConnect(this, &EngineLoop::noticeComplete);
+		requirement->onQueuedWorkConnect(this, &EngineLoop::noticeWorkQueued);
 		m_incomplete.push_back(requirement);
+	}
+
+	void ceaseReception()
+	{
+		m_receiver.ceaseReception();
+	}
+
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
+	{
+		m_onComplete.connect(receiver, function);
+	}
+
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
+	{
+		m_onComplete.connect(receiver, function);
+	}
+
+	void disconnect()
+	{
+		m_onComplete.disconnect();
+	}
+
+	void disconnect(signals::Receiver* receiver)
+	{
+		m_onComplete.disconnect(receiver);
 	}
 
 	uint8 getFrameNumber(void) const 
@@ -123,75 +261,68 @@ public:
 		return m_frameNumber; 
 	}
 
-	void ignore(FrameRequirement* observable)
-	{
-		m_observer.ignore(observable);
-	}
-
 	bool isRunning(void) const
 	{
 		return m_isRunning;
 	}
-
-	void notice(FrameRequirement* observable)
-	{	// really this would always be true
+	
+	void noticeComplete(FrameRequirement* requirement)
+	{
 		synchronize(m_mutex);
+		markRequirementCompleted(requirement);	
 
-		if (observable->isCompleted())
+		if (isFrameCompleted())
 		{
-			markRequirementCompleted(observable);	
-
-			if (isFrameCompleted())
-			{
-				markFrameCompleted();
-			}
+			markFrameCompleted();
 		}
-		else if (observable->isFinishedQueueingWork())
+	}
+	
+	void noticeWorkQueued(FrameRequirement* requirement)
+	{
+		synchronize(m_mutex);
+		bool queue_next(false);
+		requirements_iter iter = m_incomplete.begin(); 
+		requirements_iter sentinel = m_incomplete.end();
+		
+		while (iter != sentinel)
 		{
-			bool queue_next(false);
-
-			for (requirements_iter iter = m_incomplete.begin(); iter != m_incomplete.end(); iter++)
+			if (queue_next)
 			{
-				if (queue_next)
-				{
-					(*iter)->queueWork();
-					break;
-				}
-
-				if (*iter == observable)
-				{
-					queue_next = true;
-				}
+				(*iter)->queueWork();
+				break;
 			}
-		}		
+
+			if (*iter == requirement)
+			{
+				queue_next = true;
+			}
+
+			++iter;
+		}
 	}
-	
-	void notify(void)
+
+	void onConnect(signals::Transmitter* sender)
 	{
-		m_observable.notify();
+		m_receiver.onConnect(sender);
 	}
-	
-	void observe(FrameRequirement* observable)
+
+	void onDisconnect(signals::Transmitter* sender)
 	{
-		m_observer.observe(observable);
+		m_receiver.onDisconnect(sender);
 	}
-	
+
 	void removeFrameRequirement(FrameRequirement* requirement)
 	{
+		synchronize(m_mutex);
+		m_onComplete.disconnect(requirement);
 		removeFromList(requirement, m_completed, m_completeMutex);
 		removeFromList(requirement, m_incomplete, m_incompleteMutex);
-		remove(requirement);
-		requirement->remove(this);
 	}
 	
-	void remove(design_patterns::Observer<EngineLoop>* observer)
-	{
-		m_observable.remove(observer);
-	}
-
 	void start(void)
 	{
 		synchronize(m_incompleteMutex)
+		
 		if (!m_isRunning)
 		{
 			m_isRunning = true;
@@ -204,7 +335,6 @@ public:
 		if (m_isRunning)
 		{
 			m_isRunning = false;
-			notify();
 		}
 	}
 
@@ -222,10 +352,12 @@ protected:
 	
 	void markFrameCompleted(void)
 	{
-		m_frameNumber++;
-		markRequirementsIncomplete();
-		notify();
-		startFrame();
+		if (isRunning())
+		{
+			m_frameNumber++;
+			markRequirementsIncomplete();
+			startFrame();
+		}
 	}
 	
 	void markRequirementCompleted(FrameRequirement* requirement)
@@ -244,14 +376,6 @@ protected:
 		assert(m_completed.empty());
 	}
 
-	void startFrame(void)
-	{
-		if (!m_incomplete.empty())
-		{
-			(*m_incomplete.front()).queueWork();
-		}
-	}
-
 	void removeFromList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
 	{
 		synchronize(mutex)
@@ -264,7 +388,15 @@ protected:
 			}
 		}
 	}
-	
+
+	void startFrame(void)
+	{
+		if (!m_incomplete.empty())
+		{
+			(*m_incomplete.front()).queueWork();
+		}
+	}
+
 private:
 	requirements					m_completed;
 	multithreading::Mutex			m_completeMutex;
@@ -273,306 +405,133 @@ private:
 	multithreading::Mutex			m_incompleteMutex;
 	bool							m_isRunning;
 	multithreading::Mutex			m_mutex;
-	design_patterns::ObservableMember<EngineLoop>		
-									m_observable;
-	design_patterns::ObserverMember<FrameRequirement>
-									m_observer;
+	signals::Transmitter1<EngineLoop*>			
+									m_onComplete;
+	signals::ReceiverMember	
+									m_receiver;
 }; // class EngineLoop
 
-multithreading::Mutex physicalMutex;
+class TestRequirement;
 
-class Physical
+class TestJob
 : public multithreading::Executable
 {
 public:
-	Physical(millisecond work_time, Physical* next=NULL, void(*callback)(void)=NULL)
-	: m_workTime(work_time)
-	, m_next(next)
-	, m_callBack(callback)
-	{
-		/* empty */
-	}
+	TestJob(TestRequirement* requirement)
+	: m_requirement(requirement)
+	{ /* empty */ }
 	
-	void execute(void)
-	{
-		multithreading::sleep(m_workTime);
-		
-		if (m_callBack)
-		{
-			(*m_callBack)();
-		}				
-
-		if (m_next)
-		{
-			synchronize(physicalMutex)
-			static bool first(true);
-		
-			if (first)
-			{
-				multithreading::Scheduler::single().enqueue(m_next, multithreading::noThreadPreference, "Phyics 1");
-				first = false;
-			}
-			else
-			{
-				multithreading::Scheduler::single().enqueue(m_next, multithreading::noThreadPreference, "Phyics 2");
-			}
-		}
-	}
-
+	virtual ~TestJob(void) 
+	{ /* empty */ }
+	
+	void TestJob::execute(void);
+	
 protected:
-	void(*		m_callBack)(void);
-	Physical*	m_next;
-	millisecond	m_workTime;
+	TestJob();
+
+private:
+	TestRequirement*	
+		m_requirement;
 };
 
-void physicsComplete(void);
-
-Physical	physOne(1000, NULL, physicsComplete);
-Physical	physTwo(2000, NULL, physicsComplete);
-Physical	physThree(3000, &physOne, physicsComplete);
-Physical	physFour(4000, &physTwo, physicsComplete);
-
-class Physics 
+class TestRequirement 
 : public FrameRequirement
 {
 public:
-	Physics(void)
-	: m_isDoneQueuingWork(false)
+	TestRequirement(millisecond work_time, eFrameRequirementID ID_one, sint4 child_jobs)
+	: m_reqID(ID_one)
+	, m_workTime(work_time)
+	, m_childJobs(child_jobs)
 	{
-
+		// weird testing
+		m_workTime *= 100;
+		// end weird testing
+		m_original = new TestJob(this);
 	}
 
-	void testMarkFunctionComplete(void)
+	virtual 
+	~TestRequirement(void)
 	{
-		markCompleted();
-		notify();
+		delete m_original;
 	}
 
-	bool isFinishedQueueingWork(void) const
+	inline eFrameRequirementID
+	getID(void) const
 	{
-		return m_isDoneQueuingWork;
+		return m_reqID;
 	}
 
-	void notice(EngineLoop* observable)
-	{
-		uint8 current_frame = observable->getFrameNumber();
+	inline millisecond
+	getWorkTime(void) const
+	{ 
+		return m_workTime;
+	}
 
-		if (current_frame > m_lastFrame && observable->isRunning())
-		{	// queue up some work
-			m_lastFrame = current_frame;
-			markIncomplete();
+	void 
+	noticeTestJobComplete(TestJob* job, bool& spawn_new, bool& delete_self)
+	{
+		synchronize(m_mutex);
+		++m_completedJobs;
+		delete_self = job != m_original;
+
+		if (m_completedJobs >= m_childJobs)
+		{
+			notifyComplete();
+			spawn_new = false;
+		}
+		else
+		{
+			spawn_new = true;
 		}
 	}
 
-	void queueWork(void)
+	void onQueueWork(void)
 	{
-		multithreading::Scheduler::single().enqueue(&physFour, multithreading::noThreadPreference, "Physics 4");
-		multithreading::Scheduler::single().enqueue(&physThree, multithreading::noThreadPreference, "Physics 3");
-		m_isDoneQueuingWork = true;
-		notify();
+		m_completedJobs = 0;
+		std::string name = frameReqName(m_reqID);
+		name += "(o)";
+		multithreading::Scheduler::single().enqueue(m_original, multithreading::noThreadPreference, name.c_str());
 	}
 
 private:
-	bool	m_isDoneQueuingWork;
-	uint8	m_lastFrame;
-}; // class Physics
-
-
-Physics		physics;
-uint1		physicsCompletions(0);
-multithreading::Mutex physicsMutex;
-
-void physicsComplete(void)
-{
-	synchronize(physicsMutex);
-
-	physicsCompletions++;
-
-	if (physicsCompletions == 4)
-	{
-		physics.testMarkFunctionComplete();
-		physicsCompletions=0;
-	}
-}
-
-
-sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
-sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
-
-class QuickSortTester : public multithreading::Executable
-{
-public:
-	virtual void execute(void)
-	{
-		sint4 number_size = 10000;
-		sint4 number_sort = 1000;
-		sint4 number;
-		sint4* numbers = new sint4[number_size];
-		sint4* i = numbers;
-
-		for (number=0; number < number_size; number++)
-		{
-			*i++ = number;
-		}
-
-		for (number=0; number < number_sort; number++)
-		{
-			qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
-			qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
-		}
-
-		delete[] numbers;
-
-		multithreading::Scheduler::single().enqueue(
-			new QuickSortTester(),  
-			multithreading::noThreadPreference, 
-			"2nd Gen!");
-	}
-}; // QuickSortTester
-
-HANDLE mutex;
-
-multithreading::Mutex m_mutex;
-sint4 numberOfThreads=0;
-
-DEFINE_NOARGS_EXECUTABLE_FUNCTION(useMutexClass,
-	synchronize(m_mutex);
-	numberOfThreads++;
-	sint4 myNumThreads = numberOfThreads;
-	multithreading::sleep(numberOfThreads * 1000);
-	assert(numberOfThreads == myNumThreads);
-)
-
-DEFINE_NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort,
-	sint4 number_size = 10000;
-	sint4 number_sort = 1000;
-	sint4 number;
-	sint4* numbers = new sint4[number_size];
-	sint4* i = numbers;
+	multithreading::Mutex 
+		m_mutex;
 	
-	for (number=0; number < number_size; number++)
-	{
-		*i++ = number;
-	}
+	sint4					
+		m_completedJobs;
 
-	for (number=0; number < number_sort; number++)
-	{
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
-	}
- 
-	printf("I finished a sort!\n");
-	delete[] numbers;
-)
-//
-//NOARGS_EXECUTABLE_FUNCTION(doubleQuickSort)
-//{
-//	sint4 number_size = 10000;
-//	sint4 number_sort = 1000;
-//	sint4 number;
-//	sint4* numbers = new sint4[number_size];
-//	sint4* i = numbers;
-//	
-//	for (number=0; number < number_size; number++)
-//	{
-//		*i++ = number;
-//	}
-//
-//	for (number=0; number < number_sort; number++)
-//	{
-//		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
-//		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
-//	}
-// 
-//	printf("I finished a sort!\n");
-//	delete[] numbers;
-//	return 0;
-//}
-
-void threadsChecking()
-{
-	mutex = CreateMutex(NULL, false, NULL);
+	TestJob* 
+		m_original;
 	
-	std::vector<HANDLE> threads;
-	const uint4 num_threads = 8;
+	eFrameRequirementID 
+		m_reqID;
 	
-	for (uint4 i=0; i < num_threads; i++)
-	{
-		uint4 thread_id1;
-		HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, useMutexClass, NULL, CREATE_SUSPENDED, &thread_id1));
-		// HANDLE thread = (HANDLE)(_beginthreadex(NULL, 0, doubleQuickSort, NULL, CREATE_SUSPENDED, &thread_id1));
-		threads.push_back(thread);
-	}
+	millisecond
+		m_workTime;
 
-	for (uint4 i=0; i < num_threads; i++)
-	{
-		ResumeThread(threads[i]);
-	}
+	sint4
+		m_childJobs;
+}; 
+
+void TestJob::execute(void)
+{
+	doWork(m_requirement->getWorkTime());
+	bool spawn_new;
+	bool delete_self;
+	m_requirement->noticeTestJobComplete(this, spawn_new, delete_self);
 	
-	multithreading::sleep(3000);
-
-	for (uint4 i=0; i < num_threads; i++)
+	if (spawn_new)
 	{
-		CloseHandle(threads[i]);
-	}
-}
-
-void firstJob(void)
-{
-	sint4 number_size = 10000;
-	sint4 number_sort = 1000;
-	sint4 number;
-	sint4* numbers = new sint4[number_size];
-	sint4* i = numbers;
-
-	for (number=0; number < number_size; number++)
-	{
-		*i++ = number;
+		std::string name = frameReqName(m_requirement->getID());
+		name += "(c)";
+		TestJob* job = new TestJob(m_requirement);
+		multithreading::Scheduler::single().enqueue(job, multithreading::noThreadPreference, name.c_str());
 	}
 
-	for (number=0; number < number_sort; number++)
+	if (delete_self)
 	{
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
+		delete this;
 	}
-
-	printf("I finished a sort in a JOB!\n");
-	delete[] numbers;
-}
-
-template<typename T> 
-void testVectors(T epsilon)
-{
-	math::V3<T> lhs;
-	math::V3<T> rhs; 
-	bool nearly_equals = lhs.nearlyEquals(rhs, epsilon);
-	T distance = lhs.distanceSqr(rhs);
-	if (nearly_equals)
-	{
-		printf("nearly equal!");
-	}
-
-	if (distance < 0)
-	{
-		printf("impossible!");
-	}
-}
-
-void playNumericalFunctions(void)
-{
-	/*
-	real8 f8(0);
-	real4 f4(0);
-	sint8 si8(0);
-	sint4 si4(0);
-	
-	printf("%f", math::abs<real8>(f8));
-	printf("%f", math::ln<real4>(f4));
-	printf("%f", abs(f8));
-	printf("%f", abs(f4));	
-	printf("%d", math::abs<sint4>(si4));
-	printf("%d", math::abs<sint8>(si8));
-	*/
 }
 
 template<typename OWNER>
@@ -622,220 +581,48 @@ public:
 
 }; // Composite
 
-
-
-using namespace signals;
-
-class Switch
-{
-public:
-	Transmitter0				delegate0;
-	Transmitter1<sint4>			delegate1;
-	Transmitter2<sint4, real4>	delegate2;
-	
-	void run(void)
-	{
-		delegate0();
-	}
-
-	void run(sint4 how_much)
-	{
-		delegate1(how_much);
-	}
-
-	void run(sint4 how_many_ints, real4 how_many_floats)
-	{
-		delegate2(how_many_ints, how_many_floats);
-	}	
-};
-
-class Switch2
-{
-public:
-	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void))
-	{
-		delegate0.connect(receiver, function);
-	}
-
-	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(void) const)
-	{
-		delegate0.connect(receiver, function);
-	}
-
-	void disconnect(Receiver* receiver)
-	{
-		delegate0.disconnect(receiver);
-	}
-
-	void run(void)
-	{
-		delegate0();
-	}
-
-private:
-	Transmitter0 delegate0;
-};
-
-class Light : public ReceiverBase
-{
-public:
-	void turnOff(void)			{ printf("Turned Off!\n"); }
-	void setWatts(sint4 watts)	{ printf("Set watts to %d\n", watts); }
-	void calibrate(sint4 watts, real4 luminosity) 
-	{
-		printf("Set watts to %d and luminosity to %f\n", watts, luminosity);
-	}
-};
-
-class Microwave : public Receiver
-{
-public:
-	void turnOff(void) const	{ printf("Microwave turned Off!\n"); }
-	void setWatts(sint4 watts)	{ printf("Microwave set watts to %d\n", watts); }
-	void calibrate(sint4 watts, real4 luminosity) 
-	{
-		printf("Microwave Set watts to %d and luminosity to %f\n", watts, luminosity);
-	}
-
-	void disconnect(void)
-	{
-		m_receiver.disconnect();
-	}
-
-	void onConnect(Transmitter* sender)
-	{
-		m_receiver.onConnect(sender);
-	}
-
-	void onDisconnect(Transmitter* sender)
-	{
-		m_receiver.onDisconnect(sender);
-	}
-protected:
-
-private:
-	signals::ReceiverMember m_receiver;
-};
-
-class Foo
-{
-public:
-	void bar(void)
-	{}
-};
-
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
-	Switch switch1;
-	Microwave microwave;
-	Light light;
-	Switch2 switch2;
-
-	Microwave* delete_microwave = new Microwave();;
-	Light* delete_light = new Light();
 	
-	switch2.connect(&microwave, &Microwave::turnOff);
-	switch2.connect(delete_microwave, &Microwave::turnOff);
-	
-	switch1.delegate0.connect(&light, &Light::turnOff);
-	switch1.delegate0.connect(delete_light, &Light::turnOff);
-	switch1.delegate1.connect(&light, &Light::setWatts);
-	switch1.delegate2.connect(&light, &Light::calibrate);
-	switch1.delegate0.connect(&microwave, &Microwave::turnOff);
-	switch1.delegate0.connect(delete_microwave, &Microwave::turnOff);
-	switch1.delegate1.connect(&microwave, &Microwave::setWatts);
-	switch1.delegate2.connect(&microwave, &Microwave::calibrate);
-	
-	switch2.run();
-	
-	switch1.run();
-	switch1.run(5);
-	delete delete_microwave;
-	delete delete_light;
-
-	Switch* delete_switch = new Switch();
-	delete_switch->delegate0.connect(&light, &Light::turnOff);
-	delete_switch->delegate0.connect(&microwave, &Microwave::turnOff);
-	delete_switch->run();
-	delete_switch->delegate0.disconnect(&light);
-	delete delete_switch;
-	
-
-	// compiler_checks::sizeOfChecks();
-	// compiler_checks::execute();
-	// threadsChecking();	
-	multithreading::Scheduler& scheduler = multithreading::Scheduler::single();
-	// scheduler.enqueue(firstJob);
-	
-	uint4 i = 32;
-	do 
-	{
-		--i;		
-		char buffer[256];
-		int index = 256;
-		do 
-		{
-			index--;
-			buffer[index] = '\0';
-		} 
-		while (index);
-		sprintf_s(buffer, "Quick:%2d", i);
-
-	// 	scheduler.enqueue(new QuickSortTester(),  multithreading::noThreadPreference, buffer);	
-	}
-	while (i);
-
-	/*
-	real_time::Clock man_clock;
-	real_time::Clock backwards;
-	backwards.setRate(-2.0);
-	real_time::StopWatch timer(backwards);
-	cycle before = real_time::cycles();
-	multithreading::sleep(3000);
-	cycle after = real_time::cycles();
-	cycle delta = after - before;
-	millicycle mhz = real_time::millihertz();
-	millicycle delta_mcylc = delta/mhz;
-	man_clock.tick();
-	millisecond man_ms = man_clock.milliseconds();
-	second man_seconds = man_clock.seconds();
-	backwards.tick();
-	millisecond back_ms = backwards.milliseconds();
-	second back_s = backwards.seconds();
-	timer.stop();
-	millisecond timed_ms = timer.milliseconds();
-	second timed_s = timer.seconds(); 
-	*/
-	
-	while (scheduler.hasAnyWork())
-		/** empty */;
-
-
-	scheduler.printState();
-	printf("Stopped playing in the sandbox!\n");
- 
-	testVectors<real8>(1.0);
-	testVectors<real4>(1.0f);
-	testVectors<sint1>(1);
-	testVectors<uint2>(1);
-
-	playNumericalFunctions();
-
-	EngineLoop loop;
-	
-	loop.addFrameRequirement(&physics);
+	EngineLoop loop;	
+	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
+	loop.addFrameRequirement(&physics_sych);
+	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
+	loop.addFrameRequirement(&physics_asych);
+	TestRequirement rendering(6, eFR_Rendering, 4);
+	loop.addFrameRequirement(&rendering);
+	TestRequirement lighting(4, eFR_Lighting, 3);
+	loop.addFrameRequirement(&lighting);
+	TestRequirement animation(3, eFR_Animation, 2);
+	loop.addFrameRequirement(&animation);
+	TestRequirement audio(2, eFR_Audio, 4);
+	loop.addFrameRequirement(&audio);
+	TestRequirement events(1, eFR_Events, 0);
+	loop.addFrameRequirement(&events);
+	TestRequirement gameplay(1, eFR_Gameplay, 0);
+	loop.addFrameRequirement(&gameplay);
+	TestRequirement ai(1, eFR_AI, 30);
+	loop.addFrameRequirement(&ai);
+	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
+	loop.addFrameRequirement(&garbage_collection);
+	TestRequirement networking(2, eFR_Networking, 4);
+	loop.addFrameRequirement(&networking);
 	loop.start();
 
-	while (loop.getFrameNumber() < 4)
+	while (loop.getFrameNumber() < 100000)
 	{
-
+		multithreading::sleep(3000);
 	};
 
 	loop.stop();
 
+	while (multithreading::Scheduler::single().hasAnyWork())
+	{
+		multithreading::sleep(3000);
+	}	
+
+	printf("Stopped playing in the sandbox!\n");
 	return;
 }
 

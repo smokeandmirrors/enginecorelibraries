@@ -27,29 +27,6 @@ using namespace lua_extension;
 \todo global bit packing investigation
 \todo run-time set path ability for LUA_PATH
 */
-template<typename T>
-class Value 
-#if EXTENDED_BY_LUA 
-: public LuaExtendable
-#endif//EXTENDED_BY_LUA 
-{
-public:
-#if EXTENDED_BY_LUA
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Value)
-#endif//EXTENDED_BY_LUA
-	T m_value;
-	T getValue(void) const { return m_value; }
-	void setValue(T value) { m_value = value; }
-};
-
-typedef Value<sint4> Value_sint4 ;
-
-DECLARE_LUA_LIBRARY(Value_sint4);
-DEFINE_TO_LUAEXTENDABLES(Value<sint4>);
-DEFINE_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4)
-	LUA_NAMED_ENTRY("getValue", (return1Param0const<Value_sint4, sint4, &Value<sint4>::getValue>))  
-	LUA_NAMED_ENTRY("setValue", (return0Param1<Value_sint4, sint4, &Value<sint4>::setValue>))
-END_LUA_LUAEXTENDABLE(Value_sint4, Value_sint4) 
 
 #if WIN32
 #include <process.h>
@@ -68,7 +45,6 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		lua.require("ObjectOrientedParadigm");
 		register_lua_library((&lua), Vector2);
 		register_lua_library((&lua), Vector3);
-		register_lua_library((&lua), Value_sint4);
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		// lua.runConsole();
@@ -77,9 +53,7 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality
-#endif//SANDBOX
-
-	
+#endif//SANDBOX	
 	return 0;
 }
 

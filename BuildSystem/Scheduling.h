@@ -3,8 +3,9 @@
 #define SCHEDULING_H
 
 #include "Build.h"
-#include "Observation.h"
+#include "Signals.h"
 #include "Singleton.h"
+#include "Synchronization.h"
 #include "Threads.h"
 /**
 \warning WORK IN-PROGRESS! 
@@ -17,9 +18,10 @@ class PendingJobQueue;
 
 class Scheduler 
 : public design_patterns::Singleton<Scheduler>
-, public design_patterns::Observer<Thread>
+, public signals::Receiver
 {
 	friend class design_patterns::Singleton<Scheduler>;
+	friend class signals::Transmitter1<Thread*>;
 
 public:
 	/** 
@@ -48,7 +50,7 @@ public:
 		return m_numActiveJobs;
 	}
 	
-	uint4 			getNumberPendingJobs(void) const;
+	uint4 getNumberPendingJobs(void) const;
 	
 	uint4 getNumberSystemThreads(void) const	
 	{ 
@@ -57,32 +59,33 @@ public:
 	
 	bool hasAnyWork(void) const
 	{
+		synchronize(m_mutex);
 		return getNumberActiveJobs() || getNumberPendingJobs();
 	}
 
-	void ignore(Thread* observable)
+	virtual void ceaseReception(void)
 	{
-		m_observer.ignore(observable);
+		m_receiver.ceaseReception();
 	}
 
-	void notice(Thread* observable)
+	void onComplete(Thread* thread)
 	{
-		accountForFinish(observable);
+		synchronize(m_mutex);
+		accountForFinish(thread);
 		startNextJob();
 	}
-	
-	void observe(Thread* observable)
-	{
-		m_observer.observe(observable);
-	}
-	
+		
 	void printState(void) const
 	{
 		std::string output = this->toString();
 		printf(output.c_str());
 	}
 
-	void			setMaxThreads(uint4 max)			{ m_maxThreads = max; }
+	void setMaxThreads(uint4 max)			
+	{ 
+		m_maxThreads = max; 
+	}
+	
 	const std::string toString(void) const;
 	
 protected:
@@ -91,6 +94,7 @@ protected:
 	
 	inline void accountForFinish(Thread* job)
 	{
+		synchronize(m_mutex);
 		sint4 thread_index = -1;
 
 		for (uint4 i = 0; i < m_numSystemThreads; i++)
@@ -102,8 +106,6 @@ protected:
 			}
 		}
 
-		printf("Accounting for finish of %s", job->toString().c_str());
-
 		assert(thread_index != -1);
 		m_activeJobs[thread_index] = NULL;
 		m_numActiveJobs--;
@@ -112,6 +114,7 @@ protected:
 
 	inline void accountForNewJob(Thread* job, sint4 index)
 	{
+		synchronize(m_mutex);
 		m_activeJobs[index] = job;
 		m_numActiveJobs++;
 		printState();
@@ -119,6 +122,7 @@ protected:
 	
 	inline bool getFreeIndex(sint4& index)
 	{
+		synchronize(m_mutex);
 		for (uint4 i = 0; i < m_numSystemThreads; i++)
 		{
 			if (!m_activeJobs[i])
@@ -133,6 +137,7 @@ protected:
 
 	inline bool getOpenThread(sint4& index, sint4 ideal_thread)
 	{
+		synchronize(m_mutex);
 		if (ideal_thread != noThreadPreference && !m_activeJobs[ideal_thread])
 		{
 			index = ideal_thread;
@@ -145,6 +150,17 @@ protected:
 	}
 
 	void			initializeNumberSystemThreads(void);
+
+	void onConnect(signals::Transmitter* sender)
+	{
+		m_receiver.onConnect(sender);
+	}
+
+	void onDisconnect(signals::Transmitter* sender)
+	{
+		m_receiver.onDisconnect(sender);
+	}
+
 	void			startNextJob(void);
 	const std::string toStringActiveJob(Thread* job) const;
 	const std::string toStringInactiveJob(void) const;
@@ -157,9 +173,9 @@ private:
 	uint4					m_maxThreads;
 	uint4					m_numActiveJobs;
 	uint4					m_numSystemThreads;
-	design_patterns::ObserverMember<Thread>
-							m_observer;
+	signals::ReceiverMember	m_receiver;
 	PendingJobQueue*		m_pendingJobs;
+	multithreading::Mutex	m_mutex;
 }; // class Scheduler
 
 } // multithreading

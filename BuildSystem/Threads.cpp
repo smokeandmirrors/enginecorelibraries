@@ -3,7 +3,6 @@
 #include <windows.h>
 #endif//WIN32
 
-#include "Observation.h"
 #include "Threads.h"
 
 namespace multithreading

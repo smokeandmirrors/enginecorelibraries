@@ -446,10 +446,6 @@
 			Name="Design Patterns"
 			>
 			<File
-				RelativePath=".\Observation.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Signals.h"
 				>
 			</File>

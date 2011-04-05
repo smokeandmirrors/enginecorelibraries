@@ -3,7 +3,7 @@
 #define THREADS_H
 
 #include "Build.h"
-#include "Observation.h"
+#include "Signals.h"
 #include "Time.h"
 
 /**
@@ -41,7 +41,7 @@ void sleep(millisecond milliseconds);
 class Executable 
 {
 public:
-	virtual	~Executable(void) {/* empty */}
+	virtual	~Executable(void)=0 {/* empty */}
 	virtual void execute(void)=0;
 }; // class Executable
 
@@ -54,45 +54,75 @@ typedef void*				threadHandle;
 #endif//WIN32
 		
 class Thread
-: public design_patterns::Observable<Thread>
+: public signals::Transmitter1<Thread*>
 {
 public:
 	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
-	Thread(Executable* executable, 
-		sint4 CPUid=noThreadPreference, 
-		design_patterns::Observer<Thread>* observer=NULL,
-		const sint1* name="un-named") 
-	: m_executor(new Thread::ExecutableExecutor(executable))
-	, m_name(name)
-	{ 
-		initialize(CPUid, observer);
-	}
-
+	template<class RECEIVER>
 	Thread(executableFunction executable, 
 		sint4 CPUid=noThreadPreference, 
-		design_patterns::Observer<Thread>* observer=NULL,
+		RECEIVER* receiver=NULL, 
+		void (RECEIVER::* function)(Thread*) const=NULL,
 		const sint1* name="un-named")
 	: m_executor(new Thread::FunctionExecutor(executable))
 	, m_name(name)
 	{ 
-		initialize(CPUid, observer);
+		initialize(CPUid, receiver, function);
 	}
 
-	~Thread(void);
-
-	void add(design_patterns::Observer<Thread>* observer)
-	{
-		m_observable.add(observer);
+	template<class RECEIVER>
+	Thread(Executable* executable, 
+		sint4 CPUid=noThreadPreference, 
+		RECEIVER* receiver=NULL, 
+		void (RECEIVER::* function)(Thread*) const=NULL,
+		const sint1* name="un-named")
+	: m_executor(new Thread::ExecutableExecutor(executable))
+	, m_name(name)
+	{ 
+		initialize(CPUid, receiver, function);
 	}
-	
-	void notify(void)
-	{
-		m_observable.notify();
+
+	template<class RECEIVER>
+	Thread(Executable* executable, 
+		sint4 CPUid=noThreadPreference, 
+		RECEIVER* receiver=NULL, 
+		void (RECEIVER::* function)(Thread*)=NULL,
+		const sint1* name="un-named") 
+	: m_executor(new Thread::ExecutableExecutor(executable))
+	, m_name(name)
+	{ 
+		initialize(CPUid, receiver, function);
 	}
 
-	void remove(design_patterns::Observer<Thread>* observer)
+	template<class RECEIVER>
+	Thread(executableFunction executable, 
+		sint4 CPUid=noThreadPreference, 
+		RECEIVER* receiver=NULL, 
+		void (RECEIVER::* function)(Thread*)=NULL,
+		const sint1* name="un-named") 
+	: m_executor(new Thread::FunctionExecutor(executable))
+	, m_name(name)
+	{ 
+		initialize(CPUid, receiver, function);
+	}
+
+	virtual ~Thread(void);
+
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
 	{
-		m_observable.remove(observer);
+		m_onComplete.connect(receiver, function);
+	}
+
+	template<class RECEIVER>
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+	{
+		m_onComplete.connect(receiver, function);
+	}
+
+	void disconnect(signals::Receiver* receiver)
+	{
+		m_onComplete.disconnect(receiver);
 	}
 
 	const std::string toString(void) const 
@@ -165,30 +195,40 @@ private:
 	void execute(void)
 	{
 		m_executor->execute();
-		m_observable.notify();
+		m_onComplete(this);
 		delete this;
 	}
 
-	void initialize(sint4 CPUid, design_patterns::Observer<Thread>* observer)
+	template<class RECEIVER>
+	void initialize(sint4 CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
 	{
 		assert(m_executor);
-		
-		m_observable.setObservable(this);
-		
-		if (observer)
-		{
-			design_patterns::begin(observer, this);
-		}
-
+		m_onComplete.connect(receiver, function);
+		m_executor->initialize(this, m_thread, m_id, CPUid);
+	}
+	
+	template<class RECEIVER>
+	void initialize(sint4 CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+	{
+		assert(m_executor);
+		m_onComplete.connect(receiver, function);
 		m_executor->initialize(this, m_thread, m_id, CPUid);
 	}
 
-	Executor*			m_executor;
-	threadID			m_id;
-	std::string			m_name;
-	design_patterns::ObservableMember<Thread>	
-						m_observable;
-	threadHandle		m_thread;
+	Executor*			
+		m_executor;
+	
+	threadID
+		m_id;
+	
+	std::string
+		m_name;
+	
+	signals::Transmitter1<Thread*> 
+		m_onComplete;
+	
+	threadHandle		
+		m_thread;
 };
 
 } // multithreading
