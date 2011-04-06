@@ -49,13 +49,22 @@ namespace lua_library_example
 }
 
 // to use the library
-register_lua_library(Lua, example);
+REGISTER_LUA_LIBRARY(Lua, example);
 // would generate:
 Lua->openLibrary(lua_library_example::luaopen_example);
 \endcode
 
 \warning REGISTRATION MUST BE DONE IN DEPENDENCY ORDER.
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	1.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	YES
 
 */
 #include "Build.h"
@@ -411,7 +420,7 @@ or the same if it has no parent class
 // end #define END_LUA_LUAEXTENDABLE(derived_class, super_class) 
 
 /** 
-\def register_lua_library
+\def REGISTER_LUA_LIBRARY
 register a library with a lua state 
 \warning registration MUST be done in dependency order, or the behavior
 is undefined
@@ -421,9 +430,9 @@ behavior is undefined
 \param lua_object_ptr is class Lua, not struct lua_State 
 \param module of the library without string delimiters
 */
-#define register_lua_library(lua_object_ptr, module) \
+#define REGISTER_LUA_LIBRARY(lua_object_ptr, module) \
 	lua_object_ptr->openLibrary(lua_library_##module::key)		
-// end #define register_lua_library
+// end #define REGISTER_LUA_LIBRARY
 
 #define INLINE_DEFAULT_TOSTRING(Class) \
 	virtual const sint1* toString(void) \

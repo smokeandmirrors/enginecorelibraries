@@ -4,8 +4,13 @@
 /**
 \file Time.h
 
-\warning WORK IN-PROGRESS! 
-\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Unit Tested			:	NO
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
+
 */
 #include "Build.h"
 
@@ -26,6 +31,11 @@ millicycle		millihertz(void);
 millisecond		milliseconds(void);
 second			seconds(void);
 
+/** \todo split these up by constructor, if they are constructed with with a clock, all of the time is based on that clock calling tick(),
+othwerwise, they will operate on the real_time calls directly. */
+/** \todo minimize all of the arithmetic here, and remove the divides */
+/** \todo make sure all of these values can handle slomotion, reversal of time */
+
 // frame clock, gameplay/engine clock
 class Clock 
 {
@@ -35,27 +45,21 @@ public:
 	, m_currentSeconds(0)
 	, m_rate(1.0)
 	, m_tick(real_time::cycles())
-	{
-		/* empty */
-	}
-
+	{ /* empty */ }
+	
 	Clock(cycle start)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
 	, m_tick(start)
-	{
-		/* empty */
-	}
-
+	{ /* empty */ }
+	
 	Clock(const Clock& relative_parent)
 	: m_currentMilliseconds(relative_parent.milliseconds())
 	, m_currentSeconds(relative_parent.seconds())
 	, m_rate(relative_parent.getRate())
 	, m_tick(relative_parent.getTick())
-	{
-		/* empty */
-	}
+	{ /* empty */ }
 	
 	inline real8 getRate(void) const 
 	{ 
@@ -101,7 +105,6 @@ private:
 	cycle		m_tick;
 }; // class Clock
 
-
 class StopWatch 
 {
 public:
@@ -110,19 +113,15 @@ public:
 	, m_start(real_time::cycles())
 	, m_stop(m_start)
 	, m_rate(rate)
-	{
-		/* empty */
-	}
-
+	{ /* empty */ }
+	
 	StopWatch(const Clock& reference_frame)
 	: m_active(true)
 	, m_start(real_time::cycles())
 	, m_stop(m_start)
 	, m_rate(reference_frame.getRate())
-	{
-		/* empty */
-	}
-
+	{ /* empty */ }
+	
 	inline real8 getRate(void) const 
 	{ 
 		return m_rate; 
@@ -170,6 +169,73 @@ private:
 	cycle		m_start;
 	cycle		m_stop;
 }; // class StopWatch
+
+class Timer 
+{
+public:
+	Timer(const real8 rate=1.0, second max_time=0.0, second min_time=-1.0, bool auto_reset=false)
+	: m_autoReset(auto_reset)
+	, m_maxTime(max_time)
+	, m_minTime(min_time == -1.0 ? max_time : min_time)
+	, m_rate(rate)
+	{
+		reset();
+	}
+
+	inline void reset(void)
+	{
+		m_startTime = real_time::seconds();
+		m_resetTime = m_maxTime; /** \todo: randomize me */
+	}
+	
+	inline void set(second max_time, second min_time=-1.0, bool auto_reset=false)
+	{
+		m_maxTime = max_time;
+		m_minTime = min_time == -1.0 ? max_time : min_time;
+		m_autoReset = auto_reset;
+	}
+	
+	inline bool timeIsUp(void) 
+	{
+		bool time_passed = getTimePassed() >= m_resetTime;
+		
+		if (m_autoReset)
+		{
+			reset();
+		}
+		
+		return time_passed;
+	}
+
+	inline bool timeRemains(void)
+	{
+		bool time_passed = getTimePassed() < m_resetTime;
+		
+		if (m_autoReset)
+		{
+			reset();
+		}
+		
+		return time_passed;
+	}
+
+protected:
+	inline second getTimePassed(void) const
+	{
+		return m_rate * (real_time::seconds() - m_startTime); 
+	}
+
+private:
+	Timer(const Timer& relative_parent);
+	Timer operator=(const Timer&);
+
+	bool		m_autoReset;
+	second		m_maxTime;
+	second		m_minTime;
+	const real8	m_rate;
+	second		m_resetTime;
+	second		m_startTime;
+}; // class Timer
 
 } // namespace real_time
 

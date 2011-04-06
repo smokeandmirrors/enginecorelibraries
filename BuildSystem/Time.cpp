@@ -20,8 +20,12 @@ inline cycle getCycles(void)
 	assert(system_is_initialized);
 #if WIN32
 	LARGE_INTEGER perf_query;
+#if DEBUG
 	int success = QueryPerformanceCounter(&perf_query);
 	assert(success);
+#else
+	QueryPerformanceCounter(&perf_query);
+#endif//DEBUG
 	return perf_query.QuadPart - systemCycleStart;
 #else
 	PREVENT_COMPILE

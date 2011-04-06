@@ -14,6 +14,13 @@ Macros to help assist auto-writing template functions/classes.
 <BR>
 \endhtmlonly
 \date 3/22/2011
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 
 /** template arguments */

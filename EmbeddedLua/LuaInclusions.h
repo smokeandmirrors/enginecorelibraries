@@ -15,7 +15,6 @@ smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 \endhtmlonly
 \date 2/23/2010
-
 */
 #include "lua.hpp"
 #include <lauxlib.h>
@@ -49,6 +48,6 @@ checks the index as userdata but NOT lightuserdata
 \param L a lua_State
 \param n an integer index into the stack of L
 */
-#define lua_isfulluserdata(L, n) (lua_isuserdata(L, n) && !lua_islightuserdata(L, n))
+#define LUA_ISFULLUSERDATA(L, n) (lua_isuserdata(L, n) && !lua_islightuserdata(L, n))
 
 #endif//LUAINCLUSIONS_H

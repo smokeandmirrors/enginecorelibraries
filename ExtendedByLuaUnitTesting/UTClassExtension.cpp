@@ -88,7 +88,7 @@ END_LUA_LIBRARY(One)
 void Classes::test_define_lua_class()
 {
 	Lua lua;
-	register_lua_library((&lua), One);
+	REGISTER_LUA_LIBRARY((&lua), One);
 	CFIX_ASSERT(lua.doString("_G.one = One.new()"));
 	lua_State* L = lua.getState();
 	lua_getglobal(L, "one");
@@ -275,8 +275,8 @@ END_LUA_LUAEXTENDABLE(Derived, Simple)
 void supporttest_define_lua_LuaExtendable()
 {
 	lua_extension::Lua lua; 
-	register_lua_library((&lua), Simple);
-	register_lua_library((&lua), Derived);
+	REGISTER_LUA_LIBRARY((&lua), Simple);
+	REGISTER_LUA_LIBRARY((&lua), Derived);
 	unitTestingTools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
 }
 
@@ -432,9 +432,9 @@ END_LUA_LUAEXTENDABLE(Child, Parent)
 void supportProxyTesting(void)
 {
 	lua_extension::Lua lua; 
-	register_lua_library((&lua), Grandparent);
-	register_lua_library((&lua), Parent);
-	register_lua_library((&lua), Child);
+	REGISTER_LUA_LIBRARY((&lua), Grandparent);
+	REGISTER_LUA_LIBRARY((&lua), Parent);
+	REGISTER_LUA_LIBRARY((&lua), Child);
 	unitTestingTools::executeLuaUnitTest("UTProxyClasses", &lua);
 }
 
@@ -467,7 +467,7 @@ void Classes::testLuaExtension(void)
 	registerGlobalLibrary(lua.getState());
 	lua.require("Utilities");
 	lua.require("ObjectOrientedParadigm");
-	register_lua_library((&lua), Vector3);
+	REGISTER_LUA_LIBRARY((&lua), Vector3);
 	unitTestingTools::executeLuaUnitTest("UTVector", &lua);	
 }
 
@@ -504,7 +504,7 @@ void Classes::testNumbers(void)
 		CFIX_ASSERT(!isNaN(value));
 		CFIX_ASSERT(isValid(value));
 	}
-
+#if DEBUG
 	real4 one = 1.0f;
 	real4 zero = 0.0f;
 	real4 positive_infinity = one / zero;
@@ -522,6 +522,7 @@ void Classes::testNumbers(void)
 	CFIX_ASSERT(isNaN(not_a_number));
 	CFIX_ASSERT(!isValid(not_a_number));
 	CFIX_ASSERT(!isFinite(not_a_number));
+#endif//DEBUG
 }
 
 void Classes::testVector3(void)

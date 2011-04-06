@@ -6,10 +6,17 @@
 #define UNIQUE_AUX_1(sychronized,number)	UNIQUE_AUX_2(sychronized,number) 
 #define UNIQUE_SYNCHRONIZATION(sychronized) UNIQUE_AUX_1(sychronized, __COUNTER__)
 
-#define synchronize(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
+/** \todo thread policies */
+#define SYNC(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 /**
-\warning WORK IN-PROGRESS! 
-\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 namespace multithreading
 {

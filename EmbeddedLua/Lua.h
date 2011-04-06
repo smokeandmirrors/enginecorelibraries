@@ -18,6 +18,16 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \date 2/18/2010
 
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	1.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	YES
+
 */
 
 #include <stdlib.h>
@@ -41,7 +51,7 @@ public:
 	\param num_return_values the number of expected returned values, defaults
 	to LUA_MULTIRET
 	*/
-	static sint4			callProtected(lua_State* L, sint4 num_args=0, sint4 num_return_values=-1);
+	static sint4		callProtected(lua_State* L, sint4 num_args=0, sint4 num_return_values=-1);
 	/** 
 	sets package.loaded[module] = nil 
 	allows for extending of C declared libraries by %Lua files in packages
@@ -54,7 +64,7 @@ public:
 	\param L the %Lua state in which the function was called
 	\param status the error code from calling the function
 	*/
-	static sint4			report(lua_State* L, sint4 status);
+	static sint4		report(lua_State* L, sint4 status);
 	/**
 	call require from C++
 	*/
@@ -82,7 +92,7 @@ public:
 	/**
 	\return the string ID of this specific %Lua object
 	*/
-	const sint1*			getName(void) const		{ return m_name; }
+	const sint1*		getName(void) const		{ return m_name; }
 	/**
 	returns the lua_State encapsulated by this class
 	*/

@@ -4,6 +4,10 @@
 /**
 \file Singleton.h
 
+Defines a template Singleton implemenation, that simply provides
+most of the Singleton requirements: initialization, accessor,
+destruction, protected constructor/destructor.
+
 \author Smoke and Mirrors Development
 \htmlonly
 <A HREF="smokeandmirrorsdevelopment@gmail.com">
@@ -14,8 +18,14 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \endhtmlonly
 \date 3/10/2011
 
-\warning WORK IN-PROGRESS! 
-\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 #include "Build.h"
 #include "Synchronization.h"
@@ -39,14 +49,13 @@ public:
 	*/
 	static void destroy(void)
 	{
-		synchronize(mutex);
+		SYNC(mutex);
 
 		if (singleton)
 		{
 			delete singleton;
 			singleton = NULL;
 			getter = getUninitialized;
-			printf("SINGLETON DESTROYED!");
 		}
 	} // static void destroy(void)
 
@@ -73,7 +82,7 @@ private:
 	/** creates the only T and returns the the dereferenced pointer to it */
 	static T& getUninitialized(void)
 	{
-		synchronize(mutex);
+		SYNC(mutex);
 
 		if (!singleton)
 		{

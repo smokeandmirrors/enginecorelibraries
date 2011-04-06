@@ -422,10 +422,6 @@
 			Name="Foundation"
 			>
 			<File
-				RelativePath=".\Build.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Build.h"
 				>
 			</File>

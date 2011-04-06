@@ -14,6 +14,15 @@ smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 \endhtmlonly
 \date 2/18/2011
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	NO
+Tested in the field	:	NO
 */
 
 /** 

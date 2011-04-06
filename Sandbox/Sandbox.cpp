@@ -112,15 +112,15 @@ public:
 
 	}
 
-	void ceaseReception()
+	void ceaseReception(void)
 	{
 		m_receiver.ceaseReception();
 	}
 
-	void disconnect(void)
+	void ceaseTransmission(void)
 	{
-		m_onComplete.disconnect();
-		m_onQueuedWork.disconnect();
+		m_onComplete.ceaseTransmission();
+		m_onQueuedWork.ceaseTransmission();
 	}
 	
 	void noticeNextFrame(EngineLoop*)
@@ -222,7 +222,7 @@ public:
 
 	void addFrameRequirement(FrameRequirement* requirement)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		m_onComplete.connect(requirement, &FrameRequirement::noticeNextFrame);
 		requirement->onCompleteConnect(this, &EngineLoop::noticeComplete);
 		requirement->onQueuedWorkConnect(this, &EngineLoop::noticeWorkQueued);
@@ -232,6 +232,11 @@ public:
 	void ceaseReception()
 	{
 		m_receiver.ceaseReception();
+	}
+
+	void ceaseTransmission()
+	{
+		m_onComplete.ceaseTransmission();
 	}
 
 	template<class RECEIVER>
@@ -244,11 +249,6 @@ public:
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
 	{
 		m_onComplete.connect(receiver, function);
-	}
-
-	void disconnect()
-	{
-		m_onComplete.disconnect();
 	}
 
 	void disconnect(signals::Receiver* receiver)
@@ -268,7 +268,7 @@ public:
 	
 	void noticeComplete(FrameRequirement* requirement)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		markRequirementCompleted(requirement);	
 
 		if (isFrameCompleted())
@@ -279,7 +279,7 @@ public:
 	
 	void noticeWorkQueued(FrameRequirement* requirement)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		bool queue_next(false);
 		requirements_iter iter = m_incomplete.begin(); 
 		requirements_iter sentinel = m_incomplete.end();
@@ -313,7 +313,7 @@ public:
 
 	void removeFrameRequirement(FrameRequirement* requirement)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		m_onComplete.disconnect(requirement);
 		removeFromList(requirement, m_completed, m_completeMutex);
 		removeFromList(requirement, m_incomplete, m_incompleteMutex);
@@ -321,7 +321,7 @@ public:
 	
 	void start(void)
 	{
-		synchronize(m_incompleteMutex)
+		SYNC(m_incompleteMutex)
 		
 		if (!m_isRunning)
 		{
@@ -341,7 +341,7 @@ public:
 protected:
 	void addToList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
 	{
-		synchronize(mutex)
+		SYNC(mutex)
 		reqs_list.push_back(req);
 	}
 
@@ -368,8 +368,8 @@ protected:
 	
 	void markRequirementsIncomplete(void)
 	{
-		synchronize(m_completeMutex)
-		synchronize(m_incompleteMutex)
+		SYNC(m_completeMutex)
+		SYNC(m_incompleteMutex)
 		assert(m_incomplete.empty());
 		m_incomplete = m_completed;
 		m_completed.resize(0);
@@ -378,7 +378,7 @@ protected:
 
 	void removeFromList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
 	{
-		synchronize(mutex)
+		SYNC(mutex)
 		for (requirements_iter iter = reqs_list.begin(); iter != reqs_list.end(); iter++)
 		{
 			if (*iter == req)
@@ -470,7 +470,7 @@ public:
 	void 
 	noticeTestJobComplete(TestJob* job, bool& spawn_new, bool& delete_self)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		++m_completedJobs;
 		delete_self = job != m_original;
 

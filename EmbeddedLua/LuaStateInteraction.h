@@ -17,6 +17,16 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \endhtmlonly
 
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	1.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	YES
+
 */
 
 #include "Build.h"
@@ -31,7 +41,7 @@ namespace lua_extension
 This is a define macro and not an inline function due to the 
 average lua_istype function being a macro
 */
-#define assert_lua_argument(lua_istype, expected, L, index) \
+#define ASSERT_LUA_ARGUMENT(lua_istype, expected, L, index) \
 	{ \
 		sint4 stack_size = lua_gettop(L); \
 		if (index > stack_size || index < -stack_size) \
@@ -45,7 +55,7 @@ average lua_istype function being a macro
 		} \
 	}
 #else
-#define assert_lua_argument(lua_istype, type_name, L, index) {}
+#define ASSERT_LUA_ARGUMENT(lua_istype, type_name, L, index) {}
 #endif//ARGUMENT_ERRORS
 
 inline void lua_assertIndexInStack(lua_State* L, sint4 index)

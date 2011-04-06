@@ -8,8 +8,14 @@
 #include "Synchronization.h"
 #include "Threads.h"
 /**
-\warning WORK IN-PROGRESS! 
-\note EXPERIMENTAL!  NOT INTENDED FOR USE!
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 namespace multithreading
 {
@@ -59,7 +65,7 @@ public:
 	
 	bool hasAnyWork(void) const
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		return getNumberActiveJobs() || getNumberPendingJobs();
 	}
 
@@ -70,7 +76,7 @@ public:
 
 	void onComplete(Thread* thread)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		accountForFinish(thread);
 		startNextJob();
 	}
@@ -94,7 +100,7 @@ protected:
 	
 	inline void accountForFinish(Thread* job)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		sint4 thread_index = -1;
 
 		for (uint4 i = 0; i < m_numSystemThreads; i++)
@@ -114,7 +120,7 @@ protected:
 
 	inline void accountForNewJob(Thread* job, sint4 index)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		m_activeJobs[index] = job;
 		m_numActiveJobs++;
 		printState();
@@ -122,7 +128,7 @@ protected:
 	
 	inline bool getFreeIndex(sint4& index)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		for (uint4 i = 0; i < m_numSystemThreads; i++)
 		{
 			if (!m_activeJobs[i])
@@ -137,7 +143,7 @@ protected:
 
 	inline bool getOpenThread(sint4& index, sint4 ideal_thread)
 	{
-		synchronize(m_mutex);
+		SYNC(m_mutex);
 		if (ideal_thread != noThreadPreference && !m_activeJobs[ideal_thread])
 		{
 			index = ideal_thread;

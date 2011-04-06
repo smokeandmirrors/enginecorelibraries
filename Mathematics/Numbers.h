@@ -4,7 +4,14 @@
 
 #include "Build.h"
 /**
-\warning WORK IN-PROGRESS! 
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 namespace math
 {

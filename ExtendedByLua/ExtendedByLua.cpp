@@ -43,8 +43,8 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		registerGlobalLibrary(lua.getState());
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
-		register_lua_library((&lua), Vector2);
-		register_lua_library((&lua), Vector3);
+		REGISTER_LUA_LIBRARY((&lua), Vector2);
+		REGISTER_LUA_LIBRARY((&lua), Vector3);
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		// lua.runConsole();

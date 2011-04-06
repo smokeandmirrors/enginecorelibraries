@@ -229,7 +229,7 @@ void Scheduler::enqueue(Executable* job,
 	sint4 ideal_thread/* =noThreadPreference */, 
 	const sint1* name/* ="un-named" */)
 {
-	synchronize(m_mutex);
+	SYNC(m_mutex);
 	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
@@ -248,7 +248,7 @@ void Scheduler::enqueue(executableFunction job,
 	sint4 ideal_thread/* =noThreadPreference */, 
 	const sint1* name/* ="un-named" */)
 {
-	synchronize(m_mutex);
+	SYNC(m_mutex);
 	sint4 index;
 
 	if (getOpenThread(index, ideal_thread))
@@ -265,7 +265,7 @@ void Scheduler::enqueue(executableFunction job,
 
 uint4 Scheduler::getNumberPendingJobs(void) const
 {
-	synchronize(m_mutex);
+	SYNC(m_mutex);
 	return m_pendingJobs->getNumber();
 }
 
@@ -282,13 +282,13 @@ void Scheduler::initializeNumberSystemThreads(void)
 
 void Scheduler::startNextJob(void)
 {
-	synchronize(m_mutex);
+	SYNC(m_mutex);
 		
 	if (getNumberPendingJobs())
 	{
 		sint4 thread_index;
 		m_pendingJobs->getNextIdealThread(thread_index);
-		
+			
 		if (thread_index == -1)
 		{
 			bool free_thread = getFreeIndex(thread_index);

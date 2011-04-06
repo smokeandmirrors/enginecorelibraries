@@ -9,9 +9,11 @@
 namespace lua_extension
 {
 
-#define lua_setUserDataMetamethod(L, method)	/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */\
-	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */\
-	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */	
+inline void lua_setUserDataMetamethod(lua_State* L, const char* method)	
+{												/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */
+	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */
+	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */
+}
 
 inline bool isInstanceBeingRefreshed(lua_State* L)
 {	//s: userdata, lua_class_mt

@@ -15,6 +15,16 @@ performance comparison.
 <BR>
 \endhtmlonly
 \date 2/18/2010
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
+
 */
 
 /** 

@@ -21,6 +21,15 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \date 1/20/2011
 
 \todo 32/64-bit number types, NULL, assert, warn, error
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 #include <assert.h>
 
@@ -32,10 +41,10 @@ smokeandmirrorsdevelopment@gmail.com</A>
 #endif
 #endif
 
+/** preprocessor control for conditionally preventing code from compiling */
+#define COMPILE_IF(condition) switch(0){case 0: case condition:;}
 /** preprocessor control for explicitly preventing code from compiling */
 #define PREVENT_COMPILE switch(0){case 0:case 0:;}
-/** conditional preprocessor control for explicitly preventing code from compiling */
-#define PREVENT_COMPILE_IF(condition) switch(0){case 1: case condition:;}
 /** preprocessor control for unit testing compilation */
 #define WITH_UNIT_TESTING 1
 

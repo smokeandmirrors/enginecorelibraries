@@ -123,6 +123,16 @@ C function
 \see the simplest examples below
 
 \todo document the necessary steps to add another function of args # or params # not present
+
+<DEVELOPMENT STATUS>
+Current Draft		:	1.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	YES
+
 */
 
 #include "Build.h"

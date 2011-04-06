@@ -15,6 +15,16 @@ development.
 
 \todo C99 functions:
 http://en.wikipedia.org/wiki/Math.h
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
+
 */
 
 namespace math

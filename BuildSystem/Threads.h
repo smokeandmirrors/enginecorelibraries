@@ -7,7 +7,14 @@
 #include "Time.h"
 
 /**
-\warning WORK IN-PROGRESS! 
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 namespace multithreading
 {
@@ -54,7 +61,6 @@ typedef void*				threadHandle;
 #endif//WIN32
 		
 class Thread
-: public signals::Transmitter1<Thread*>
 {
 public:
 	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
