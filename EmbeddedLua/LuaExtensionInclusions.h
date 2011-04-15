@@ -23,9 +23,8 @@ smokeandmirrorsdevelopment@gmail.com</A>
 <BR>
 \endhtmlonly
 \date 2/11/2011
-
-\todo 32/64-bit number types, NULL, assert, warn, error
 */
+
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"

@@ -610,7 +610,7 @@ void sandbox::play()
 	loop.addFrameRequirement(&networking);
 	loop.start();
 
-	while (loop.getFrameNumber() < 100000)
+	while (loop.getFrameNumber() < 2)
 	{
 		multithreading::sleep(3000);
 	};
@@ -623,6 +623,7 @@ void sandbox::play()
 	}	
 
 	printf("Stopped playing in the sandbox!\n");
+	multithreading::Scheduler::single().destroy();
 	return;
 }
 

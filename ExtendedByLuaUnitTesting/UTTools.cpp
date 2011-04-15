@@ -10,7 +10,7 @@
 #include "LuaExtensionInclusions.h"
 #endif
 
-namespace unitTestingTools
+namespace unit_testing_tools
 {
 
 void checkNearEqual(real4 lhs, real4 rhs, real4 tolerance)
@@ -86,5 +86,5 @@ void executeLuaUnitTest(char* module, Lua* lua)
 }
 #endif
 
-} // namespace unitTestingTools
+} // namespace unit_testing_tools
 #endif//WITH_UNIT_TESTING

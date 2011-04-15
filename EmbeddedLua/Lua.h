@@ -3,9 +3,7 @@
 #define LUA_H
 /**
 \file Lua.h
-This file defines the class Lua
-The Lua class encapsulates a lua_Struct.  It will allow for easier
-creation of application and library code for %Lua.
+\brief This file defines the class Lua.  
 
 \author Smoke and Mirrors Development
 \htmlonly
@@ -27,6 +25,9 @@ Unit Tested			:	YES
 Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	YES
+
+The Lua class encapsulates a lua_Struct.  It will allow for easier creation
+of application and library code for %Lua.
 
 */
 

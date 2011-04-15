@@ -11,11 +11,11 @@ private:
 public:
 	void LuaUnitTesting()
 	{
-		unitTestingTools::executeLuaUnitTest("UTLibraryFunctions");
+		unit_testing_tools::executeLuaUnitTest("UTLibraryFunctions");
 	}
 	void LuaOOPUnitTesting()
 	{
-		unitTestingTools::executeLuaUnitTest("UTOOP");
+		unit_testing_tools::executeLuaUnitTest("UTOOP");
 	}
 };
 

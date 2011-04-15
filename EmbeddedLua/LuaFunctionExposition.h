@@ -4,8 +4,29 @@
 /**
 \file LuaFunctionExposition.h
 
-This file attempts to make even easier the generation C++ functions
+\brief This file attempts to make even easier the generation C++ functions
 that are exposed to Lua.
+
+\author Smoke and Mirrors Development
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2011 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
+\date 2/18/2010
+
+\warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	1.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	YES
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	YES
 
 luaFunctionTemplates Lua function templates
 Template functions to make it easer to expose static and class
@@ -122,16 +143,20 @@ C function
 \note EFL_ here means "Expose Function to Lua.."
 \see the simplest examples below
 
-\todo document the necessary steps to add another function of args # or params # not present
+If you need to add another function for a not present number of arguments,
+make sure that the template arguments macros are present in 
+TemplateArguments.h:
+CW_TEMPLATE_ARGS_RETS_
+CW_TEMPLATE_RETURN_SIGNATURE_
+CW_DECLARE_FUNCTION_ARGS_
+CW_DECLARE_RETS_
+CW_ASSIGN_RETS_
+CW_CALL_RETS_
 
-<DEVELOPMENT STATUS>
-Current Draft		:	1.0
-Current Phase		:   FIELD TESTING
-Purpose				:	DEPLOYMENT
-Unit Tested			:	YES
-Used in development	:	YES
-Used in experiments :	YES
-Tested in the field	:	YES
+And then make sure the necessary arguments are present below:
+EFL_GET_ARGS_
+EFL_PUSH_RETS_
+EFL_GET_INSTANCE_ARGS_
 
 */
 

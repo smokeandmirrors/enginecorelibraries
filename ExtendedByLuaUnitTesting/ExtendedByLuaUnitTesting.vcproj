@@ -337,6 +337,10 @@
 		<Filter
 			Name="Math"
 			>
+			<File
+				RelativePath=".\UTMath.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="BuildSystem"
@@ -349,10 +353,6 @@
 		<Filter
 			Name="EmbeddedLua"
 			>
-			<File
-				RelativePath="..\LuaFiles\UnitTestingFramework.lua"
-				>
-			</File>
 			<File
 				RelativePath=".\UTClassExtension.cpp"
 				>
@@ -376,51 +376,55 @@
 			<Filter
 				Name="UTLuaFiles"
 				>
-			</Filter>
-			<Filter
-				Name="UTSupport"
-				>
 				<File
-					RelativePath="..\LuaFiles\Child.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Grandparent.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\Parent.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\UTOne.lua"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="UTTests"
-				>
-				<File
-					RelativePath="..\LuaFiles\UTLibraryFunctions.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\UTLuaExtendableClasses.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\UTOOP.lua"
-					>
-				</File>
-				<File
-					RelativePath="..\LuaFiles\UTProxyClasses.lua"
+					RelativePath="..\LuaFiles\UnitTestingFramework.lua"
 					>
 				</File>
 				<Filter
-					Name="UTMath"
+					Name="UTTests"
 					>
 					<File
-						RelativePath="..\LuaFiles\UTVector.lua"
+						RelativePath="..\LuaFiles\UTLibraryFunctions.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTLuaExtendableClasses.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTOOP.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTProxyClasses.lua"
+						>
+					</File>
+					<Filter
+						Name="UTMath"
+						>
+						<File
+							RelativePath="..\LuaFiles\UTVector.lua"
+							>
+						</File>
+					</Filter>
+				</Filter>
+				<Filter
+					Name="UTSupport"
+					>
+					<File
+						RelativePath="..\LuaFiles\Child.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\Grandparent.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\Parent.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTOne.lua"
 						>
 					</File>
 				</Filter>
