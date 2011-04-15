@@ -1,4 +1,5 @@
 #include <list>
+#include <map>
 #include <stdio.h>
 #include <tchar.h>
 #include <vector>
@@ -534,57 +535,317 @@ void TestJob::execute(void)
 	}
 }
 
+class Agent;
+
+class Ability
+{
+public:
+	Ability(void)
+	: m_agent(NULL)
+	{
+
+	}
+
+	virtual 
+	~Ability(void)
+	{
+		/* empty */
+	}
+
+	virtual 
+	uint4 
+	getAbilityID(void) const=0;
+
+	void 
+	attachTo(Agent* agent)
+	{
+		assert(agent);
+		m_agent = agent;
+		onAttachTo();
+	}
+
+	void 
+	detach(void)
+	{
+		onDetach();
+		m_agent = NULL;
+	}
+
+	const Agent* 
+	getAgent(void) const
+	{
+		return m_agent;
+	}
+
+protected:
+	virtual 
+	void 
+	onAttachTo(void)
+	{
+		/* empty */
+	}
+
+	virtual 
+	void 
+	onDetach(void)
+	{
+		/* empty */
+	}
+
+private:
+	const Agent* m_agent;
+};
+
+class Agent
+{
+	typedef std::map< uint4, Ability* > 
+		abilities;
+
+	typedef abilities::iterator 
+		abilities_iter;
+
+	typedef std::pair<const uint4, Ability* > 
+		abilities_pair;
+public:
+	void
+	add(Ability* ability)
+	{
+		uint4 id = ability->getAbilityID();
+
+		if (!m_abilities[id])
+		{
+			m_abilities[id] = ability;
+			ability->attachTo(this);
+		}
+	}
+	
+	template<typename ABILITY>
+	ABILITY* 
+	get(bool construct_missing=false)
+	{
+		uint4 id = ABILITY::staticGetAbilityID();
+		Ability* ability = m_abilities[id];
+
+		if (!ability && construct_missing)
+		{
+			ability = new ABILITY();
+			ability->attachTo(this);
+		}
+
+		return static_cast<ABILITY*>(ability);	
+	}
+
+	template<typename ABILITY>
+	bool
+	has(void) const
+	{
+		return m_abilities.find(ABILITY::staticGetAbilityID()) != m_abilities.end();
+	}
+
+	void
+	remove(Ability* ability)
+	{
+		abilities_iter iter = m_abilities.find(ability->getAbilityID());
+
+		if (iter != m_abilities.end())
+		{
+			m_abilities.erase(iter);
+		}
+	}
+
+private:
+	abilities	
+		m_abilities;	
+};
+
+class Attack : public Ability
+{
+public:
+	static 
+	uint4 
+	staticGetAbilityID(void)
+	{
+		return __COUNTER__;
+	}
+
+	uint4
+	getAbilityID(void) const
+	{
+		return Attack::staticGetAbilityID();
+	}
+
+protected:
+
+private:
+
+};
+
+class Navigation : public Ability
+{
+public:
+	static 
+	uint4 
+	staticGetAbilityID(void)
+	{
+		return __COUNTER__;
+	}
+
+	uint4
+	getAbilityID(void) const
+	{
+		return Navigation::staticGetAbilityID();
+	}
+
+protected:
+
+private:
+
+};
+
 template<typename OWNER>
 class Component
 {
 public:
-	static uint4 
-		getComponentID(void); // return __COUNTER__; ???
+	static 
+	uint4 
+	staticGetComponentID(void)
+	{ 
+		return __COUNTER__;
+	}
 
-	Component<OWNER>*
-		addShared(void);
+	virtual
+	~Component(void)
+	{
+		/* empty */
+	}
 
 	void 
-		attachTo(OWNER& owner);
+	attachTo(OWNER& owner)
+	{
+		m_owner = &owner;
+		onAttachTo();
+	}
 	
 	void 
-		detach(void);
+	detach(void)
+	{
+		onDetach();
+		m_owner = NULL;
+	}
 	
+	uint4 
+	getComponentID(void) const
+	{
+		return staticGetComponentID();
+	}
+
 	const OWNER* 
-		getOwner(void) const;
+	getOwner(void) const
+	{
+		return m_owner;
+	}
+
+protected:
+	virtual 
+	void 
+	onAttachTo(void)
+	{
+		/* empty */
+	}
+
+	virtual 
+	void 
+	onDetach(void)
+	{
+		/* empty */
+	}
 
 private:
 	OWNER*	m_owner;
 }; // Component
  
+class TAttack : public Component<Agent>
+{
+
+};
+
+/*
 template<typename OWNER>
 class Composite // interface/base/member
 {
-public:
-	void add(Component<OWNER>* component);
-	void remove(Component<OWNER>* component);
+	typedef std::map< uint4, Component<OWNER>* > 
+		components;
 	
-	template<typename COMPONENT>
-	COMPONENT* get(bool construct=false)
+	typedef components::iterator 
+		components_iter;
+
+	typedef std::pair<const uint4, Component<OWNER>* > 
+		components_pair;
+	
+public:
+	void
+	add(Component<OWNER>* component) 
+	{
+		uint4 id = component->getComponentID();
+
+		if (!m_components[id])
+		{
+			m_components[id] = component;
+		}
+	}
+	
+	template<typename COMPONENT> 
+	COMPONENT* 
+	get(bool construct_missing=false)
 	{
 		uint4 id = COMPONENT::getComponentID();
-		// if (container[id]) =
-		return NULL;
+		COMPONENT* component = m_components[id];
+		
+		if (!component && construct_missing)
+		{
+			component = new COMPONENT<OWNER>();
+			component->attachTo(this);
+		}
+
+		return component;
 	}
 
 	template<typename COMPONENT>
-	bool hasA(void)
+	bool 
+	hasA(void)
 	{
 		uint4 id = COMPONENT::getComponentID();
 		return false;
 	}
-
+	
+	void 
+	remove(Component<OWNER>* component)
+	{
+		components_iter iter = m_components.find(component->getComponentID());
+		
+		if (iter != m_components.end())
+		{
+			m_components.erase(iter);
+		}
+	}
+	
+private:
+	components	
+		m_components;
 }; // Composite
+*/
 
 void sandbox::play()
 {
 	printf("Playing in the sandbox!\n");	
 	
+	Agent agent;
+	agent.add(new Navigation());
+	Navigation* nav = agent.get<Navigation>();
+	assert(nav->getAgent() == &agent);
+	assert(!agent.has<Attack>());
+	assert(agent.get<Attack>(true));
+
 	EngineLoop loop;	
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
 	loop.addFrameRequirement(&physics_sych);
