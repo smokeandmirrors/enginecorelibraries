@@ -6,7 +6,7 @@
 #include "Signals.h"
 #include "Singleton.h"
 #include "Synchronization.h"
-#include "Threads.h"
+#include "Multithreading.h"
 /**
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
@@ -20,6 +20,7 @@ Tested in the field	:	NO
 namespace multithreading
 {
 
+class Thread;
 class PendingJobQueue;
 
 class Scheduler 
@@ -181,7 +182,7 @@ private:
 	uint4					m_numSystemThreads;
 	signals::ReceiverMember	m_receiver;
 	PendingJobQueue*		m_pendingJobs;
-	multithreading::Mutex	m_mutex;
+	DECLARE_MUTEX(m_mutex);
 }; // class Scheduler
 
 } // multithreading

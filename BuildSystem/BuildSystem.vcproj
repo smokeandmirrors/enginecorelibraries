@@ -394,6 +394,10 @@
 			Name="Multithreading"
 			>
 			<File
+				RelativePath=".\Multithreading.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Scheduling.cpp"
 				>
 			</File>
@@ -410,11 +414,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Threads.cpp"
+				RelativePath=".\Thread.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Threads.h"
+				RelativePath=".\Thread.h"
 				>
 			</File>
 		</Filter>
@@ -441,6 +445,10 @@
 		<Filter
 			Name="Design Patterns"
 			>
+			<File
+				RelativePath=".\Composition.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Signals.h"
 				>

@@ -8,7 +8,7 @@
 
 #include "Scheduling.h"
 #include "Synchronization.h"
-#include "Threads.h"
+#include "Thread.h"
 
 namespace multithreading
 {

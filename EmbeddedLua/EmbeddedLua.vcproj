@@ -473,6 +473,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LuaBuild.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaExtensionInclusions.h"
 				>
 			</File>

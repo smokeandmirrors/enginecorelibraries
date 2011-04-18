@@ -29,7 +29,7 @@ Tested in the field	:	YES
 
 */
 
-#include "Build.h"
+#include "LuaBuild.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 

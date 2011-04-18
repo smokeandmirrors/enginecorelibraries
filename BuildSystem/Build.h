@@ -20,7 +20,9 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \endhtmlonly
 \date 1/20/2011
 
-\todo 32/64-bit number types, NULL, assert, warn, error
+\todo NULL, assert, warn, error
+\todo a pass on forward declarations rather than includes, since I've just
+forgotten about it, after working in UE3 for so long.
 
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
@@ -69,4 +71,33 @@ typedef float 				real4;
 typedef double				real8;
 
 /**@}*/
+
+template<class TO, class FROM>
+TO* checked_cast(FROM* from)
+{
+	assert(static_cast<TO*>(from) == dynamic_cast<TO*>(from));
+	return static_cast<TO*>(from);
+}
+
+template<class TO, class FROM>
+TO& checked_cast(FROM& from)
+{
+	assert(static_cast<TO*>(&from) == dynamic_cast<TO*>(&from));
+	return static_cast<TO&>(from);
+}
+
+template<class TO, class FROM>
+const TO* checked_cast(const FROM* from)
+{
+	assert(static_cast<const TO*>(from) == dynamic_cast<const TO*>(from));
+	return static_cast<const TO*>(from);
+}
+
+template<class TO, class FROM>
+const TO& checked_cast(const FROM& from)
+{
+	assert(static_cast<const TO*>(&from) == dynamic_cast<const TO*>(&from));
+	return static_cast<const TO&>(from);
+}
+
 #endif//BUILD_H

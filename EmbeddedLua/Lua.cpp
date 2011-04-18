@@ -5,6 +5,7 @@
 #include <malloc.h>
 
 #include "LuaInclusions.h"
+#include "LuaExtensibility.h"
 
 namespace lua_extension 
 {

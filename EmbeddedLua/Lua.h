@@ -30,9 +30,7 @@ The Lua class encapsulates a lua_Struct.  It will allow for easier creation
 of application and library code for %Lua.
 
 */
-
-#include <stdlib.h>
-#include "LuaExtensibility.h"
+#include "LuaBuild.h"
 
 namespace lua_extension 
 {

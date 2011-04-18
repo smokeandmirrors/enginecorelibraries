@@ -96,7 +96,7 @@ private:
 	/** a pointer to the current getter function */
 	static T& (*					getter)(void);
 	/** a mutex to guard the creation/destruction of the singleton */
-	static multithreading::Mutex	mutex;
+	DECLARE_STATIC_MUTEX(mutex);
 	/** the static pointer to the only instance of T */
 	static T*						singleton;
 	// not allowed

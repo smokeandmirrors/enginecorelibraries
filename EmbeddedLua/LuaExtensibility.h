@@ -67,10 +67,7 @@ Used in experiments :	YES
 Tested in the field	:	YES
 
 */
-#include "Build.h"
-
-struct lua_State;
-struct lua_Debug;
+#include "LuaBuild.h"
 
 /**
 \defgroup LuaExtension Lua Extension
@@ -79,8 +76,6 @@ aid embedding %Lua in an executable, and exposing libraries and classes
 for use in %Lua.
 @{
 */
-
-typedef sint4 (*lua_function)(lua_State* L);
 
 namespace lua_extension 
 {
@@ -217,8 +212,9 @@ back out of %Lua.
 	{ \
 		template<> inline Class* to< Class* >(lua_State* L, sint4 index) \
 		{ \
-			Class* object = dynamic_cast< Class* >(to< LuaExtendable* >(L, index)); \
-			if (object) \
+			LuaExtendable* le = to<LuaExtendable*>(L, index); \
+			Class* object = dynamic_cast< Class* >(le); \
+			if (object == static_cast< Class* >(le)) \
 				return object; \
 			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: unknown", index, #Class); \
 			return NULL; \

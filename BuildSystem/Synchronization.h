@@ -1,13 +1,6 @@
 #pragma once
 #ifndef SYNCHRONIZATION_H
 #define SYNCHRONIZATION_H
-
-#define UNIQUE_AUX_2(sychronized,number)	sychronized##number
-#define UNIQUE_AUX_1(sychronized,number)	UNIQUE_AUX_2(sychronized,number) 
-#define UNIQUE_SYNCHRONIZATION(sychronized) UNIQUE_AUX_1(sychronized, __COUNTER__)
-
-/** \todo thread policies */
-#define SYNC(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 /**
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
@@ -18,6 +11,17 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
+
+#define UNIQUE_AUX_2(sychronized,number)	sychronized##number
+#define UNIQUE_AUX_1(sychronized,number)	UNIQUE_AUX_2(sychronized,number) 
+#define UNIQUE_SYNCHRONIZATION(sychronized) UNIQUE_AUX_1(sychronized, __COUNTER__)
+
+/** \todo thread policies */
+#define DECLARE_MUTEX(identifier)			multithreading::Mutex	identifier;
+#define DECLARE_MUTABLE_MUTEX(identifier)	mutable multithreading::Mutex	identifier;
+#define DECLARE_STATIC_MUTEX(identifier)	static multithreading::Mutex	identifier;
+#define SYNC(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
+
 namespace multithreading
 {
 

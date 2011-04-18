@@ -185,7 +185,7 @@ protected:
 	
 private:
 	/** thread synchonizer */
-	multithreading::Mutex	m_mutex;
+	DECLARE_MUTEX(m_mutex);
 	/** a list of all transmitters this object is registered with */
 	sender_set				m_transmitters;
 };
@@ -289,7 +289,7 @@ protected:
 	
 private:
 	/** thread synchonizer */
-	multithreading::Mutex	m_mutex;
+	DECLARE_MUTEX(m_mutex);
 	/** the actual owner, the object that will actually receive the signals */
 	Receiver*				m_receiver;
 	/** a list of all transmitters this object is registered with */
@@ -820,7 +820,7 @@ private:
 		} \
 	private: \
 		connections_list				m_receivers; \
-		mutable multithreading::Mutex	m_mutex; \
+		DECLARE_MUTABLE_MUTEX(m_mutex) \
 	};
 
 SIGNALS_DECLARE_TRANSMITTER(1);

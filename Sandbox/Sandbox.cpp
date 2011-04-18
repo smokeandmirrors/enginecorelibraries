@@ -11,13 +11,16 @@
 
 #include "Build.h"
 #include "CompilerChecks.h"
+#include "Composition.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
 #include "Signals.h"
-#include "Threads.h"
+#include "Thread.h"
 #include "Time.h"
 #include "Vector.h"
+
+using namespace design_patterns;
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
@@ -400,12 +403,12 @@ protected:
 
 private:
 	requirements					m_completed;
-	multithreading::Mutex			m_completeMutex;
+	DECLARE_MUTEX(m_completeMutex);
 	uint8							m_frameNumber;
 	requirements					m_incomplete;
-	multithreading::Mutex			m_incompleteMutex;
+	DECLARE_MUTEX(m_incompleteMutex);
 	bool							m_isRunning;
-	multithreading::Mutex			m_mutex;
+	DECLARE_MUTEX(m_mutex);
 	signals::Transmitter1<EngineLoop*>			
 									m_onComplete;
 	signals::ReceiverMember	
@@ -495,8 +498,7 @@ public:
 	}
 
 private:
-	multithreading::Mutex 
-		m_mutex;
+	DECLARE_MUTEX(m_mutex);
 	
 	sint4					
 		m_completedJobs;
@@ -604,8 +606,6 @@ class Agent
 	typedef abilities::iterator 
 		abilities_iter;
 
-	typedef std::pair<const uint4, Ability* > 
-		abilities_pair;
 public:
 	void
 	add(Ability* ability)
@@ -702,138 +702,61 @@ private:
 
 };
 
-template<typename OWNER>
-class Component
+class TAgent 
+: public Composite<TAgent>
 {
 public:
-	static 
-	uint4 
-	staticGetComponentID(void)
-	{ 
-		return __COUNTER__;
-	}
-
-	virtual
-	~Component(void)
+	~TAgent(void)
 	{
 		/* empty */
-	}
-
-	void 
-	attachTo(OWNER& owner)
-	{
-		m_owner = &owner;
-		onAttachTo();
-	}
-	
-	void 
-	detach(void)
-	{
-		onDetach();
-		m_owner = NULL;
-	}
-	
-	uint4 
-	getComponentID(void) const
-	{
-		return staticGetComponentID();
-	}
-
-	const OWNER* 
-	getOwner(void) const
-	{
-		return m_owner;
 	}
 
 protected:
-	virtual 
-	void 
-	onAttachTo(void)
-	{
-		/* empty */
-	}
-
-	virtual 
-	void 
-	onDetach(void)
-	{
-		/* empty */
-	}
 
 private:
-	OWNER*	m_owner;
-}; // Component
- 
-class TAttack : public Component<Agent>
+};
+
+class VEffect
+: public Composite<VEffect>
+{
+public:
+	~VEffect(void)
+	{
+		/* empty */
+	}
+
+protected:
+
+private:
+};
+
+class TVFXSaver : public Component<VEffect>
+{
+public:
+	~TVFXSaver(void) {}
+};
+
+class TAgentSaver : public Component<TAgent>
+{
+public:
+	~TAgentSaver(void) {}
+};
+
+class A
+{
+public:
+	virtual ~A(void) {}
+};
+
+class B : public A
 {
 
 };
 
-/*
-template<typename OWNER>
-class Composite // interface/base/member
+class C 
 {
-	typedef std::map< uint4, Component<OWNER>* > 
-		components;
-	
-	typedef components::iterator 
-		components_iter;
 
-	typedef std::pair<const uint4, Component<OWNER>* > 
-		components_pair;
-	
-public:
-	void
-	add(Component<OWNER>* component) 
-	{
-		uint4 id = component->getComponentID();
-
-		if (!m_components[id])
-		{
-			m_components[id] = component;
-		}
-	}
-	
-	template<typename COMPONENT> 
-	COMPONENT* 
-	get(bool construct_missing=false)
-	{
-		uint4 id = COMPONENT::getComponentID();
-		COMPONENT* component = m_components[id];
-		
-		if (!component && construct_missing)
-		{
-			component = new COMPONENT<OWNER>();
-			component->attachTo(this);
-		}
-
-		return component;
-	}
-
-	template<typename COMPONENT>
-	bool 
-	hasA(void)
-	{
-		uint4 id = COMPONENT::getComponentID();
-		return false;
-	}
-	
-	void 
-	remove(Component<OWNER>* component)
-	{
-		components_iter iter = m_components.find(component->getComponentID());
-		
-		if (iter != m_components.end())
-		{
-			m_components.erase(iter);
-		}
-	}
-	
-private:
-	components	
-		m_components;
-}; // Composite
-*/
+};
 
 void sandbox::play()
 {
@@ -846,6 +769,15 @@ void sandbox::play()
 	assert(!agent.has<Attack>());
 	assert(agent.get<Attack>(true));
 
+	TAgent tagent;
+	TAgentSaver tagentsaver;
+	TVFXSaver fxsaver;
+	VEffect veffect;
+
+	tagent.add(&tagentsaver);
+	assert(tagent.has<TAgentSaver>());
+	veffect.add(&fxsaver);
+	
 	EngineLoop loop;	
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
 	loop.addFrameRequirement(&physics_sych);
@@ -883,8 +815,20 @@ void sandbox::play()
 		multithreading::sleep(3000);
 	}	
 
-	printf("Stopped playing in the sandbox!\n");
+	const A a;
+	const B b;
+	const C c;
+
+	const B* pb;
+	const A* pa = &a;
+
+
+
+	pb = checked_cast<const B>(pa);
+	const B& rb = checked_cast<B>(a);
+	
 	multithreading::Scheduler::single().destroy();
+	printf("Stopped playing in the sandbox!\n");
 	return;
 }
 
