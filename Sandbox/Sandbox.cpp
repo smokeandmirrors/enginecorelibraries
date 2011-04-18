@@ -1,11 +1,13 @@
 #include <list>
 #include <map>
-#include <stdio.h>
-#include <tchar.h>
-#include <vector>
-
 #if WIN32
 #include <process.h>
+#endif//WIN32
+#include <stdio.h>
+#include <tchar.h>
+#include <typeinfo>
+#include <vector>
+#if WIN32
 #include <windows.h>
 #endif//WIN32
 
@@ -21,6 +23,15 @@
 #include "Vector.h"
 
 using namespace design_patterns;
+
+void onPlay(void);
+
+void sandbox::play()
+{
+	printf("Playing in the sandbox!\n");
+	onPlay();
+	printf("Stopped playing in the sandbox!\n");
+}
 
 sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
 sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
@@ -537,247 +548,92 @@ void TestJob::execute(void)
 	}
 }
 
-class Agent;
-
-class Ability
+class Agent 
+: public Composite<Agent>
 {
 public:
-	Ability(void)
-	: m_agent(NULL)
-	{
 
-	}
-
-	virtual 
-	~Ability(void)
-	{
-		/* empty */
-	}
-
-	virtual 
-	uint4 
-	getAbilityID(void) const=0;
-
-	void 
-	attachTo(Agent* agent)
-	{
-		assert(agent);
-		m_agent = agent;
-		onAttachTo();
-	}
-
-	void 
-	detach(void)
-	{
-		onDetach();
-		m_agent = NULL;
-	}
-
-	const Agent* 
-	getAgent(void) const
-	{
-		return m_agent;
-	}
-
-protected:
-	virtual 
-	void 
-	onAttachTo(void)
-	{
-		/* empty */
-	}
-
-	virtual 
-	void 
-	onDetach(void)
-	{
-		/* empty */
-	}
-
-private:
-	const Agent* m_agent;
 };
 
-class Agent
+class VisualFX
+: public Composite<VisualFX>
 {
-	typedef std::map< uint4, Ability* > 
-		abilities;
 
-	typedef abilities::iterator 
-		abilities_iter;
+};
 
+class Movement
+: public Component<Agent, Movement>
+{
+};
+
+class Attack
+: public Component<Agent, Attack>
+{
 public:
-	void
-	add(Ability* ability)
-	{
-		uint4 id = ability->getAbilityID();
 
-		if (!m_abilities[id])
-		{
-			m_abilities[id] = ability;
-			ability->attachTo(this);
-		}
-	}
+};
+
+class Defense
+: public Component<Agent, Defense>
+{
+
+};
+
+class Shadows
+: public Component<VisualFX, Shadows>
+{
+
+};
+
+void onPlay(void)
+{
+	Agent alpha;
+	Movement movement;
+	Attack attack;
+	Defense defense;
+	alpha.add(movement);
+	alpha.add(attack);
+
+	uint4 movement_ID = movement.getGUID();
+	uint4 static_movement_ID = Movement::componentGUID;
+	uint4 attack_ID = attack.getGUID();
+	uint4 static_attack_ID = Attack::componentGUID;
+	uint4 defense_ID = defense.getGUID();
+	uint4 static_defense_ID = Defense::componentGUID;
+
+	uint4 one = __COUNTER__;
+	uint4 two = __COUNTER__;
+	uint4 three = __COUNTER__;
+
+	std::map<type_info, sint4> crazytalk;
 	
-	template<typename ABILITY>
-	ABILITY* 
-	get(bool construct_missing=false)
-	{
-		uint4 id = ABILITY::staticGetAbilityID();
-		Ability* ability = m_abilities[id];
-
-		if (!ability && construct_missing)
-		{
-			ability = new ABILITY();
-			ability->attachTo(this);
-		}
-
-		return static_cast<ABILITY*>(ability);	
-	}
-
-	template<typename ABILITY>
-	bool
-	has(void) const
-	{
-		return m_abilities.find(ABILITY::staticGetAbilityID()) != m_abilities.end();
-	}
-
-	void
-	remove(Ability* ability)
-	{
-		abilities_iter iter = m_abilities.find(ability->getAbilityID());
-
-		if (iter != m_abilities.end())
-		{
-			m_abilities.erase(iter);
-		}
-	}
-
-private:
-	abilities	
-		m_abilities;	
-};
-
-class Attack : public Ability
-{
-public:
-	static 
-	uint4 
-	staticGetAbilityID(void)
-	{
-		return __COUNTER__;
-	}
-
-	uint4
-	getAbilityID(void) const
-	{
-		return Attack::staticGetAbilityID();
-	}
-
-protected:
-
-private:
-
-};
-
-class Navigation : public Ability
-{
-public:
-	static 
-	uint4 
-	staticGetAbilityID(void)
-	{
-		return __COUNTER__;
-	}
-
-	uint4
-	getAbilityID(void) const
-	{
-		return Navigation::staticGetAbilityID();
-	}
-
-protected:
-
-private:
-
-};
-
-class TAgent 
-: public Composite<TAgent>
-{
-public:
-	~TAgent(void)
-	{
-		/* empty */
-	}
-
-protected:
-
-private:
-};
-
-class VEffect
-: public Composite<VEffect>
-{
-public:
-	~VEffect(void)
-	{
-		/* empty */
-	}
-
-protected:
-
-private:
-};
-
-class TVFXSaver : public Component<VEffect>
-{
-public:
-	~TVFXSaver(void) {}
-};
-
-class TAgentSaver : public Component<TAgent>
-{
-public:
-	~TAgentSaver(void) {}
-};
-
-class A
-{
-public:
-	virtual ~A(void) {}
-};
-
-class B : public A
-{
-
-};
-
-class C 
-{
-
-};
-
-void sandbox::play()
-{
-	printf("Playing in the sandbox!\n");	
 	
-	Agent agent;
-	agent.add(new Navigation());
-	Navigation* nav = agent.get<Navigation>();
-	assert(nav->getAgent() == &agent);
-	assert(!agent.has<Attack>());
-	assert(agent.get<Attack>(true));
+	int idone = typeid(Movement).before(typeid(Movement));
+	int MbeforeA = typeid(Movement).before(typeid(Attack));
+	int AbeforeM = typeid(Attack).before(typeid(Movement));
 
-	TAgent tagent;
-	TAgentSaver tagentsaver;
-	TVFXSaver fxsaver;
-	VEffect veffect;
+	if (typeid(Movement) == typeid(Attack))
+	{
+		printf("sweet");
+	}
+	else
+	{
+		printf("awesome");
+	}
 
-	tagent.add(&tagentsaver);
-	assert(tagent.has<TAgentSaver>());
-	veffect.add(&fxsaver);
-	
+	assert(alpha.has<Movement>());
+	assert(alpha.has<Attack>());
+	assert(!alpha.has<Defense>());
+	assert(&movement == alpha.get<Movement>());
+	assert(&attack == alpha.get<Attack>());
+	assert(NULL == alpha.get<Defense>());
+	alpha.remove(movement);
+	assert(!alpha.has<Movement>());
+	assert(NULL == alpha.get<Movement>());
+	alpha.remove(attack);
+	assert(!alpha.has<Attack>());
+	assert(NULL == alpha.get<Attack>());
+
 	EngineLoop loop;	
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
 	loop.addFrameRequirement(&physics_sych);
@@ -815,20 +671,5 @@ void sandbox::play()
 		multithreading::sleep(3000);
 	}	
 
-	const A a;
-	const B b;
-	const C c;
-
-	const B* pb;
-	const A* pa = &a;
-
-
-
-	pb = checked_cast<const B>(pa);
-	const B& rb = checked_cast<B>(a);
-	
 	multithreading::Scheduler::single().destroy();
-	printf("Stopped playing in the sandbox!\n");
-	return;
 }
-

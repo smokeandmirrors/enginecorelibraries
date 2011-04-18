@@ -67,8 +67,8 @@ Used in experiments :	YES
 Tested in the field	:	YES
 
 */
+#include <typeinfo>
 #include "LuaBuild.h"
-
 /**
 \defgroup LuaExtension Lua Extension
 macros, classes and functions to 
@@ -216,7 +216,7 @@ back out of %Lua.
 			Class* object = dynamic_cast< Class* >(le); \
 			if (object == static_cast< Class* >(le)) \
 				return object; \
-			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: unknown", index, #Class); \
+			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, #Class, typeid(object).name()); \
 			return NULL; \
 		} \
 		template<> inline const Class* to< const Class* >(lua_State* L, sint4 index) \
@@ -226,13 +226,11 @@ back out of %Lua.
 		template<> inline Class& to< Class& >(lua_State* L, sint4 index) \
 		{ \
 			Class* object = to< Class* >(L, index); \
-			assert(object); \
 			return *object; \
 		} \
 		template<> inline const Class& to< const Class& >(lua_State* L, sint4 index) \
 		{ \
 			Class* object = to< Class* >(L, index); \
-			assert(object); \
 			return *object; \
 		} \
 	}

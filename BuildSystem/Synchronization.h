@@ -12,15 +12,22 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-#define UNIQUE_AUX_2(sychronized,number)	sychronized##number
-#define UNIQUE_AUX_1(sychronized,number)	UNIQUE_AUX_2(sychronized,number) 
-#define UNIQUE_SYNCHRONIZATION(sychronized) UNIQUE_AUX_1(sychronized, __COUNTER__)
+#define UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) \
+	sychronized##number
+#define UNIQUE_SYNCHRONIZATION_PREFIX(sychronized,number) \
+	UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) 
+#define UNIQUE_SYNCHRONIZATION(sychronized) \
+	UNIQUE_SYNCHRONIZATION_PREFIX(sychronized, __COUNTER__)
 
 /** \todo thread policies */
-#define DECLARE_MUTEX(identifier)			multithreading::Mutex	identifier;
-#define DECLARE_MUTABLE_MUTEX(identifier)	mutable multithreading::Mutex	identifier;
-#define DECLARE_STATIC_MUTEX(identifier)	static multithreading::Mutex	identifier;
-#define SYNC(mutex) multithreading::Synchronizer UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
+#define DECLARE_MUTEX(identifier) \
+	multithreading::Mutex			identifier;
+#define DECLARE_MUTABLE_MUTEX(identifier) \
+	mutable multithreading::Mutex	identifier;
+#define DECLARE_STATIC_MUTEX(identifier) \
+	static multithreading::Mutex	identifier;
+#define SYNC(mutex) \
+	multithreading::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 
 namespace multithreading
 {

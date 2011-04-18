@@ -29,43 +29,29 @@ Tested in the field	:	NO
 namespace design_patterns
 {
 
-template<typename OWNER>
-class Component
-{
-public:
-	static 
-	uint4 
-	staticGetComponentID(void)
-	{ 
-		return __COUNTER__;
-	}
+typedef uint4 Component_GUID;
 
-	virtual
-	~Component(void)=0
+template<typename OWNER>
+class AbstractComponent
+{
+	template<typename OWNER> friend class Composite;
+
+public:
+	AbstractComponent(void)
+	: m_owner(NULL)
 	{
 		/* empty */
 	}
 
-	void 
-	attach(OWNER* owner)
+	virtual
+	~AbstractComponent(void)=0
 	{
-		assert(owner);
-		m_owner = owner;
-		onAttachTo();
+		/* empty */
 	}
-	
-	void 
-	detach(void)
-	{
-		onDetach();
-		m_owner = NULL;
-	}
-	
-	uint4 
-	getComponentID(void) const
-	{
-		return staticGetComponentID();
-	}
+
+	virtual 
+	Component_GUID
+	getGUID(void) const=0;
 
 	const OWNER* 
 	getOwner(void) const
@@ -90,15 +76,46 @@ protected:
 
 private:
 	OWNER*	m_owner;
+
+	void 
+	attach(OWNER* owner)
+	{
+		assert(owner);
+		m_owner = owner;
+		onAttachTo();
+	}
+
+	void 
+	detach(void)
+	{
+		onDetach();
+		m_owner = NULL;
+	}
 }; // Component
- 
+
+template<typename OWNER, typename DERIVED_CLASS>
+class Component : public AbstractComponent<OWNER>
+{
+public:
+	static const Component_GUID componentGUID;
+
+	Component_GUID 
+	getGUID(void) const
+	{
+		return componentGUID;
+	}
+}; // Component
+
+template<typename OWNER, typename DERIVED_CLASS> 
+const Component_GUID Component<OWNER, DERIVED_CLASS>::componentGUID = __COUNTER__;
+
 template<typename OWNER>
 class Composite // interface/base/member
 {
-	typedef std::map<uint4, Component<OWNER>*> 
+	typedef std::map<uint4, AbstractComponent<OWNER>*> 
 		components;
 	
-	typedef typename std::map<uint4, Component<OWNER>*>::iterator 
+	typedef typename std::map<uint4, AbstractComponent<OWNER>*>::iterator 
 		components_iter;
 	
 public:
@@ -109,14 +126,15 @@ public:
 	}
 
 	void
-	add(Component<OWNER>* component) 
+	add(AbstractComponent<OWNER>& component) 
 	{
-		uint4 id = component->getComponentID();
+		//typeid(component)
+		uint4 id = 0; //component.getComponentID();
 
 		if (!m_components[id])
 		{
-			m_components[id] = component;
-			component->attach(static_cast<OWNER*>(this));
+			m_components[id] = &component;
+			component.attach(static_cast<OWNER*>(this));
 		}
 	}
 	
@@ -124,8 +142,8 @@ public:
 	COMPONENT* 
 	get(bool construct_missing=false)
 	{
-		uint4 id = COMPONENT::staticGetComponentID();
-		Component<OWNER>* component = m_components[id];
+		uint4 id = COMPONENT::componentGUID;
+		AbstractComponent<OWNER>* component = m_components[id];
 		
 		if (!component && construct_missing)
 		{
@@ -133,20 +151,20 @@ public:
 			component->attach(static_cast<OWNER*>(this));
 		}
 
-		return static_cast<COMPONENT>(component);
+		return static_cast<COMPONENT*>(component);
 	}
 
 	template<typename COMPONENT>
 	bool 
 	has(void) const
 	{
-		return m_components.find(COMPONENT::staticGetComponentID()) != m_components.end();
+		return m_components.find(COMPONENT::componentGUID) != m_components.end();
 	}
 	
 	void 
-	remove(Component<OWNER>* component)
+	remove(AbstractComponent<OWNER>& component)
 	{
-		components_iter iter = m_components.find(component->getComponentID());
+		components_iter iter = m_components.find(component.getGUID());
 		
 		if (iter != m_components.end())
 		{
