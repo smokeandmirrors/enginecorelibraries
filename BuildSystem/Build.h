@@ -53,6 +53,26 @@ Tested in the field	:	NO
 /**
 \defgroup Global typedefs 
 Adhere to these to enable easier cross-platform development
+
+\note I just finally heard from another programmer why this is done 
+so often, and it is mostly related to serialization/communication
+across platforms/networks/compilers/implementations
+
+in ANY other situation, do NOT use the sized types, use the unsized types
+
+\todo investigate this more
+
+// typedef char					schar;
+// typedef unsigned char		uchar;
+// typedef short				sshort;
+// typedef unsigned short		ushort;
+// typedef int					sint;
+// typedef unsigned int			uint;
+// typedef long long			slong;
+// typedef unsigned long long	ulong;
+// typedef float 				real;
+// typedef double				dreal;
+
 @{
 */
 
