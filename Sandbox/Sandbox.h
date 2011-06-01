@@ -11,6 +11,9 @@ Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	NO
 */
+
+#include "CompilerChecks.h"
+
 namespace sandbox 
 {
 	void play(void);
