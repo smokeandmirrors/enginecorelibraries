@@ -23,6 +23,8 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \todo NULL, assert, warn, error
 \todo a pass on forward declarations rather than includes, since I've just
 forgotten about it, after working in UE3 for so long.
+\todo find/create a decent set of containers
+\todo global bit packing investigation
 
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0

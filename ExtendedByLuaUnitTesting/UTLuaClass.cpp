@@ -8,6 +8,7 @@
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
+#include "LuaStateInteraction.h"
 #include "UTTools.h"
 
 using namespace lua_extension;
@@ -42,25 +43,25 @@ public:
 
 	void luaRequire()
 	{
-		Lua* lua = new Lua();
-		bool result = lua->require("Utilities"); 
+		DECLARE_UNIT_TESTING_LUA_OBJECT
+		bool result = lua.require("Utilities"); 
 		CFIX_ASSERT(result);
-		result = lua->require("ObjectOrientedParadigm");
+		result = lua.require("ObjectOrientedParadigm");
 		CFIX_ASSERT(result);
-		delete lua;
 	}
 
 	void doString()
 	{	
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua.doString("print\'Hello!\'");
 	}
 		
 	void nilLoadedStatus()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua.require("UnitTestingFramework");
 		lua_State* L = lua.getState();
+		
 		//s: ?
 		lua_getglobal(L, "package");
 		lua_getfield(L, -1, "loaded");
@@ -82,7 +83,7 @@ public:
 
 	void callProtected()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		lua_getglobal(L, "math");
 		CFIX_ASSERT(lua_istable(L, -1));

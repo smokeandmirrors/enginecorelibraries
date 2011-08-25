@@ -84,7 +84,7 @@ END_LUA_LIBRARY(One)
 
 void Classes::test_define_lua_class()
 {
-	Lua lua;
+	DECLARE_UNIT_TESTING_LUA_OBJECT
 	REGISTER_LUA_LIBRARY((&lua), One);
 	CFIX_ASSERT(lua.doString("_G.one = One.new()"));
 	lua_State* L = lua.getState();
@@ -123,7 +123,7 @@ void Classes::test_define_lua_class()
 	//s: one 1
 	CFIX_ASSERT(three_value == 3);
 	lua_pop(L, 2);
-	lua.require("UTOne");
+	CFIX_ASSERT(lua.require("UTOne"));
 	CFIX_ASSERT(lua.doString("_G.one2 = One.new()"));
 	CFIX_ASSERT(lua.doString("_G.there = type(one2.decrement) == 'function'"));
 	lua_getglobal(L, "there");
@@ -271,7 +271,7 @@ END_LUA_LUAEXTENDABLE(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
 {
-	lua_extension::Lua lua; 
+	DECLARE_UNIT_TESTING_LUA_OBJECT
 	REGISTER_LUA_LIBRARY((&lua), Simple);
 	REGISTER_LUA_LIBRARY((&lua), Derived);
 	unit_testing_tools::executeLuaUnitTest("UTLuaExtendableClasses", &lua);
@@ -428,7 +428,7 @@ END_LUA_LUAEXTENDABLE(Child, Parent)
 
 void supportProxyTesting(void)
 {
-	lua_extension::Lua lua; 
+	DECLARE_UNIT_TESTING_LUA_OBJECT 
 	REGISTER_LUA_LIBRARY((&lua), Grandparent);
 	REGISTER_LUA_LIBRARY((&lua), Parent);
 	REGISTER_LUA_LIBRARY((&lua), Child);

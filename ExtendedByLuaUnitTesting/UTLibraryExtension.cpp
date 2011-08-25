@@ -1,7 +1,9 @@
 #include "Build.h"
+
 #if WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include <string.h>
+#include "UTTools.h"
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
@@ -43,7 +45,7 @@ class LibraryExtensionUT : public cfixcc::TestFixture
 public:
 	void test_staticParam0()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		//s: 
 		REGISTER_LUA_LIBRARY((&lua), UnitTestLibrary);
@@ -67,7 +69,7 @@ public:
 
 	void test_staticParam1()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		//s: 
 		REGISTER_LUA_LIBRARY((&lua), UnitTestLibrary);
@@ -91,7 +93,7 @@ public:
 
 	void test_staticReturn2Param0()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		//s: 
 		REGISTER_LUA_LIBRARY((&lua), UnitTestLibrary);
@@ -116,7 +118,7 @@ public:
 
 	void test_staticReturn2Param1()
 	{
-		Lua lua;
+		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		//s: 
 		REGISTER_LUA_LIBRARY((&lua), UnitTestLibrary);

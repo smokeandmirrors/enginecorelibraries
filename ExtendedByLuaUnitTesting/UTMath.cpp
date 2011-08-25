@@ -48,7 +48,7 @@ public:
 
 void UTMath::testLuaExtension(void)
 {
-	Lua lua;
+	DECLARE_UNIT_TESTING_LUA_OBJECT
 	registerGlobalLibrary(lua.getState());
 	lua.require("Utilities");
 	lua.require("ObjectOrientedParadigm");

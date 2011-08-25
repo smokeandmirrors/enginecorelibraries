@@ -105,6 +105,7 @@ public:
 	void				nilLoadedStatus(const sint1* module) const;
 	/** 
 	Opens %Lua library using the lua_function provided
+	\warning if you loaded a library and altered it, this will reload that library
 	*/
 	void				openLibrary(lua_function key) const;
 	/**
@@ -115,6 +116,10 @@ public:
 	quick, low functionality console for fast testing 
 	*/
 	void				runConsole(void) const;
+	/**
+	sets the LUA_PATH value to the passed in string, loads the package library if not done yet
+	*/
+	void				setPackagePath(const char* luaPath);
 	
 protected:
 	/**

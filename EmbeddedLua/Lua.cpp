@@ -6,10 +6,23 @@
 
 #include "LuaInclusions.h"
 #include "LuaExtensibility.h"
+#include "LuaStateInteraction.h"
+
+#define CONDITIONAL_STANDARD_LIB_OPEN(L, libname) \
+	{ \
+		lua_getfield(L, LUA_GLOBALSINDEX, #libname); \
+		if (!lua_istable(L, -1)) \
+		{ \
+			openLibrary(luaopen_##libname); \
+		} \
+		else \
+		{ \
+			lua_pop(L, 1); \
+		} \
+	}
 
 namespace lua_extension 
 {
-
 #if !GOLDMASTER
 // \note taken straight from lua.c
 static sint4 traceback (lua_State* L)
@@ -198,15 +211,25 @@ void Lua::openLibrary(lua_function opener) const
 
 void Lua::openStandardLibraries(void) const
 {
-	openLibrary(luaopen_base);
-	openLibrary(luaopen_math);
-	openLibrary(luaopen_package);
-	openLibrary(luaopen_string);
-	openLibrary(luaopen_table);
-	openLibrary(luaopen_os);
-#if	DEBUG /////
-	openLibrary(luaopen_debug);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, base);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, math);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, package);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, string);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, table);
+	CONDITIONAL_STANDARD_LIB_OPEN(L, os);
+#if	DEBUG 
+	CONDITIONAL_STANDARD_LIB_OPEN(L, base);
 #endif // DEBUG 
+
+// 	openLibrary(luaopen_base);
+// 	openLibrary(luaopen_math);
+// 	openLibrary(luaopen_package);
+// 	openLibrary(luaopen_string);
+// 	openLibrary(luaopen_table);
+// 	openLibrary(luaopen_os);
+// #if	DEBUG 
+// 	openLibrary(luaopen_debug);
+// #endif // DEBUG 
 }
 
 // \note taken and modified from from lua.c 
@@ -267,6 +290,15 @@ void Lua::runConsole(void) const
 			break;
 		}
 	}	
+}
+
+void Lua::setPackagePath(const char* luaPath)
+{
+	CONDITIONAL_STANDARD_LIB_OPEN(L, package);
+	lua_getglobal(L, "package");	//s: package
+	push(L, luaPath);				//s: package, LUA_PATH,2B
+	lua_setfield(L, -2, "path");	//s: package
+	lua_pop(L, 1);					//s: 
 }
 
 } // namespace lua_extension

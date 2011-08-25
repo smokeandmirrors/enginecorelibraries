@@ -1,6 +1,6 @@
-#include <cfixcc.h>
-
 #include "Build.h"
+#if WITH_UNIT_TESTING	
+#include <cfixcc.h>
 #include "Signals.h"
 
 using namespace signals;
@@ -259,3 +259,4 @@ CFIXCC_BEGIN_CLASS(UTSignals)
 	CFIXCC_METHOD(SignalsTest1)
 CFIXCC_END_CLASS()
 
+#endif//WITH_UNIT_TESTING
