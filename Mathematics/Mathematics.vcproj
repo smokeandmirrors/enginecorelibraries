@@ -432,6 +432,18 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="LuaMathExtensions"
+			>
+			<File
+				RelativePath=".\LuaMathExtensions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaMathExtensions.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

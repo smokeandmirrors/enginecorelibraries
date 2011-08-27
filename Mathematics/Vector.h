@@ -45,10 +45,6 @@ Vector classes and operations
 #include "Numbers.h"
 #include "NumericalFunctions.h"
 
-#if EXTENDED_BY_LUA
-#include "LuaExtensionInclusions.h"
-#endif//EXTENDED_BY_LUA
-
 namespace math
 {
 
@@ -86,9 +82,6 @@ a 2D Vector class with T elements
 */
 template<typename T>
 class V2 
-#if EXTENDED_BY_LUA
-	: public lua_extension::LuaExtendable
-#endif//EXTENDED_BY_LUA
 {
 public:
 	// data
@@ -104,9 +97,6 @@ public:
 	explicit V2(T scalar) : x(scalar), y(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
-#if EXTENDED_BY_LUA
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector2)
-#endif//EXTENDED_BY_LUA
 	// access
 	const T& 	operator[](uint4 i) const;	
 	T& 			operator[](uint4 i);
@@ -170,9 +160,6 @@ public:
 */
 template<typename T>
 class V3 
-#if EXTENDED_BY_LUA
-	: public lua_extension::LuaExtendable
-#endif//EXTENDED_BY_LUA
 {
 public:
 	// data 
@@ -189,9 +176,6 @@ public:
 	explicit V3(T scalar) : x(scalar), y(scalar), z(scalar) 	
 	{/* empty */}
 	// \see normalized constructor below
-#if EXTENDED_BY_LUA
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Vector3)
-#endif//EXTENDED_BY_LUA	
 	// access 
 	const T& 	operator[](uint4 i) const;	
 	T& 			operator[](uint4 i);
@@ -895,10 +879,5 @@ template<typename T> inline void V3<T>::zero()
 /** @} end Vector_Operations */
 
 } // end namespace math
-
-#if EXTENDED_BY_LUA
-DECLARE_LUA_LUAEXTENDABLE_NS(math, Vector2);
-DECLARE_LUA_LUAEXTENDABLE_NS(math, Vector3);
-#endif//EXTENDED_BY_LUA
 
 #endif//VECTOR_H

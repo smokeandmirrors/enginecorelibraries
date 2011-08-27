@@ -5,6 +5,7 @@
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
+#include "LuaMathExtensions.cpp"
 #endif//EXTENDED_BY_LUA
 #include "Numbers.h"
 #include "NumericalFunctions.h"

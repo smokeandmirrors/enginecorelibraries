@@ -6,6 +6,8 @@ Defines the entry point for the console application.
 #include <stdio.h>
 #include <tchar.h>
 
+#include "LuaMathExtensions.h"
+
 #if EXTENDED_BY_LUA
 #pragma message("This executable is compiling with embedded lua.")
 #include "LuaExtensionInclusions.h"
