@@ -172,7 +172,7 @@ public:
 		m_other = other; 
 	}
 
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Simple)
+	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Simple)
 
 private:
 	Simple*			m_other;
@@ -190,7 +190,7 @@ DEFINE_LUA_LUAEXTENDABLE(Simple, Simple)
 	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
 	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
 	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
-END_LUA_LUAEXTENDABLE(Simple, Simple)
+END_LUA_CLASS(Simple, Simple)
 
 
 class Derived
@@ -219,7 +219,7 @@ public:
 	uint4				getDerivation(void) const	{ return 21; }
 	virtual uint4		getValue(void) const		{ return 14; }
 
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived)
+	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived)
 };
 
 uint4 Derived::numAllocated = 0;
@@ -267,7 +267,7 @@ LUA_FUNC(getUnexposed)
 DEFINE_LUA_LUAEXTENDABLE(Derived, Simple)
 LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint4, &Derived::getDerivation>))
 LUA_ENTRY(getUnexposed)
-END_LUA_LUAEXTENDABLE(Derived, Simple)
+END_LUA_CLASS(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
 {
@@ -334,7 +334,7 @@ public:
 		return this == &other; 
 	}
 
-	INLINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
+	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
 
 protected:
 	const sint1*				m_name;
@@ -355,7 +355,7 @@ LUA_ENTRY(__call)
 LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const sint1*, &Grandparent::getFamilyName>))
 LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const sint1*, &Grandparent::getTitle>))
 LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
-END_LUA_LUAEXTENDABLE(Grandparent, Grandparent)
+END_LUA_CLASS(Grandparent, Grandparent)
 
 /**
 \class
@@ -372,7 +372,7 @@ public:
 	const sint1*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const sint1*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
-	INLINE_DEFAULT_GETCLASSNAME(Parent)
+	DEFINE_DEFAULT_GETCLASSNAME(Parent)
 
 private:
 	Grandparent*			m_grandParent;			
@@ -384,7 +384,7 @@ DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Parent, Grandparent)
 LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const sint1*, &Parent::getGrandparentName>))
 LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
-END_LUA_LUAEXTENDABLE(Parent, Grandparent) 
+END_LUA_CLASS(Parent, Grandparent) 
 
 /**
 \class
@@ -409,7 +409,7 @@ public:
 	const sint1*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const sint1*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
-	INLINE_DEFAULT_GETCLASSNAME(Child)
+	DEFINE_DEFAULT_GETCLASSNAME(Child)
 
 private:
 	Parent*					m_parent;
@@ -422,7 +422,7 @@ LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
 LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
 LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const sint1*, &Child::getParentName>))
 LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
-END_LUA_LUAEXTENDABLE(Child, Parent)
+END_LUA_CLASS(Child, Parent)
 
 // END PROXY
 

@@ -73,7 +73,7 @@ public:
 	Quaternion(real4 scalar) : w(scalar), x(scalar), y(scalar), z(scalar)
 	{/* empty */}
 #if EXTENDED_BY_LUA
-	INLINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Quaternion)
+	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Quaternion)
 #endif//EXTENDED_BY_LUA 
 
 }; // Quaternion

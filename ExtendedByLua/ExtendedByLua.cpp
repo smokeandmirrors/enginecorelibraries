@@ -57,12 +57,8 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 	}
 #endif//EXTENDED_BY_LUA
 	
-	// int int_version = compiler_checks::Math<int>::ZERO_TOLERANCE;
-	// float float_version = compiler_checks::Math<float>::ZERO_TOLERANCE;
-
-
 #if SANDBOX
-	// sandbox::play();// just plays with C/C++ compile/runtime functionality
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
 #endif//SANDBOX	
 	return 0;
 }

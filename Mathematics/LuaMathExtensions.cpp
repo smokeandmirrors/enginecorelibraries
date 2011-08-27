@@ -59,103 +59,19 @@ namespace lua_library_Vector2
 		}
 	}
 
-	LUA_FUNC(__newindexErrorVector2)
-	{
-#if DEBUG
-		return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  "
-			"Use DEFINE_LUA_LUAEXTENDABLE_BY_PROXY to expose this class to Lua if that is desired.", "Vector2");
-#else
-		(void*)L;
-		return 0;
-#endif//DEBUG
-	}
-
-	LUA_FUNC(__tostringVector2)
-	{
-		lua_pushstring(L, "Vector2");
-		return 1;
-	}
+	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector2)
 
 	static const luaL_reg Vector2_library[] = 
 	{
 		LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<Vector2>)
-		LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse)
-		LUA_NAMED_ENTRY("__new", lua_extension::__new<Vector2>)
-		// LUA_NAMED_ENTRY("__newindex", __newindexErrorVector2)
-		LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
-		LUA_NAMED_ENTRY("__tostring", __tostringVector2)
-		
+		LUA_CLASS__isnewindexable_FALSE
+		LUA_CLASS__new_AUTO(Vector2)
+		LUA_CLASS__setmetatable_USERDATA
+		LUA_CLASS__tostring_AUTO(Vector2)
 		LUA_NAMED_ENTRY("__index", __indexVector2)
 		LUA_NAMED_ENTRY("__newindex", __newindexVector2)
 		LUA_NAMED_ENTRY("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
-		LUA_FINAL_ENTRY
-	};
-
-	LUA_FUNC(key)
-	{
-		luaL_register(L, "Vector2", Vector2_library);
-		lua_extension::declareLuaClass(L, "Vector2", "Vector2");
-		return 1;
-	}
-};
-
-/*
-
-DEFINE_LUA_LUAEXTENDABLE(Vector2, Vector2)
-		LUA_NAMED_ENTRY("__index", __indexVector2)
-		LUA_NAMED_ENTRY("__newindex", __newindexVector2)
-		LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) 
-		LUA_NAMED_ENTRY("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
-		LUA_FINAL_ENTRY 
-	};	// end function list 
-	sint4 key(lua_State* L) 
-	{ 
-		luaL_register(L, "Vector2", Vector2_library); 
-		LuaExtendable::declareLuaClass(L, "Vector2", "Vector2"); 
-		return 1; 
-	} 
-}; // end namespace lua_library_Vector2
-}; // end namespace lua_library_Vector2
-*/
-
-LUA_FUNC(__indexVector3)
-{
-	const sint1* key = to<const sint1*>(L, -1);
-	const Vector3& v = to<const Vector3&>(L, -2);
-
-	if (key[1] == '\0' 
-		&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
-	{
-		return push(L, v[*key - 'x']);
-	}
-	else
-	{									//s:
-		lua_getglobal(L, "getClass");	//s: getClass
-		push(L, "Vector3");				//s: getClass, "Vector3"
-		lua_call(L, 1, 1);				//s: Vector3
-		lua_getfield(L, -1, key);		//s: Vector3[key]
-		return 1;
-	}
-}
-
-LUA_FUNC(__newindexVector3)
-{
-	real4 value = to<real4>(L, -1);
-	const sint1* key = to<const sint1*>(L, -2);
-	Vector3& v = to<Vector3&>(L, -3);
-
-	if (key[1] == '\0' 
-		&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
-	{
-		(&v.x)[*key - 'x'] = value;
-		return 0;
-	}
-	else
-	{
-		return luaL_error(L, "ERROR! the only valid assignable indices for Vector3"
-			" are 'x', 'y' and 'z'");
-	}
-}
+END_LUA_CLASS(Vector2, Vector2)
 
 namespace lua_library_Vector3
 {	
@@ -333,55 +249,91 @@ namespace lua_library_Vector3
 	DEFINE_VOID_VECTOR3_FUNC(scale)
 	DEFINE_VOID_VECTOR3_FUNC(subtract)
 
-} // end namespace lua_library_Vector3
+	LUA_FUNC(__indexVector3)
+	{
+		const sint1* key = to<const sint1*>(L, -1);
+		const Vector3& v = to<const Vector3&>(L, -2);
 
-DEFINE_LUA_LUAEXTENDABLE(Vector3, Vector3)
-	LUA_NAMED_ENTRY("__eq", (return1Param1const<Vector3, bool, const Vector3&, &V3<float>::operator==>))
-	LUA_NAMED_ENTRY("__index", __indexVector3)
-	LUA_NAMED_ENTRY("__newindex", __newindexVector3) 
-	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse)
-	LUA_ENTRY(		 add)
-	LUA_NAMED_ENTRY("construct", initialize)
-	LUA_ENTRY(		 cross)
-	LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distance>))
-	LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceSqr>))
-	LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXY>))
-	LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXYSqr>))
-	LUA_ENTRY(		 divide)
-	LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::dot>))
-	LUA_ENTRY(		 equals)
-	LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFar>))
-	LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFarXY>))
-	LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNear>))
-	LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNearXY>))
-	LUA_NAMED_ENTRY("isNormal", (return1Param0const<Vector3, bool, &V3<float>::isNormal>))
-	LUA_NAMED_ENTRY("isZero", (return1Param0const<Vector3, bool, &V3<float>::isZero>))
-	LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, real4, &V3<float>::magnitude>))
-	LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeSqr>))
-	LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXY>))
-	LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXYSqr>))
-	LUA_ENTRY(		 nearlyEquals)
-	LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &V3<float>::negate>))
-	LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, real4, &V3<float>::normalize>))
-	LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &V3<float>::perpendicular>))
-	LUA_ENTRY(		 scale)
-	LUA_NAMED_ENTRY("set", initialize)
-	// slightly higher performance options for Lua
-	LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, real4, &V3<float>::set>))
-	LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, real4, real4, real4, &V3<float>::set>))
-	LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &V3<float>::set>))
-	LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, real4, &V3<float>::set>))
-	LUA_ENTRY(		 subtract)
-	LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &V3<float>::zero>))
-	LUA_FINAL_ENTRY 
-};	// end function list 
+		if (key[1] == '\0' 
+			&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
+		{
+			return push(L, v[*key - 'x']);
+		}
+		else
+		{									//s:
+			lua_getglobal(L, "getClass");	//s: getClass
+			push(L, "Vector3");				//s: getClass, "Vector3"
+			lua_call(L, 1, 1);				//s: Vector3
+			lua_getfield(L, -1, key);		//s: Vector3[key]
+			return 1;
+		}
+	}
 
-sint4 key(lua_State* L) 
-{ 
-	luaL_register(L, "Vector3", Vector3_library); 
-	lua_extension::declareLuaClass(L, "Vector3", "Vector3"); 
-	return 1; 
-} 
+	LUA_FUNC(__newindexVector3)
+	{
+		real4 value = to<real4>(L, -1);
+		const sint1* key = to<const sint1*>(L, -2);
+		Vector3& v = to<Vector3&>(L, -3);
 
-}; // end namespace lua_library_Vector3
+		if (key[1] == '\0' 
+			&& (key[0] == 'x' || key[0] == 'y' || key[0] == 'z')) 
+		{
+			(&v.x)[*key - 'x'] = value;
+			return 0;
+		}
+		else
+		{
+			return luaL_error(L, "ERROR! the only valid assignable indices for Vector3"
+				" are 'x', 'y' and 'z'");
+		}
+	}
+
+	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector3)
+
+	static const luaL_reg Vector3_library[] = 
+	{
+		LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<Vector3>)
+		LUA_CLASS__isnewindexable_FALSE
+		LUA_CLASS__new_AUTO(Vector3)
+		LUA_CLASS__setmetatable_USERDATA
+		LUA_CLASS__tostring_AUTO(Vector3)
+		LUA_NAMED_ENTRY("__index", __indexVector3)
+		LUA_NAMED_ENTRY("__newindex", __newindexVector3)
+		LUA_NAMED_ENTRY("__eq", (return1Param1const<Vector3, bool, const Vector3&, &V3<float>::operator==>))
+		LUA_CLASS__isnewindexable_FALSE
+		LUA_ENTRY(		 add)
+		LUA_NAMED_ENTRY("construct", initialize)
+		LUA_ENTRY(		 cross)
+		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distance>))
+		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceSqr>))
+		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXY>))
+		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXYSqr>))
+		LUA_ENTRY(		 divide)
+		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::dot>))
+		LUA_ENTRY(		 equals)
+		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFar>))
+		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFarXY>))
+		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNear>))
+		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNearXY>))
+		LUA_NAMED_ENTRY("isNormal", (return1Param0const<Vector3, bool, &V3<float>::isNormal>))
+		LUA_NAMED_ENTRY("isZero", (return1Param0const<Vector3, bool, &V3<float>::isZero>))
+		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, real4, &V3<float>::magnitude>))
+		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeSqr>))
+		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXY>))
+		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXYSqr>))
+		LUA_ENTRY(		 nearlyEquals)
+		LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &V3<float>::negate>))
+		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, real4, &V3<float>::normalize>))
+		LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &V3<float>::perpendicular>))
+		LUA_ENTRY(		 scale)
+		LUA_NAMED_ENTRY("set", initialize)
+		// slightly higher performance options for Lua
+		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, real4, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, real4, real4, real4, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, real4, &V3<float>::set>))
+		LUA_ENTRY(		 subtract)
+		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &V3<float>::zero>))
+END_LUA_CLASS(Vector3, Vector3)
+
 #endif//EXTENDED_BY_LUA

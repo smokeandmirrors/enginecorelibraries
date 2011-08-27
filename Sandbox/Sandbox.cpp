@@ -28,6 +28,12 @@ void onPlay(void);
 
 void sandbox::play()
 {
+	
+	int int_version = compiler_checks::Math<int>::ZERO_TOLERANCE;
+	float float_version = compiler_checks::Math<float>::ZERO_TOLERANCE;
+
+	compiler_checks::check();
+
 	printf("Playing in the sandbox!\n");
 	onPlay();
 	printf("Stopped playing in the sandbox!\n");

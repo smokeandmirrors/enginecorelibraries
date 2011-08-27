@@ -26,6 +26,8 @@ namespace compiler_checks
 	const int Math<int>::ZERO_TOLERANCE = 5;
 	const float Math<float>::ZERO_TOLERANCE = 0.0f;
 
+	void check(void);
+
 } // namespace compiler_checks
 
 
