@@ -116,6 +116,13 @@ to %Lua and the %Lua C API.
 @{
 */
 
+#define CLOSE_LUA_LIB(NAME) \
+		LUA_FINAL_ENTRY \
+	};	/* end function list */ 
+
+#define CLOSE_LUA_NS(NAME) \
+	}; // end namespace lua_library_##name
+
 /** 
 \def DECLARE_LUA_LIBRARY
 Declares a %Lua library for shared inclusion.  If used for a class,
@@ -176,6 +183,20 @@ Declares a library around a POD class
 	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE::CLASS)
 // #define DECLARE_LUA_CLASS_NS
 
+#define DEFINE_DEFAULT_TOSTRING(CLASS) \
+	virtual const sint1* toString(void) \
+	{ \
+		return "This is a " #CLASS; \
+	}
+	// #define DEFINE_DEFAULT_TOSTRING(CLASS) 
+
+#define DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
+	virtual const sint1* getClassName(void) const \
+	{ \
+		return #CLASS; \
+	}
+	// #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
+
 #if DEBUG 
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
@@ -203,6 +224,18 @@ Declares a library around a POD class
 	}	
 // #define DEFINE_LUA_CLASS__tostring
 
+#define DEFINE_LUA_CLASS(CLASS, SUPER_CLASS) \
+	OPEN_LUA_NS(CLASS) \
+		DEFINE_LUA_CLASS_AUTO_METAMETHODS(CLASS) \
+		OPEN_LUA_LIB(CLASS) \
+			LUA_CLASS__gc_DESTRUCTOR \
+			LUA_CLASS__isnewindexable_FALSE \
+			LUA_CLASS__new_AUTO(CLASS)\
+			LUA_CLASS__newindex_ERROR_AUTO(CLASS) \
+			LUA_CLASS__setmetatable_USERDATA \
+			LUA_CLASS__tostring_AUTO(CLASS)
+// #define_LUA_CLASS
+
 #define DEFINE_LUA_CLASS_AUTO_METAMETHODS(CLASS) \
 	DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	DEFINE_LUA_CLASS__tostring(CLASS) 
@@ -216,26 +249,33 @@ This method is ideal for static classes or libraries.
 \note highly recommended to precede END_LUA_LIBRARY
 \param name name of the library without string delimiters
 */
-#define DEFINE_LUA_LIBRARY(name) \
-	namespace lua_library_##name \
-	{ \
-		static const luaL_reg name##_library[] = \
-		{	/* begin function list */						
+#define DEFINE_LUA_LIBRARY(NAME) \
+	OPEN_LUA_NS(NAME) \
+		OPEN_LUA_LIB(NAME)				
 // #define DEFINE_LUA_LIBRARY
 
-#define DEFINE_LUA_CLASS(CLASS, SUPER_CLASS) \
-	namespace lua_library_##CLASS \
+#define DEFINE_LUA_OPENER(NAME) \
+	sint4 key(lua_State* L) \
 	{ \
-		DEFINE_LUA_CLASS_AUTO_METAMETHODS \
-		static const luaL_reg CLASS##_library[] = \
-		{ \
-			LUA_CLASS__gc_DESTRUCTOR \
-			LUA_CLASS__isnewindexable_FALSE \
-			LUA_CLASS__new_AUTO(CLASS)\
-			LUA_CLASS__newindex_ERROR_AUTO(CLASS) \
-			LUA_CLASS__setmetatable_USERDATA \
-			LUA_CLASS__tostring_AUTO(CLASS)
-// #define_LUA_CLASS
+		luaL_register(L, #NAME, NAME##_library); \
+		return 1; \
+	} 
+
+#define DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
+	sint4 key(lua_State* L) \
+	{ \
+		luaL_register(L, #CLASS, CLASS##_library); \
+		lua_extension::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
+		return 1; \
+	} 
+
+#define DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
+	sint4 key(lua_State* L) \
+	{ \
+		luaL_register(L, #NAME, NAME##_library); \
+		Lua::nilLoadedStatus(L, #NAME); \
+		return 1; \
+	} 
 
 /**
 \def DEFINE_LUA_LUAEXTENDABLE
@@ -257,44 +297,13 @@ or the same if it has no parent class
 \note adds a __tostring, calls toString defined by the LuaExtendable
 */
 #define DEFINE_LUA_LUAEXTENDABLE(CLASS, SUPER_CLASS) \
-	namespace lua_library_##CLASS \
-	{ \
-		static const luaL_reg CLASS##_library[] = \
-		{ \
-			LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod) \
+	DEFINE_LUA_LIBRARY(CLASS) \
+			LUA_EXTENDABLE__gc_DESTRUCTOR \
 			LUA_CLASS__isnewindexable_FALSE \
 			LUA_CLASS__new_AUTO(CLASS) \
-			LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) \
+			LUA_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
 			LUA_CLASS__setmetatable_USERDATA \
-			LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
-// #define_LUA_LUAEXTENDABLE
-
-/**
-\def DEFINE_LUA_LUAEXTENDABLE_NOCTOR
-Define a %Lua library around a class, so that instances of the 
-controlled in %Lua. This also exposes simple userdata pointers with all 
-associated C++ and Lua methods, but it doesn't create any ability to added 
-new %Lua fields.  It also doesn't supply any constructor or destructor exposure
-to %Lua This could be used for objects like singletons.
-\param CLASS the name of the CLASS being exposed, with no delimiters
-\param SuperClass with no delimiters, the parent class of the LuaExtendable,
-or the same if it has no parent class
-\note compile-time directive
-\note highly recommended to precede an END_LUA_CLASS
-\note adds a __isnewindexable, returns false
-\note adds a __newindex, throws a %Lua error
-\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
-\note adds a __tostring, calls toString defined by the LuaExtendable
-*/
-#define DEFINE_LUA_LUAEXTENDABLE_NOCTOR(CLASS, SuperClass) \
-	namespace lua_library_##CLASS \
-	{ \
-		static const luaL_reg CLASS##_library[] = \
-		{ \
-			LUA_CLASS__isnewindexable_FALSE \
-			LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) \
-			LUA_CLASS__setmetatable_USERDATA \
-			LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
+			LUA_EXTENDABLE__tostring_AUTO(CLASS)  
 // #define_LUA_LUAEXTENDABLE
 
 /**
@@ -323,59 +332,59 @@ or the same if it has no parent class
 \note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
 \note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(CLASS, SuperClass) \
-	namespace lua_library_##CLASS \
-	{ \
-		static const luaL_reg CLASS##_library[] = \
-		{ \
-			LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod) \
+#define DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(CLASS, SUPER_CLASS) \
+	DEFINE_LUA_LIBRARY(CLASS) \
+			LUA_EXTENDABLE__gc_DESTRUCTOR \
 			LUA_CLASS__isExtendableByProxy \
 			LUA_CLASS__isnewindexable_TRUE \
 			LUA_CLASS__new_AUTO(CLASS) \
 			LUA_CLASS__setmetatable_PROXY \
-			LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
+			LUA_EXTENDABLE__tostring_AUTO(CLASS) 
 // #define DEFINE_LUA_LUAEXTENDABLE_BY_PROXY
 
-#define DEFINE_DEFAULT_TOSTRING(CLASS) \
-	virtual const sint1* toString(void) \
-	{ \
-		return "This is a " #CLASS; \
-	}
-	// #define DEFINE_DEFAULT_TOSTRING(CLASS) 
+/**
+\def DEFINE_LUA_LUAEXTENDABLE_NOCTOR
+Define a %Lua library around a class, so that instances of the 
+controlled in %Lua. This also exposes simple userdata pointers with all 
+associated C++ and Lua methods, but it doesn't create any ability to added 
+new %Lua fields.  It also doesn't supply any constructor or destructor exposure
+to %Lua This could be used for objects like singletons.
+\param CLASS the name of the CLASS being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
+\note compile-time directive
+\note highly recommended to precede an END_LUA_CLASS
+\note adds a __isnewindexable, returns false
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
+*/
+#define DEFINE_LUA_LUAEXTENDABLE_NOCTOR(CLASS, SuperClass) \
+	DEFINE_LUA_LIBRARY(CLASS) \
+			LUA_CLASS__isnewindexable_FALSE \
+			LUA_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
+			LUA_CLASS__setmetatable_USERDATA \
+			LUA_EXTENDABLE__tostring_AUTO(CLASS) 
+// #define_LUA_LUAEXTENDABLE
 
-#define DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
-	virtual const sint1* getClassName(void) const \
-	{ \
-		return #CLASS; \
-	}
-	// #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
+#define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) \
+	DEFINE_DEFAULT_TOSTRING(CLASS) \
+	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
+	DEFINE_PROXY_SETMETATABLE(CLASS)
+	// #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) 
 
 #define DEFINE_PROXY_SETMETATABLE(CLASS) \
 	virtual sint4 setMetatable(lua_State* L) \
 	{ \
 		return setProxyMetatable(L); \
 	}
-	// #define DEFINE_PROXY_SETMETATABLE(CLASS) 
-
-#define DEFINE_USERDATA_SETMETATABLE(CLASS) \
-	virtual sint4 setMetatable(lua_State* L) \
-	{ \
-		return setUserdataMetatable(L); \
-	}
-	// #define DEFINE_USERDATA_SETMETATABLE(CLASS) 
-
-#define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) \
-	DEFINE_DEFAULT_TOSTRING(CLASS) \
-	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
-	DEFINE_PROXY_SETMETATABLE(CLASS)
-	// #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) 
+// #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) 
 
 #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) \
 	DEFINE_DEFAULT_TOSTRING(CLASS) \
 	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	DEFINE_USERDATA_SETMETATABLE(CLASS)
-	// #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) 
-
+// #define DEFINE_PROXY_SETMETATABLE(CLASS) 
 
 #if ARGUMENT_ERRORS
 #define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
@@ -456,93 +465,61 @@ back out of %Lua.
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
 	namespace lua_extension \
 	{ \
-		template<> inline CLASS* to< CLASS* >(lua_State* L, sint4 index) \
+	template<> inline CLASS* to< CLASS* >(lua_State* L, sint4 index) \
 		{ \
-			LuaExtendable* le = to<LuaExtendable*>(L, index); \
-			CLASS* object = dynamic_cast< CLASS* >(le); \
-			if (object == static_cast< CLASS* >(le)) \
-				return object; \
-			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, #CLASS, typeid(object).name()); \
-			return NULL; \
+		LuaExtendable* le = to<LuaExtendable*>(L, index); \
+		CLASS* object = dynamic_cast< CLASS* >(le); \
+		if (object == static_cast< CLASS* >(le)) \
+		return object; \
+		luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, #CLASS, typeid(object).name()); \
+		return NULL; \
 		} \
 		template<> inline const CLASS* to< const CLASS* >(lua_State* L, sint4 index) \
 		{ \
-			return to< CLASS* >(L, index); \
+		return to< CLASS* >(L, index); \
 		} \
 		template<> inline CLASS& to< CLASS& >(lua_State* L, sint4 index) \
 		{ \
-			CLASS* object = to< CLASS* >(L, index); \
-			return *object; \
+		CLASS* object = to< CLASS* >(L, index); \
+		return *object; \
 		} \
 		template<> inline const CLASS& to< const CLASS& >(lua_State* L, sint4 index) \
 		{ \
-			CLASS* object = to< CLASS* >(L, index); \
-			return *object; \
+		CLASS* object = to< CLASS* >(L, index); \
+		return *object; \
 		} \
-	}
+		}
 // #define DEFINE_TO_LUAEXTENDABLES
 #else
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
 	namespace lua_extension \
 	{ \
-		template<> inline CLASS* to< CLASS* >(lua_State* L, sint4 index) \
+	template<> inline CLASS* to< CLASS* >(lua_State* L, sint4 index) \
 		{ \
-			return static_cast< CLASS* >(to<LuaExtendable*>(L, index)); \
+		return static_cast< CLASS* >(to<LuaExtendable*>(L, index)); \
 		} \
 		template<> inline const CLASS* to< const CLASS* >(lua_State* L, sint4 index) \
 		{ \
-			return to< CLASS* >(L, index); \
+		return to< CLASS* >(L, index); \
 		} \
 		template<> inline CLASS& to<CLASS&>(lua_State* L, sint4 index) \
 		{ \
-			return *to< CLASS* >(L, index); \
+		return *to< CLASS* >(L, index); \
 		} \
 		template<> inline const CLASS& to< const CLASS& >(lua_State* L, sint4 index) \
 		{ \
-			return *to< CLASS* >(L, index); \
+		return *to< CLASS* >(L, index); \
 		} \
-	}
+		}
 // #define DEFINE_TO_LUAEXTENDABLES
 #endif//ARGUMENT_ERRORS
 
-/** 
-\def END_LUA_LIBRARY
-end a library definition for registration
-\note compile-time directive
-\note highly recommended to follow with DEFINE_LUA_LIBRARY
-\param name name of the library without string delimiters
-*/
-#define END_LUA_LIBRARY(name) \
-			LUA_FINAL_ENTRY \
-		};	/* end function list */ \
-		sint4 key(lua_State* L) \
-		{ \
-			luaL_register(L, #name, name##_library); \
-			return 1; \
-		} \
-	}; // end namespace lua_library_##name
-// #define END_LUA_LIBRARY
-
-/** 
-\def END_LUA_LIBRARY_EXTENSIBLE
-end a library definition for registration,
-adds shortcut to allow extending the library in %Lua with 
-the require() function.
-\note compile-time directive
-\note highly recommended to follow define_lua_library_extensible
-\param name name of the library without string delimiters
-*/
-#define END_LUA_LIBRARY_EXTENSIBLE(name) \
-			LUA_FINAL_ENTRY \
-		};	/* end function list */ \
-		sint4 key(lua_State* L) \
-		{ \
-			luaL_register(L, #name, name##_library); \
-			Lua::nilLoadedStatus(L, #name); \
-			return 1; \
-		} \
-	}; // end namespace lua_library_##name
-// #define END_LUA_LIBRARY_EXTENSIBLE
+#define DEFINE_USERDATA_SETMETATABLE(CLASS) \
+	virtual sint4 setMetatable(lua_State* L) \
+	{ \
+		return setUserdataMetatable(L); \
+	}
+// #define DEFINE_USERDATA_SETMETATABLE(CLASS) 
 
 /**
 \def END_LUA_CLASS
@@ -559,17 +536,38 @@ or the same if it has no parent class
 \note highly recommended to follow any form of DEFINE_LUA_LUAEXTENDABLE
 */
 #define END_LUA_CLASS(CLASS, SUPER_CLASS) \
-			LUA_FINAL_ENTRY \
-		};	/* end function list */ \
-		sint4 key(lua_State* L) \
-		{ \
-			luaL_register(L, #CLASS, CLASS##_library); \
-			lua_extension::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
-			return 1; \
-		} \
-	}; // end namespace lua_library_##name
+		CLOSE_LUA_LIB(CLASS) \
+		DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
+	CLOSE_LUA_NS(CLASS)
 // #define END_LUA_CLASS(CLASS, SUPER_CLASS) 
 
+/** 
+\def END_LUA_LIBRARY
+end a library definition for registration
+\note compile-time directive
+\note highly recommended to follow with DEFINE_LUA_LIBRARY
+\param name name of the library without string delimiters
+*/
+#define END_LUA_LIBRARY(NAME) \
+		CLOSE_LUA_LIB(NAME) \
+		DEFINE_LUA_OPENER(NAME) \
+	CLOSE_LUA_NS(NAME)
+// #define END_LUA_LIBRARY
+
+/** 
+\def END_LUA_LIBRARY_EXTENSIBLE
+end a library definition for registration,
+adds shortcut to allow extending the library in %Lua with 
+the require() function.
+\note compile-time directive
+\note highly recommended to follow define_lua_library_extensible
+\param CLASS name of the library without string delimiters
+*/
+#define END_LUA_LIBRARY_EXTENSIBLE(CLASS) \
+		CLOSE_LUA_LIB(CLASS) \
+		DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
+	CLOSE_LUA_NS(CLASS)
+// #define END_LUA_LIBRARY_EXTENSIBLE
 
 /** \todo name these all to LUA_ENTRY_CLASS<> */
 #define LUA_CLASS__gc_DESTRUCTOR \
@@ -607,7 +605,16 @@ add a lua method to a definition by the same name
 */
 #define LUA_ENTRY(function) \
 	{(#function), (function)}, 
+
 // #define LUA_ENTRY
+#define LUA_EXTENDABLE__gc_DESTRUCTOR \
+	LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod)
+
+#define LUA_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
+	LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) 
+
+#define LUA_EXTENDABLE__tostring_AUTO(CLASS) \
+	LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
 
 /**
 the sentinel entry in a lua library
@@ -638,6 +645,14 @@ add a lua method to a definition by a different name
 #define LUA_NAMED_ENTRY(name, function)	\
 	{(name), (function)}, 
 // #define LUA_NAMED_ENTRY
+
+#define OPEN_LUA_LIB(NAME) \
+	static const luaL_reg NAME##_library[] = \
+	{	/* begin function list */
+
+#define OPEN_LUA_NS(NAME) \
+	namespace lua_library_##NAME \
+	{ 
 
 /** 
 \def REGISTER_LUA_LIBRARY
