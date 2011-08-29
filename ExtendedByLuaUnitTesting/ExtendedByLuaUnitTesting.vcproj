@@ -358,6 +358,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UTClassExtension2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UTLibraryExtension.cpp"
 				>
 			</File>

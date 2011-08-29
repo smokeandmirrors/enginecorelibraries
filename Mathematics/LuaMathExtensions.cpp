@@ -19,7 +19,6 @@ using namespace math;
 
 #if EXTENDED_BY_LUA
 
-
 namespace lua_library_Vector2 
 {
 	LUA_FUNC(__indexVector2)

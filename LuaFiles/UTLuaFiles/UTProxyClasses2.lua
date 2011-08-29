@@ -2,21 +2,22 @@ module(..., package.seeall)
 local OOP = require'ObjectOrientedParadigm'
 local UT = require'UnitTestingFramework'
 require 'Utilities'
+
 ----------------------------------------------------------------------
 UT.test('inheritance',
 	function()
-		local g = new'Grandparent'
+		local g = new'Grandparent2'
 		-- C++ functions
 		UT.check(type(g.getFamilyName) == 'function')
 		UT.checkEqual(g:getFamilyName(), 'Curran')
 		UT.check(type(g.getTitle) == 'function')
-		UT.checkEqual(g:getTitle(), 'Grandparent')
+		UT.checkEqual(g:getTitle(), 'Grandparent2')
 		UT.checkT(g.__eq, 'function')
 		UT.check(g == g)
-		local g2 = new'Grandparent'
+		local g2 = new'Grandparent2'
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
-		UT.checkEqual(g.."", 'This is a Grandparent') 
+		UT.checkEqual(g.."", 'This is a Grandparent2') 
 		UT.checkT(g.__gc, 'function')
 		UT.checkT(g.__call, 'function')
 		UT.check(g(), 7)
@@ -29,7 +30,7 @@ UT.test('inheritance',
 		UT.checkEqual(g:getNumberOfKids(), 2)
 		UT.checkT(g.getNumberOfGrandKids, 'function')
 		UT.checkEqual(g:getNumberOfGrandKids(), 5)
-		g = new('Parent')
+		g = new('Parent2')
 		-- C++ functions
 		UT.checkT(g.setGrandparent, 'function')
 		g:setGrandparent(g2)
@@ -40,16 +41,16 @@ UT.test('inheritance',
 		UT.check(type(g.getFamilyName) == 'function')
 		UT.checkEqual(g:getFamilyName(), 'Curran')
 		UT.check(type(g.getTitle) == 'function')
-		UT.checkEqual(g:getTitle(), 'Parent')
+		UT.checkEqual(g:getTitle(), 'Parent2')
 		UT.checkT(g.__eq, 'function')
 		UT.checkT(g.__call, 'function')
 		UT.check(g(), 7)
 		UT.check(g == g)
 		UT.check(g ~= g2)
-		local g2 = new('Parent')
+		local g2 = new('Parent2')
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
-		UT.checkEqual(g.."", 'This is a Grandparent') 
+		UT.checkEqual(g.."", 'This is a Grandparent2') 
 		UT.checkT(g.__gc, 'function')
 		-- Lua constructor results
 		UT.checkEqual(g.numberOfParents, 3)
@@ -64,8 +65,7 @@ UT.test('inheritance',
 		UT.checkEqual(g:getNumberOfGrandKids(), 0)
 		UT.checkT(g.getNumberOfParents, 'function')
 		UT.checkEqual(g:getNumberOfParents(), 3)		
-		
-		g = new'Child'
+		g = new'Child2'
 		-- C++ functions
 		UT.checkT(g.setGrandparent, 'function')
 		g:setGrandparent(g2)
@@ -76,16 +76,16 @@ UT.test('inheritance',
 		UT.check(type(g.getFamilyName) == 'function')
 		UT.checkEqual(g:getFamilyName(), 'Curran')
 		UT.check(type(g.getTitle) == 'function')
-		UT.checkEqual(g:getTitle(), 'Child')
+		UT.checkEqual(g:getTitle(), 'Child2')
 		UT.checkT(g.__eq, 'function')
 		UT.check(g == g)
 		UT.check(g ~= g2)
-		local g2 = new'Child'
+		local g2 = new'Child2'
 		UT.check(g == g2 and g2 == g)
 		g2.favoritePark = 'Lake Harriett'
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
-		UT.checkEqual(g.."", 'This is a Grandparent') 
+		UT.checkEqual(g.."", 'This is a Grandparent2') 
 		UT.checkT(g.__gc, 'function')
 		UT.checkT(g.__call, 'function')
 		UT.check(g(), 7)
@@ -100,9 +100,9 @@ UT.test('inheritance',
 		UT.checkEqual(g.favoriteFood, 'Pizza')
 		UT.checkEqual(g.favoriteMovie, 'Star Wars')
 		UT.checkT(g.mom, 'userdata')
-		UT.check(g.mom:IS_A('Parent'))
+		UT.check(g.mom:IS_A('Parent2'))
 		UT.checkT(g.dad, 'userdata')
-		UT.check(g.dad:IS_A('Parent'))
+		UT.check(g.dad:IS_A('Parent2'))
 		-- Lua functions
 		UT.checkT(g.getNumberOfKids, 'function')
 		UT.checkEqual(g:getNumberOfKids(), 0)
@@ -111,13 +111,13 @@ UT.test('inheritance',
 		UT.checkT(g.getNumberOfParents, 'function')
 		UT.checkEqual(g:getNumberOfParents(), 2)		
 		UT.checkT(g.getNumberOfGrandparents, 'function')
-		UT.checkEqual(g:getNumberOfGrandparents(), 4)	
+		UT.checkEqual(g:getNumberOfGrandparents(), 4)
 	end
 )
 ----------------------------------------------------------------------
 UT.test('proxy useage',
 	function()
-		local c = new'Child'
+		local c = new'Child2'
 		UT.checkT(c, 'userdata')
 		UT.check(c.newThing == nil)
 		c.newThing = 2;
@@ -128,9 +128,9 @@ UT.test('proxy useage',
 ----------------------------------------------------------------------
 UT.test('proxy OOP friendliness',
 	function()
-		UT.testClassProperties('Grandparent')
-		UT.testClassProperties('Parent', 'Grandparent')
-		UT.testClassProperties('Child', 'Parent')
+		UT.testClassProperties('Grandparent2')
+		UT.testClassProperties('Parent2', 'Grandparent2')
+		UT.testClassProperties('Child2', 'Parent2')
 	end
 )
 
@@ -138,25 +138,27 @@ UT.test('proxy OOP friendliness',
 UT.test('proxy class redefinition',
 	function()
 		if DEBUG_INTERPRETATION then
-			require'Child'
-			c = new'Child'
-			UT.testClassProperties('Parent', 'Grandparent')
-			UT.testClassProperties('Child', 'Parent')
-			Parent.onRefresh = function() return 'refreshed' end
-			declareClass(Parent)
+			require'Child2'
+			c = new'Child2'
+			UT.testClassProperties('Parent2', 'Grandparent2')
+			UT.testClassProperties('Child2', 'Parent2')
+			Parent2.onRefresh = function() return 'refreshed' end
+			declareClass(Parent2)
+		---[[
 			UT.checkT(c.onRefresh, 'function')
 			UT.checkEqual(c:onRefresh(), 'refreshed')
-			UT.testInstanceProperties(c, 'Child', 'Parent')
-			Child.__add = function(lhs, rhs) return 2 end
-			Child.refreshed = function(self) return self() + 7 end
-			declareClass(Child)
-			UT.checkEqual(c + new'Child', 2)
+			UT.testInstanceProperties(c, 'Child2', 'Parent2')
+			Child2.__add = function(lhs, rhs) return 2 end
+			Child2.refreshed = function(self) return self() + 7 end
+			declareClass(Child2)
+			UT.checkEqual(c + new'Child2', 2)
 			UT.checkT(c.refreshed, 'function')
 			UT.checkEqual(c:refreshed(), 14)
-			UT.testInstanceProperties(c, 'Child', 'Parent')
-			UT.checkEqual((new'Child'):refreshed(), 14)
-			UT.testClassProperties('Parent', 'Grandparent')
-			UT.testClassProperties('Child', 'Parent')
+			UT.testInstanceProperties(c, 'Child2', 'Parent2')
+			UT.checkEqual((new'Child2'):refreshed(), 14)
+			UT.testClassProperties('Parent2', 'Grandparent2')
+			UT.testClassProperties('Child2', 'Parent2')
 		end
+		--]]
 	end
 )

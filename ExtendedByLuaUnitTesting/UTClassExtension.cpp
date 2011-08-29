@@ -4,8 +4,6 @@
 #include <string.h>
 
 #include "UTTools.h"
-#include "Vector.h"
-#include "NumericalFunctions.h"
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
@@ -183,7 +181,7 @@ bool Simple::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Simple);
 
-DEFINE_LUA_LUAEXTENDABLE(Simple, Simple)
+DEFINE_LUA_CLASS(EXTENDABLE, Simple, Simple)
 	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint4, &Simple::getValue>))
 	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
 	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint4, &Simple::getValue>))
@@ -264,9 +262,9 @@ LUA_FUNC(getUnexposed)
 	return push(L, Unexposed::getUnexposed());
 }
 
-DEFINE_LUA_LUAEXTENDABLE(Derived, Simple)
-LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint4, &Derived::getDerivation>))
-LUA_ENTRY(getUnexposed)
+DEFINE_LUA_CLASS(EXTENDABLE, Derived, Simple)
+	LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint4, &Derived::getDerivation>))
+	LUA_ENTRY(getUnexposed)
 END_LUA_CLASS(Derived, Simple)
 
 void supporttest_define_lua_LuaExtendable()
@@ -281,11 +279,11 @@ void Classes::test_define_lua_LuaExtendable()
 {
 	supporttest_define_lua_LuaExtendable();
 
-	CFIX_ASSERT(Simple::getNumAllocated() == 0.0f);
+	CFIX_ASSERT(Simple::getNumAllocated() == 0);
 	CFIX_ASSERT(Simple::wasEverCreated());
-	CFIX_ASSERT(Derived::getNumAllocated() == 0.0f);
+	CFIX_ASSERT(Derived::getNumAllocated() == 0);
 	CFIX_ASSERT(Derived::wasEverCreated());
-	CFIX_ASSERT(Unexposed::getNumAllocated() == 0.0f);
+	CFIX_ASSERT(Unexposed::getNumAllocated() == 0);
 	CFIX_ASSERT(Unexposed::wasEverCreated());
 }
 
@@ -307,8 +305,7 @@ public:
 	static uint4 getNumAllocated(void)	{ return numAllocatedGrandparents; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
-	Grandparent(const sint1* name=NULL) 
-		: m_name(name) 
+	Grandparent(void) 
 	{
 		everCreated = true;
 		numAllocatedGrandparents++;
@@ -335,9 +332,6 @@ public:
 	}
 
 	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
-
-protected:
-	const sint1*				m_name;
 }; // Grandparent
 
 uint4 Grandparent::numAllocatedGrandparents = 0;
@@ -350,11 +344,11 @@ LUA_FUNC(__call)
 	return push(L, 7);
 }
 
-DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Grandparent, Grandparent)
-LUA_ENTRY(__call) 
-LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const sint1*, &Grandparent::getFamilyName>))
-LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const sint1*, &Grandparent::getTitle>))
-LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Grandparent, Grandparent)
+	LUA_ENTRY(__call) 
+	LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const sint1*, &Grandparent::getFamilyName>))
+	LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const sint1*, &Grandparent::getTitle>))
+	LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 END_LUA_CLASS(Grandparent, Grandparent)
 
 /**
@@ -380,7 +374,7 @@ private:
 
 DECLARE_LUA_LUAEXTENDABLE(Parent);
 
-DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Parent, Grandparent)
+DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Parent, Grandparent)
 LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
 LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const sint1*, &Parent::getGrandparentName>))
 LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
@@ -417,11 +411,11 @@ private:
 
 DECLARE_LUA_LUAEXTENDABLE(Child);
 
-DEFINE_LUA_LUAEXTENDABLE_BY_PROXY(Child, Parent)
-LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
-LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const sint1*, &Child::getParentName>))
-LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
+DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Child, Parent)
+	LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
+	LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
+	LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const sint1*, &Child::getParentName>))
+	LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 END_LUA_CLASS(Child, Parent)
 
 // END PROXY
@@ -438,7 +432,7 @@ void supportProxyTesting(void)
 void Classes::test_define_lua_LuaExtendable_by_proxy()
 {
 	supportProxyTesting();
-	CFIX_ASSERT(Grandparent::getNumAllocated() == 0.0f);
+	CFIX_ASSERT(Grandparent::getNumAllocated() == 0);
 	CFIX_ASSERT(Grandparent::wasEverCreated());
 }
 
