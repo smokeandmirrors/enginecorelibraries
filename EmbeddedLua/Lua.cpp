@@ -60,7 +60,8 @@ Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_sto
 	
 	if (initialize_userdata_storage)
 		initializeUserdataStorage();
-
+	
+	/** \todo use methods like this this to save memory on LuaExtendables */
 	initializeDefaultProxyMetamethods();
 
 #if !GOLDMASTER

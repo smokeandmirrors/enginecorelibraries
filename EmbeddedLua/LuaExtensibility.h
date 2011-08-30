@@ -123,6 +123,27 @@ to %Lua and the %Lua C API.
 #define CLOSE_LUA_NS(NAME) \
 	}; // end namespace lua_library_##name
 
+
+/**
+\def DECLARE_LUA_CLASS
+Declares a library around a POD class
+\note compile-time directive
+*/
+#define DECLARE_LUA_CLASS(CLASS) \
+	DECLARE_LUA_LIBRARY(CLASS) \
+	DEFINE_TO_CLASS_FUNCTIONS(CLASS) 
+	// #define DECLARE_LUA_LUAEXTENDABLE
+
+/**
+\def DECLARE_LUA_CLASS_NS
+Declares a library around a POD class
+\note compile-time directive
+*/
+#define DECLARE_LUA_CLASS_NS(NAMESPACE, CLASS) \
+	DECLARE_LUA_LIBRARY(CLASS)	\
+	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE::CLASS)
+	// #define DECLARE_LUA_CLASS_NS
+
 /** 
 \def DECLARE_LUA_LIBRARY
 Declares a %Lua library for shared inclusion.  If used for a class,
@@ -163,46 +184,26 @@ the LuaExtendable interface.
 	DEFINE_TO_LUAEXTENDABLES(NAMESPACE::CLASS)
 // #define DECLARE_LUA_LUAEXTENDABLE_NS
 
-/**
-\def DECLARE_LUA_CLASS
-Declares a library around a POD class
-\note compile-time directive
-*/
-#define DECLARE_LUA_CLASS(CLASS) \
-	DECLARE_LUA_LIBRARY(CLASS) \
-	DEFINE_TO_CLASS_FUNCTIONS(CLASS) 
-// #define DECLARE_LUA_LUAEXTENDABLE
-
-/**
-\def DECLARE_LUA_CLASS_NS
-Declares a library around a POD class
-\note compile-time directive
-*/
-#define DECLARE_LUA_CLASS_NS(NAMESPACE, CLASS) \
-	DECLARE_LUA_LIBRARY(CLASS)	\
-	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE::CLASS)
-// #define DECLARE_LUA_CLASS_NS
-
 #define DEFINE_DEFAULT_TOSTRING(CLASS) \
 	virtual const sint1* toString(void) \
 	{ \
 		return "This is a " #CLASS; \
 	}
-	// #define DEFINE_DEFAULT_TOSTRING(CLASS) 
+// #define DEFINE_DEFAULT_TOSTRING(CLASS) 
 
 #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	virtual const sint1* getClassName(void) const \
 	{ \
 		return #CLASS; \
 	}
-	// #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
+// #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
 
 #if DEBUG 
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
 	{ \
 		return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  " \
-		"Use DEFINE_LUA_LUAEXTENDABLE_BY_PROXY to expose this class to Lua if that is desired.", #CLASS); \
+		"Use DEFINE_LUA_CLASS_BY_PROXY to expose this class to Lua if that is desired.", #CLASS); \
 	}
 // #define DEFINE_LUA_CLASS__newindex_ERROR
 #else 
@@ -224,16 +225,106 @@ Declares a library around a POD class
 	}	
 // #define DEFINE_LUA_CLASS__tostring
 
-#define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-	OPEN_LUA_NS(CLASS) \
-		DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
-		OPEN_LUA_LIB(CLASS) \
-// #define_LUA_CLASS
+
+/**
+\def DEFINE_LUA_CLASS
+Define a %Lua library around a class, so that instances of the 
+class can be created or controlled in %Lua. This also exposes simple 
+userdata pointers with all associated C++ and Lua methods, but it doesn't 
+create any ability to added new %Lua fields.  But, this is often never needed.
+This method would be preferable for objects like vectors.
+\param CLASS the name of the CLASS being exposed, with no delimiters
+\param SUPER_CLASS with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
+\note compile-time directive
+\note highly recommended to precede an END_LUA_CLASS
+\note adds a __gc, calls the destructor on the LuaExtendable
+\note adds a __isnewindexable, returns false
+\note adds a __new, calls the no-args constructor
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
+*/
+#define DEFINE_LUA_CLASS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_CLASS__isnewindexable_FALSE \
+		LUA_CLASS__new_AUTO(CLASS) \
+		LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_CLASS__setmetatable_USERDATA \
+		LUA_##TYPE##__tostring_AUTO(CLASS)  
+// #define DEFINE_LUA_CLASS 
 
 #define DEFINE_LUA_CLASS_AUTO_METAMETHODS(CLASS) \
 	DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	DEFINE_LUA_CLASS__tostring(CLASS) 
 // #define DEFINE_LUA_CLASS_AUTO_METAMETHODS
+
+/**
+\def DEFINE_LUA_CLASS_BY_PROXY
+begin a library definition for registration via a %Lua proxy table,
+and use the default "__new", "__setmetatable", "__gc" & "__tostring" methods
+
+The "by proxy" method is desirable because it allows a userdata type in lua
+to be treated exactly like a table, an ObjectOrientedParadigm class instance, and 
+a C++ class instance.  It is an arguably more expensive version of a %Lua
+exposed class.  It requires each exposed object to have its own userdata
+pointer, proxy table for new values, and metatable to reference the proxy 
+table.  That's a lot of storage, and it comes with all the associated
+extra table indexing and function calls.  But, it results in ZERO distinction
+between all %Lua classes, and partly C++ classes when operating with them 
+in %Lua.  The extra simplicity and power makes it worth it very valuable.
+\param CLASS the name of the CLASS being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
+\note compile-time directive
+\note highly recommended to precede an END_LUA_CLASS
+\note adds a __gc, calls the destructor on the LuaExtendable
+\note adds a __isExtendableByProxy, (used in %Lua) returns true
+\note adds a __isnewindexable, returns false
+\note adds a __new, calls the no-args constructor
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
+*/
+#define DEFINE_LUA_CLASS_BY_PROXY(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+	LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
+	LUA_CLASS__isExtendableByProxy \
+	LUA_CLASS__isnewindexable_TRUE \
+	LUA_CLASS__new_AUTO(CLASS) \
+	LUA_CLASS__setmetatable_PROXY \
+	LUA_##TYPE##__tostring_AUTO(CLASS) 
+// #define DEFINE_LUA_CLASS_BY_PROXY
+
+#define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+	OPEN_LUA_NS(CLASS) \
+		DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
+		OPEN_LUA_LIB(CLASS) \
+	// #define_LUA_CLASS
+
+/**
+\def DEFINE_LUA_CLASS_NOCTOR
+Define a %Lua library around a class, so that instances of the 
+controlled in %Lua. This also exposes simple userdata pointers with all 
+associated C++ and Lua methods, but it doesn't create any ability to added 
+new %Lua fields.  It also doesn't supply any constructor or destructor exposure
+to %Lua This could be used for objects like singletons.
+\param CLASS the name of the CLASS being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
+\note compile-time directive
+\note highly recommended to precede an END_LUA_CLASS
+\note adds a __isnewindexable, returns false
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
+*/
+#define DEFINE_LUA_CLASS_NOCTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+	LUA_CLASS__isnewindexable_FALSE \
+	LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+	LUA_CLASS__setmetatable_USERDATA \
+	LUA_##TYPE##__tostring_AUTO(CLASS) 
 
 #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
 
@@ -273,113 +364,25 @@ This method is ideal for static classes or libraries.
 		return 1; \
 	} 
 
-/**
-\def DEFINE_LUA_LUAEXTENDABLE
-Define a %Lua library around a class, so that instances of the 
-class can be created or controlled in %Lua. This also exposes simple 
-userdata pointers with all associated C++ and Lua methods, but it doesn't 
-create any ability to added new %Lua fields.  But, this is often never needed.
-This method would be preferable for objects like vectors.
-\param CLASS the name of the CLASS being exposed, with no delimiters
-\param SUPER_CLASS with no delimiters, the parent class of the LuaExtendable,
-or the same if it has no parent class
-\note compile-time directive
-\note highly recommended to precede an END_LUA_CLASS
-\note adds a __gc, calls the destructor on the LuaExtendable
-\note adds a __isnewindexable, returns false
-\note adds a __new, calls the no-args constructor
-\note adds a __newindex, throws a %Lua error
-\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
-\note adds a __tostring, calls toString defined by the LuaExtendable
-*/
-#define DEFINE_LUA_CLASS(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-			LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
-			LUA_CLASS__isnewindexable_FALSE \
-			LUA_CLASS__new_AUTO(CLASS) \
-			LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-			LUA_CLASS__setmetatable_USERDATA \
-			LUA_##TYPE##__tostring_AUTO(CLASS)  
-// #define DEFINE_LUA_CLASS 
-
-/**
-\def DEFINE_LUA_LUAEXTENDABLE_BY_PROXY
-begin a library definition for registration via a %Lua proxy table,
-and use the default "__new", "__setmetatable", "__gc" & "__tostring" methods
-
-The "by proxy" method is desirable because it allows a userdata type in lua
-to be treated exactly like a table, an ObjectOrientedParadigm class instance, and 
-a C++ class instance.  It is an arguably more expensive version of a %Lua
-exposed class.  It requires each exposed object to have its own userdata
-pointer, proxy table for new values, and metatable to reference the proxy 
-table.  That's a lot of storage, and it comes with all the associated
-extra table indexing and function calls.  But, it results in ZERO distinction
-between all %Lua classes, and partly C++ classes when operating with them 
-in %Lua.  The extra simplicity and power makes it worth it very valuable.
-\param CLASS the name of the CLASS being exposed, with no delimiters
-\param SuperClass with no delimiters, the parent class of the LuaExtendable,
-or the same if it has no parent class
-\note compile-time directive
-\note highly recommended to precede an END_LUA_CLASS
-\note adds a __gc, calls the destructor on the LuaExtendable
-\note adds a __isExtendableByProxy, (used in %Lua) returns true
-\note adds a __isnewindexable, returns false
-\note adds a __new, calls the no-args constructor
-\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
-\note adds a __tostring, calls toString defined by the LuaExtendable
-*/
-#define DEFINE_LUA_CLASS_BY_PROXY(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-			LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
-			LUA_CLASS__isExtendableByProxy \
-			LUA_CLASS__isnewindexable_TRUE \
-			LUA_CLASS__new_AUTO(CLASS) \
-			LUA_CLASS__setmetatable_PROXY \
-			LUA_##TYPE##__tostring_AUTO(CLASS) 
-// #define DEFINE_LUA_CLASS_BY_PROXY
-
-/**
-\def DEFINE_LUA_LUAEXTENDABLE_NOCTOR
-Define a %Lua library around a class, so that instances of the 
-controlled in %Lua. This also exposes simple userdata pointers with all 
-associated C++ and Lua methods, but it doesn't create any ability to added 
-new %Lua fields.  It also doesn't supply any constructor or destructor exposure
-to %Lua This could be used for objects like singletons.
-\param CLASS the name of the CLASS being exposed, with no delimiters
-\param SuperClass with no delimiters, the parent class of the LuaExtendable,
-or the same if it has no parent class
-\note compile-time directive
-\note highly recommended to precede an END_LUA_CLASS
-\note adds a __isnewindexable, returns false
-\note adds a __newindex, throws a %Lua error
-\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
-\note adds a __tostring, calls toString defined by the LuaExtendable
-*/
-#define DEFINE_LUA_CLASS_NOCTOR(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-			LUA_CLASS__isnewindexable_FALSE \
-			LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-			LUA_CLASS__setmetatable_USERDATA \
-			LUA_##TYPE##__tostring_AUTO(CLASS) 
-
 #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) \
 	DEFINE_DEFAULT_TOSTRING(CLASS) \
 	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	DEFINE_PROXY_SETMETATABLE(CLASS)
-	// #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) 
+// #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) 
+
+
+#define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) \
+	DEFINE_DEFAULT_TOSTRING(CLASS) \
+	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
+	DEFINE_USERDATA_SETMETATABLE(CLASS)
+// #define DEFINE_PROXY_SETMETATABLE(CLASS) 
 
 #define DEFINE_PROXY_SETMETATABLE(CLASS) \
 	virtual sint4 setMetatable(lua_State* L) \
 	{ \
 		return setProxyMetatable(L); \
 	}
-	// #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) 
-
-#define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) \
-	DEFINE_DEFAULT_TOSTRING(CLASS) \
-	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
-	DEFINE_USERDATA_SETMETATABLE(CLASS)
-	// #define DEFINE_PROXY_SETMETATABLE(CLASS) 
+// #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) 
 
 #if ARGUMENT_ERRORS
 #define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
@@ -584,11 +587,11 @@ the require() function.
 #define LUA_CLASS__newindex_ERROR_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__newindex", lua_library_##CLASS##::__newindexError##CLASS) 
 
-#define LUA_CLASS__setmetatable_USERDATA \
-	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
-
 #define LUA_CLASS__setmetatable_PROXY \
 	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setProxyMetatable) 
+
+#define LUA_CLASS__setmetatable_USERDATA \
+	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
 
 #define LUA_CLASS__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", __tostring##CLASS)

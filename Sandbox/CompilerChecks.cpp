@@ -50,7 +50,5 @@ namespace compiler_checks
 		size_t sizeof2T = sizeof(Things2);
 		size_t sizeofv2t = sizeof(vThings2);
 		size_t sum = sizeof2TI + sizeof2T + sizeofv2t;
-
-
 	}
 } // namespace compiler_checks 

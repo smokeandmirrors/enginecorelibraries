@@ -144,7 +144,6 @@ UT.test('proxy class redefinition',
 			UT.testClassProperties('Child2', 'Parent2')
 			Parent2.onRefresh = function() return 'refreshed' end
 			declareClass(Parent2)
-		---[[
 			UT.checkT(c.onRefresh, 'function')
 			UT.checkEqual(c:onRefresh(), 'refreshed')
 			UT.testInstanceProperties(c, 'Child2', 'Parent2')
@@ -159,6 +158,5 @@ UT.test('proxy class redefinition',
 			UT.testClassProperties('Parent2', 'Grandparent2')
 			UT.testClassProperties('Child2', 'Parent2')
 		end
-		--]]
 	end
 )
