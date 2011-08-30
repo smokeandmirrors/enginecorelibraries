@@ -288,12 +288,12 @@ or the same if it has no parent class
 */
 #define DEFINE_LUA_CLASS_BY_PROXY(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-	LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
-	LUA_CLASS__isExtendableByProxy \
-	LUA_CLASS__isnewindexable_TRUE \
-	LUA_CLASS__new_AUTO(CLASS) \
-	LUA_CLASS__setmetatable_PROXY \
-	LUA_##TYPE##__tostring_AUTO(CLASS) 
+		LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_CLASS__isExtendableByProxy \
+		LUA_CLASS__isnewindexable_TRUE \
+		LUA_CLASS__new_AUTO(CLASS) \
+		LUA_CLASS__setmetatable_PROXY \
+		LUA_##TYPE##__tostring_AUTO(CLASS) 
 // #define DEFINE_LUA_CLASS_BY_PROXY
 
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
@@ -321,10 +321,10 @@ or the same if it has no parent class
 */
 #define DEFINE_LUA_CLASS_NOCTOR(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-	LUA_CLASS__isnewindexable_FALSE \
-	LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-	LUA_CLASS__setmetatable_USERDATA \
-	LUA_##TYPE##__tostring_AUTO(CLASS) 
+		LUA_CLASS__isnewindexable_FALSE \
+		LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_CLASS__setmetatable_USERDATA \
+		LUA_##TYPE##__tostring_AUTO(CLASS) 
 
 #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
 
