@@ -16,14 +16,14 @@ using namespace lua_extension;
 using namespace math;
 using namespace unit_testing_tools;
 
-void checkVector(const Vector3& v, real4 x, real4 y, real4 z)
+void checkVector(const Vector3& v, sreal x, sreal y, sreal z)
 {
 	CFIXCC_ASSERT_EQUALS(v.x, x);
 	CFIXCC_ASSERT_EQUALS(v.y, y);
 	CFIXCC_ASSERT_EQUALS(v.z, z);
 }
 
-void checkVector(const Vector3& v, real4 x, real4 y, real4 z, real4 tolerance)
+void checkVector(const Vector3& v, sreal x, sreal y, sreal z, sreal tolerance)
 {
 	checkNearEqual(v.x, x, tolerance);
 	checkNearEqual(v.y, y, tolerance);
@@ -59,22 +59,22 @@ void UTMath::testLuaExtension(void)
 
 void UTMath::testNumbers(void)
 {
-	real4 decimal = 0.999999999999999999999f;
-	sint4 limit = 4294967295;
+	sreal decimal = 0.999999999999999999999f;
+	sint limit = 4294967295;
 
-	for (sint4 i = -limit; i < limit; i++)
+	for (sint i = -limit; i < limit; i++)
 	{
-		real4 value = static_cast<real4>(i) + decimal;
+		sreal value = static_cast<sreal>(i) + decimal;
 		CFIX_ASSERT(isFinite(value));
 		CFIX_ASSERT(!isNaN(value));
 		CFIX_ASSERT(isValid(value));
 	}
 #if DEBUG
-	real4 one = 1.0f;
-	real4 zero = 0.0f;
-	real4 positive_infinity = one / zero;
-	real4 negative_infinity = log(0.0f);
-	real4 not_a_number = zero / zero; 
+	sreal one = 1.0f;
+	sreal zero = 0.0f;
+	sreal positive_infinity = one / zero;
+	sreal negative_infinity = log(0.0f);
+	sreal not_a_number = zero / zero; 
 
 	CFIX_ASSERT(!isFinite(positive_infinity));
 	CFIX_ASSERT(!isNaN(positive_infinity));
@@ -172,8 +172,8 @@ void UTMath::testVector3(void)
 	checkVector(v,1,2,3,0.0f);
 	z.set(-1,-2,-3);
 	checkVector(z,-1,-2,-3,0.0f);
-	real4 v_dot_z = v.dot(z);
-	real4 z_dot_v = z.dot(v);
+	sreal v_dot_z = v.dot(z);
+	sreal z_dot_v = z.dot(v);
 	CFIXCC_ASSERT_EQUALS(v_dot_z, z_dot_v);
 	CFIXCC_ASSERT_EQUALS(v_dot_z, -14.0f);
 	CFIXCC_ASSERT_EQUALS(z_dot_v, -14.0f);

@@ -13,7 +13,7 @@
 namespace multithreading
 {
 #if WIN32
-inline uint4 getNumHardwareThreads(void)
+inline uint getNumHardwareThreads(void)
 {
 	_SYSTEM_INFO system_info;
 	GetSystemInfo(&system_info);
@@ -27,12 +27,12 @@ class PendingJobQueue
 	class PendingJob 
 	{
 	public:
-		sint4 getIdealThread(void) const
+		sint getIdealThread(void) const
 		{
 			return m_idealThread;
 		}
 
-		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)=0;
+		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)=0;
 		virtual void	recycle(PendingJobQueue& queue)=0;
 	
 		const std::string toString(void) const
@@ -41,14 +41,14 @@ class PendingJobQueue
 		}
 	
 	protected:
-		sint4			m_idealThread;
+		sint			m_idealThread;
 		std::string		m_name;
 	}; // PendingJob 
 
 	class PendingObject : public PendingJob
 	{
 	public:
-		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
+		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)
 		{
 			return new Thread(m_job, CPUid, scheduler, &Scheduler::onComplete, m_name.c_str());
 		}
@@ -59,8 +59,8 @@ class PendingJobQueue
 		}
 
 		inline void reset(Executable* job=NULL, 
-			sint4 ideal_thread=noThreadPreference, 
-			const sint1* name="un-named")
+			sint ideal_thread=noThreadPreference, 
+			const schar* name="un-named")
 		{
 			m_idealThread = ideal_thread;
 			m_job = job;
@@ -74,7 +74,7 @@ class PendingJobQueue
 	class PendingFunction : public PendingJob
 	{
 	public:
-		virtual Thread* newThread(Scheduler* scheduler, sint4 CPUid)
+		virtual Thread* newThread(Scheduler* scheduler, sint CPUid)
 		{
 			return new Thread(m_job, CPUid, scheduler, &Scheduler::onComplete, m_name.c_str());
 		}
@@ -85,8 +85,8 @@ class PendingJobQueue
 		}
 
 		inline void reset(executableFunction job=NULL, 
-			sint4 ideal_thread=noThreadPreference, 
-			const sint1* name="un-named")
+			sint ideal_thread=noThreadPreference, 
+			const schar* name="un-named")
 		{
 			m_job = job;
 			m_idealThread = ideal_thread;
@@ -99,20 +99,20 @@ class PendingJobQueue
 
 public:
 	inline void add(Executable* job, 
-		sint4 ideal_thread=noThreadPreference, 
-		const sint1* name="un-named")
+		sint ideal_thread=noThreadPreference, 
+		const schar* name="un-named")
 	{
 		m_pendingJobs.push_back(getFreeJob(job, ideal_thread, name));
 	}
 	
 	inline void add(executableFunction job, 
-		sint4 ideal_thread=noThreadPreference, 
-		const sint1* name="un-named")
+		sint ideal_thread=noThreadPreference, 
+		const schar* name="un-named")
 	{
 		m_pendingJobs.push_back(getFreeJob(job, ideal_thread, name));
 	}
 
-	inline bool getNextIdealThread(sint4& ideal_thread) const
+	inline bool getNextIdealThread(sint& ideal_thread) const
 	{
 		if (getNumber())
 		{
@@ -126,12 +126,12 @@ public:
 		}	
 	}
 
-	inline uint4 getNumber(void) const
+	inline uint getNumber(void) const
 	{
-		return static_cast<uint4>(m_pendingJobs.size());
+		return static_cast<uint>(m_pendingJobs.size());
 	}
 
-	inline Thread* startNextJob(Scheduler* scheduler, sint4 CPUid)
+	inline Thread* startNextJob(Scheduler* scheduler, sint CPUid)
 	{
 		if (getNumber())
 		{
@@ -154,8 +154,8 @@ protected:
 	}
 
 	inline PendingJob* getFreeJob(Executable* job, 
-		sint4 ideal_thread, 
-		const sint1* name="un-named")
+		sint ideal_thread, 
+		const schar* name="un-named")
 	{
 		PendingObject* object;
 		
@@ -174,8 +174,8 @@ protected:
 	}
 
 	inline PendingJob* getFreeJob(executableFunction job, 
-		sint4 ideal_thread, 
-		const sint1* name="un-named")
+		sint ideal_thread, 
+		const schar* name="un-named")
 	{
 		PendingFunction* object;
 
@@ -211,7 +211,7 @@ Scheduler::Scheduler(void)
 	m_maxThreads = getNumberSystemThreads();
 	m_activeJobs = new Thread*[m_numSystemThreads];
 	
-	for (uint4 i = 0; i < m_numSystemThreads; i++)
+	for (uint i = 0; i < m_numSystemThreads; i++)
 	{
 		m_activeJobs[i] = NULL;
 	}
@@ -226,11 +226,11 @@ Scheduler::~Scheduler(void)
 }
 
 void Scheduler::enqueue(Executable* job, 
-	sint4 ideal_thread/* =noThreadPreference */, 
-	const sint1* name/* ="un-named" */)
+	sint ideal_thread/* =noThreadPreference */, 
+	const schar* name/* ="un-named" */)
 {
 	SYNC(m_mutex);
-	sint4 index;
+	sint index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
@@ -245,11 +245,11 @@ void Scheduler::enqueue(Executable* job,
 }
 
 void Scheduler::enqueue(executableFunction job, 
-	sint4 ideal_thread/* =noThreadPreference */, 
-	const sint1* name/* ="un-named" */)
+	sint ideal_thread/* =noThreadPreference */, 
+	const schar* name/* ="un-named" */)
 {
 	SYNC(m_mutex);
-	sint4 index;
+	sint index;
 
 	if (getOpenThread(index, ideal_thread))
 	{
@@ -263,7 +263,7 @@ void Scheduler::enqueue(executableFunction job,
 	}
 }
 
-uint4 Scheduler::getNumberPendingJobs(void) const
+uint Scheduler::getNumberPendingJobs(void) const
 {
 	SYNC(m_mutex);
 	return m_pendingJobs->getNumber();
@@ -286,7 +286,7 @@ void Scheduler::startNextJob(void)
 		
 	if (getNumberPendingJobs())
 	{
-		sint4 thread_index;
+		sint thread_index;
 		m_pendingJobs->getNextIdealThread(thread_index);
 			
 		if (thread_index == -1)
@@ -332,7 +332,7 @@ const std::string Scheduler::toString(void) const
 	sprintf_s(buffer, "Number of pending jobs: %d\n", getNumberPendingJobs());
 	output += buffer;
 
-	for (uint4 hardware_index = 0; hardware_index < getNumberSystemThreads(); hardware_index++)
+	for (uint hardware_index = 0; hardware_index < getNumberSystemThreads(); hardware_index++)
 	{
 		index = 256;
 		do 

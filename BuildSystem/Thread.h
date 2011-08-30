@@ -20,8 +20,8 @@ namespace multithreading
 {
 
 #if WIN32
-typedef uint4(__stdcall*	threadable)(void*);
-typedef uint4				threadID;
+typedef uint(__stdcall*	threadable)(void*);
+typedef uint				threadID;
 typedef void*				threadHandle;
 #else
 	PREVENT_COMPILE
@@ -33,10 +33,10 @@ public:
 	/** \todo make thread pool, static borrow/recycle, private constructors, destructors, etc */
 	template<class RECEIVER>
 	Thread(executableFunction executable, 
-		sint4 CPUid=noThreadPreference, 
+		sint CPUid=noThreadPreference, 
 		RECEIVER* receiver=NULL, 
 		void (RECEIVER::* function)(Thread*) const=NULL,
-		const sint1* name="un-named")
+		const schar* name="un-named")
 	: m_executor(new Thread::FunctionExecutor(executable))
 	, m_name(name)
 	{ 
@@ -45,10 +45,10 @@ public:
 
 	template<class RECEIVER>
 	Thread(Executable* executable, 
-		sint4 CPUid=noThreadPreference, 
+		sint CPUid=noThreadPreference, 
 		RECEIVER* receiver=NULL, 
 		void (RECEIVER::* function)(Thread*) const=NULL,
-		const sint1* name="un-named")
+		const schar* name="un-named")
 	: m_executor(new Thread::ExecutableExecutor(executable))
 	, m_name(name)
 	{ 
@@ -57,10 +57,10 @@ public:
 
 	template<class RECEIVER>
 	Thread(Executable* executable, 
-		sint4 CPUid=noThreadPreference, 
+		sint CPUid=noThreadPreference, 
 		RECEIVER* receiver=NULL, 
 		void (RECEIVER::* function)(Thread*)=NULL,
-		const sint1* name="un-named") 
+		const schar* name="un-named") 
 	: m_executor(new Thread::ExecutableExecutor(executable))
 	, m_name(name)
 	{ 
@@ -69,10 +69,10 @@ public:
 
 	template<class RECEIVER>
 	Thread(executableFunction executable, 
-		sint4 CPUid=noThreadPreference, 
+		sint CPUid=noThreadPreference, 
 		RECEIVER* receiver=NULL, 
 		void (RECEIVER::* function)(Thread*)=NULL,
-		const sint1* name="un-named") 
+		const schar* name="un-named") 
 	: m_executor(new Thread::FunctionExecutor(executable))
 	, m_name(name)
 	{ 
@@ -105,7 +105,7 @@ public:
 
 private:
 #if WIN32
-	static uint4 __stdcall executeThread(void* pThread)
+	static uint __stdcall executeThread(void* pThread)
 	{
 		static_cast<Thread*>(pThread)->execute();
 		return 0;
@@ -118,7 +118,7 @@ private:
 	{
 	public:
 		virtual void execute(void)=0;
-		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint4 CPUid);
+		void initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid);
 	}; // class Executor
 
 	class ExecutableExecutor : public Executor
@@ -173,7 +173,7 @@ private:
 	}
 
 	template<class RECEIVER>
-	void initialize(sint4 CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
+	void initialize(sint CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
 	{
 		assert(m_executor);
 		m_onComplete.connect(receiver, function);
@@ -181,7 +181,7 @@ private:
 	}
 	
 	template<class RECEIVER>
-	void initialize(sint4 CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+	void initialize(sint CPUid, RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
 	{
 		assert(m_executor);
 		m_onComplete.connect(receiver, function);

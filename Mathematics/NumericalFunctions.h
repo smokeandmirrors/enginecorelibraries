@@ -43,12 +43,12 @@ template<typename T> inline T floor(T exponent);
 template<typename T> inline bool isFinite(T number);
 template<typename T> inline bool isNaN(T number);
 template<typename T> inline bool isValid(T number);	
-template<typename T> inline T ldexp(T number, sint4 base_2_exponent);
+template<typename T> inline T ldexp(T number, sint base_2_exponent);
 template<typename T> inline T ln(T number);
 template<typename T> inline T log10(T number);
 template<typename T> inline T mod(T numerator, T denominator);
 template<typename T> inline T pow(T base, T exponent);
-template<typename T> inline T rexp(T number, sint4& exponent);
+template<typename T> inline T rexp(T number, sint& exponent);
 template<typename T> inline T sin(T number);
 template<typename T> inline T sinh(T number);
 template<typename T> inline T sqrt(T square);
@@ -57,252 +57,252 @@ template<typename T> inline T tanh(T number);
 
 } // namespace math
 
-template<> inline sint4 math::abs<sint4>(sint4 number)
+template<> inline sint math::abs<sint>(sint number)
 {
 	return ::abs(number);
 }
 
-template<> inline sint8 math::abs<sint8>(sint8 number)
+template<> inline slong math::abs<slong>(slong number)
 {
-	return static_cast<sint4>( ::abs( static_cast<sint4>(number) ) );
+	return static_cast<sint>( ::abs( static_cast<sint>(number) ) );
 }
 
-template<> inline real4 math::abs<real4>(real4 number)
-{
-	return fabs(number);
-}
-
-template<> inline real8 math::abs<real8>(real8 number)
+template<> inline sreal math::abs<sreal>(sreal number)
 {
 	return fabs(number);
 }
 
-template<> inline real4 math::acos<real4>(real4 number)
+template<> inline dreal math::abs<dreal>(dreal number)
+{
+	return fabs(number);
+}
+
+template<> inline sreal math::acos<sreal>(sreal number)
 {
 	return ::acos(number);
 }
 
-template<> inline real8 math::acos<real8>(real8 number)
+template<> inline dreal math::acos<dreal>(dreal number)
 {
 	return ::acos(number);
 }
 
-template<> inline real4 math::asin<real4>(real4 number)
+template<> inline sreal math::asin<sreal>(sreal number)
 {
 	return ::asin(number);
 }
 
-template<> inline real8 math::asin<real8>(real8 number)
+template<> inline dreal math::asin<dreal>(dreal number)
 {
 	return ::asin(number);
 }
 
-template<> inline real4 math::atan<real4>(real4 number)
+template<> inline sreal math::atan<sreal>(sreal number)
 {
 	return ::atan(number);
 }
 
-template<> inline real8 math::atan<real8>(real8 number)
+template<> inline dreal math::atan<dreal>(dreal number)
 {
 	return ::atan(number);
 }
 
-template<> inline real4 math::atan2<real4>(real4 x_coordinate, real4 y_coordinate)
+template<> inline sreal math::atan2<sreal>(sreal x_coordinate, sreal y_coordinate)
 {
 	return ::atan2(x_coordinate, y_coordinate);
 }
 
-template<> inline real8 math::atan2<real8>(real8 x_coordinate, real8 y_coordinate)
+template<> inline dreal math::atan2<dreal>(dreal x_coordinate, dreal y_coordinate)
 {
 	return ::atan2(x_coordinate, y_coordinate);
 }
 
-template<> inline real4 math::ceil<real4>(real4 number)
+template<> inline sreal math::ceil<sreal>(sreal number)
 {
 	return ::ceil(number);
 }
 
-template<> inline real8 math::ceil<real8>(real8 number)
+template<> inline dreal math::ceil<dreal>(dreal number)
 {
 	return ::ceil(number);
 }
 
-template<> inline real4 math::cos<real4>(real4 number)
+template<> inline sreal math::cos<sreal>(sreal number)
 {
 	return ::cos(number);
 }
 
-template<> inline real8 math::cos<real8>(real8 number)
+template<> inline dreal math::cos<dreal>(dreal number)
 {
 	return ::cos(number);
 }
 
-template<> inline real4 math::cosh<real4>(real4 number)
+template<> inline sreal math::cosh<sreal>(sreal number)
 {
 	return ::cosh(number);
 }
 
-template<> inline real8 math::cosh<real8>(real8 number)
+template<> inline dreal math::cosh<dreal>(dreal number)
 {
 	return ::cosh(number);
 }
 
-template<> inline real4 math::exp<real4>(real4 exponent)
+template<> inline sreal math::exp<sreal>(sreal exponent)
 {
 	return ::exp(exponent);
 }
 
-template<> inline real8 math::exp<real8>(real8 exponent)
+template<> inline dreal math::exp<dreal>(dreal exponent)
 {
 	return ::exp(exponent);
 }
 
-template<> inline real4 math::floor<real4>(real4 exponent)
+template<> inline sreal math::floor<sreal>(sreal exponent)
 {
 	return ::floor(exponent);
 }
 
-template<> inline real8 math::floor<real8>(real8 exponent)
+template<> inline dreal math::floor<dreal>(dreal exponent)
 {
 	return ::floor(exponent);
 }
 
-template<> inline bool math::isFinite<real4>(real4 number) 
+template<> inline bool math::isFinite<sreal>(sreal number) 
 { 
 	return _finite(number) != 0; 
 }
 
-template<> inline bool math::isFinite<real8>(real8 number) 
+template<> inline bool math::isFinite<dreal>(dreal number) 
 { 
 	return _finite(number) != 0;
 }
 
-template<> inline bool math::isNaN<real4>(real4 number)		
+template<> inline bool math::isNaN<sreal>(sreal number)		
 { 
 	return _isnan(number) != 0; 
 }
 
-template<> inline bool math::isNaN<real8>(real8 number) 
+template<> inline bool math::isNaN<dreal>(dreal number) 
 { 
 	return _isnan(number) != 0; 
 }
 
-template<> inline bool math::isValid<real4>(real4 number)
+template<> inline bool math::isValid<sreal>(sreal number)
 {
 	return _finite(number) != 0; 
 }
 
-template<> inline bool math::isValid<real8>(real8 number) 
+template<> inline bool math::isValid<dreal>(dreal number) 
 { 
 	return _finite(number) != 0; 
 }
 
-template<> inline real4 math::ldexp<real4>(real4 number, sint4 base_2_exponent)
+template<> inline sreal math::ldexp<sreal>(sreal number, sint base_2_exponent)
 {
 	return ::ldexp(number, base_2_exponent);
 }
 
-template<> inline real8 math::ldexp<real8>(real8 number, sint4 base_2_exponent)
+template<> inline dreal math::ldexp<dreal>(dreal number, sint base_2_exponent)
 {
 	return ::ldexp(number, base_2_exponent);
 }
 
-template<> inline real4 math::ln<real4>(real4 number)
+template<> inline sreal math::ln<sreal>(sreal number)
 {
 	return log(number);
 }
 
-template<> inline real8 math::ln<real8>(real8 number)
+template<> inline dreal math::ln<dreal>(dreal number)
 {
 	return log(number);
 }
 
-template<> inline real4 math::log10<real4>(real4 number)
+template<> inline sreal math::log10<sreal>(sreal number)
 {
 	return ::log10(number);
 }
 
-template<> inline real8 math::log10<real8>(real8 number)
+template<> inline dreal math::log10<dreal>(dreal number)
 {
 	return ::log10(number);
 }
 
-template<> inline real4 math::mod<real4>(real4 numerator, real4 denominator)
+template<> inline sreal math::mod<sreal>(sreal numerator, sreal denominator)
 {
 	return fmod(numerator, denominator);
 }
 
-template<> inline real8 math::mod<real8>(real8 numerator, real8 denominator)
+template<> inline dreal math::mod<dreal>(dreal numerator, dreal denominator)
 {
 	return fmod(numerator, denominator);
 }
 
-template<> inline real4 math::pow<real4>(real4 base, real4 exponent)
+template<> inline sreal math::pow<sreal>(sreal base, sreal exponent)
 {
 	return ::pow(base, exponent);
 }
 
-template<> inline real8 math::pow<real8>(real8 base, real8 exponent)
+template<> inline dreal math::pow<dreal>(dreal base, dreal exponent)
 {
 	return ::pow(base, exponent);
 }
 
-template<> inline real4 math::rexp<real4>(real4 number, sint4& exponent)
+template<> inline sreal math::rexp<sreal>(sreal number, sint& exponent)
 {
 	return frexp(number, &exponent);
 }
 
-template<> inline real8 math::rexp<real8>(real8 number, sint4& exponent)
+template<> inline dreal math::rexp<dreal>(dreal number, sint& exponent)
 {
 	return frexp(number, &exponent);
 }
 
-template<> inline real4 math::sin<real4>(real4 number)
+template<> inline sreal math::sin<sreal>(sreal number)
 {
 	return ::sin(number);
 }
 
-template<> inline real8 math::sin<real8>(real8 number)
+template<> inline dreal math::sin<dreal>(dreal number)
 {
 	return ::sin(number);
 }
 
-template<> inline real4 math::sinh<real4>(real4 number)
+template<> inline sreal math::sinh<sreal>(sreal number)
 {
 	return ::sinh(number);
 }
 
-template<> inline real8 math::sinh<real8>(real8 number)
+template<> inline dreal math::sinh<dreal>(dreal number)
 {
 	return ::sinh(number);
 }
 
-template<> inline real4 math::sqrt<real4>(real4 square)
+template<> inline sreal math::sqrt<sreal>(sreal square)
 {
 	return ::sqrt(square);
 }
 
-template<> inline real8 math::sqrt<real8>(real8 square)
+template<> inline dreal math::sqrt<dreal>(dreal square)
 {
 	return ::sqrt(square);
 }
 
-template<> inline real4 math::tan<real4>(real4 number)
+template<> inline sreal math::tan<sreal>(sreal number)
 {
 	return ::tan(number);
 }
 
-template<> inline real8 math::tan<real8>(real8 number)
+template<> inline dreal math::tan<dreal>(dreal number)
 {
 	return ::tan(number);
 }
 
-template<> inline real4 math::tanh<real4>(real4 number)
+template<> inline sreal math::tanh<sreal>(sreal number)
 {
 	return ::tanh(number);
 }
 
-template<> inline real8 math::tanh<real8>(real8 number)
+template<> inline dreal math::tanh<dreal>(dreal number)
 {
 	return ::tanh(number);
 }

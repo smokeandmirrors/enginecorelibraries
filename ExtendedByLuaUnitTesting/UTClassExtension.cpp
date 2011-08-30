@@ -22,8 +22,8 @@ class One
 {
 public:
 	typedef One super;
-	sint4 getValue(void) const		{ return 1; }
-	sint4 increment(sint4 i) const	{ return i + getValue(); }
+	sint getValue(void) const		{ return 1; }
+	sint increment(sint i) const	{ return i + getValue(); }
 }; // Basic
 
 DECLARE_LUA_LIBRARY(One)
@@ -67,7 +67,7 @@ LUA_FUNC(getValueOne)
 
 LUA_FUNC(incrementOne)
 {
-	sint4 argument = to<sint4>(L, -1);						//s: ud, arg
+	sint argument = to<sint>(L, -1);						//s: ud, arg
 	lua_pop(L, 1);											//s: ud
 	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
 	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
@@ -102,7 +102,7 @@ void Classes::test_define_lua_class()
 	lua_call(L, 1, 1);
 	//s: one 1
 	CFIX_ASSERT(lua_isnumber(L, -1));
-	sint4 one_value = to<sint4>(L, -1);
+	sint one_value = to<sint>(L, -1);
 	//s: one 1
 	CFIX_ASSERT(one_value == 1);
 	lua_pop(L, 1);
@@ -117,7 +117,7 @@ void Classes::test_define_lua_class()
 	//s: one increment one 2
 	lua_call(L, 2, 1);
 	//s: one 3
-	sint4 three_value = to<sint4>(L, -1);
+	sint three_value = to<sint>(L, -1);
 	//s: one 1
 	CFIX_ASSERT(three_value == 3);
 	lua_pop(L, 2);
@@ -132,7 +132,7 @@ void Classes::test_define_lua_class()
 	lua_getglobal(L, "zero");
 	//s: _G.there _G.zero
 	CFIX_ASSERT(lua_isnumber(L, -1));
-	sint4 zero = to<sint4>(L, -1);
+	sint zero = to<sint>(L, -1);
 	CFIX_ASSERT(zero == 0.0f);
 	lua_pop(L, 2);
 }
@@ -142,7 +142,7 @@ class Simple
 {
 private:
 	static bool everCreated;
-	static uint4 numAllocated;
+	static uint numAllocated;
 
 public:
 	Simple(void)
@@ -156,12 +156,12 @@ public:
 		numAllocated--;
 	}
 
-	static uint4 getNumAllocated(void)	{ return numAllocated; }
+	static uint getNumAllocated(void)	{ return numAllocated; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
 public:
 	Simple*			getOther(void) const		{ return m_other; }
-	virtual uint4	getValue(void) const		{ return 7; }
+	virtual uint	getValue(void) const		{ return 7; }
 	bool			isSimple(void) const		{ return true; }
 	Simple*			reproduce() const			{ return new Simple(); }
 
@@ -176,15 +176,15 @@ private:
 	Simple*			m_other;
 };
 
-uint4 Simple::numAllocated = 0;
+uint Simple::numAllocated = 0;
 bool Simple::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Simple);
 
 DEFINE_LUA_CLASS(EXTENDABLE, Simple, Simple)
-	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint4, &Simple::getValue>))
+	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
 	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
-	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint4, &Simple::getValue>))
+	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
 	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
 	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
 	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
@@ -196,7 +196,7 @@ class Derived
 {
 private:
 	static bool everCreated;
-	static uint4 numAllocated;
+	static uint numAllocated;
 
 public:
 	Derived(void)
@@ -210,17 +210,17 @@ public:
 		numAllocated--;
 	}
 
-	static uint4 getNumAllocated(void)		{ return numAllocated; }
+	static uint getNumAllocated(void)		{ return numAllocated; }
 	static bool wasEverCreated(void)		{ return everCreated; }
 
 public:
-	uint4				getDerivation(void) const	{ return 21; }
-	virtual uint4		getValue(void) const		{ return 14; }
+	uint				getDerivation(void) const	{ return 21; }
+	virtual uint		getValue(void) const		{ return 14; }
 
 	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived)
 };
 
-uint4 Derived::numAllocated = 0;
+uint Derived::numAllocated = 0;
 bool Derived::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Derived);
@@ -230,7 +230,7 @@ class Unexposed
 {
 private:
 	static bool everCreated;
-	static uint4 numAllocated;
+	static uint numAllocated;
 
 public:
 	Unexposed(void)
@@ -250,11 +250,11 @@ public:
 		if (!singleton) singleton = new Unexposed();
 		return singleton;
 	}
-	static uint4 getNumAllocated(void)		{ return numAllocated; }
+	static uint getNumAllocated(void)		{ return numAllocated; }
 	static bool wasEverCreated(void)		{ return everCreated; }
 };
 
-uint4 Unexposed::numAllocated = 0;
+uint Unexposed::numAllocated = 0;
 bool Unexposed::everCreated = false;
 
 LUA_FUNC(getUnexposed)
@@ -263,7 +263,7 @@ LUA_FUNC(getUnexposed)
 }
 
 DEFINE_LUA_CLASS(EXTENDABLE, Derived, Simple)
-	LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint4, &Derived::getDerivation>))
+	LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
 	LUA_ENTRY(getUnexposed)
 END_LUA_CLASS(Derived, Simple)
 
@@ -297,12 +297,12 @@ class Grandparent
 {
 private:
 	static bool everCreated;
-	static uint4 numAllocatedGrandparents;
+	static uint numAllocatedGrandparents;
 	
 public:
 	typedef Grandparent super;
 
-	static uint4 getNumAllocated(void)	{ return numAllocatedGrandparents; }
+	static uint getNumAllocated(void)	{ return numAllocatedGrandparents; }
 	static bool wasEverCreated(void)	{ return everCreated; }
 
 	Grandparent(void) 
@@ -316,12 +316,12 @@ public:
 		numAllocatedGrandparents--;
 	}
 
-	const sint1* getFamilyName(void) const 
+	const schar* getFamilyName(void) const 
 	{ 
 		return "Curran"; 
 	}
 
-	virtual const sint1* getTitle(void) const 
+	virtual const schar* getTitle(void) const 
 	{ 
 		return "Grandparent"; 
 	}
@@ -334,7 +334,7 @@ public:
 	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent)
 }; // Grandparent
 
-uint4 Grandparent::numAllocatedGrandparents = 0;
+uint Grandparent::numAllocatedGrandparents = 0;
 bool Grandparent::everCreated = false;
 
 DECLARE_LUA_LUAEXTENDABLE(Grandparent);
@@ -346,8 +346,8 @@ LUA_FUNC(__call)
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Grandparent, Grandparent)
 	LUA_ENTRY(__call) 
-	LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const sint1*, &Grandparent::getFamilyName>))
-	LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const sint1*, &Grandparent::getTitle>))
+	LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const schar*, &Grandparent::getFamilyName>))
+	LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const schar*, &Grandparent::getTitle>))
 	LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 END_LUA_CLASS(Grandparent, Grandparent)
 
@@ -363,8 +363,8 @@ public:
 	typedef Grandparent super;
 	Parent(Grandparent* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
 	Grandparent*			getGrandparent(void) const		{ return m_grandParent; }
-	const sint1*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
-	virtual const sint1*		getTitle(void) const			{ return "Parent"; }
+	const schar*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
+	virtual const schar*		getTitle(void) const			{ return "Parent"; }
 	void					setGrandparent(Grandparent* gp) { m_grandParent = gp; }
 	DEFINE_DEFAULT_GETCLASSNAME(Parent)
 
@@ -376,7 +376,7 @@ DECLARE_LUA_LUAEXTENDABLE(Parent);
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Parent, Grandparent)
 LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
-LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const sint1*, &Parent::getGrandparentName>))
+LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const schar*, &Parent::getGrandparentName>))
 LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
 END_LUA_CLASS(Parent, Grandparent) 
 
@@ -400,8 +400,8 @@ public:
 	}
 
 	Parent*					getParent(void) const		{ return m_parent; }
-	const sint1*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
-	virtual const sint1*		getTitle(void) const		{ return "Child"; }
+	const schar*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
+	virtual const schar*		getTitle(void) const		{ return "Child"; }
 	void					setParent(Parent* gp)		{ m_parent = gp; }
 	DEFINE_DEFAULT_GETCLASSNAME(Child)
 
@@ -414,7 +414,7 @@ DECLARE_LUA_LUAEXTENDABLE(Child);
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Child, Parent)
 	LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
 	LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-	LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const sint1*, &Child::getParentName>))
+	LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const schar*, &Child::getParentName>))
 	LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
 END_LUA_CLASS(Child, Parent)
 

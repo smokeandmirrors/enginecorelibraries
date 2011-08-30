@@ -18,8 +18,8 @@ Tested in the field	:	NO
 namespace multithreading
 {
 #if WIN32
-#define ARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void* args)
-#define NOARGS_EXECUTABLE_FUNCTION(name) uint4 __stdcall name(void*)
+#define ARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void* args)
+#define NOARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void*)
 #else
 	PREVENT_COMPILE
 #endif//WIN32
@@ -40,7 +40,7 @@ namespace multithreading
 
 typedef void(* executableFunction)(void);
 
-extern const sint4 noThreadPreference; 
+extern const sint noThreadPreference; 
 
 void sleep(millisecond milliseconds);
 

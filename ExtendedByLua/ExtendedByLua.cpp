@@ -44,7 +44,7 @@ are included in the macro below
 
 #endif//UNIT_TEST_VERIFICATION
 
-sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
+sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
 

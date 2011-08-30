@@ -9,7 +9,7 @@ time the object is pushed into %Lua
 
 \todo the "else" of this statement needs to be written for non-lua extendables...gack.
 */
-sint4 lua_extension::push(lua_State* L, LuaExtendable* value)
+sint lua_extension::push(lua_State* L, LuaExtendable* value)
 {
 	pushRegisteredClass(L, value);					//s: ud
 	lua_getglobal(L, "getmetatable");				//s: ud, getmetatable	

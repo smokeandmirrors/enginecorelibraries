@@ -56,21 +56,21 @@ class Quaternion
 {
 public:
 	/** if this is rotation, theta degrees around axis n, w = cos(theta/2) */
-	real4 w; 
+	sreal w; 
 	/** if this is rotation, theta degrees around axis n, x = n.x * sin(theta/2) */
-	real4 x;
+	sreal x;
 	/** if this is rotation, theta degrees around axis n, y = n.y * sin(theta/2) */
-	real4 y;
+	sreal y;
 	/** if this is rotation, theta degrees around axis n, z = n.z * sin(theta/2) */
-	real4 z;
+	sreal z;
 
 	Quaternion(void)
 	{/* empty */}
 	Quaternion(const Quaternion& q) : w(q.w), x(q.x), y(q.y), z(q.z)
 	{/* empty */}
-	Quaternion(real4 W, real4 X, real4 Y, real4 Z) : w(W), x(X), y(Y), z(Z)
+	Quaternion(sreal W, sreal X, sreal Y, sreal Z) : w(W), x(X), y(Y), z(Z)
 	{/* empty */}
-	Quaternion(real4 scalar) : w(scalar), x(scalar), y(scalar), z(scalar)
+	Quaternion(sreal scalar) : w(scalar), x(scalar), y(scalar), z(scalar)
 	{/* empty */}
 #if EXTENDED_BY_LUA
 	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Quaternion)

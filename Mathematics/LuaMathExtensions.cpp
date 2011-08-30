@@ -23,7 +23,7 @@ namespace lua_library_Vector2
 {
 	LUA_FUNC(__indexVector2)
 	{
-		const sint1* key = to<const sint1*>(L, -1);
+		const schar* key = to<const schar*>(L, -1);
 		const Vector2& v = to<const Vector2&>(L, -2);
 
 		if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
@@ -42,8 +42,8 @@ namespace lua_library_Vector2
 
 	LUA_FUNC(__newindexVector2)
 	{
-		real4 value = to<real4>(L, -1);
-		const sint1* key = to<const sint1*>(L, -2);
+		sreal value = to<sreal>(L, -1);
+		const schar* key = to<const schar*>(L, -2);
 		Vector2& v = to<Vector2&>(L, -3);
 
 		if (key[1] == '\0' && (key[0] == 'x' || key[0] == 'y')) 
@@ -77,7 +77,7 @@ namespace lua_library_Vector3
 #define DEFINE_VOID_VECTOR3_FUNC(opfunc) \
 	LUA_FUNC(opfunc) \
 	{ \
-	sint4 stack_size = lua_gettop(L); \
+	sint stack_size = lua_gettop(L); \
 	switch (stack_size) \
 	{ \
 	case 2: \
@@ -85,7 +85,7 @@ namespace lua_library_Vector3
 	Vector3& v = to<Vector3&>(L, -2); \
 	if (lua_isnumber(L, -1)) \
 	{ \
-	v.opfunc(to<real4>(L, -1)); \
+	v.opfunc(to<sreal>(L, -1)); \
 } \
 				else \
 	{ \
@@ -96,7 +96,7 @@ namespace lua_library_Vector3
 		case 4: \
 	{ \
 	Vector3& v = to<Vector3&>(L, -4); \
-	v.opfunc(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1)); \
+	v.opfunc(to<sreal>(L, -3), to<sreal>(L, -2), to<sreal>(L, -1)); \
 } \
 	break; \
 		default: \
@@ -119,7 +119,7 @@ namespace lua_library_Vector3
 
 	LUA_FUNC(cross)
 	{
-		sint4 stack_size = lua_gettop(L);
+		sint stack_size = lua_gettop(L);
 		switch (stack_size)
 		{
 		case 2:
@@ -146,7 +146,7 @@ namespace lua_library_Vector3
 
 	LUA_FUNC(equals)
 	{
-		sint4 stack_size = lua_gettop(L); 
+		sint stack_size = lua_gettop(L); 
 
 		switch (stack_size) 
 		{ 
@@ -160,7 +160,7 @@ namespace lua_library_Vector3
 		case 4: 
 			{ 
 				Vector3& v = to<Vector3&>(L, -4); 
-				return push(L, v.equals(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1))); 
+				return push(L, v.equals(to<sreal>(L, -3), to<sreal>(L, -2), to<sreal>(L, -1))); 
 			} 
 			break; 
 		default: 
@@ -171,7 +171,7 @@ namespace lua_library_Vector3
 
 	LUA_FUNC(nearlyEquals)
 	{
-		sint4 stack_size = lua_gettop(L); 
+		sint stack_size = lua_gettop(L); 
 
 		switch (stack_size) 
 		{ 
@@ -186,7 +186,7 @@ namespace lua_library_Vector3
 			{ 
 				Vector3& lhs = to<Vector3&>(L, -3); 
 				Vector3& rhs = to<Vector3&>(L, -4);
-				real4 epsilon = to<real4>(L, -1);
+				sreal epsilon = to<sreal>(L, -1);
 				return push(L, lhs.nearlyEquals(rhs, epsilon)); 
 			} 
 			break; 
@@ -198,7 +198,7 @@ namespace lua_library_Vector3
 
 	LUA_FUNC(initialize)
 	{
-		sint4 stack_size = lua_gettop(L);
+		sint stack_size = lua_gettop(L);
 		switch (stack_size)
 		{
 		case 1:
@@ -214,7 +214,7 @@ namespace lua_library_Vector3
 				Vector3& v = to<Vector3&>(L, -2);
 				if (lua_isnumber(L, -1))
 				{
-					v.set(to<real4>(L, -1));
+					v.set(to<sreal>(L, -1));
 				}
 				else
 				{
@@ -227,14 +227,14 @@ namespace lua_library_Vector3
 		case 3:
 			{
 				Vector3& v = to<Vector3&>(L, -3);
-				v.set(to<sint4>(L, -2), to<real4>(L, -1));
+				v.set(to<sint>(L, -2), to<sreal>(L, -1));
 				lua_pushvalue(L, -3);
 				return 1;
 			}
 		case 4:
 			{
 				Vector3& v = to<Vector3&>(L, -4);
-				v.set(to<real4>(L, -3), to<real4>(L, -2), to<real4>(L, -1));
+				v.set(to<sreal>(L, -3), to<sreal>(L, -2), to<sreal>(L, -1));
 				lua_pushvalue(L, -4);
 				return 1;
 			}
@@ -243,14 +243,14 @@ namespace lua_library_Vector3
 			luaL_error(L, "bad parameters to Vector3.set()");
 			return 0;
 		}
-	} // sint4 set(lua_State* L)
+	} // sint set(lua_State* L)
 
 	DEFINE_VOID_VECTOR3_FUNC(scale)
 	DEFINE_VOID_VECTOR3_FUNC(subtract)
 
 	LUA_FUNC(__indexVector3)
 	{
-		const sint1* key = to<const sint1*>(L, -1);
+		const schar* key = to<const schar*>(L, -1);
 		const Vector3& v = to<const Vector3&>(L, -2);
 
 		if (key[1] == '\0' 
@@ -270,8 +270,8 @@ namespace lua_library_Vector3
 
 	LUA_FUNC(__newindexVector3)
 	{
-		real4 value = to<real4>(L, -1);
-		const sint1* key = to<const sint1*>(L, -2);
+		sreal value = to<sreal>(L, -1);
+		const schar* key = to<const schar*>(L, -2);
 		Vector3& v = to<Vector3&>(L, -3);
 
 		if (key[1] == '\0' 
@@ -303,34 +303,34 @@ namespace lua_library_Vector3
 		LUA_ENTRY(		 add)
 		LUA_NAMED_ENTRY("construct", initialize)
 		LUA_ENTRY(		 cross)
-		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distance>))
-		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceSqr>))
-		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXY>))
-		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::distanceXYSqr>))
+		LUA_NAMED_ENTRY("distance", (return1Param1const<Vector3, sreal, const Vector3&, &V3<float>::distance>))
+		LUA_NAMED_ENTRY("distanceSqr", (return1Param1const<Vector3, sreal, const Vector3&, &V3<float>::distanceSqr>))
+		LUA_NAMED_ENTRY("distanceXY", (return1Param1const<Vector3, sreal, const Vector3&, &V3<float>::distanceXY>))
+		LUA_NAMED_ENTRY("distanceXYSqr", (return1Param1const<Vector3, sreal, const Vector3&, &V3<float>::distanceXYSqr>))
 		LUA_ENTRY(		 divide)
-		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, real4, const Vector3&, &V3<float>::dot>))
+		LUA_NAMED_ENTRY("dot", (return1Param1const<Vector3, sreal, const Vector3&, &V3<float>::dot>))
 		LUA_ENTRY(		 equals)
-		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFar>))
-		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isFarXY>))
-		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNear>))
-		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, real4, &V3<float>::isNearXY>))
+		LUA_NAMED_ENTRY("isFar", (return1Param2const<Vector3, bool, const Vector3&, sreal, &V3<float>::isFar>))
+		LUA_NAMED_ENTRY("isFarXY", (return1Param2const<Vector3, bool, const Vector3&, sreal, &V3<float>::isFarXY>))
+		LUA_NAMED_ENTRY("isNear", (return1Param2const<Vector3, bool, const Vector3&, sreal, &V3<float>::isNear>))
+		LUA_NAMED_ENTRY("isNearXY", (return1Param2const<Vector3, bool, const Vector3&, sreal, &V3<float>::isNearXY>))
 		LUA_NAMED_ENTRY("isNormal", (return1Param0const<Vector3, bool, &V3<float>::isNormal>))
 		LUA_NAMED_ENTRY("isZero", (return1Param0const<Vector3, bool, &V3<float>::isZero>))
-		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, real4, &V3<float>::magnitude>))
-		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeSqr>))
-		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXY>))
-		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, real4, &V3<float>::magnitudeXYSqr>))
+		LUA_NAMED_ENTRY("magnitude", (return1Param0const<Vector3, sreal, &V3<float>::magnitude>))
+		LUA_NAMED_ENTRY("magnitudeSqr", (return1Param0const<Vector3, sreal, &V3<float>::magnitudeSqr>))
+		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, sreal, &V3<float>::magnitudeXY>))
+		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, sreal, &V3<float>::magnitudeXYSqr>))
 		LUA_ENTRY(		 nearlyEquals)
 		LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &V3<float>::negate>))
-		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, real4, &V3<float>::normalize>))
+		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, sreal, &V3<float>::normalize>))
 		LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &V3<float>::perpendicular>))
 		LUA_ENTRY(		 scale)
 		LUA_NAMED_ENTRY("set", initialize)
 		// slightly higher performance options for Lua
-		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, real4, &V3<float>::set>))
-		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, real4, real4, real4, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setAll", (return0Param1<Vector3, sreal, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setEach", (return0Param3<Vector3, sreal, sreal, sreal, &V3<float>::set>))
 		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &V3<float>::set>))
-		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint4, real4, &V3<float>::set>))
+		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint, sreal, &V3<float>::set>))
 		LUA_ENTRY(		 subtract)
 		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &V3<float>::zero>))
 END_LUA_CLASS(Vector3, Vector3)

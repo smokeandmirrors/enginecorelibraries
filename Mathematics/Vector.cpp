@@ -32,7 +32,7 @@ const Vector3	right3D		( 1.0f,  0.0f,  0.0f);
 const Vector3	up3D		( 0.0f,  0.0f,  1.0f);
 }
 
-void math::nativeVectorPerformance(uint4 iterations)
+void math::nativeVectorPerformance(uint iterations)
 {	/** 
 	this function simply tries to emulate a %Lua vector performance
 	function as closely as possible for fair comparison 
@@ -50,7 +50,7 @@ void math::nativeVectorPerformance(uint4 iterations)
 	Vector3* Yneg = new Vector3( 0,-1, 0);
 	Vector3* Zneg = new Vector3( 0, 0,-1);
 
-	for (uint4 i(0); i < iterations; i++)
+	for (uint i(0); i < iterations; i++)
 	{
 		bool is_true;
 		is_true = w == v;
@@ -94,8 +94,8 @@ void math::nativeVectorPerformance(uint4 iterations)
 		v->divide(50, 25, 10);
 		v->set(1,2,3);
 		z->set(-1,-2,-3);
-		real4 v_dot_z = v->dot(*z);
-		real4 z_dot_v = z->dot(*v);
+		sreal v_dot_z = v->dot(*z);
+		sreal z_dot_v = z->dot(*v);
 		v_dot_z = z_dot_v;
 		v->set(*w);
 		*v == *w;

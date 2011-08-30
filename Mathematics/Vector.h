@@ -98,8 +98,8 @@ public:
 	{/* empty */}
 	// \see normalized constructor below
 	// access
-	const T& 	operator[](uint4 i) const;	
-	T& 			operator[](uint4 i);
+	const T& 	operator[](uint i) const;	
+	T& 			operator[](uint i);
 	// addition 
 	void 		add(T scalar);
 	void 		add(T X, T Y);
@@ -142,7 +142,7 @@ public:
 	void 		set(T scalar);
 	void 		set(T X, T Y);
 	void 		set(const V2<T>& v);
-	void		set(uint4 index, T scalar);
+	void		set(uint index, T scalar);
 	V2<T>& 		operator=(const V2<T>& v);
 	// substraction 
 	void 		subtract(T scalar);
@@ -177,8 +177,8 @@ public:
 	{/* empty */}
 	// \see normalized constructor below
 	// access 
-	const T& 	operator[](uint4 i) const;	
-	T& 			operator[](uint4 i);
+	const T& 	operator[](uint i) const;	
+	T& 			operator[](uint i);
 	// addition 
 	void 		add(T scalar);
 	void 		add(T X, T Y, T Z);
@@ -232,7 +232,7 @@ public:
 	void 		set(T scalar);
 	void 		set(T X, T Y, T Z);
 	void 		set(const V3<T>& v);
-	void		set(uint4 index, T scalar);
+	void		set(uint index, T scalar);
 	V3<T>&		operator=(const V2<T>& v);
 	V3<T>& 		operator=(const V3<T>& v);
 	// substraction 
@@ -246,7 +246,7 @@ public:
 	void		zero(void);
 }; // class Vector3
 
-void nativeVectorPerformance(uint4 iterations);
+void nativeVectorPerformance(uint iterations);
 
 /** 
 \defgroup Vector_Operations Operations
@@ -260,22 +260,22 @@ standard vector operations
 array and function accessors 
 @{
 */
-template<typename T> inline const T& V2<T>::operator[](uint4 i) const
+template<typename T> inline const T& V2<T>::operator[](uint i) const
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-template<typename T> inline T& V2<T>::operator[](uint4 i)
+template<typename T> inline T& V2<T>::operator[](uint i)
 {
 	assert(i < 2);
 	return (&x)[i];
 }
-template<typename T> inline const T& V3<T>::operator[](uint4 i) const
+template<typename T> inline const T& V3<T>::operator[](uint i) const
 {
 	assert(i < 3);
 	return (&x)[i];
 }
-template<typename T> inline T& V3<T>::operator[](uint4 i)
+template<typename T> inline T& V3<T>::operator[](uint i)
 {
 	assert(i < 3);
 	return (&x)[i];
@@ -790,7 +790,7 @@ template<typename T> inline V2<T>& V2<T>::operator=(const V2<T>& v)
 	y = v.y;
 	return *this;
 }
-template<typename T> inline void V2<T>::set(uint4 index, T scalar)
+template<typename T> inline void V2<T>::set(uint index, T scalar)
 {
 	switch (index)
 	{
@@ -828,7 +828,7 @@ template<typename T> inline V3<T>& V3<T>::operator=(const V2<T>& v)
 	y = v.y;
 	return *this;
 }
-template<typename T> inline void V3<T>::set(uint4 index, T scalar)
+template<typename T> inline void V3<T>::set(uint index, T scalar)
 {
 	switch (index)
 	{

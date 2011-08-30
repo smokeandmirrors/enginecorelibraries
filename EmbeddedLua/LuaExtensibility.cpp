@@ -14,13 +14,13 @@ inline bool
 inline void 
 	setUserdataMetamethod(lua_State* L, const char* method);
 
-sint4 __getProxy(lua_State* L)
+sint __getProxy(lua_State* L)
 {
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: proxy/nil
 	return 1;
 }
 
-sint4 __newindexProxy(lua_State* L) 
+sint __newindexProxy(lua_State* L) 
 {											//s: ud, k, v 	
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
 	lua_replace(L, -4);						//s: proxy, k, v
@@ -29,7 +29,7 @@ sint4 __newindexProxy(lua_State* L)
 	return 0;
 }
 
-void completeLuaClassDeclaration(lua_State* L, const sint1* derived, const sint1* super)
+void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar* super)
 {
 	lua_getglobal(L, derived);
 	//s: class_def
@@ -85,7 +85,7 @@ void completeLuaClassDeclaration(lua_State* L, const sint1* derived, const sint1
 	//s:
 }
 
-void declareLuaClass(lua_State* L, const sint1* derived, const sint1* super)
+void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 {
 	Lua::nilLoadedStatus(L, derived);
 	Lua::require(L, "ObjectOrientedParadigm"); 
@@ -124,14 +124,14 @@ inline bool isInstanceBeingRefreshed(lua_State* L)
 	}
 }
 
-void printToLua(lua_State* L, const sint1* string)
+void printToLua(lua_State* L, const schar* string)
 {	
 	lua_getglobal(L, "print");	//s: print
 	lua_pushstring(L, string);	//s: print, string
 	lua_call(L, 1, 0);			//s: 
 }
 
-sint4 pushRegisteredClass(lua_State* L, void* pushee)
+sint pushRegisteredClass(lua_State* L, void* pushee)
 {
 	lua_getfield(L, LUA_REGISTRYINDEX, "pusheduserdata");	//s: pusheduserdatatable
 	lua_pushlightuserdata(L, pushee);						//s: pusheduserdatatable, pushee* 
@@ -152,7 +152,7 @@ sint4 pushRegisteredClass(lua_State* L, void* pushee)
 	return 1;
 }
 
-sint4 setProxyMetatable(lua_State* L)
+sint setProxyMetatable(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
 	function(userdata, class_mt)
@@ -236,20 +236,20 @@ inline void setUserdataMetamethod(lua_State* L, const char* method)
 	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */
 }
 
-sint4 setUserdataMetatable(lua_State* L)
+sint setUserdataMetatable(lua_State* L)
 {								//s: userdata, lua_class_mt
 	lua_setmetatable(L, -2);	//s: userdata/mt
 	return 1;
 }
 
-sint4 LuaExtendable::__gcmetamethod(lua_State* L)
+sint LuaExtendable::__gcmetamethod(lua_State* L)
 {
 	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	delete udata;
 	return 0;
 }
 
-sint4 LuaExtendable::__newindexError(lua_State* L)
+sint LuaExtendable::__newindexError(lua_State* L)
 {											//: t, k, v
 #if DEBUG
 	LuaExtendable* udata = to<LuaExtendable*>(L, -3);
@@ -262,7 +262,7 @@ sint4 LuaExtendable::__newindexError(lua_State* L)
 #endif//DEBUG
 }
 
-sint4 LuaExtendable::__tostring(lua_State* L)
+sint LuaExtendable::__tostring(lua_State* L)
 {
 	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	lua_pushstring(L, udata->toString());

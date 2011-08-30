@@ -5,6 +5,6 @@
 struct lua_State;
 struct lua_Debug;
 
-typedef sint4 (*lua_function)(lua_State* L);
+typedef sint (*lua_function)(lua_State* L);
 
 #endif//LUABUILD_H

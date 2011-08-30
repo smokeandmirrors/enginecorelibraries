@@ -36,30 +36,30 @@ public:
 	is finished 
 	*/
 	void			enqueue(Executable* job, 
-						sint4 ideal_thread=noThreadPreference,
-						const sint1* name="un-named");
+						sint ideal_thread=noThreadPreference,
+						const schar* name="un-named");
 
 	/** 
 	\todo expose an optional direct callback mechanism for when the job
 	is finished 
 	*/
 	void			enqueue(executableFunction job, 
-						sint4 ideal_thread=noThreadPreference,
-						const sint1* name="un-named");
+						sint ideal_thread=noThreadPreference,
+						const schar* name="un-named");
 
-	uint4 getMaxThreads(void) const 
+	uint getMaxThreads(void) const 
 	{ 
 		return m_maxThreads; 
 	}
 	
-	uint4 getNumberActiveJobs(void) const
+	uint getNumberActiveJobs(void) const
 	{
 		return m_numActiveJobs;
 	}
 	
-	uint4 getNumberPendingJobs(void) const;
+	uint getNumberPendingJobs(void) const;
 	
-	uint4 getNumberSystemThreads(void) const	
+	uint getNumberSystemThreads(void) const	
 	{ 
 		return m_numSystemThreads; 
 	}
@@ -88,7 +88,7 @@ public:
 		printf(output.c_str());
 	}
 
-	void setMaxThreads(uint4 max)			
+	void setMaxThreads(uint max)			
 	{ 
 		m_maxThreads = max; 
 	}
@@ -102,13 +102,13 @@ protected:
 	inline void accountForFinish(Thread* job)
 	{
 		SYNC(m_mutex);
-		sint4 thread_index = -1;
+		sint thread_index = -1;
 
-		for (uint4 i = 0; i < m_numSystemThreads; i++)
+		for (uint i = 0; i < m_numSystemThreads; i++)
 		{
 			if (m_activeJobs[i] == job)
 			{
-				thread_index = static_cast<sint4>(i);
+				thread_index = static_cast<sint>(i);
 				break;
 			}
 		}
@@ -119,7 +119,7 @@ protected:
 		printState();
 	}
 
-	inline void accountForNewJob(Thread* job, sint4 index)
+	inline void accountForNewJob(Thread* job, sint index)
 	{
 		SYNC(m_mutex);
 		m_activeJobs[index] = job;
@@ -127,14 +127,14 @@ protected:
 		printState();
 	}
 	
-	inline bool getFreeIndex(sint4& index)
+	inline bool getFreeIndex(sint& index)
 	{
 		SYNC(m_mutex);
-		for (uint4 i = 0; i < m_numSystemThreads; i++)
+		for (uint i = 0; i < m_numSystemThreads; i++)
 		{
 			if (!m_activeJobs[i])
 			{
-				index = static_cast<sint4>(i);
+				index = static_cast<sint>(i);
 				return true;
 			}
 		}
@@ -142,7 +142,7 @@ protected:
 		return false;
 	}
 
-	inline bool getOpenThread(sint4& index, sint4 ideal_thread)
+	inline bool getOpenThread(sint& index, sint ideal_thread)
 	{
 		SYNC(m_mutex);
 		if (ideal_thread != noThreadPreference && !m_activeJobs[ideal_thread])
@@ -177,9 +177,9 @@ private:
 	Scheduler operator=(const Scheduler&);
 	
 	Thread**				m_activeJobs;
-	uint4					m_maxThreads;
-	uint4					m_numActiveJobs;
-	uint4					m_numSystemThreads;
+	uint					m_maxThreads;
+	uint					m_numActiveJobs;
+	uint					m_numSystemThreads;
 	signals::ReceiverMember	m_receiver;
 	PendingJobQueue*		m_pendingJobs;
 	DECLARE_MUTEX(m_mutex);

@@ -50,31 +50,31 @@ public:
 	\param num_return_values the number of expected returned values, defaults
 	to LUA_MULTIRET
 	*/
-	static sint4		callProtected(lua_State* L, sint4 num_args=0, sint4 num_return_values=-1);
+	static sint		callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
 	/** 
 	sets package.loaded[module] = nil 
 	allows for extending of C declared libraries by %Lua files in packages
 	by the same name using require.
 	This needs to be done because luaL_register modifies the package.loaded table.
 	*/
-	static void			nilLoadedStatus(lua_State* L, const sint1* module);
+	static void			nilLoadedStatus(lua_State* L, const schar* module);
 	/**
 	reports output from the lua_State after a function call
 	\param L the %Lua state in which the function was called
 	\param status the error code from calling the function
 	*/
-	static sint4		report(lua_State* L, sint4 status);
+	static sint		report(lua_State* L, sint status);
 	/**
 	call require from C++
 	*/
-	static bool			require(lua_State* L, const sint1* module);
+	static bool			require(lua_State* L, const schar* module);
 	/** 
 	public [no-args] constructor.
 	\param name a string identifier
 	\param open_standard_libs if true, the base, package, string, table, and math %Lua libraries will be opened
 	\param initialize_userdata_storage if true, the solution to userdata table indexing will be initialized
 	*/
-	Lua(const sint1* name="anonymous", bool open_standard_libs=true, bool initialize_userdata_storage=true);
+	Lua(const schar* name="anonymous", bool open_standard_libs=true, bool initialize_userdata_storage=true);
 	/** 
 	destroys the lua_State and any memory allocated by this object
 	*/
@@ -83,7 +83,7 @@ public:
 	loads end executes the string as a lua chunk
 	\return the status of the execution
 	*/
-	bool				doString(const sint1* chunk, const sint1* source="native code");
+	bool				doString(const schar* chunk, const schar* source="native code");
 	/**
 	\return the number of bytes allocated by the %Lua state
 	*/
@@ -91,7 +91,7 @@ public:
 	/**
 	\return the string ID of this specific %Lua object
 	*/
-	const sint1*		getName(void) const		{ return m_name; }
+	const schar*		getName(void) const		{ return m_name; }
 	/**
 	returns the lua_State encapsulated by this class
 	*/
@@ -102,7 +102,7 @@ public:
 	by the same name using require
 	\param module the name of the (loaded) module
 	*/
-	void				nilLoadedStatus(const sint1* module) const;
+	void				nilLoadedStatus(const schar* module) const;
 	/** 
 	Opens %Lua library using the lua_function provided
 	\warning if you loaded a library and altered it, this will reload that library
@@ -111,7 +111,7 @@ public:
 	/**
 	require() shortcut
 	*/
-	bool				require(const sint1* module);
+	bool				require(const schar* module);
 	/** 
 	quick, low functionality console for fast testing 
 	*/
@@ -144,7 +144,7 @@ protected:
 	
 private:
 	/** open standard libraries and such */
-	void				initialize(const sint1* name);
+	void				initialize(const schar* name);
 	/** allocation method, see comments in Lua.cpp */
 	static void*		luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize);
 	/** The use of this could only be a terrible idea. */

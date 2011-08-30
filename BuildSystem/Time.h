@@ -14,10 +14,10 @@ Tested in the field	:	NO
 */
 #include "Build.h"
 
-typedef uint8 cycle;
-typedef real8 millicycle;
-typedef real8 millisecond;
-typedef real8 second;
+typedef ulong cycle;
+typedef dreal millicycle;
+typedef dreal millisecond;
+typedef dreal second;
 
 namespace real_time
 {
@@ -61,7 +61,7 @@ public:
 	, m_tick(relative_parent.getTick())
 	{ /* empty */ }
 	
-	inline real8 getRate(void) const 
+	inline dreal getRate(void) const 
 	{ 
 		return m_rate; 
 	}
@@ -76,7 +76,7 @@ public:
 		return m_currentSeconds;
 	}
 	
-	inline void setRate(real8 rate)
+	inline void setRate(dreal rate)
 	{
 		m_rate = rate;
 	}
@@ -84,7 +84,7 @@ public:
 	inline void	tick(void)
 	{
 		cycle tick = real_time::cycles();
-		real8 delta = m_rate * (tick - m_tick);
+		dreal delta = m_rate * (tick - m_tick);
 		m_currentMilliseconds += static_cast<millisecond>(delta / real_time::millihertz()); 
 		m_currentSeconds += static_cast<second>(delta / real_time::hertz());
 		m_tick = tick;
@@ -101,14 +101,14 @@ private:
 
 	millisecond	m_currentMilliseconds;
 	second		m_currentSeconds;
-	real8		m_rate;
+	dreal		m_rate;
 	cycle		m_tick;
 }; // class Clock
 
 class StopWatch 
 {
 public:
-	StopWatch(real8 rate=1.0)
+	StopWatch(dreal rate=1.0)
 	: m_active(true)
 	, m_start(real_time::cycles())
 	, m_stop(m_start)
@@ -122,7 +122,7 @@ public:
 	, m_rate(reference_frame.getRate())
 	{ /* empty */ }
 	
-	inline real8 getRate(void) const 
+	inline dreal getRate(void) const 
 	{ 
 		return m_rate; 
 	}
@@ -165,7 +165,7 @@ private:
 	StopWatch operator=(const StopWatch&);
 	
 	bool		m_active;
-	const real8	m_rate;
+	const dreal	m_rate;
 	cycle		m_start;
 	cycle		m_stop;
 }; // class StopWatch
@@ -173,7 +173,7 @@ private:
 class Timer 
 {
 public:
-	Timer(const real8 rate=1.0, second max_time=0.0, second min_time=-1.0, bool auto_reset=false)
+	Timer(const dreal rate=1.0, second max_time=0.0, second min_time=-1.0, bool auto_reset=false)
 	: m_autoReset(auto_reset)
 	, m_maxTime(max_time)
 	, m_minTime(min_time == -1.0 ? max_time : min_time)
@@ -232,7 +232,7 @@ private:
 	bool		m_autoReset;
 	second		m_maxTime;
 	second		m_minTime;
-	const real8	m_rate;
+	const dreal	m_rate;
 	second		m_resetTime;
 	second		m_startTime;
 }; // class Timer

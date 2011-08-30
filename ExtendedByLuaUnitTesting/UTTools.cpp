@@ -13,17 +13,17 @@
 namespace unit_testing_tools
 {
 
-void checkNearEqual(real4 lhs, real4 rhs, real4 tolerance)
+void checkNearEqual(sreal lhs, sreal rhs, sreal tolerance)
 {
 	tolerance = tolerance == 0.0f ? 0.0001f : tolerance;
-	real4 delta = fabs(lhs - rhs);
+	sreal delta = fabs(lhs - rhs);
 	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
 }
 
-void checkNearEqual(real8 lhs, real8 rhs, real8 tolerance)
+void checkNearEqual(dreal lhs, dreal rhs, dreal tolerance)
 {
 	tolerance = tolerance == 0.0f ? 0.0001 : tolerance;
-	real8 delta = abs(lhs - rhs);
+	dreal delta = abs(lhs - rhs);
 	CFIXCC_ASSERT_LESS_OR_EQUAL(delta, tolerance);
 }
 
@@ -63,12 +63,12 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	//s:
 	lua_getglobal(L, "lastUnitTestNumFailures");
 	//s: lastUnitTestNumFailures
-	sint4 result = to<sint4>(L, -1);
+	sint result = to<sint>(L, -1);
 	lua_pop(L, 1);
 	//s:
 	lua_getglobal(L,  "lastUnitTestReport");
 	//s: lastUnitTestReport
-	const sint1* report = to<const sint1*>(L, -1);
+	const schar* report = to<const schar*>(L, -1);
 	lua_pop(L, 1);
 	//s:
 	// Convert to a wchar_t*

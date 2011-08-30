@@ -39,16 +39,16 @@ void sandbox::play()
 	printf("Stopped playing in the sandbox!\n");
 }
 
-sint4 sintCompareAscending(const void* a, const void* b)	{ return (*(sint4*)(a)) - (*(sint4*)(b)); }
-sint4 sintCompareDescending(const void* a, const void* b)	{ return (*(sint4*)(b)) - (*(sint4*)(a)); }
+sint sintCompareAscending(const void* a, const void* b)	{ return (*(sint*)(a)) - (*(sint*)(b)); }
+sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
 
 inline void doWork(millisecond milliseconds)
 {
-	sint4 number_size = 1000;
-	sint4 numbers[1000];// = new sint4[number_size];
-	sint4* i = numbers;
+	sint number_size = 1000;
+	sint numbers[1000];// = new sint[number_size];
+	sint* i = numbers;
 	
-	for (sint4 number = 0; number < number_size; number++)
+	for (sint number = 0; number < number_size; number++)
 	{
 		*i++ = number;
 	}
@@ -57,8 +57,8 @@ inline void doWork(millisecond milliseconds)
 		
 	do 
 	{
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareAscending);	
-		qsort(numbers, number_size, sizeof(uint4), &sintCompareDescending);	
+		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
 	while (real_time::milliseconds() - start < milliseconds);
 
@@ -277,7 +277,7 @@ public:
 		m_onComplete.disconnect(receiver);
 	}
 
-	uint8 getFrameNumber(void) const 
+	ulong getFrameNumber(void) const 
 	{ 
 		return m_frameNumber; 
 	}
@@ -421,7 +421,7 @@ protected:
 private:
 	requirements					m_completed;
 	DECLARE_MUTEX(m_completeMutex);
-	uint8							m_frameNumber;
+	ulong							m_frameNumber;
 	requirements					m_incomplete;
 	DECLARE_MUTEX(m_incompleteMutex);
 	bool							m_isRunning;
@@ -459,7 +459,7 @@ class TestRequirement
 : public FrameRequirement
 {
 public:
-	TestRequirement(millisecond work_time, eFrameRequirementID ID_one, sint4 child_jobs)
+	TestRequirement(millisecond work_time, eFrameRequirementID ID_one, sint child_jobs)
 	: m_reqID(ID_one)
 	, m_workTime(work_time)
 	, m_childJobs(child_jobs)
@@ -517,7 +517,7 @@ public:
 private:
 	DECLARE_MUTEX(m_mutex);
 	
-	sint4					
+	sint					
 		m_completedJobs;
 
 	TestJob* 
@@ -529,7 +529,7 @@ private:
 	millisecond
 		m_workTime;
 
-	sint4
+	sint
 		m_childJobs;
 }; 
 
@@ -600,18 +600,18 @@ void onPlay(void)
 	alpha.add(movement);
 	alpha.add(attack);
 
-	uint4 movement_ID = movement.getGUID();
-	uint4 static_movement_ID = Movement::componentGUID;
-	uint4 attack_ID = attack.getGUID();
-	uint4 static_attack_ID = Attack::componentGUID;
-	uint4 defense_ID = defense.getGUID();
-	uint4 static_defense_ID = Defense::componentGUID;
+	uint movement_ID = movement.getGUID();
+	uint static_movement_ID = Movement::componentGUID;
+	uint attack_ID = attack.getGUID();
+	uint static_attack_ID = Attack::componentGUID;
+	uint defense_ID = defense.getGUID();
+	uint static_defense_ID = Defense::componentGUID;
 
-	uint4 one = __COUNTER__;
-	uint4 two = __COUNTER__;
-	uint4 three = __COUNTER__;
+	uint one = __COUNTER__;
+	uint two = __COUNTER__;
+	uint three = __COUNTER__;
 
-	std::map<type_info, sint4> crazytalk;
+	std::map<type_info, sint> crazytalk;
 	
 	
 	int idone = typeid(Movement).before(typeid(Movement));

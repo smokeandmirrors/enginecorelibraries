@@ -64,33 +64,36 @@ in ANY other situation, do NOT use the sized types, use the unsized types
 
 \todo investigate this more
 
-// typedef char					schar;
-// typedef unsigned char		uchar;
-// typedef short				sshort;
-// typedef unsigned short		ushort;
-// typedef int					sint;
-// typedef unsigned int			uint;
-// typedef long long			slong;
-// typedef unsigned long long	ulong;
-// typedef float 				real;
-// typedef double				dreal;
-
 @{
 */
 
-/** integral types */
-typedef char				sint1;
-typedef unsigned char		uint1;
-typedef short				sint2;
-typedef unsigned short		uint2;
-typedef int					sint4;
-typedef unsigned int		uint4;
-typedef long long			sint8;
-typedef unsigned long long	uint8;
+/** un-sized types */
+typedef char				schar;
+typedef unsigned char		uchar;
+typedef short				sshort;
+typedef unsigned short		ushort;
+typedef int					sint;
+typedef unsigned int		uint;
+typedef long long			slong;
+typedef unsigned long long	ulong;
+typedef float 				sreal;
+typedef double				dreal;
 
-/** floating point types */
-typedef float 				real4;
-typedef double				real8;
+/** sized types 
+\todo fill these in with compiler/OS specific types when a proven reason for it comes up:
+probably going to be something over network/serialization/platform requirements
+
+typedef char				schar;
+typedef unsigned char		uchar;
+typedef short				sshort;
+typedef unsigned short		ushort;
+typedef int					sint;
+typedef unsigned int		uint;
+typedef long long			slong;
+typedef unsigned long long	ulong;
+typedef float 				sreal;
+typedef double				dreal;
+*/
 
 /**@}*/
 

@@ -5,8 +5,8 @@
 
 using namespace signals;
 
-static const sint4 value1(1);
-static const sint4 value2(2);
+static const sint value1(1);
+static const sint value2(2);
 
 class TestReceiverBase 
 : public ReceiverBase
@@ -33,69 +33,69 @@ public:
 		++m_0ConstReceptionCount;
 	}
 
-	void increment1ReceptionCount(sint4 count1)
+	void increment1ReceptionCount(sint count1)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		++m_1ReceptionCount;
 	}
 
-	void increment1ConstReceptionCount(sint4 count1)
+	void increment1ConstReceptionCount(sint count1)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		++m_1ConstReceptionCount;
 	}
 
-	void increment2ReceptionCount(sint4 count1, sint4 count2)
+	void increment2ReceptionCount(sint count1, sint count2)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		CFIXCC_ASSERT_EQUALS(value2, count2); 
 		++m_2ReceptionCount;
 	}
 
-	void increment2ConstReceptionCount(sint4 count1, sint4 count2)
+	void increment2ConstReceptionCount(sint count1, sint count2)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		CFIXCC_ASSERT_EQUALS(value2, count2); 
 		++m_2ConstReceptionCount;
 	}	
 	
-	sint4 get0ReceptionCount(void) const
+	sint get0ReceptionCount(void) const
 	{
 		return m_0ReceptionCount;
 	}
 
-	sint4 get0ConstReceptionCount(void) const
+	sint get0ConstReceptionCount(void) const
 	{
 		return m_0ConstReceptionCount;
 	}
 
-	sint4 get1ReceptionCount(void) const
+	sint get1ReceptionCount(void) const
 	{
 		return m_1ReceptionCount;
 	}
 
-	sint4 get1ConstReceptionCount(void) const
+	sint get1ConstReceptionCount(void) const
 	{
 		return m_1ConstReceptionCount;
 	}
 
-	sint4 get2ReceptionCount(void) const
+	sint get2ReceptionCount(void) const
 	{
 		return m_2ReceptionCount;
 	}
 
-	sint4 get2ConstReceptionCount(void) const
+	sint get2ConstReceptionCount(void) const
 	{
 		return m_2ConstReceptionCount;
 	}
 
 private:
-	mutable sint4 m_0ReceptionCount;
-	mutable sint4 m_0ConstReceptionCount;
-	mutable sint4 m_1ReceptionCount;
-	mutable sint4 m_1ConstReceptionCount;
-	mutable sint4 m_2ReceptionCount;
-	mutable sint4 m_2ConstReceptionCount;
+	mutable sint m_0ReceptionCount;
+	mutable sint m_0ConstReceptionCount;
+	mutable sint m_1ReceptionCount;
+	mutable sint m_1ConstReceptionCount;
+	mutable sint m_2ReceptionCount;
+	mutable sint m_2ConstReceptionCount;
 };
 
 class TestReceiverMember
@@ -128,58 +128,58 @@ public:
 		++m_0ConstReceptionCount;
 	}
 
-	void increment1ReceptionCount(sint4 count1)
+	void increment1ReceptionCount(sint count1)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		++m_1ReceptionCount;
 	}
 
-	void increment1ConstReceptionCount(sint4 count1)
+	void increment1ConstReceptionCount(sint count1)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		++m_1ConstReceptionCount;
 	}
 
-	void increment2ReceptionCount(sint4 count1, sint4 count2)
+	void increment2ReceptionCount(sint count1, sint count2)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		CFIXCC_ASSERT_EQUALS(value2, count2); 
 		++m_2ReceptionCount;
 	}
 
-	void increment2ConstReceptionCount(sint4 count1, sint4 count2)
+	void increment2ConstReceptionCount(sint count1, sint count2)
 	{
 		CFIXCC_ASSERT_EQUALS(value1, count1); 
 		CFIXCC_ASSERT_EQUALS(value2, count2); 
 		++m_2ConstReceptionCount;
 	}	
 	
-	sint4 get0ReceptionCount(void) const
+	sint get0ReceptionCount(void) const
 	{
 		return m_0ReceptionCount;
 	}
 
-	sint4 get0ConstReceptionCount(void) const
+	sint get0ConstReceptionCount(void) const
 	{
 		return m_0ConstReceptionCount;
 	}
 
-	sint4 get1ReceptionCount(void) const
+	sint get1ReceptionCount(void) const
 	{
 		return m_1ReceptionCount;
 	}
 
-	sint4 get1ConstReceptionCount(void) const
+	sint get1ConstReceptionCount(void) const
 	{
 		return m_1ConstReceptionCount;
 	}
 
-	sint4 get2ReceptionCount(void) const
+	sint get2ReceptionCount(void) const
 	{
 		return m_2ReceptionCount;
 	}
 
-	sint4 get2ConstReceptionCount(void) const
+	sint get2ConstReceptionCount(void) const
 	{
 		return m_2ConstReceptionCount;
 	}
@@ -195,12 +195,12 @@ public:
 	}
 
 private:
-	mutable sint4 m_0ReceptionCount;
-	mutable sint4 m_0ConstReceptionCount;
-	mutable sint4 m_1ReceptionCount;
-	mutable sint4 m_1ConstReceptionCount;
-	mutable sint4 m_2ReceptionCount;
-	mutable sint4 m_2ConstReceptionCount;
+	mutable sint m_0ReceptionCount;
+	mutable sint m_0ConstReceptionCount;
+	mutable sint m_1ReceptionCount;
+	mutable sint m_1ConstReceptionCount;
+	mutable sint m_2ReceptionCount;
+	mutable sint m_2ConstReceptionCount;
 	signals::ReceiverMember
 		m_receiver;
 };
@@ -213,8 +213,8 @@ public:
 	void SignalsTest1()
 	{
 		Transmitter0 t0;
-		Transmitter1<sint4> t1;
-		Transmitter2<sint4, sint4> t2;
+		Transmitter1<sint> t1;
+		Transmitter2<sint, sint> t2;
 		
 		TestReceiverBase trb;
 		TestReceiverMember trm;

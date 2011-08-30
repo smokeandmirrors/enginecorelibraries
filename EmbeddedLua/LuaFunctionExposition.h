@@ -48,15 +48,15 @@ The following templates are currently defined by way of the macros below:
 //////////////////////////////////////////////////////////////////////////
 // static non member functions: 
 template<typename ARG_1, void (* function)(ARG_1)> 
-inline sint4 staticReturn0Param1(lua_State* L);
+inline sint staticReturn0Param1(lua_State* L);
 
 template<typename RET_1, RET_1 (* function)(void)>
-inline sint4 staticReturn1Param0(lua_State* L);
+inline sint staticReturn1Param0(lua_State* L);
 
 // ... 
 
 template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (*function)(RET_2&, ARG_1, ARG_2)>
-inline sint4 staticReturn2Param2(lua_State* L);
+inline sint staticReturn2Param2(lua_State* L);
 
 // ...
 
@@ -66,20 +66,20 @@ typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5,
 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
 RET_1 (*function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)
 >
-inline sint4 return5Param5(lua_State* L);
+inline sint return5Param5(lua_State* L);
 
 //////////////////////////////////////////////////////////////////////////
 // class member functions: 
 template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1)> 
-inline sint4 return0Param1(lua_State* L);
+inline sint return0Param1(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void)>
-inline sint4 return1Param0(lua_State* L);
+inline sint return1Param0(lua_State* L);
 
 // ... 
 
 template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (CLASS::* function)(RET_2&, ARG_1, ARG_2)>
-inline sint4 return2Param2(lua_State* L);
+inline sint return2Param2(lua_State* L);
 
 // ...
 
@@ -89,20 +89,20 @@ typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5,
 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
 RET_1 (CLASS::* function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)
 >
-inline sint4 return5Param5(lua_State* L);
+inline sint return5Param5(lua_State* L);
 
 //////////////////////////////////////////////////////////////////////////
 // class member const functions: 
 template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1) const> 
-inline sint4 return0Param1const(lua_State* L);
+inline sint return0Param1const(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void) const>
-inline sint4 return1Param0const(lua_State* L);
+inline sint return1Param0const(lua_State* L);
 
 // ... 
 
 template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (CLASS::* function)(RET_2&, ARG_1, ARG_2) const>
-inline sint4 return2Param2const(lua_State* L);
+inline sint return2Param2const(lua_State* L);
 
 // ...
 
@@ -112,18 +112,18 @@ typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5,
 typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, 
 RET_1 (CLASS::* function)(RET_2&, RET_3&, RET_4&, RET_5&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) const
 >
-inline sint4 return5Param5const(lua_State* L);
+inline sint return5Param5const(lua_State* L);
 \endcode
 
 example:
 C function:
 \code
-real4 Vector3::dot(const Vector3& v) const; // member function, 1 return value, 1 argument
+sreal Vector3::dot(const Vector3& v) const; // member function, 1 return value, 1 argument
 \endcode
 
 wrapper:
 \code
-return1Param1const<Vector3, real4, const Vector3&, &Vector3::dot>
+return1Param1const<Vector3, sreal, const Vector3&, &Vector3::dot>
 \endcode
 
 %Lua call:
@@ -169,14 +169,14 @@ EFL_GET_INSTANCE_ARGS_
 namespace lua_extension
 {
 	template<void(* function)(void)> 
-	inline sint4 staticReturn0Param0(lua_State* L)
+	inline sint staticReturn0Param0(lua_State* L)
 	{
 		(*function)();
 		return 0;
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void)>
-	inline sint4 return0Param0(lua_State* L)
+	inline sint return0Param0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -186,7 +186,7 @@ namespace lua_extension
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void) const>
-	inline sint4 return0Param0const(lua_State* L)
+	inline sint return0Param0const(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -247,7 +247,7 @@ namespace lua_extension
 	{ \
 		if (CLASS* object = EFL_GET_INSTANCE_ARGS_##num_args) \
 		{ \
-			sint4 pushed(0); \
+			sint pushed(0); \
 			CW_DECLARE_RETS_##num_rets \
 			EFL_GET_ARGS_##num_args \
 			CW_ASSIGN_RETS_##num_rets (object->*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
@@ -259,9 +259,9 @@ namespace lua_extension
 
 // declare and implement the template non-member static function
 #define EFL_STATIC(num_rets, num_args) \
-	inline sint4 staticReturn##num_rets##Param##num_args##(lua_State* L) \
+	inline sint staticReturn##num_rets##Param##num_args##(lua_State* L) \
 	{ \
-		sint4 pushed(0); \
+		sint pushed(0); \
 		CW_DECLARE_RETS_##num_rets \
 		EFL_GET_ARGS_##num_args \
 		CW_ASSIGN_RETS_##num_rets (*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
@@ -271,12 +271,12 @@ namespace lua_extension
 
 // declare and implement the class member function
 #define EFL_CLASS(num_rets, num_args) \
-	inline sint4 return##num_rets##Param##num_args##(lua_State* L) \
+	inline sint return##num_rets##Param##num_args##(lua_State* L) \
 	EFL_CLASS_IMPLEMENTATION(num_rets, num_args)
 
 // declare and implement the class const member function
 #define EFL_CONST_CLASS(num_rets, num_args) \
-	inline sint4 return##num_rets##Param##num_args##const(lua_State* L) \
+	inline sint return##num_rets##Param##num_args##const(lua_State* L) \
 	EFL_CLASS_IMPLEMENTATION(num_rets, num_args)
 
 // define a static function with the specified number of arguments

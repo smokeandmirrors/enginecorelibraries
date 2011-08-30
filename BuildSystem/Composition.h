@@ -29,7 +29,7 @@ Tested in the field	:	NO
 namespace design_patterns
 {
 
-typedef uint4 Component_GUID;
+typedef uint Component_GUID;
 
 template<typename OWNER>
 class AbstractComponent
@@ -112,10 +112,10 @@ const Component_GUID Component<OWNER, DERIVED_CLASS>::componentGUID = __COUNTER_
 template<typename OWNER>
 class Composite // interface/base/member
 {
-	typedef std::map<uint4, AbstractComponent<OWNER>*> 
+	typedef std::map<uint, AbstractComponent<OWNER>*> 
 		components;
 	
-	typedef typename std::map<uint4, AbstractComponent<OWNER>*>::iterator 
+	typedef typename std::map<uint, AbstractComponent<OWNER>*>::iterator 
 		components_iter;
 	
 public:
@@ -129,7 +129,7 @@ public:
 	add(AbstractComponent<OWNER>& component) 
 	{
 		//typeid(component)
-		uint4 id = 0; //component.getComponentID();
+		uint id = 0; //component.getComponentID();
 
 		if (!m_components[id])
 		{
@@ -142,7 +142,7 @@ public:
 	COMPONENT* 
 	get(bool construct_missing=false)
 	{
-		uint4 id = COMPONENT::componentGUID;
+		uint id = COMPONENT::componentGUID;
 		AbstractComponent<OWNER>* component = m_components[id];
 		
 		if (!component && construct_missing)

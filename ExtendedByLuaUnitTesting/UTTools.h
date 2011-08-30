@@ -25,8 +25,8 @@ this path will have to be set on a per machine basis
 
 namespace unit_testing_tools
 {
-	void checkNearEqual(real4 lhs, real4 rhs, real4 tolerance=0.0f);
-	void checkNearEqual(real8 lhs, real8 rhs, real8 tolerance=0.0f);
+	void checkNearEqual(sreal lhs, sreal rhs, sreal tolerance=0.0f);
+	void checkNearEqual(dreal lhs, dreal rhs, dreal tolerance=0.0f);
 #if EXTENDED_BY_LUA 
 	void executeLuaUnitTest(char* module, lua_extension::Lua* lua=NULL);
 #endif

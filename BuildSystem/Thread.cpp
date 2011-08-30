@@ -8,20 +8,20 @@
 namespace multithreading
 {
 
-const sint4 noThreadPreference(-1);
+const sint noThreadPreference(-1);
 
 void sleep(millisecond milliseconds)
 {
 #if WIN32
-	Sleep(static_cast<uint4>(milliseconds));
+	Sleep(static_cast<uint>(milliseconds));
 #endif//WIN32
 }
 
 inline void			closeThread(threadHandle);
-inline threadHandle	createThread(threadable function, threadID& id, void* args, sint4 CPUid=noThreadPreference);
+inline threadHandle	createThread(threadable function, threadID& id, void* args, sint CPUid=noThreadPreference);
 
 #if WIN32
-inline threadHandle createThread(threadable function, threadID& id, void* args, sint4/* CPUid*/)
+inline threadHandle createThread(threadable function, threadID& id, void* args, sint/* CPUid*/)
 {	
 	HANDLE newthread = (HANDLE)(_beginthreadex(NULL, 0, function, args, 0, &id));
 	/** 
@@ -29,7 +29,7 @@ inline threadHandle createThread(threadable function, threadID& id, void* args, 
 	platform basis
 	if (CPUid != noThreadPreference)
 	{
-		DWORD result = SetThreadIdealProcessor(newthread, static_cast<uint4>(CPUid));
+		DWORD result = SetThreadIdealProcessor(newthread, static_cast<uint>(CPUid));
 	}
 	*/
 	return newthread;
@@ -47,7 +47,7 @@ Thread::~Thread(void)
 	closeThread(m_thread);
 }
 
-void Thread::Executor::initialize(Thread* thread, threadHandle& handle, threadID& id, sint4 CPUid)
+void Thread::Executor::initialize(Thread* thread, threadHandle& handle, threadID& id, sint CPUid)
 {
 	handle = multithreading::createThread(Thread::executeThread, id, thread, CPUid);
 }
