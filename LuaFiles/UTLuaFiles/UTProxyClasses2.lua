@@ -50,7 +50,7 @@ UT.test('inheritance',
 		local g2 = new('Parent2')
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
-		UT.checkEqual(g.."", 'This is a Grandparent2') 
+		UT.checkEqual(g.."", 'This is a Parent2') 
 		UT.checkT(g.__gc, 'function')
 		-- Lua constructor results
 		UT.checkEqual(g.numberOfParents, 3)
@@ -85,10 +85,11 @@ UT.test('inheritance',
 		g2.favoritePark = 'Lake Harriett'
 		UT.check(g ~= g2 and g2 ~= g)
 		UT.checkT(g.__tostring, 'function')
-		UT.checkEqual(g.."", 'This is a Grandparent2') 
+		UT.checkEqual(g.."", 'This is a Child2') 
 		UT.checkT(g.__gc, 'function')
 		UT.checkT(g.__call, 'function')
 		UT.check(g(), 7)
+		---[[
 		local g3 = g2:get()
 		UT.checkT(getmetatable(g3), 'table')
 		-- Lua constructor results
@@ -112,8 +113,11 @@ UT.test('inheritance',
 		UT.checkEqual(g:getNumberOfParents(), 2)		
 		UT.checkT(g.getNumberOfGrandparents, 'function')
 		UT.checkEqual(g:getNumberOfGrandparents(), 4)
+		--]]
 	end
 )
+
+---[[
 ----------------------------------------------------------------------
 UT.test('proxy useage',
 	function()
@@ -160,3 +164,4 @@ UT.test('proxy class redefinition',
 		end
 	end
 )
+--]]

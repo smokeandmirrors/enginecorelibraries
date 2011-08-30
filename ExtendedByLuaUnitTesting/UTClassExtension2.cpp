@@ -1,4 +1,5 @@
 #include "Build.h"
+
 #if WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 #include "UTTools.h"
 
 #if EXTENDED_BY_LUA
+
 #include "LuaExtensionInclusions.h"
 
 using namespace lua_extension;
@@ -14,8 +16,8 @@ class UTClassExtension2 : public cfixcc::TestFixture
 {
 public:
 	void test_define_lua_class(void);
-	void test_define_lua_LuaExtendable(void); 
-	void test_define_lua_LuaExtendable_by_proxy(void);
+	void test_define_lua_class2(void); 
+	void test_define_lua_class2_by_proxy(void);
 };
 
 class One2
@@ -139,7 +141,6 @@ void UTClassExtension2::test_define_lua_class()
 }
 
 class Simple2
-	: public LuaExtendable
 {
 private:
 	static bool everCreated;
@@ -171,8 +172,6 @@ public:
 		m_other = other; 
 	}
 
-	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Simple2)
-
 private:
 	Simple2*			m_other;
 };
@@ -180,15 +179,15 @@ private:
 uint4 Simple2::numAllocated = 0;
 bool Simple2::everCreated = false;
 
-DECLARE_LUA_LUAEXTENDABLE(Simple2);
+DECLARE_LUA_CLASS(Simple2);
 
-DEFINE_LUA_CLASS(EXTENDABLE, Simple2, Simple2)
-LUA_NAMED_ENTRY("__call", (return1Param0const<Simple2, uint4, &Simple2::getValue>))
-LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple2, Simple2*, &Simple2::getOther>))
-LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple2, uint4, &Simple2::getValue>))
-LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple2, bool, &Simple2::isSimple>))
-LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple2, Simple2*, &Simple2::reproduce>))
-LUA_NAMED_ENTRY("setOther", (return0Param1<Simple2, Simple2*, &Simple2::setOther>))
+DEFINE_LUA_CLASS(CLASS, Simple2, Simple2)
+	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple2, uint4, &Simple2::getValue>))
+	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple2, Simple2*, &Simple2::getOther>))
+	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple2, uint4, &Simple2::getValue>))
+	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple2, bool, &Simple2::isSimple>))
+	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple2, Simple2*, &Simple2::reproduce>))
+	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple2, Simple2*, &Simple2::setOther>))
 END_LUA_CLASS(Simple2, Simple2)
 
 
@@ -217,16 +216,14 @@ public:
 public:
 	uint4				getDerivation(void) const	{ return 21; }
 	virtual uint4		getValue(void) const		{ return 14; }
-
-	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(Derived2)
 };
 
 uint4 Derived2::numAllocated = 0;
 bool Derived2::everCreated = false;
 
-DECLARE_LUA_LUAEXTENDABLE(Derived2);
+DECLARE_LUA_CLASS(Derived2);
 
-DEFINE_LUA_CLASS(EXTENDABLE, Derived2, Simple2)
+DEFINE_LUA_CLASS(CLASS, Derived2, Simple2)
 LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived2, uint4, &Derived2::getDerivation>))
 END_LUA_CLASS(Derived2, Simple2)
 
@@ -238,7 +235,7 @@ void supporttest_define_lua_class()
 	unit_testing_tools::executeLuaUnitTest("UTLuaExtendableClasses2", &lua);
 }
 
-void UTClassExtension2::test_define_lua_LuaExtendable()
+void UTClassExtension2::test_define_lua_class2()
 {
 	supporttest_define_lua_class();
 
@@ -249,12 +246,7 @@ void UTClassExtension2::test_define_lua_LuaExtendable()
 }
 
 // BEGIN PROXY
-/**
-\class
-demonstrates full inheritance tree and proxy useage
-*/
 class Grandparent2 
-	: public LuaExtendable
 {
 private:
 	static bool everCreated;
@@ -291,61 +283,48 @@ public:
 	{
 		return this == &other; 
 	}
-
-	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(Grandparent2)
 }; // Grandparent2
 
 uint4 Grandparent2::numAllocatedGrandparents = 0;
 bool Grandparent2::everCreated = false;
 
-DECLARE_LUA_LUAEXTENDABLE(Grandparent2);
+DECLARE_LUA_CLASS(Grandparent2);
 
 LUA_FUNC(__call2)
 {
 	return push(L, 7);
 }
 
-DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Grandparent2, Grandparent2)
+DEFINE_LUA_CLASS_BY_PROXY(CLASS, Grandparent2, Grandparent2)
 LUA_NAMED_ENTRY("__call", __call2) 
 LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent2, const sint1*, &Grandparent2::getFamilyName>))
 LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent2, const sint1*, &Grandparent2::getTitle>))
 LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent2, bool, const Grandparent2&, &Grandparent2::operator==>))
 END_LUA_CLASS(Grandparent2, Grandparent2)
 
-/**
-\class
-
-demonstrates full inheritance tree and proxy useage
-*/
 class Parent2 
 	: public Grandparent2
 {
 public:
 	typedef Grandparent2 super;
-	Parent2(Grandparent2* gp=NULL) : m_grandParent(gp)		{ /* empty */ }
+	Parent2(Grandparent2* gp=NULL) : m_grandParent(gp)		{  }
 	Grandparent2*			getGrandparent(void) const		{ return m_grandParent; }
 	const sint1*				getGrandparentName(void) const	{ return "Robert Michael Curran, Sr."; }
 	virtual const sint1*		getTitle(void) const			{ return "Parent2"; }
 	void					setGrandparent(Grandparent2* gp) { m_grandParent = gp; }
-	DEFINE_DEFAULT_GETCLASSNAME(Parent2)
 
 private:
 	Grandparent2*			m_grandParent;			
 }; // Parent2
 
-DECLARE_LUA_LUAEXTENDABLE(Parent2);
+DECLARE_LUA_CLASS(Parent2);
 
-DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Parent2, Grandparent2)
+DEFINE_LUA_CLASS_BY_PROXY(CLASS, Parent2, Grandparent2)
 LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent2, Grandparent2*, &Parent2::getGrandparent>))
 LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent2, const sint1*, &Parent2::getGrandparentName>))
 LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent2, Grandparent2*, &Parent2::setGrandparent>))
 END_LUA_CLASS(Parent2, Grandparent2) 
 
-/**
-\class
-
-demonstrates full inheritance tree and proxy usesage
-*/
 class Child2 
 	: public Parent2
 {
@@ -364,15 +343,14 @@ public:
 	const sint1*				getParentName(void) const	{ return "Robert Michael Curran, Jr."; }
 	virtual const sint1*		getTitle(void) const		{ return "Child2"; }
 	void					setParent(Parent2* gp)		{ m_parent = gp; }
-	DEFINE_DEFAULT_GETCLASSNAME(Child2)
 
 private:
 	Parent2*					m_parent;
 }; // Child2
 
-DECLARE_LUA_LUAEXTENDABLE(Child2);
+DECLARE_LUA_CLASS(Child2);
 
-DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Child2, Parent2)
+DEFINE_LUA_CLASS_BY_PROXY(CLASS, Child2, Parent2)
 LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child2*, &Child2::get>))
 LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child2, Parent2*, &Child2::getParent>))
 LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child2, const sint1*, &Child2::getParentName>))
@@ -390,17 +368,17 @@ void supportProxyTesting2(void)
 	unit_testing_tools::executeLuaUnitTest("UTProxyClasses2", &lua);
 }
 
-void UTClassExtension2::test_define_lua_LuaExtendable_by_proxy()
+void UTClassExtension2::test_define_lua_class2_by_proxy()
 {
 	supportProxyTesting2();
 	CFIX_ASSERT(Grandparent2::getNumAllocated() == 0);
-	// CFIX_ASSERT(Grandparent2::wasEverCreated());
+	CFIX_ASSERT(Grandparent2::wasEverCreated());
 }
 
 CFIXCC_BEGIN_CLASS(UTClassExtension2)
 	CFIXCC_METHOD(test_define_lua_class)
-	CFIXCC_METHOD(test_define_lua_LuaExtendable)
-	CFIXCC_METHOD(test_define_lua_LuaExtendable_by_proxy)
+	CFIXCC_METHOD(test_define_lua_class2)
+	CFIXCC_METHOD(test_define_lua_class2_by_proxy)
 CFIXCC_END_CLASS()
 
 #endif//EXTENDED_BY_LUA

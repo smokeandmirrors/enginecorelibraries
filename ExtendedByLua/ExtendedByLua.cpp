@@ -38,6 +38,12 @@ are included in the macro below
 #include <windows.h>
 #endif//WIN32
 
+#define UNIT_TEST_VERIFICATION 0
+
+#if UNIT_TEST_VERIFICATION
+
+#endif//UNIT_TEST_VERIFICATION
+
 sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
@@ -51,6 +57,13 @@ sint4 _tmain(sint4 /* argc */, _TCHAR* /* argv[] */)
 		lua.require("ObjectOrientedParadigm");
 		REGISTER_LUA_LIBRARY((&lua), Vector2);
 		REGISTER_LUA_LIBRARY((&lua), Vector3);
+
+#if UNIT_TEST_VERIFICATION
+		REGISTER_LUA_LIBRARY((&lua), Grandparent2);
+		REGISTER_LUA_LIBRARY((&lua), Parent2);
+		REGISTER_LUA_LIBRARY((&lua), Child2);
+#endif // UNIT_TEST_VERIFICATION
+
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		lua.runConsole();

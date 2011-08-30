@@ -457,6 +457,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LuaStateInteraction.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaStateInteraction.h"
 				>
 			</File>

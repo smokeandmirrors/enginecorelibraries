@@ -62,6 +62,6 @@ UT.test('simple declaration',
 		s:setOther(d2)
 		local d3 = s:getOther()
 		UT.checkEqual(d2, d3)
-		UT.testInstanceProperties(d3, 'Derived2', 'Simple2')		
+		UT.testInstanceProperties(d3, 'Derived2', 'Simple2')	
 	end
 )

@@ -100,9 +100,6 @@ for use in %Lua.
 @{
 */
 
-namespace lua_extension 
-{
-
 #if !GOLDMASTER
 #define ARGUMENT_ERRORS 1
 #endif//!GOLDMASTER
@@ -131,8 +128,12 @@ Declares a library around a POD class
 */
 #define DECLARE_LUA_CLASS(CLASS) \
 	DECLARE_LUA_LIBRARY(CLASS) \
+	DECLARE_LUA_PUSH_FUNCTION(CLASS) \
 	DEFINE_TO_CLASS_FUNCTIONS(CLASS) 
 	// #define DECLARE_LUA_LUAEXTENDABLE
+
+	// DEFINE_LUA_PUSH_FUNCTION(CLASS) \
+
 
 /**
 \def DECLARE_LUA_CLASS_NS
@@ -141,8 +142,12 @@ Declares a library around a POD class
 */
 #define DECLARE_LUA_CLASS_NS(NAMESPACE, CLASS) \
 	DECLARE_LUA_LIBRARY(CLASS)	\
-	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE::CLASS)
+	DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
+	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE##::##CLASS)
 	// #define DECLARE_LUA_CLASS_NS
+
+	// 	DEFINE_LUA_PUSH_FUNCTION_FROM_NS(NAMESPACE, CLASS) \
+
 
 /** 
 \def DECLARE_LUA_LIBRARY
@@ -184,6 +189,20 @@ the LuaExtendable interface.
 	DEFINE_TO_LUAEXTENDABLES(NAMESPACE::CLASS)
 // #define DECLARE_LUA_LUAEXTENDABLE_NS
 
+#define DECLARE_LUA_PUSH_FUNCTION(CLASS) \
+	namespace lua_extension \
+	{ \
+		sint4 push(lua_State* L, CLASS * value); \
+	} 
+// #define DECLARE_LUA_PUSH_FUNCTION
+
+#define DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
+	namespace lua_extension \
+	{ \
+		sint4 push(lua_State* L, NAMESPACE##::##CLASS * value); \
+	} 
+// #define DECLARE_LUA_PUSH_FUNCTION_NS
+
 #define DEFINE_DEFAULT_TOSTRING(CLASS) \
 	virtual const sint1* toString(void) \
 	{ \
@@ -220,7 +239,7 @@ the LuaExtendable interface.
 #define DEFINE_LUA_CLASS__tostring(CLASS) \
 	LUA_FUNC(__tostring##CLASS##) \
 	{ \
-		lua_pushstring(L, #CLASS); \
+		lua_pushstring(L, "This is a " #CLASS); \
 		return 1; \
 	}	
 // #define DEFINE_LUA_CLASS__tostring
@@ -297,10 +316,37 @@ or the same if it has no parent class
 // #define DEFINE_LUA_CLASS_BY_PROXY
 
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
 	OPEN_LUA_NS(CLASS) \
 		DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
 		OPEN_LUA_LIB(CLASS) \
 	// #define_LUA_CLASS
+
+#define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) \
+	sint4 lua_extension::push(lua_State* L, CLASS * value) \
+	{ \
+		pushRegisteredClass(L, value); \
+		lua_getglobal(L, "getmetatable"); \
+		lua_pushvalue(L, -2); \
+		lua_call(L, 1, 1); \
+		if (lua_istable(L, -1)) \
+		{ \
+			lua_pop(L, 1); \
+		} \
+		else \
+		{ \
+			lua_pop(L, 1); \
+			lua_getglobal(L, "ObjectOrientedParadigm"); \
+			lua_getfield(L, -1, "initializers_PRIVATE"); \
+			lua_replace(L, -2); \
+			lua_getfield(L, -1, #CLASS ); \
+			lua_replace(L, -2); \
+			lua_pushvalue(L, -2); \
+			lua_call(L, 1, 0); \
+		} \
+		return 1; \
+	} 
+// #define DEFINE_LUA_PUSH_FUNCTION(CLASS) 
 
 /**
 \def DEFINE_LUA_CLASS_NOCTOR
@@ -326,7 +372,17 @@ or the same if it has no parent class
 		LUA_CLASS__setmetatable_USERDATA \
 		LUA_##TYPE##__tostring_AUTO(CLASS) 
 
+/**
+empty for now, but makes things easier
+*/
 #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
+// #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
+
+/**
+empty for now, but makes things easier
+*/
+#define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
+// #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
 /** 
 \def DEFINE_LUA_LIBRARY
@@ -528,8 +584,7 @@ via ObjectOrientedParadgim.lua.
 \param SuperClass with no delimiters, the parent class of the LuaExtendable,
 or the same if it has no parent class
 
-\todo investigate why this doesn't need nilLoadedStatus()
-- answer: called in declareLuaClass
+calls nilLoadedStatus() in declareLuaClass
 
 \note compile-time directive
 \note highly recommended to follow any form of DEFINE_LUA_LUAEXTENDABLE
@@ -670,6 +725,9 @@ behavior is undefined
 
 /** @} */
 
+namespace lua_extension 
+{
+
 /**
 \interface LuaExtendable
 Implementing this interface, and defining the methods via the macros above
@@ -678,6 +736,7 @@ easiest way to expose a class and all of it's methods to %Lua.
 \warning The thread safety of this class is not guaranteed!
 \ingroup LuaExtension
 */
+
 class LuaExtendable 
 {
 public:
