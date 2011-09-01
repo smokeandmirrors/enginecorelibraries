@@ -66,30 +66,18 @@ Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	YES
 
-
-\todo break up all of the declaration options into
-separate groups:
-LuaExtendable 
-Class
-
-times
-
-Proxy
-Meta
-NoCtor , etc.
-
 \todo investigate how much library sharing can happen
 with LuaExtendable, probably a lot less memory in Lua
 can be taken up that way.  There is obviously less
 code bloat.
 
-\todo check the extinsible library stuff
-make sure that is working
-
 \todo document these in terms of the methods required by 
 the ObjectOrientedParadigm
 
+\todo declare/define enums
+
 */
+
 #include <typeinfo>
 #include "LuaBuild.h"
 /**
@@ -266,12 +254,12 @@ or the same if it has no parent class
 */
 #define DEFINE_LUA_CLASS(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
-		LUA_CLASS__isnewindexable_FALSE \
-		LUA_CLASS__new_AUTO(CLASS) \
-		LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-		LUA_CLASS__setmetatable_USERDATA \
-		LUA_##TYPE##__tostring_AUTO(CLASS)  
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
 // #define DEFINE_LUA_CLASS 
 
 #define DEFINE_LUA_CLASS_AUTO_METAMETHODS(CLASS) \
@@ -307,12 +295,12 @@ or the same if it has no parent class
 */
 #define DEFINE_LUA_CLASS_BY_PROXY(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_##TYPE##__gc_DESTRUCTOR(CLASS) \
-		LUA_CLASS__isExtendableByProxy \
-		LUA_CLASS__isnewindexable_TRUE \
-		LUA_CLASS__new_AUTO(CLASS) \
-		LUA_CLASS__setmetatable_PROXY \
-		LUA_##TYPE##__tostring_AUTO(CLASS) 
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isExtendableByProxy \
+		LUA_ENTRY_CLASS__isnewindexable_TRUE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_PROXY \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 // #define DEFINE_LUA_CLASS_BY_PROXY
 
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
@@ -322,6 +310,16 @@ or the same if it has no parent class
 		OPEN_LUA_LIB(CLASS) \
 	// #define_LUA_CLASS
 
+/**
+\note when pushing an object into %Lua, it might not be because the 
+object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this
+case, if the class has a extra methods defined in %Lua, especially a 'construct'
+method, that %Lua only properties of the object must be initialized the first
+time the object is pushed into %Lua
+
+\warning when called at this time (somewhere NOT from a new() call) NO ARGUMENTS WILL 
+BE PASSED IN TO THE FUNCTION
+*/
 #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) \
 	sint lua_extension::push(lua_State* L, CLASS * value) \
 	{ \
@@ -348,8 +346,16 @@ or the same if it has no parent class
 	} 
 // #define DEFINE_LUA_PUSH_FUNCTION(CLASS) 
 
+#define DEFINE_LUA_CLASS_NO_CTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
+
 /**
-\def DEFINE_LUA_CLASS_NOCTOR
+\def DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR
 Define a %Lua library around a class, so that instances of the 
 controlled in %Lua. This also exposes simple userdata pointers with all 
 associated C++ and Lua methods, but it doesn't create any ability to added 
@@ -365,12 +371,12 @@ or the same if it has no parent class
 \note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
 \note adds a __tostring, calls toString defined by the LuaExtendable
 */
-#define DEFINE_LUA_CLASS_NOCTOR(TYPE, CLASS, SUPER_CLASS) \
+#define DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_CLASS__isnewindexable_FALSE \
-		LUA_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-		LUA_CLASS__setmetatable_USERDATA \
-		LUA_##TYPE##__tostring_AUTO(CLASS) 
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 
 /**
 empty for now, but makes things easier
@@ -624,31 +630,31 @@ the require() function.
 // #define END_LUA_LIBRARY_EXTENSIBLE
 
 /** \todo name these all to LUA_ENTRY_CLASS<> */
-#define LUA_CLASS__gc_DESTRUCTOR(CLASS) \
+#define LUA_ENTRY_CLASS__gc_DESTRUCTOR(CLASS) \
 	LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
 
-#define LUA_CLASS__isExtendableByProxy \
+#define LUA_ENTRY_CLASS__isExtendableByProxy \
 	LUA_NAMED_ENTRY("__isExtendableByProxy", lua_extension::pushTrue) 
 
-#define LUA_CLASS__isnewindexable_TRUE \
+#define LUA_ENTRY_CLASS__isnewindexable_TRUE \
 	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushTrue) 
 
-#define LUA_CLASS__isnewindexable_FALSE \
+#define LUA_ENTRY_CLASS__isnewindexable_FALSE \
 	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) 
 
-#define LUA_CLASS__new_AUTO(CLASS) \
+#define LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__new", lua_extension::__new<##CLASS##>) 
 
-#define LUA_CLASS__newindex_ERROR_AUTO(CLASS) \
+#define LUA_ENTRY_CLASS__newindex_ERROR_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__newindex", lua_library_##CLASS##::__newindexError##CLASS) 
 
-#define LUA_CLASS__setmetatable_PROXY \
+#define LUA_ENTRY_CLASS__setmetatable_PROXY \
 	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setProxyMetatable) 
 
-#define LUA_CLASS__setmetatable_USERDATA \
+#define LUA_ENTRY_CLASS__setmetatable_USERDATA \
 	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
 
-#define LUA_CLASS__tostring_AUTO(CLASS) \
+#define LUA_ENTRY_CLASS__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", __tostring##CLASS)
 
 /** 
@@ -661,13 +667,13 @@ add a lua method to a definition by the same name
 	{(#function), (function)}, 
 
 // #define LUA_ENTRY
-#define LUA_EXTENDABLE__gc_DESTRUCTOR(CLASS) \
+#define LUA_ENTRY_EXTENDABLE__gc_DESTRUCTOR(CLASS) \
 	LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod)
 
-#define LUA_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
+#define LUA_ENTRY_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) 
 
-#define LUA_EXTENDABLE__tostring_AUTO(CLASS) \
+#define LUA_ENTRY_EXTENDABLE__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
 
 /**
@@ -720,7 +726,7 @@ behavior is undefined
 \param module of the library without string delimiters
 */
 #define REGISTER_LUA_LIBRARY(lua_object_ptr, module) \
-	lua_object_ptr->openLibrary(lua_library_##module::key)		
+	lua_object_ptr->openLibrary(lua_library_##module::key);		
 // #define REGISTER_LUA_LIBRARY
 
 /** @} */

@@ -98,7 +98,7 @@ template<> inline sint to<sint>(lua_State* L, sint index)
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
-	return static_cast<sint>(lua_tonumber(L, index));
+	return static_cast<sint>(lua_tointeger(L, index));
 }
 
 template<> inline uint to<uint>(lua_State* L, sint index)
@@ -111,7 +111,7 @@ template<> inline uint to<uint>(lua_State* L, sint index)
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "number", actual); 
 	} 
 #endif//ARGUMENT_ERRORS 
-	return static_cast<uint>(lua_tonumber(L, index));
+	return static_cast<uint>(lua_tointeger(L, index));
 }
 
 template<> inline sreal to<sreal>(lua_State* L, sint index)
@@ -209,13 +209,13 @@ inline sint push(lua_State* L, bool value)
 
 inline sint push(lua_State* L, sint value)
 {
-	lua_pushinteger (L, static_cast<lua_Integer>(value));
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
 	return 1;
 }
 
 inline sint push(lua_State* L, uint value)
 {
-	lua_pushinteger (L, static_cast<lua_Integer>(value));
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
 	return 1;
 }
 
@@ -243,8 +243,6 @@ object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this
 case, if the class has a extra methods defined in %Lua, especially a 'construct'
 method, that %Lua only properties of the object must be initialized the first
 time the object is pushed into %Lua
-
-\todo the "else" of this statement needs to be written for non-lua extendables...gack.
 */
 sint push(lua_State* L, LuaExtendable* value);
 

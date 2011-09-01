@@ -63,10 +63,10 @@ namespace lua_library_Vector2
 	static const luaL_reg Vector2_library[] = 
 	{
 		LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<Vector2>)
-		LUA_CLASS__isnewindexable_FALSE
-		LUA_CLASS__new_AUTO(Vector2)
-		LUA_CLASS__setmetatable_USERDATA
-		LUA_CLASS__tostring_AUTO(Vector2)
+		LUA_ENTRY_CLASS__isnewindexable_FALSE
+		LUA_ENTRY_CLASS__new_AUTO(Vector2)
+		LUA_ENTRY_CLASS__setmetatable_USERDATA
+		LUA_ENTRY_CLASS__tostring_AUTO(Vector2)
 		LUA_NAMED_ENTRY("__index", __indexVector2)
 		LUA_NAMED_ENTRY("__newindex", __newindexVector2)
 		LUA_NAMED_ENTRY("add", (return0Param1<Vector2, const Vector2&, &Vector2::add>))
@@ -292,14 +292,14 @@ namespace lua_library_Vector3
 	static const luaL_reg Vector3_library[] = 
 	{
 		LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<Vector3>)
-		LUA_CLASS__isnewindexable_FALSE
-		LUA_CLASS__new_AUTO(Vector3)
-		LUA_CLASS__setmetatable_USERDATA
-		LUA_CLASS__tostring_AUTO(Vector3)
+		LUA_ENTRY_CLASS__isnewindexable_FALSE
+		LUA_ENTRY_CLASS__new_AUTO(Vector3)
+		LUA_ENTRY_CLASS__setmetatable_USERDATA
+		LUA_ENTRY_CLASS__tostring_AUTO(Vector3)
 		LUA_NAMED_ENTRY("__index", __indexVector3)
 		LUA_NAMED_ENTRY("__newindex", __newindexVector3)
 		LUA_NAMED_ENTRY("__eq", (return1Param1const<Vector3, bool, const Vector3&, &V3<float>::operator==>))
-		LUA_CLASS__isnewindexable_FALSE
+		LUA_ENTRY_CLASS__isnewindexable_FALSE
 		LUA_ENTRY(		 add)
 		LUA_NAMED_ENTRY("construct", initialize)
 		LUA_ENTRY(		 cross)
@@ -321,9 +321,9 @@ namespace lua_library_Vector3
 		LUA_NAMED_ENTRY("magnitudeXY", (return1Param0const<Vector3, sreal, &V3<float>::magnitudeXY>))
 		LUA_NAMED_ENTRY("magnitudeXYSqr", (return1Param0const<Vector3, sreal, &V3<float>::magnitudeXYSqr>))
 		LUA_ENTRY(		 nearlyEquals)
-		LUA_NAMED_ENTRY("negate", (return0Param0<Vector3, &V3<float>::negate>))
+		LUA_NAMED_ENTRY("negate", (memberReturn0Param0_0<Vector3, &V3<float>::negate>))
 		LUA_NAMED_ENTRY("normalize", (return1Param0<Vector3, sreal, &V3<float>::normalize>))
-		LUA_NAMED_ENTRY("perpendicular", (return0Param0<Vector3, &V3<float>::perpendicular>))
+		LUA_NAMED_ENTRY("perpendicular", (memberReturn0Param0_0<Vector3, &V3<float>::perpendicular>))
 		LUA_ENTRY(		 scale)
 		LUA_NAMED_ENTRY("set", initialize)
 		// slightly higher performance options for Lua
@@ -332,7 +332,7 @@ namespace lua_library_Vector3
 		LUA_NAMED_ENTRY("setEqual", (return0Param1<Vector3, const Vector3&, &V3<float>::set>))
 		LUA_NAMED_ENTRY("setIndex", (return0Param2<Vector3, uint, sreal, &V3<float>::set>))
 		LUA_ENTRY(		 subtract)
-		LUA_NAMED_ENTRY("zero", (return0Param0<Vector3, &V3<float>::zero>))
+		LUA_NAMED_ENTRY("zero", (memberReturn0Param0_0<Vector3, &V3<float>::zero>))
 END_LUA_CLASS(Vector3, Vector3)
 
 #endif//EXTENDED_BY_LUA

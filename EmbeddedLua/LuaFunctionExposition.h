@@ -158,6 +158,8 @@ EFL_GET_ARGS_
 EFL_PUSH_RETS_
 EFL_GET_INSTANCE_ARGS_
 
+\todo optional arguments (should be nearly trivial)
+
 */
 
 #include "Build.h"
@@ -166,17 +168,24 @@ EFL_GET_INSTANCE_ARGS_
 #include "LuaStateInteraction.h"
 #include "TemplateArguments.h"
 
+/*
+static
+member
+const_
+*/
+
+
 namespace lua_extension
 {
 	template<void(* function)(void)> 
-	inline sint staticReturn0Param0(lua_State* L)
+	inline sint staticReturn0Param0_0(lua_State* L)
 	{
 		(*function)();
 		return 0;
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void)>
-	inline sint return0Param0(lua_State* L)
+	inline sint memberReturn0Param0_0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -186,7 +195,7 @@ namespace lua_extension
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void) const>
-	inline sint return0Param0const(lua_State* L)
+	inline sint const_Return0Param0_0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{

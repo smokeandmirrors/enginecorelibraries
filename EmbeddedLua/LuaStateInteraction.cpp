@@ -1,14 +1,16 @@
 #include "LuaStateInteraction.h"
 
 /**
-\note when pushing a LueExtendable into %Lua, it might not be because the 
+\note when pushing an object into %Lua, it might not be because the 
 object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this
 case, if the class has a extra methods defined in %Lua, especially a 'construct'
 method, that %Lua only properties of the object must be initialized the first
 time the object is pushed into %Lua
 
-\todo the "else" of this statement needs to be written for non-lua extendables...gack.
+\warning when called at this time (somewhere NOT from a new() call) NO ARGUMENTS WILL 
+BE PASSED IN TO THE FUNCTION
 */
+
 sint lua_extension::push(lua_State* L, LuaExtendable* value)
 {
 	pushRegisteredClass(L, value);					//s: ud
