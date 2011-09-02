@@ -182,12 +182,12 @@ bool Simple::everCreated = false;
 DECLARE_LUA_LUAEXTENDABLE(Simple);
 
 DEFINE_LUA_CLASS(EXTENDABLE, Simple, Simple)
-	LUA_NAMED_ENTRY("__call", (return1Param0const<Simple, uint, &Simple::getValue>))
-	LUA_NAMED_ENTRY("getOther", (return1Param0const<Simple, Simple*, &Simple::getOther>))
-	LUA_NAMED_ENTRY("getValue", (return1Param0const<Simple, uint, &Simple::getValue>))
-	LUA_NAMED_ENTRY("isSimple", (return1Param0const<Simple, bool, &Simple::isSimple>))
-	LUA_NAMED_ENTRY("reproduce", (return1Param0const<Simple, Simple*, &Simple::reproduce>))
-	LUA_NAMED_ENTRY("setOther", (return0Param1<Simple, Simple*, &Simple::setOther>))
+	LUA_NAMED_ENTRY("__call", (const_Return1Param0<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("getOther", (const_Return1Param0<Simple, Simple*, &Simple::getOther>))
+	LUA_NAMED_ENTRY("getValue", (const_Return1Param0<Simple, uint, &Simple::getValue>))
+	LUA_NAMED_ENTRY("isSimple", (const_Return1Param0<Simple, bool, &Simple::isSimple>))
+	LUA_NAMED_ENTRY("reproduce", (const_Return1Param0<Simple, Simple*, &Simple::reproduce>))
+	LUA_NAMED_ENTRY("setOther", (memberReturn0Param1<Simple, Simple*, &Simple::setOther>))
 END_LUA_CLASS(Simple, Simple)
 
 
@@ -263,7 +263,7 @@ LUA_FUNC(getUnexposed)
 }
 
 DEFINE_LUA_CLASS(EXTENDABLE, Derived, Simple)
-	LUA_NAMED_ENTRY("getDerivation", (return1Param0const<Derived, uint, &Derived::getDerivation>))
+	LUA_NAMED_ENTRY("getDerivation", (const_Return1Param0<Derived, uint, &Derived::getDerivation>))
 	LUA_ENTRY(getUnexposed)
 END_LUA_CLASS(Derived, Simple)
 
@@ -346,9 +346,9 @@ LUA_FUNC(__call)
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Grandparent, Grandparent)
 	LUA_ENTRY(__call) 
-	LUA_NAMED_ENTRY("getFamilyName",	(return1Param0const<Grandparent, const schar*, &Grandparent::getFamilyName>))
-	LUA_NAMED_ENTRY("getTitle",			(return1Param0const<Grandparent, const schar*, &Grandparent::getTitle>))
-	LUA_NAMED_ENTRY("__eq",				(return1Param1const<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+	LUA_NAMED_ENTRY("getFamilyName",	(const_Return1Param0<Grandparent, const schar*, &Grandparent::getFamilyName>))
+	LUA_NAMED_ENTRY("getTitle",			(const_Return1Param0<Grandparent, const schar*, &Grandparent::getTitle>))
+	LUA_NAMED_ENTRY("__eq",				(const_Return1Param1<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 END_LUA_CLASS(Grandparent, Grandparent)
 
 /**
@@ -375,9 +375,9 @@ private:
 DECLARE_LUA_LUAEXTENDABLE(Parent);
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Parent, Grandparent)
-LUA_NAMED_ENTRY("getGrandparent",		(return1Param0const<Parent, Grandparent*, &Parent::getGrandparent>))
-LUA_NAMED_ENTRY("getGrandparentName",	(return1Param0const<Parent, const schar*, &Parent::getGrandparentName>))
-LUA_NAMED_ENTRY("setGrandparent",		(return0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
+LUA_NAMED_ENTRY("getGrandparent",		(const_Return1Param0<Parent, Grandparent*, &Parent::getGrandparent>))
+LUA_NAMED_ENTRY("getGrandparentName",	(const_Return1Param0<Parent, const schar*, &Parent::getGrandparentName>))
+LUA_NAMED_ENTRY("setGrandparent",		(memberReturn0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
 END_LUA_CLASS(Parent, Grandparent) 
 
 /**
@@ -413,9 +413,9 @@ DECLARE_LUA_LUAEXTENDABLE(Child);
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Child, Parent)
 	LUA_NAMED_ENTRY("get",				(staticReturn1Param0<Child*, &Child::get>))
-	LUA_NAMED_ENTRY("getParent",		(return1Param0const<Child, Parent*, &Child::getParent>))
-	LUA_NAMED_ENTRY("getParentName",	(return1Param0const<Child, const schar*, &Child::getParentName>))
-	LUA_NAMED_ENTRY("setParent",		(return0Param1<Child, Parent*, &Child::setParent>))
+	LUA_NAMED_ENTRY("getParent",		(const_Return1Param0<Child, Parent*, &Child::getParent>))
+	LUA_NAMED_ENTRY("getParentName",	(const_Return1Param0<Child, const schar*, &Child::getParentName>))
+	LUA_NAMED_ENTRY("setParent",		(memberReturn0Param1<Child, Parent*, &Child::setParent>))
 END_LUA_CLASS(Child, Parent)
 
 // END PROXY

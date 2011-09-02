@@ -71,10 +71,10 @@ inline sint return5Param5(lua_State* L);
 //////////////////////////////////////////////////////////////////////////
 // class member functions: 
 template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1)> 
-inline sint return0Param1(lua_State* L);
+inline sint memberReturn0Param1(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void)>
-inline sint return1Param0(lua_State* L);
+inline sint memberReturn1Param0(lua_State* L);
 
 // ... 
 
@@ -97,7 +97,7 @@ template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1) const>
 inline sint return0Param1const(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void) const>
-inline sint return1Param0const(lua_State* L);
+inline sint const_Return1Param0(lua_State* L);
 
 // ... 
 
@@ -123,7 +123,7 @@ sreal Vector3::dot(const Vector3& v) const; // member function, 1 return value, 
 
 wrapper:
 \code
-return1Param1const<Vector3, sreal, const Vector3&, &Vector3::dot>
+const_Return1Param1<Vector3, sreal, const Vector3&, &Vector3::dot>
 \endcode
 
 %Lua call:
@@ -148,7 +148,6 @@ make sure that the template arguments macros are present in
 TemplateArguments.h:
 CW_TEMPLATE_ARGS_RETS_
 CW_TEMPLATE_RETURN_SIGNATURE_
-CW_DECLARE_FUNCTION_ARGS_
 CW_DECLARE_RETS_
 CW_ASSIGN_RETS_
 CW_CALL_RETS_
@@ -168,24 +167,17 @@ EFL_GET_INSTANCE_ARGS_
 #include "LuaStateInteraction.h"
 #include "TemplateArguments.h"
 
-/*
-static
-member
-const_
-*/
-
-
 namespace lua_extension
 {
 	template<void(* function)(void)> 
-	inline sint staticReturn0Param0_0(lua_State* L)
+	inline sint staticReturn0Param0(lua_State* L)
 	{
 		(*function)();
 		return 0;
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void)>
-	inline sint memberReturn0Param0_0(lua_State* L)
+	inline sint memberReturn0Param0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -195,7 +187,7 @@ namespace lua_extension
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void) const>
-	inline sint const_Return0Param0_0(lua_State* L)
+	inline sint const_Return0Param0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -240,74 +232,74 @@ namespace lua_extension
 	template<typename CLASS
 
 // end the static function template declaration
-#define EFL_END_STATIC_TEMPLATE_ARGS(num_rets, num_args) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
+#define EFL_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
 
 // end the class member function template declaration
-#define EFL_END_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) >
+#define EFL_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
 
 // end the class const member function template declaration
-#define EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##num_rets (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##num_rets##_ARGS_##num_args) const>
+#define EFL_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) const>
 
 // and implement the class member function
-#define EFL_CLASS_IMPLEMENTATION(num_rets, num_args) \
+#define EFL_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS) \
 	{ \
-		if (CLASS* object = EFL_GET_INSTANCE_ARGS_##num_args) \
+		if (CLASS* object = EFL_GET_INSTANCE_ARGS_##NUM_ARGS) \
 		{ \
 			sint pushed(0); \
-			CW_DECLARE_RETS_##num_rets \
-			EFL_GET_ARGS_##num_args \
-			CW_ASSIGN_RETS_##num_rets (object->*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
-			EFL_PUSH_RETS_##num_rets \
+			CW_DECLARE_RETS_##NUM_RETS \
+			EFL_GET_ARGS_##NUM_ARGS \
+			CW_ASSIGN_RETS_##NUM_RETS (object->*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
+			EFL_PUSH_RETS_##NUM_RETS \
 			return pushed; \
 		} \
 		return 0; \
 	}
 
 // declare and implement the template non-member static function
-#define EFL_STATIC(num_rets, num_args) \
-	inline sint staticReturn##num_rets##Param##num_args##(lua_State* L) \
+#define EFL_STATIC(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(staticReturn##NUM_RETS##Param##NUM_ARGS) \
 	{ \
 		sint pushed(0); \
-		CW_DECLARE_RETS_##num_rets \
-		EFL_GET_ARGS_##num_args \
-		CW_ASSIGN_RETS_##num_rets (*function)(CW_CALL_RETS_##num_rets##_ARGS_##num_args); \
-		EFL_PUSH_RETS_##num_rets \
+		CW_DECLARE_RETS_##NUM_RETS \
+		EFL_GET_ARGS_##NUM_ARGS \
+		CW_ASSIGN_RETS_##NUM_RETS (*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
+		EFL_PUSH_RETS_##NUM_RETS \
 		return pushed; \
 	}
 
 // declare and implement the class member function
-#define EFL_CLASS(num_rets, num_args) \
-	inline sint return##num_rets##Param##num_args##(lua_State* L) \
-	EFL_CLASS_IMPLEMENTATION(num_rets, num_args)
+#define EFL_CLASS(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(memberReturn##NUM_RETS##Param##NUM_ARGS) \
+	EFL_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
 
 // declare and implement the class const member function
-#define EFL_CONST_CLASS(num_rets, num_args) \
-	inline sint return##num_rets##Param##num_args##const(lua_State* L) \
-	EFL_CLASS_IMPLEMENTATION(num_rets, num_args)
+#define EFL_CONST_CLASS(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(const_Return##NUM_RETS##Param##NUM_ARGS) \
+	EFL_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
 
 // define a static function with the specified number of arguments
-#define EFL_GENERATE_STATIC_TEMPLATE(num_rets, num_args) \
+#define EFL_GENERATE_STATIC_TEMPLATE(NUM_RETS, NUM_ARGS) \
 	EFL_BEGIN_STATIC_TEMPLATE_ARGS \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
-	EFL_END_STATIC_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_STATIC(num_rets, num_args)
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EFL_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EFL_STATIC(NUM_RETS, NUM_ARGS)
 
 // define a class member function with the specified number of arguments
-#define EFL_GENERATE_CLASS_TEMPLATE(num_rets, num_args) \
+#define EFL_GENERATE_CLASS_TEMPLATE(NUM_RETS, NUM_ARGS) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
-	EFL_END_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_CLASS(num_rets, num_args)
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EFL_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EFL_CLASS(NUM_RETS, NUM_ARGS)
 
 // define a class const member function with the specified number of arguments
-#define EFL_GENERATE_CLASS_CONST_TEMPLATE(num_rets, num_args) \
+#define EFL_GENERATE_CLASS_CONST_TEMPLATE(NUM_RETS, NUM_ARGS) \
 	EFL_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##num_rets##_ARGS_##num_args, \
-	EFL_END_CONST_CLASS_TEMPLATE_ARGS(num_rets, num_args) \
-	EFL_CONST_CLASS(num_rets, num_args)
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EFL_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EFL_CONST_CLASS(NUM_RETS, NUM_ARGS)
 
 // define all argument #, parameter # functions of the generation_macro
 #define EFL_GENERATE_ALL(generation_macro) \

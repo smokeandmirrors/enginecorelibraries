@@ -111,6 +111,11 @@ void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 	//s: 
 }
 
+sint doNothing(lua_State* L)
+{
+	return 0;
+}
+
 inline bool isInstanceBeingRefreshed(lua_State* L)
 {	//s: userdata, lua_class_mt
 	if (lua_getmetatable(L, -2))

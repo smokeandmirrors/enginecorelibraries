@@ -860,6 +860,12 @@ void
 	declareLuaClass(lua_State* L, const schar* derived, const schar* super);
 
 /**
+a short-cut to some code writing
+*/
+sint 
+	doNothing(lua_State* L);
+
+/**
 print the string to the %Lua output
 \ingroup LuaExtension
 */
@@ -896,9 +902,117 @@ since you can't call setmetatable on a userdata value in %Lua.
 */
 sint
 	setUserdataMetatable(lua_State* L);
-
 } // namespace lua_extension 
 
 /** @} */
 
+/*
+\todo if ever desired, finish looking into this:
+
+
+struct AllPublic
+{
+sint 
+one;
+bool 
+two;
+sreal 
+three;
+}
+
+DECLARE_LUA_CLASS(AllPublic);
+
+LUA_FUNC(AllPublic__index)
+{
+const schar* k = to<const schar*>(L, -1);
+const AllPublic& t = to<const AllPublic&>(L, -2);
+
+if (!strcmp(k,"one")) return push(L, t.one);
+if (!strcmp(k,"two")) return push(L, t.two);
+if (!strcmp(k,"three")) return push(L, t.three);
+
+lua_getglobal(L, "getClass");	//s: getClass
+push(L, "AllPublic");			//s: getClass, "AllPublic"
+lua_call(L, 1, 1);				//s: AllPublic
+lua_getfield(L, -1, key);		//s: AllPublic[key]
+return 1;
+}
+
+LUA_FUNC(AllPublic__newindex)
+{
+const schar* k = to<const schar*>(L, -2);
+const AllPublic& t = to<const AllPublic&>(L, -3);
+
+if (!strcmp(k,"one")) { t.one = to<sint>(L, -1); return 0; }
+if (!strcmp(k,"two")) { t.two = to<bool>(L, -1); return 0; }
+if (!strcmp(k,"three")) { t.three = to<sreal>(L, -1); return 0; }
+
+return luaL_error(L, "ERROR! nonassignable index %s for AllPublic", k);
+}
+
+DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
+OPEN_LUA_NS(CLASS) \
+DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
+OPEN_LUA_LIB(CLASS)
+LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+LUA_ENTRY_CLASS__isnewindexable_FALSE \
+LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+LUA_ENTRY_CLASS__setmetatable_USERDATA \
+LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
+END_LUA_CLASS(AllPublic, AllPublic)
+
+
+struct AllPublic
+{
+sint 
+one;
+bool 
+two;
+sreal 
+three;
+};
+
+DECLARE_LUA_CLASS(AllPublic);
+
+LUA_FUNC(AllPublic_getone)
+{
+return push(L, to<const AllPublic&>(L, -1).one);
+}
+LUA_FUNC(AllPublic_setone)
+{
+to<AllPublic&>(L, -2).one = to<sint>(L, -1);
+return 0;
+}
+
+LUA_FUNC(AllPublic_gettwo)
+{
+return push(L, to<const AllPublic&>(L, -1).two);
+}
+LUA_FUNC(AllPublic_settwo)
+{
+to<AllPublic&>(L, -2).two = to<bool>(L, -1);
+return 0;
+}
+
+LUA_FUNC(AllPublic_getthree)
+{
+return push(L, to<const AllPublic&>(L, -1).three);
+}
+LUA_FUNC(AllPublic_setthree)
+{
+to<AllPublic&>(L, -2).three = to<sreal>(L, -1);
+return 0;
+}
+
+DEFINE_LUA_CLASS(CLASS, AllPublic, AllPublic)
+LUA_NAMED_ENTRY("getOne", AllPublic_getone)
+LUA_NAMED_ENTRY("setOne", AllPublic_setone)
+END_LUA_CLASS(AllPublic, AllPublic)
+
+
+*/
+
+
 #endif//LUAEXTENSIBILITY_H
+
