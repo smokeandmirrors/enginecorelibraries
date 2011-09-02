@@ -104,10 +104,11 @@ to %Lua and the %Lua C API.
 #define CLOSE_LUA_LIB(NAME) \
 		LUA_FINAL_ENTRY \
 	};	/* end function list */ 
+// #define CLOSE_LUA_LIB
 
 #define CLOSE_LUA_NS(NAME) \
 	}; // end namespace lua_library_##name
-
+// #define CLOSE_LUA_NS
 
 /**
 \def DECLARE_LUA_CLASS
@@ -118,10 +119,7 @@ Declares a library around a POD class
 	DECLARE_LUA_LIBRARY(CLASS) \
 	DECLARE_LUA_PUSH_FUNCTION(CLASS) \
 	DEFINE_TO_CLASS_FUNCTIONS(CLASS) 
-	// #define DECLARE_LUA_LUAEXTENDABLE
-
-	// DEFINE_LUA_PUSH_FUNCTION(CLASS) \
-
+// #define DECLARE_LUA_LUAEXTENDABLE
 
 /**
 \def DECLARE_LUA_CLASS_NS
@@ -132,10 +130,7 @@ Declares a library around a POD class
 	DECLARE_LUA_LIBRARY(CLASS)	\
 	DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
 	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE##::##CLASS)
-	// #define DECLARE_LUA_CLASS_NS
-
-	// 	DEFINE_LUA_PUSH_FUNCTION_FROM_NS(NAMESPACE, CLASS) \
-
+// #define DECLARE_LUA_CLASS_NS
 
 /** 
 \def DECLARE_LUA_LIBRARY
@@ -205,6 +200,14 @@ the LuaExtendable interface.
 	}
 // #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
 
+#define DEFINE_CONDITIONAL__index_ENTRY(INDEX) \
+	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
+// #define DEFINE_CONDITIONAL__index_ENTRY
+
+#define DEFINE_CONDITIONAL__newindex_ENTRY(INDEX, TYPE) \
+	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
+// #define DEFINE_CONDITIONAL__index_ENTRY
+
 #if DEBUG 
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
@@ -231,7 +234,6 @@ the LuaExtendable interface.
 		return 1; \
 	}	
 // #define DEFINE_LUA_CLASS__tostring
-
 
 /**
 \def DEFINE_LUA_CLASS
@@ -303,12 +305,62 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 // #define DEFINE_LUA_CLASS_BY_PROXY
 
+#define DEFINE_LUA_NO_CLASS_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
+// #define DEFINE_LUA_NO_CLASS_NO_INDEX
+
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
 	OPEN_LUA_NS(CLASS) \
 		DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
-		OPEN_LUA_LIB(CLASS) \
-	// #define_LUA_CLASS
+		OPEN_LUA_LIB(CLASS) 
+// #define DEFINE_LUA_CLASS_LIB
+
+#define DEFINE_LUA_CLASS_LIB_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
+	OPEN_LUA_NS(CLASS) \
+		DEFINE_LUA_##TYPE##__tostring(CLASS) \
+		OPEN_LUA_LIB(CLASS) 
+// #define DEFINE_LUA_CLASS_LIB_NO_INDEX
+
+#define DEFINE_LUA_CLASS_NO_CTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
+// #define DEFINE_LUA_CLASS_NO_CTOR
+
+/**
+\def DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR
+Define a %Lua library around a class, so that instances of the 
+controlled in %Lua. This also exposes simple userdata pointers with all 
+associated C++ and Lua methods, but it doesn't create any ability to added 
+new %Lua fields.  It also doesn't supply any constructor or destructor exposure
+to %Lua This could be used for objects like singletons.
+\param CLASS the name of the CLASS being exposed, with no delimiters
+\param SuperClass with no delimiters, the parent class of the LuaExtendable,
+or the same if it has no parent class
+\note compile-time directive
+\note highly recommended to precede an END_LUA_CLASS
+\note adds a __isnewindexable, returns false
+\note adds a __newindex, throws a %Lua error
+\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
+\note adds a __tostring, calls toString defined by the LuaExtendable
+*/
+#define DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
+
 
 /**
 \note when pushing an object into %Lua, it might not be because the 
@@ -346,37 +398,11 @@ BE PASSED IN TO THE FUNCTION
 	} 
 // #define DEFINE_LUA_PUSH_FUNCTION(CLASS) 
 
-#define DEFINE_LUA_CLASS_NO_CTOR(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
-		LUA_ENTRY_CLASS__isnewindexable_FALSE \
-		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-		LUA_ENTRY_CLASS__setmetatable_USERDATA \
-		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
-
 /**
-\def DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR
-Define a %Lua library around a class, so that instances of the 
-controlled in %Lua. This also exposes simple userdata pointers with all 
-associated C++ and Lua methods, but it doesn't create any ability to added 
-new %Lua fields.  It also doesn't supply any constructor or destructor exposure
-to %Lua This could be used for objects like singletons.
-\param CLASS the name of the CLASS being exposed, with no delimiters
-\param SuperClass with no delimiters, the parent class of the LuaExtendable,
-or the same if it has no parent class
-\note compile-time directive
-\note highly recommended to precede an END_LUA_CLASS
-\note adds a __isnewindexable, returns false
-\note adds a __newindex, throws a %Lua error
-\note adds a __setmetatable, calls setMetatable defined by the LuaExtendable
-\note adds a __tostring, calls toString defined by the LuaExtendable
+empty for now, but makes things easier
 */
-#define DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_ENTRY_CLASS__isnewindexable_FALSE \
-		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-		LUA_ENTRY_CLASS__setmetatable_USERDATA \
-		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
+#define DEFINE_LUA_EXTENDABLE__tostring(CLASS)
+// #define DEFINE_LUA_EXTENDABLE__tostring
 
 /**
 empty for now, but makes things easier
@@ -389,6 +415,21 @@ empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 // #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
+
+
+#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
+	LUA_FUNC(##CLASS##__index) \
+	{ \
+		const schar* k = to<const schar*>(L, -1); \
+		const AllPublic& t = to<const AllPublic&>(L, -2); 
+// #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS
+
+#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
+	LUA_FUNC(##CLASS##__newindex) \
+	{ \
+	const schar* k = to<const schar*>(L, -2); \
+	CLASS& t = to<CLASS&>(L, -3); 
+// #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS
 
 /** 
 \def DEFINE_LUA_LIBRARY
@@ -600,6 +641,20 @@ calls nilLoadedStatus() in declareLuaClass
 		DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
 	CLOSE_LUA_NS(CLASS)
 // #define END_LUA_CLASS(CLASS, SUPER_CLASS) 
+
+#define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
+		lua_getglobal(L, "getClass");	/*s: getClass */ \
+		push(L, #CLASS);				/*s: getClass, "CLASS" */ \
+		lua_call(L, 1, 1);				/*s: AllPublic */ \
+		lua_getfield(L, -1, k);			/*s: AllPublic[k] */ \
+		return 1; \
+	} 
+// #define END_LUA_FUNC__index_PUBLIC_MEMBERS	
+
+#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
+		return luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
+	}
+// #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS	
 
 /** 
 \def END_LUA_LIBRARY
@@ -858,12 +913,6 @@ makes sure that the class is declared declared in the lua OOP system.
 */
 void				
 	declareLuaClass(lua_State* L, const schar* derived, const schar* super);
-
-/**
-a short-cut to some code writing
-*/
-sint 
-	doNothing(lua_State* L);
 
 /**
 print the string to the %Lua output

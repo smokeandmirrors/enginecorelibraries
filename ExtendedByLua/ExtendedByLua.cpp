@@ -56,53 +56,27 @@ struct AllPublic
 
 	sint method(void) const { return 17; }
 };
+// #define DEFINE_LUA_NO_INDEX_METHODS(CLASS, TYPE, SUPER_CLASS) \
 
 DECLARE_LUA_CLASS(AllPublic);
 
-LUA_FUNC(AllPublic__index)
-{
-	const schar* k = to<const schar*>(L, -1);
-	const AllPublic& t = to<const AllPublic&>(L, -2);
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
+	DEFINE_CONDITIONAL__index_ENTRY(one)
+	DEFINE_CONDITIONAL__index_ENTRY(two)
+	DEFINE_CONDITIONAL__index_ENTRY(three)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
 
-	if (!strcmp(k,"one")) return push(L, t.one);
-	if (!strcmp(k,"two")) return push(L, t.two);
-	if (!strcmp(k,"three")) return push(L, t.three);
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
+	DEFINE_CONDITIONAL__newindex_ENTRY(one, sint)
+	DEFINE_CONDITIONAL__newindex_ENTRY(two, bool)
+	DEFINE_CONDITIONAL__newindex_ENTRY(three, sreal)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
 
-	lua_getglobal(L, "getClass");	//s: getClass
-	push(L, "AllPublic");			//s: getClass, "AllPublic"
-	lua_call(L, 1, 1);				//s: AllPublic
-	lua_getfield(L, -1, k);		//s: AllPublic[k]
-	return 1;
-}
-
-LUA_FUNC(AllPublic__newindex)
-{
-	const schar* k = to<const schar*>(L, -2);
-	AllPublic& t = to<AllPublic&>(L, -3);
-
-	if (!strcmp(k,"one")) { t.one = to<sint>(L, -1); return 0; }
-	if (!strcmp(k,"two")) { t.two = to<bool>(L, -1); return 0; }
-	if (!strcmp(k,"three")) { t.three = to<sreal>(L, -1); return 0; }
-
-	return luaL_error(L, "ERROR! nonassignable index %s for AllPublic", k);
-}
-
-// DEFINE_LUA_NO_INDEX_METHODS(CLASS, TYPE, SUPER_CLASS)
-DEFINE_LUA_CLASS_PUSH_FUNCTION(AllPublic) 
-	OPEN_LUA_NS(AllPublic) 
-		DEFINE_LUA_CLASS_AUTO_METAMETHODS(AllPublic) 
-		OPEN_LUA_LIB(AllPublic)
-			// LUA_NAMED_ENTRY("construct", doNothing)
-			LUA_ENTRY_CLASS__gc_DESTRUCTOR(AllPublic) 
-			LUA_ENTRY_CLASS__isnewindexable_FALSE
-			LUA_ENTRY_CLASS__new_AUTO(AllPublic) 
-			LUA_ENTRY_CLASS__setmetatable_USERDATA 
-			LUA_ENTRY_CLASS__tostring_AUTO(AllPublic)
+DEFINE_LUA_NO_CLASS_NO_INDEX(CLASS, AllPublic, AllPublic)
 			LUA_NAMED_ENTRY("__index", AllPublic__index)
 			LUA_NAMED_ENTRY("__newindex", AllPublic__newindex)
 			LUA_NAMED_ENTRY("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
 END_LUA_CLASS(AllPublic, AllPublic)
-
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
