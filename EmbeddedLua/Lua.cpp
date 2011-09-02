@@ -221,16 +221,6 @@ void Lua::openStandardLibraries(void) const
 #if	DEBUG 
 	CONDITIONAL_STANDARD_LIB_OPEN(L, base);
 #endif // DEBUG 
-
-// 	openLibrary(luaopen_base);
-// 	openLibrary(luaopen_math);
-// 	openLibrary(luaopen_package);
-// 	openLibrary(luaopen_string);
-// 	openLibrary(luaopen_table);
-// 	openLibrary(luaopen_os);
-// #if	DEBUG 
-// 	openLibrary(luaopen_debug);
-// #endif // DEBUG 
 }
 
 // \note taken and modified from from lua.c 

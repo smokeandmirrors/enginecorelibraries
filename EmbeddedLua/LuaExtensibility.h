@@ -398,7 +398,16 @@ BE PASSED IN TO THE FUNCTION
 		} \
 		return 1; \
 	} 
-// #define DEFINE_LUA_PUSH_FUNCTION(CLASS) 
+// #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) 
+
+#define DEFINE_LUA_ENUM(ENUM_NAME) \
+	namespace lua_extension \
+	{ \
+		LUA_FUNC(register_##ENUM_NAME##) \
+		{ \
+			lua_newtable(L);					/*s: {} */ \
+			lua_setglobal(L, #ENUM_NAME);		/*s: */ \
+			lua_getglobal(L, #ENUM_NAME);		/*s: ENUM_NAME */ 
 
 /**
 empty for now, but makes things easier
@@ -673,6 +682,14 @@ calls nilLoadedStatus() in declareLuaClass
 	CLOSE_LUA_NS(CLASS)
 // #define END_LUA_CLASS(CLASS, SUPER_CLASS) 
 
+
+#define END_LUA_ENUM \
+			lua_pop(L, 1); /*s:  */ \
+			return 0; \
+		} \
+	} // end namespace lua_extension
+// #define END_LUA_ENUM
+
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
 		lua_getglobal(L, "getClass");	/*s: getClass */ \
 		push(L, #CLASS);				/*s: getClass, "CLASS" */ \
@@ -762,6 +779,12 @@ add a lua method to a definition by the same name
 #define LUA_ENTRY_EXTENDABLE__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
 
+
+#define LUA_ENUM(ENUMERATION) \
+			push(L, ENUMERATION);				/*s: ENUM_NAME, ENUMERATION */ \
+			lua_setfield(L, -2, #ENUMERATION );	/*s: ENUM_NAME */ 
+// #define LUA_ENUM
+
 /**
 the sentinel entry in a lua library
 */
@@ -800,6 +823,10 @@ add a lua method to a definition by a different name
 	namespace lua_library_##NAME \
 	{ 
 
+#define REGISTER_LUA_ENUM(LUA_OBJECT_PTR, ENUM_NAME) \
+	lua_extension::register_##ENUM_NAME##(LUA_OBJECT_PTR->getState());
+// #define REGISTER_LUA_ENUM
+
 /** 
 \def REGISTER_LUA_LIBRARY
 register a library with a lua state 
@@ -811,8 +838,8 @@ behavior is undefined
 \param lua_object_ptr is class Lua, not struct lua_State 
 \param module of the library without string delimiters
 */
-#define REGISTER_LUA_LIBRARY(lua_object_ptr, module) \
-	lua_object_ptr->openLibrary(lua_library_##module::key);		
+#define REGISTER_LUA_LIBRARY(LUA_OBJECT_PTR, MODULE) \
+	LUA_OBJECT_PTR->openLibrary(lua_library_##MODULE::key);		
 // #define REGISTER_LUA_LIBRARY
 
 /** @} */
