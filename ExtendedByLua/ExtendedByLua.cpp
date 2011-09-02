@@ -58,6 +58,24 @@ struct AllPublic
 };
 // #define DEFINE_LUA_NO_INDEX_METHODS(CLASS, TYPE, SUPER_CLASS) \
 
+enum eNumbers
+{
+	One,
+	Two,
+	Three	
+};
+
+typedef enum eDirections
+{
+	Up,
+	Down,
+	Left,
+	Right
+};
+
+DEFINE_TO_ENUM_BOUND(eDirections, Up, Right)
+DEFINE_TO_ENUM(eNumbers)
+
 DECLARE_LUA_CLASS(AllPublic);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
@@ -97,10 +115,19 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		REGISTER_LUA_LIBRARY((&lua), Grandparent2);
 		REGISTER_LUA_LIBRARY((&lua), Parent2);
 		REGISTER_LUA_LIBRARY((&lua), Child2);
-		
 #endif // UNIT_TEST_VERIFICATION
 
 		// get the user file for easier rapid iteration
+
+		lua_State* L = lua.getState();
+		push(L, One);
+		eNumbers en = to<eNumbers>(L, -1);
+		lua_pop(L, 1);
+
+		push(L, Down);
+		eDirections dir = to<eDirections>(L, -1);
+		lua_pop(L, 1);		
+
 		lua.require("User");
 		lua.runConsole();
 	}

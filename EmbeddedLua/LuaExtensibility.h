@@ -200,10 +200,12 @@ the LuaExtendable interface.
 	}
 // #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
 
+/** \todo replace with a string -> offset map */
 #define DEFINE_CONDITIONAL__index_ENTRY(INDEX) \
 	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
 // #define DEFINE_CONDITIONAL__index_ENTRY
 
+/** \todo replace with a string -> offset map */
 #define DEFINE_CONDITIONAL__newindex_ENTRY(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
 // #define DEFINE_CONDITIONAL__index_ENTRY
@@ -531,9 +533,24 @@ This method is ideal for static classes or libraries.
 			} \
 			return **static_cast< CLASS** >(lua_touserdata(L, index)); \
 		} \
-	}
+	} // namespace lua_extension 
 // #define DEFINE_TO_CLASS_FUNCTIONS
-#else
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
+	template<> inline ENUM lua_extension::to< ##ENUM## >(lua_State* L, sint index) \
+	{ \
+		ENUM value = static_cast< ##ENUM## >(to<sint>(L, index)); \
+		if (value > MAX || value < MIN) \
+		{ \
+			luaL_error(L, "argument type error! enum:" #ENUM " must be >= " #MIN ":%d and <= " #MAX ":%d but is %d", MIN, MAX, value); \
+		} \
+		return value; \
+	}
+// #define DEFINE_TO_ENUM_BOUND
+
+#else // #if ARGUMENT_ERRORS
+
 #define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
 	namespace lua_extension \
 	{ \
@@ -553,9 +570,23 @@ This method is ideal for static classes or libraries.
 		{ \
 			return **static_cast<CLASS**>(lua_touserdata(L, index)); \
 		} \
-	}
+	} // namespace lua_extension 
 // #define DEFINE_TO_CLASS_FUNCTIONS
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
+	DEFINE_TO_ENUM(ENUM)		
+// #define DEFINE_TO_ENUM_BOUND
+
 #endif//ARGUMENT_ERRORS
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#define DEFINE_TO_ENUM(ENUM) \
+	template<> inline eNumbers lua_extension::to<##ENUM##>(lua_State* L, sint index) \
+	{ \
+		return static_cast<##ENUM##>(to<sint>(L, index)); \
+	}
+// #define DEFINE_TO_ENUM
 
 /**
 defines functions that can be used to get specific class pointers
