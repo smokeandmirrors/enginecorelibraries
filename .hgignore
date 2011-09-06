@@ -48,3 +48,7 @@ glob:BuildSystem/Release/Scheduling.obj
 glob:BuildSystem/Release/Synchronization.obj
 glob:BuildSystem/Release/Threads.obj
 glob:Mathematics/vsluaplugin_log.txt
+syntax: glob
+BuildSystem/Release/Time.obj
+BuildSystem/Release/Thread.obj
+BuildSystem/Debug/Thread.obj
