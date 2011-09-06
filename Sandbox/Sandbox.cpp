@@ -593,89 +593,89 @@ class Shadows
 
 void onPlay(void)
 {
-	Agent alpha;
-	Movement movement;
-	Attack attack;
-	Defense defense;
-	alpha.add(movement);
-	alpha.add(attack);
-
-	uint movement_ID = movement.getGUID();
-	uint static_movement_ID = Movement::componentGUID;
-	uint attack_ID = attack.getGUID();
-	uint static_attack_ID = Attack::componentGUID;
-	uint defense_ID = defense.getGUID();
-	uint static_defense_ID = Defense::componentGUID;
-
-	uint one = __COUNTER__;
-	uint two = __COUNTER__;
-	uint three = __COUNTER__;
-
-	std::map<type_info, sint> crazytalk;
-	
-	
-	int idone = typeid(Movement).before(typeid(Movement));
-	int MbeforeA = typeid(Movement).before(typeid(Attack));
-	int AbeforeM = typeid(Attack).before(typeid(Movement));
-
-	if (typeid(Movement) == typeid(Attack))
-	{
-		printf("sweet");
-	}
-	else
-	{
-		printf("awesome");
-	}
-
-	assert(alpha.has<Movement>());
-	assert(alpha.has<Attack>());
-	assert(!alpha.has<Defense>());
-	assert(&movement == alpha.get<Movement>());
-	assert(&attack == alpha.get<Attack>());
-	assert(NULL == alpha.get<Defense>());
-	alpha.remove(movement);
-	assert(!alpha.has<Movement>());
-	assert(NULL == alpha.get<Movement>());
-	alpha.remove(attack);
-	assert(!alpha.has<Attack>());
-	assert(NULL == alpha.get<Attack>());
-
-	EngineLoop loop;	
-	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
-	loop.addFrameRequirement(&physics_sych);
-	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
-	loop.addFrameRequirement(&physics_asych);
-	TestRequirement rendering(6, eFR_Rendering, 4);
-	loop.addFrameRequirement(&rendering);
-	TestRequirement lighting(4, eFR_Lighting, 3);
-	loop.addFrameRequirement(&lighting);
-	TestRequirement animation(3, eFR_Animation, 2);
-	loop.addFrameRequirement(&animation);
-	TestRequirement audio(2, eFR_Audio, 4);
-	loop.addFrameRequirement(&audio);
-	TestRequirement events(1, eFR_Events, 0);
-	loop.addFrameRequirement(&events);
-	TestRequirement gameplay(1, eFR_Gameplay, 0);
-	loop.addFrameRequirement(&gameplay);
-	TestRequirement ai(1, eFR_AI, 30);
-	loop.addFrameRequirement(&ai);
-	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
-	loop.addFrameRequirement(&garbage_collection);
-	TestRequirement networking(2, eFR_Networking, 4);
-	loop.addFrameRequirement(&networking);
-	loop.start();
-
-	while (loop.getFrameNumber() < 2)
-	{
-		multithreading::sleep(3000);
-	};
-
-	loop.stop();
-
-	while (multithreading::Scheduler::single().hasAnyWork())
-	{
-		multithreading::sleep(3000);
-	}	
-
-	multithreading::Scheduler::single().destroy();
+// 	Agent alpha;
+// 	Movement movement;
+// 	Attack attack;
+// 	Defense defense;
+// 	alpha.add(movement);
+// 	alpha.add(attack);
+// 
+// 	uint movement_ID = movement.getGUID();
+// 	uint static_movement_ID = Movement::componentGUID;
+// 	uint attack_ID = attack.getGUID();
+// 	uint static_attack_ID = Attack::componentGUID;
+// 	uint defense_ID = defense.getGUID();
+// 	uint static_defense_ID = Defense::componentGUID;
+// 
+// 	uint one = __COUNTER__;
+// 	uint two = __COUNTER__;
+// 	uint three = __COUNTER__;
+// 
+// 	std::map<type_info, sint> crazytalk;
+// 	
+// 	
+// 	int idone = typeid(Movement).before(typeid(Movement));
+// 	int MbeforeA = typeid(Movement).before(typeid(Attack));
+// 	int AbeforeM = typeid(Attack).before(typeid(Movement));
+// 
+// 	if (typeid(Movement) == typeid(Attack))
+// 	{
+// 		printf("sweet");
+// 	}
+// 	else
+// 	{
+// 		printf("awesome");
+// 	}
+// 
+// 	assert(alpha.has<Movement>());
+// 	assert(alpha.has<Attack>());
+// 	assert(!alpha.has<Defense>());
+// 	assert(&movement == alpha.get<Movement>());
+// 	assert(&attack == alpha.get<Attack>());
+// 	assert(NULL == alpha.get<Defense>());
+// 	alpha.remove(movement);
+// 	assert(!alpha.has<Movement>());
+// 	assert(NULL == alpha.get<Movement>());
+// 	alpha.remove(attack);
+// 	assert(!alpha.has<Attack>());
+// 	assert(NULL == alpha.get<Attack>());
+// 
+// 	EngineLoop loop;	
+// 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
+// 	loop.addFrameRequirement(&physics_sych);
+// 	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
+// 	loop.addFrameRequirement(&physics_asych);
+// 	TestRequirement rendering(6, eFR_Rendering, 4);
+// 	loop.addFrameRequirement(&rendering);
+// 	TestRequirement lighting(4, eFR_Lighting, 3);
+// 	loop.addFrameRequirement(&lighting);
+// 	TestRequirement animation(3, eFR_Animation, 2);
+// 	loop.addFrameRequirement(&animation);
+// 	TestRequirement audio(2, eFR_Audio, 4);
+// 	loop.addFrameRequirement(&audio);
+// 	TestRequirement events(1, eFR_Events, 0);
+// 	loop.addFrameRequirement(&events);
+// 	TestRequirement gameplay(1, eFR_Gameplay, 0);
+// 	loop.addFrameRequirement(&gameplay);
+// 	TestRequirement ai(1, eFR_AI, 30);
+// 	loop.addFrameRequirement(&ai);
+// 	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
+// 	loop.addFrameRequirement(&garbage_collection);
+// 	TestRequirement networking(2, eFR_Networking, 4);
+// 	loop.addFrameRequirement(&networking);
+// 	loop.start();
+// 
+// 	while (loop.getFrameNumber() < 2)
+// 	{
+// 		multithreading::sleep(3000);
+// 	};
+// 
+// 	loop.stop();
+// 
+// 	while (multithreading::Scheduler::single().hasAnyWork())
+// 	{
+// 		multithreading::sleep(3000);
+// 	}	
+// 
+// 	multithreading::Scheduler::single().destroy();
 }

@@ -74,8 +74,6 @@ code bloat.
 \todo document these in terms of the methods required by 
 the ObjectOrientedParadigm
 
-\todo declare/define enums
-
 */
 
 #include <typeinfo>
@@ -176,6 +174,9 @@ the LuaExtendable interface.
 	namespace lua_extension \
 	{ \
 		sint push(lua_State* L, CLASS * value); \
+		sint push(lua_State* L, const CLASS * value); \
+		sint push(lua_State* L, CLASS & value); \
+		sint push(lua_State* L, const CLASS & value); \
 	} 
 // #define DECLARE_LUA_PUSH_FUNCTION
 
@@ -183,6 +184,9 @@ the LuaExtendable interface.
 	namespace lua_extension \
 	{ \
 		sint push(lua_State* L, NAMESPACE##::##CLASS * value); \
+		sint push(lua_State* L, const NAMESPACE##::##CLASS * value); \
+		sint push(lua_State* L, NAMESPACE##::##CLASS & value); \
+		sint push(lua_State* L, const NAMESPACE##::##CLASS & value); \
 	} 
 // #define DECLARE_LUA_PUSH_FUNCTION_NS
 
@@ -201,14 +205,14 @@ the LuaExtendable interface.
 // #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
 
 /** \todo replace with a string -> offset map */
-#define DEFINE_CONDITIONAL__index_ENTRY(INDEX) \
+#define __index_FUNCTION_ENTRY(INDEX) \
 	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
-// #define DEFINE_CONDITIONAL__index_ENTRY
+// #define __index_FUNCTION_ENTRY
 
 /** \todo replace with a string -> offset map */
-#define DEFINE_CONDITIONAL__newindex_ENTRY(INDEX, TYPE) \
+#define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
-// #define DEFINE_CONDITIONAL__index_ENTRY
+// #define __index_FUNCTION_ENTRY
 
 #if DEBUG 
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
@@ -307,14 +311,16 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 // #define DEFINE_LUA_CLASS_BY_PROXY
 
-#define DEFINE_LUA_NO_CLASS_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
+#define DEFINE_LUA_CLASS_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
 		LUA_ENTRY_CLASS__isnewindexable_FALSE \
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
-		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
-// #define DEFINE_LUA_NO_CLASS_NO_INDEX
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
+		LUA_NAMED_ENTRY("__index", CLASS##__index) \
+		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+// #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS
 
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
@@ -323,12 +329,12 @@ or the same if it has no parent class
 		OPEN_LUA_LIB(CLASS) 
 // #define DEFINE_LUA_CLASS_LIB
 
-#define DEFINE_LUA_CLASS_LIB_NO_INDEX(TYPE, CLASS, SUPER_CLASS) \
+#define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
 	OPEN_LUA_NS(CLASS) \
 		DEFINE_LUA_##TYPE##__tostring(CLASS) \
 		OPEN_LUA_LIB(CLASS) 
-// #define DEFINE_LUA_CLASS_LIB_NO_INDEX
+// #define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS
 
 #define DEFINE_LUA_CLASS_NO_CTOR(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
@@ -397,17 +403,37 @@ BE PASSED IN TO THE FUNCTION
 			lua_call(L, 1, 0); \
 		} \
 		return 1; \
-	} 
+	} \
+	sint lua_extension::push(lua_State* L, CLASS & value) \
+	{ \
+		return push(L, &value); \
+	} \
+	sint lua_extension::push(lua_State* L, const CLASS & value) \
+	{ \
+		return push(L, const_cast<CLASS &>(value)); \
+	} \
+	sint lua_extension::push(lua_State* L, const CLASS * value) \
+	{ \
+		return push(L, const_cast<CLASS*>(value)); \
+	}
 // #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) 
 
 #define DEFINE_LUA_ENUM(ENUM_NAME) \
+	DEFINE_TO_ENUM(ENUM_NAME) \
 	namespace lua_extension \
 	{ \
-		LUA_FUNC(register_##ENUM_NAME##) \
+		LUA_FUNC(register_##ENUM_NAME) \
 		{ \
-			lua_newtable(L);					/*s: {} */ \
-			lua_setglobal(L, #ENUM_NAME);		/*s: */ \
-			lua_getglobal(L, #ENUM_NAME);		/*s: ENUM_NAME */ 
+			lua_newtable(L);					/*s: {} */ 
+		
+#define DEFINE_LUA_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
+	DEFINE_TO_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
+	namespace lua_extension \
+	{ \
+		LUA_FUNC(register_##ENUM) \
+		{ \
+			lua_newtable(L);			/*s: {} */ \
+			LUA_ENUM(MIN_VALUE)
 
 /**
 empty for now, but makes things easier
@@ -432,7 +458,7 @@ empty for now, but makes things easier
 	LUA_FUNC(##CLASS##__index) \
 	{ \
 		const schar* k = to<const schar*>(L, -1); \
-		const AllPublic& t = to<const AllPublic&>(L, -2); 
+		const CLASS& t = to<const CLASS&>(L, -2); 
 // #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS
 
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
@@ -591,7 +617,7 @@ This method is ideal for static classes or libraries.
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM(ENUM) \
-	template<> inline eNumbers lua_extension::to<##ENUM##>(lua_State* L, sint index) \
+	template<> inline ENUM lua_extension::to<##ENUM##>(lua_State* L, sint index) \
 	{ \
 		return static_cast<##ENUM##>(to<sint>(L, index)); \
 	}
@@ -683,11 +709,24 @@ calls nilLoadedStatus() in declareLuaClass
 // #define END_LUA_CLASS(CLASS, SUPER_CLASS) 
 
 
-#define END_LUA_ENUM \
-			lua_pop(L, 1); /*s:  */ \
+#define END_LUA_ENUM(ENUM) \
+			lua_newtable(L);						/*s: ReadOnly proxy */ \
+			lua_newtable(L);						/*s: ReadOnly proxy mt */ \
+			lua_pushvalue(L, -3);					/*s: ReadOnly proxy mt ReadOnly */ \
+			lua_setfield(L, -2, "__index");			/*s: ReadOnly proxy mt */ \
+			lua_pushcfunction(L, lua_extension::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
+			lua_setfield(L, -2, "__newindex");		/*s: ReadOnly proxy mt */ \
+			lua_setmetatable(L, -2);				/*s: ReadOnly proxy */ \
+			lua_replace(L, -2);						/*s: proxy */ \
+			lua_setglobal(L, #ENUM );				/*s: */ \
 			return 0; \
 		} \
 	} // end namespace lua_extension
+// #define END_LUA_ENUM
+
+#define END_LUA_ENUM_BOUND(ENUM, MAX_ENUM_VALUE) \
+			LUA_ENUM(MAX_ENUM_VALUE)	/*s: MAX_ENUM_VALUE */ \
+		END_LUA_ENUM(ENUM)
 // #define END_LUA_ENUM
 
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
@@ -732,7 +771,6 @@ the require() function.
 	CLOSE_LUA_NS(CLASS)
 // #define END_LUA_LIBRARY_EXTENSIBLE
 
-/** \todo name these all to LUA_ENTRY_CLASS<> */
 #define LUA_ENTRY_CLASS__gc_DESTRUCTOR(CLASS) \
 	LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
 
@@ -949,6 +987,9 @@ stack
 */
 sint
 	__getProxy(lua_State* L);
+
+sint 
+	__newindexEnum(lua_State* L);
 
 /**
 __newindex method for the metatable of a class exposed to %Lua 

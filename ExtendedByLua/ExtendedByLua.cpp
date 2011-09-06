@@ -73,26 +73,47 @@ typedef enum eDirections
 	Right
 };
 
-DEFINE_TO_ENUM_BOUND(eDirections, Up, Right)
-DEFINE_TO_ENUM(eNumbers)
+enum ReadOnly
+{
+	ZeroRO,
+	OneRO,
+	TwoRO
+};
+
+DEFINE_LUA_ENUM(ReadOnly)
+	LUA_ENUM(ZeroRO)
+	LUA_ENUM(OneRO)
+	LUA_ENUM(TwoRO)
+END_LUA_ENUM(ReadOnly)
+
+DEFINE_LUA_ENUM_BOUND(eDirections, Up, Right)
+	LUA_ENUM(Down)
+	LUA_ENUM(Left)
+END_LUA_ENUM_BOUND(eDirections, Right)
+
+DEFINE_LUA_ENUM(eNumbers)
+	LUA_ENUM(One)
+	LUA_ENUM(Two)
+	LUA_ENUM(Three)
+END_LUA_ENUM(eNumbers)
 
 DECLARE_LUA_CLASS(AllPublic);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
-	DEFINE_CONDITIONAL__index_ENTRY(one)
-	DEFINE_CONDITIONAL__index_ENTRY(two)
-	DEFINE_CONDITIONAL__index_ENTRY(three)
+	__index_FUNCTION_ENTRY(one)
+	__index_FUNCTION_ENTRY(two)
+	__index_FUNCTION_ENTRY(three)
 END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
-	DEFINE_CONDITIONAL__newindex_ENTRY(one, sint)
-	DEFINE_CONDITIONAL__newindex_ENTRY(two, bool)
-	DEFINE_CONDITIONAL__newindex_ENTRY(three, sreal)
+	__newindex_FUNCTION_ENTRY(one, sint)
+	__newindex_FUNCTION_ENTRY(two, bool)
+	__newindex_FUNCTION_ENTRY(three, sreal)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
 
-DEFINE_LUA_NO_CLASS_NO_INDEX(CLASS, AllPublic, AllPublic)
-			LUA_NAMED_ENTRY("__index", AllPublic__index)
-			LUA_NAMED_ENTRY("__newindex", AllPublic__newindex)
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+			// LUA_NAMED_ENTRY("__index", AllPublic__index)
+			// LUA_NAMED_ENTRY("__newindex", AllPublic__newindex)
 			LUA_NAMED_ENTRY("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
 END_LUA_CLASS(AllPublic, AllPublic)
 
@@ -110,6 +131,9 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		REGISTER_LUA_LIBRARY((&lua), Vector2);
 		REGISTER_LUA_LIBRARY((&lua), Vector3);
 		REGISTER_LUA_LIBRARY((&lua), AllPublic);
+		REGISTER_LUA_ENUM((&lua), eNumbers)
+		REGISTER_LUA_ENUM((&lua), eDirections)
+		REGISTER_LUA_ENUM((&lua), ReadOnly)
 
 #if UNIT_TEST_VERIFICATION
 		REGISTER_LUA_LIBRARY((&lua), Grandparent2);
@@ -127,6 +151,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		push(L, Down);
 		eDirections dir = to<eDirections>(L, -1);
 		lua_pop(L, 1);		
+
 
 		lua.require("User");
 		lua.runConsole();

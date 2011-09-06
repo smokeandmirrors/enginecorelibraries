@@ -20,6 +20,11 @@ sint __getProxy(lua_State* L)
 	return 1;
 }
 
+sint __newindexEnum(lua_State* L)
+{
+	return luaL_error(L, "attept to assign a value to an enum!");
+}
+
 sint __newindexProxy(lua_State* L) 
 {											//s: ud, k, v 	
 	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
