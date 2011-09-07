@@ -76,21 +76,36 @@ end
 if package then
 ---------------------------------------------------------------------
 -- reloads a module
-function _G.rerequire(name)
+function _G.rerequire(name, hideNotFoundError, hideSyntaxError)
 	package.loaded[name] = nil
-	return require(name)
+	return require(name, hideNotFoundError, hideSyntaxError)
 end
 
-local oldrequire = require
+if not oldrequire then
+	oldrequire = require
+end
 
-function _G.require(name)
+function _G.require(name, hideNotFoundError, hideSyntaxError)
 	if package.loaded[name] then
 		return package.loaded[name]
 	else
-		print("requiring:", name)
-		return oldrequire(name)
+		local status, pack = xpcall(
+			function() 
+				return oldrequire(name) 
+			end, 
+			function(err)
+				local isMissing = string.match(err, 'module \''..name..'\' not found:')
+				if ((not hideNotFoundError) and isMissing)
+				or ((not hideSyntaxError) and (not isMissing)) then
+					print(err)
+				end
+			end)		
+		if status then
+			return pack
+		end
 	end
 end
+
 end -- package
 
 --[[ table extensions]]--

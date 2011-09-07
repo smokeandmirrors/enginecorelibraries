@@ -241,16 +241,18 @@ sint Lua::report(lua_State* L, sint error_code)
 	return error_code;
 }
 
-bool Lua::require(lua_State* L, const schar* module)
+bool Lua::require(lua_State* L, const schar* module, bool hideNotFoundError, bool hideSyntaxError)
 {
 	lua_getglobal(L, "require");
-	lua_pushstring(L, module);
-	return callProtected(L, 1, 1) == 0;
+	push(L, module);
+	push(L, hideNotFoundError);
+	push(L, hideSyntaxError);
+	return callProtected(L, 3, 1) == 0;
 }
 
-bool Lua::require(const schar* module)
+bool Lua::require(const schar* module, bool hideNotFoundError, bool hideSyntaxError)
 {
-	return require(L, module);
+	return require(L, module, hideNotFoundError, hideSyntaxError);
 }
 
 void Lua::runConsole(void) const

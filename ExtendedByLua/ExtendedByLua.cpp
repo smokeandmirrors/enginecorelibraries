@@ -153,7 +153,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua_pop(L, 1);		
 
 
-		lua.require("User");
+		// lua.require("User");
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA

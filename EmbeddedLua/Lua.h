@@ -67,7 +67,7 @@ public:
 	/**
 	call require from C++
 	*/
-	static bool			require(lua_State* L, const schar* module);
+	static bool			require(lua_State* L, const schar* module, bool hideNotFoundError=false, bool hideSyntaxError=false);
 	/** 
 	public [no-args] constructor.
 	\param name a string identifier
@@ -111,7 +111,7 @@ public:
 	/**
 	require() shortcut
 	*/
-	bool				require(const schar* module);
+	bool				require(const schar* module, bool hideNotFoundError=false, bool hideSyntaxError=false);
 	/** 
 	quick, low functionality console for fast testing 
 	*/
