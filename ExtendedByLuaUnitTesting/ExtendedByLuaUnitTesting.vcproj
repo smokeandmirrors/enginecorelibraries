@@ -428,7 +428,19 @@
 						>
 					</File>
 					<File
+						RelativePath="..\LuaFiles\UTLuaFiles\UTLuaExtendableClasses2.lua"
+						>
+					</File>
+					<File
 						RelativePath="..\LuaFiles\UTOne.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTLuaFiles\UTOne2.lua"
+						>
+					</File>
+					<File
+						RelativePath="..\LuaFiles\UTLuaFiles\UTProxyClasses2.lua"
 						>
 					</File>
 				</Filter>
