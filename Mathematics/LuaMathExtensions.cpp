@@ -16,7 +16,6 @@ using namespace lua_extension;
 #endif//EXTENDED_BY_LUA
 using namespace math;
 
-
 #if EXTENDED_BY_LUA
 
 namespace lua_library_Vector2 
@@ -104,8 +103,7 @@ namespace lua_library_Vector3
 } \
 	return 0; \
 } 
-	// #define DEFINE_VOID_VECTOR3_FUNC(opfunc)
-
+	
 #define DEFINE_VECTOR3_OPERATOR(name, opfunc) \
 	LUA_FUNC(name) \
 	{ \
@@ -113,8 +111,7 @@ namespace lua_library_Vector3
 	Vector3& rhs = to<Vector3&>(L, -1); \
 	return push(L, new Vector3(lhs opfunc rhs)); \
 }
-	// #define DEFINE_VECTOR3_OPERATOR(opfunc)  
-
+	
 	DEFINE_VOID_VECTOR3_FUNC(add)
 
 	LUA_FUNC(cross)

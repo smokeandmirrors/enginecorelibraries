@@ -56,7 +56,6 @@ struct AllPublic
 
 	sint method(void) const { return 17; }
 };
-// #define DEFINE_LUA_NO_INDEX_METHODS(CLASS, TYPE, SUPER_CLASS) \
 
 enum eNumbers
 {

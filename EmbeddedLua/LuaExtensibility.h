@@ -99,17 +99,35 @@ to %Lua and the %Lua C API.
 @{
 */
 
+/** 
+used for an entry in a "getter" function 
+for public members that can be pushed directly into %Lua
+\todo replace with a string -> offset map 
+\*/
+#define __index_FUNCTION_ENTRY(INDEX) \
+	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
+
+/**
+used for an entry in a "setter" function 
+for public members that can be set directly from %Lua
+\todo replace with a string -> offset map 
+*/
+#define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
+	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
+
+/**
+used to end a function list of functions to expose to %Lua
+*/
 #define CLOSE_LUA_LIB(NAME) \
 		LUA_FINAL_ENTRY \
 	};	/* end function list */ 
-// #define CLOSE_LUA_LIB
 
+/** 
+*/
 #define CLOSE_LUA_NS(NAME) \
 	}; // end namespace lua_library_##name
-// #define CLOSE_LUA_NS
 
 /**
-\def DECLARE_LUA_CLASS
 Declares a library around a POD class
 \note compile-time directive
 */
@@ -117,10 +135,8 @@ Declares a library around a POD class
 	DECLARE_LUA_LIBRARY(CLASS) \
 	DECLARE_LUA_PUSH_FUNCTION(CLASS) \
 	DEFINE_TO_CLASS_FUNCTIONS(CLASS) 
-// #define DECLARE_LUA_LUAEXTENDABLE
 
 /**
-\def DECLARE_LUA_CLASS_NS
 Declares a library around a POD class
 \note compile-time directive
 */
@@ -128,10 +144,8 @@ Declares a library around a POD class
 	DECLARE_LUA_LIBRARY(CLASS)	\
 	DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
 	DEFINE_TO_CLASS_FUNCTIONS(NAMESPACE##::##CLASS)
-// #define DECLARE_LUA_CLASS_NS
 
 /** 
-\def DECLARE_LUA_LIBRARY
 Declares a %Lua library for shared inclusion.  If used for a class,
 instances of the class can be created or controlled in %Lua.  Using this 
 method, the programmer is responsible for the whole system of usage of the 
@@ -146,10 +160,8 @@ with the module ObjectOrientedParadigm.
 	{ \
 		sint key(lua_State* L); \
 	}; // end namespace lua_library_##name
-// #define begin_lua_library_declaration
 
 /**
-\def DECLARE_LUA_LUAEXTENDABLE
 Declares a library around a class that implements
 the LuaExtendable interface.
 \note compile-time directive
@@ -157,10 +169,8 @@ the LuaExtendable interface.
 #define DECLARE_LUA_LUAEXTENDABLE(CLASS) \
 	DECLARE_LUA_LIBRARY(CLASS) \
 	DEFINE_TO_LUAEXTENDABLES(CLASS) 
-// #define DECLARE_LUA_LUAEXTENDABLE
 
 /**
-\def DECLARE_LUA_LUAEXTENDABLE_NS
 Declares a library around a class in a namespace that implements
 the LuaExtendable interface.
 \note compile-time directive
@@ -168,8 +178,9 @@ the LuaExtendable interface.
 #define DECLARE_LUA_LUAEXTENDABLE_NS(NAMESPACE, CLASS) \
 	DECLARE_LUA_LIBRARY(CLASS)	\
 	DEFINE_TO_LUAEXTENDABLES(NAMESPACE::CLASS)
-// #define DECLARE_LUA_LUAEXTENDABLE_NS
 
+/** 
+*/
 #define DECLARE_LUA_PUSH_FUNCTION(CLASS) \
 	namespace lua_extension \
 	{ \
@@ -178,8 +189,9 @@ the LuaExtendable interface.
 		sint push(lua_State* L, CLASS & value); \
 		sint push(lua_State* L, const CLASS & value); \
 	} 
-// #define DECLARE_LUA_PUSH_FUNCTION
 
+/** 
+*/
 #define DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
 	namespace lua_extension \
 	{ \
@@ -188,61 +200,53 @@ the LuaExtendable interface.
 		sint push(lua_State* L, NAMESPACE##::##CLASS & value); \
 		sint push(lua_State* L, const NAMESPACE##::##CLASS & value); \
 	} 
-// #define DECLARE_LUA_PUSH_FUNCTION_NS
 
-#define DEFINE_DEFAULT_TOSTRING(CLASS) \
-	virtual const schar* toString(void) \
-	{ \
-		return "This is a " #CLASS; \
-	}
-// #define DEFINE_DEFAULT_TOSTRING(CLASS) 
-
+/** 
+*/
 #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	virtual const schar* getClassName(void) const \
 	{ \
 		return #CLASS; \
 	}
-// #define DEFINE_DEFAULT_GETCLASSNAME(CLASS) 
 
-/** \todo replace with a string -> offset map */
-#define __index_FUNCTION_ENTRY(INDEX) \
-	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
-// #define __index_FUNCTION_ENTRY
-
-/** \todo replace with a string -> offset map */
-#define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
-	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
-// #define __index_FUNCTION_ENTRY
+/** 
+*/
+#define DEFINE_DEFAULT_TOSTRING(CLASS) \
+	virtual const schar* toString(void) \
+	{ \
+		return "This is a " #CLASS; \
+	}
 
 #if DEBUG 
+/** 
+*/
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
 	{ \
 		return luaL_error(L, "ERROR! Attempting to assign a value to a LuaExtendable %s that doesn't support new values.  " \
 		"Use DEFINE_LUA_CLASS_BY_PROXY to expose this class to Lua if that is desired.", #CLASS); \
 	}
-// #define DEFINE_LUA_CLASS__newindex_ERROR
 #else 
+/** 
+*/
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
 	{ \
 		(void*)L; \
 		return 0; \
 	}
-// #define DEFINE_LUA_CLASS__newindex_ERROR
 #endif//DEBUG
 
-/** \left off */
+/** 
+*/
 #define DEFINE_LUA_CLASS__tostring(CLASS) \
 	LUA_FUNC(__tostring##CLASS##) \
 	{ \
 		lua_pushstring(L, "This is a " #CLASS); \
 		return 1; \
 	}	
-// #define DEFINE_LUA_CLASS__tostring
 
 /**
-\def DEFINE_LUA_CLASS
 Define a %Lua library around a class, so that instances of the 
 class can be created or controlled in %Lua. This also exposes simple 
 userdata pointers with all associated C++ and Lua methods, but it doesn't 
@@ -268,15 +272,14 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
-// #define DEFINE_LUA_CLASS 
 
+/** 
+*/
 #define DEFINE_LUA_CLASS_AUTO_METAMETHODS(CLASS) \
 	DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	DEFINE_LUA_CLASS__tostring(CLASS) 
-// #define DEFINE_LUA_CLASS_AUTO_METAMETHODS
 
 /**
-\def DEFINE_LUA_CLASS_BY_PROXY
 begin a library definition for registration via a %Lua proxy table,
 and use the default "__new", "__setmetatable", "__gc" & "__tostring" methods
 
@@ -309,33 +312,25 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_PROXY \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
-// #define DEFINE_LUA_CLASS_BY_PROXY
 
-#define DEFINE_LUA_CLASS_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
-		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
-		LUA_ENTRY_CLASS__isnewindexable_FALSE \
-		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
-		LUA_ENTRY_CLASS__setmetatable_USERDATA \
-		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
-		LUA_NAMED_ENTRY("__index", CLASS##__index) \
-		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
-// #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS
-
+/** 
+*/
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
 	OPEN_LUA_NS(CLASS) \
 		DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
 		OPEN_LUA_LIB(CLASS) 
-// #define DEFINE_LUA_CLASS_LIB
 
+/** 
+*/
 #define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
 	OPEN_LUA_NS(CLASS) \
 		DEFINE_LUA_##TYPE##__tostring(CLASS) \
 		OPEN_LUA_LIB(CLASS) 
-// #define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS
 
+/** 
+*/
 #define DEFINE_LUA_CLASS_NO_CTOR(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
@@ -343,10 +338,8 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
-// #define DEFINE_LUA_CLASS_NO_CTOR
 
 /**
-\def DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR
 Define a %Lua library around a class, so that instances of the 
 controlled in %Lua. This also exposes simple userdata pointers with all 
 associated C++ and Lua methods, but it doesn't create any ability to added 
@@ -369,6 +362,17 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 
+/** 
+*/
+#define DEFINE_LUA_CLASS_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
+		LUA_NAMED_ENTRY("__index", CLASS##__index) \
+		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
 
 /**
 \note when pushing an object into %Lua, it might not be because the 
@@ -416,8 +420,9 @@ BE PASSED IN TO THE FUNCTION
 	{ \
 		return push(L, const_cast<CLASS*>(value)); \
 	}
-// #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) 
 
+/** 
+*/
 #define DEFINE_LUA_ENUM(ENUM_NAME) \
 	DEFINE_TO_ENUM(ENUM_NAME) \
 	namespace lua_extension \
@@ -426,6 +431,8 @@ BE PASSED IN TO THE FUNCTION
 		{ \
 			lua_newtable(L);					/*s: {} */ 
 		
+/** 
+*/
 #define DEFINE_LUA_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
 	DEFINE_TO_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
 	namespace lua_extension \
@@ -439,37 +446,34 @@ BE PASSED IN TO THE FUNCTION
 empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE__tostring(CLASS)
-// #define DEFINE_LUA_EXTENDABLE__tostring
 
 /**
 empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
-// #define DEFINE_LUA_EXTENDABLE_AUTO_METAMETHODS(CLASS) 
 
 /**
 empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
-// #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
-
+/** 
+*/
 #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
 	LUA_FUNC(##CLASS##__index) \
 	{ \
 		const schar* k = to<const schar*>(L, -1); \
 		const CLASS& t = to<const CLASS&>(L, -2); 
-// #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS
 
+/** 
+*/
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
 	LUA_FUNC(##CLASS##__newindex) \
 	{ \
 	const schar* k = to<const schar*>(L, -2); \
 	CLASS& t = to<CLASS&>(L, -3); 
-// #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS
 
 /** 
-\def DEFINE_LUA_LIBRARY
 Begin a library definition for registration
 This method is ideal for static classes or libraries.
 \note compile-time directive
@@ -479,8 +483,9 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_LIBRARY(NAME) \
 	OPEN_LUA_NS(NAME) \
 		OPEN_LUA_LIB(NAME)				
-// #define DEFINE_LUA_LIBRARY
 
+/** 
+*/
 #define DEFINE_LUA_OPENER(NAME) \
 	sint key(lua_State* L) \
 	{ \
@@ -488,6 +493,8 @@ This method is ideal for static classes or libraries.
 		return 1; \
 	} 
 
+/** 
+*/
 #define DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
 	sint key(lua_State* L) \
 	{ \
@@ -496,6 +503,8 @@ This method is ideal for static classes or libraries.
 		return 1; \
 	} 
 
+/** 
+*/
 #define DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
 	sint key(lua_State* L) \
 	{ \
@@ -504,27 +513,31 @@ This method is ideal for static classes or libraries.
 		return 1; \
 	} 
 
+/** 
+*/
 #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) \
 	DEFINE_DEFAULT_TOSTRING(CLASS) \
 	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	DEFINE_PROXY_SETMETATABLE(CLASS)
-// #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) 
 
-
+/** 
+*/
 #define DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(CLASS) \
 	DEFINE_DEFAULT_TOSTRING(CLASS) \
 	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
 	DEFINE_USERDATA_SETMETATABLE(CLASS)
-// #define DEFINE_PROXY_SETMETATABLE(CLASS) 
 
+/** 
+*/
 #define DEFINE_PROXY_SETMETATABLE(CLASS) \
 	virtual sint setMetatable(lua_State* L) \
 	{ \
 		return setProxyMetatable(L); \
 	}
-// #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) 
 
 #if ARGUMENT_ERRORS
+/** 
+*/
 #define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
 	namespace lua_extension \
 	{ \
@@ -569,7 +582,6 @@ This method is ideal for static classes or libraries.
 			return **static_cast< CLASS** >(lua_touserdata(L, index)); \
 		} \
 	} // namespace lua_extension 
-// #define DEFINE_TO_CLASS_FUNCTIONS
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
@@ -582,10 +594,9 @@ This method is ideal for static classes or libraries.
 		} \
 		return value; \
 	}
-// #define DEFINE_TO_ENUM_BOUND
-
 #else // #if ARGUMENT_ERRORS
-
+/** 
+*/
 #define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
 	namespace lua_extension \
 	{ \
@@ -606,13 +617,10 @@ This method is ideal for static classes or libraries.
 			return **static_cast<CLASS**>(lua_touserdata(L, index)); \
 		} \
 	} // namespace lua_extension 
-// #define DEFINE_TO_CLASS_FUNCTIONS
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
 	DEFINE_TO_ENUM(ENUM)		
-// #define DEFINE_TO_ENUM_BOUND
-
 #endif//ARGUMENT_ERRORS
 
 /** helps compilers with enums as paramenters in template wrapped functions */
@@ -621,7 +629,6 @@ This method is ideal for static classes or libraries.
 	{ \
 		return static_cast<##ENUM##>(to<sint>(L, index)); \
 	}
-// #define DEFINE_TO_ENUM
 
 /**
 defines functions that can be used to get specific class pointers
@@ -656,7 +663,6 @@ back out of %Lua.
 		return *object; \
 		} \
 		}
-// #define DEFINE_TO_LUAEXTENDABLES
 #else
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
 	namespace lua_extension \
@@ -678,18 +684,17 @@ back out of %Lua.
 		return *to< CLASS* >(L, index); \
 		} \
 		}
-// #define DEFINE_TO_LUAEXTENDABLES
 #endif//ARGUMENT_ERRORS
 
+/** 
+*/
 #define DEFINE_USERDATA_SETMETATABLE(CLASS) \
 	virtual sint setMetatable(lua_State* L) \
 	{ \
 		return setUserdataMetatable(L); \
 	}
-// #define DEFINE_USERDATA_SETMETATABLE(CLASS) 
 
 /**
-\def END_LUA_CLASS
 This closes out the luaL_reg and defines the library opener function, 
 which will register the exposed function and declare a %Lua class
 via ObjectOrientedParadgim.lua.
@@ -706,9 +711,9 @@ calls nilLoadedStatus() in declareLuaClass
 		CLOSE_LUA_LIB(CLASS) \
 		DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
 	CLOSE_LUA_NS(CLASS)
-// #define END_LUA_CLASS(CLASS, SUPER_CLASS) 
 
-
+/** 
+*/
 #define END_LUA_ENUM(ENUM) \
 			lua_newtable(L);						/*s: ReadOnly proxy */ \
 			lua_newtable(L);						/*s: ReadOnly proxy mt */ \
@@ -722,13 +727,15 @@ calls nilLoadedStatus() in declareLuaClass
 			return 0; \
 		} \
 	} // end namespace lua_extension
-// #define END_LUA_ENUM
 
+/** 
+*/
 #define END_LUA_ENUM_BOUND(ENUM, MAX_ENUM_VALUE) \
 			LUA_ENUM(MAX_ENUM_VALUE)	/*s: MAX_ENUM_VALUE */ \
 		END_LUA_ENUM(ENUM)
-// #define END_LUA_ENUM
 
+/** 
+*/
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
 		lua_getglobal(L, "getClass");	/*s: getClass */ \
 		push(L, #CLASS);				/*s: getClass, "CLASS" */ \
@@ -736,15 +743,14 @@ calls nilLoadedStatus() in declareLuaClass
 		lua_getfield(L, -1, k);			/*s: AllPublic[k] */ \
 		return 1; \
 	} 
-// #define END_LUA_FUNC__index_PUBLIC_MEMBERS	
 
+/** 
+*/
 #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
 		return luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
 	}
-// #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS	
 
 /** 
-\def END_LUA_LIBRARY
 end a library definition for registration
 \note compile-time directive
 \note highly recommended to follow with DEFINE_LUA_LIBRARY
@@ -754,10 +760,8 @@ end a library definition for registration
 		CLOSE_LUA_LIB(NAME) \
 		DEFINE_LUA_OPENER(NAME) \
 	CLOSE_LUA_NS(NAME)
-// #define END_LUA_LIBRARY
 
 /** 
-\def END_LUA_LIBRARY_EXTENSIBLE
 end a library definition for registration,
 adds shortcut to allow extending the library in %Lua with 
 the require() function.
@@ -769,37 +773,53 @@ the require() function.
 		CLOSE_LUA_LIB(CLASS) \
 		DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
 	CLOSE_LUA_NS(CLASS)
-// #define END_LUA_LIBRARY_EXTENSIBLE
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__gc_DESTRUCTOR(CLASS) \
 	LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__isExtendableByProxy \
 	LUA_NAMED_ENTRY("__isExtendableByProxy", lua_extension::pushTrue) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__isnewindexable_TRUE \
 	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushTrue) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__isnewindexable_FALSE \
 	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__new", lua_extension::__new<##CLASS##>) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__newindex_ERROR_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__newindex", lua_library_##CLASS##::__newindexError##CLASS) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__setmetatable_PROXY \
 	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setProxyMetatable) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__setmetatable_USERDATA \
 	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
 
+/** 
+*/
 #define LUA_ENTRY_CLASS__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", __tostring##CLASS)
 
 /** 
-\def LUA_ENTRY
 add a lua method to a definition by the same name 
 \note compile-time directive
 \param function a lua_function
@@ -807,21 +827,26 @@ add a lua method to a definition by the same name
 #define LUA_ENTRY(function) \
 	{(#function), (function)}, 
 
-// #define LUA_ENTRY
+/** 
+*/
 #define LUA_ENTRY_EXTENDABLE__gc_DESTRUCTOR(CLASS) \
 	LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod)
 
+/** 
+*/
 #define LUA_ENTRY_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) 
 
+/** 
+*/
 #define LUA_ENTRY_EXTENDABLE__tostring_AUTO(CLASS) \
 	LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
 
-
+/** 
+*/
 #define LUA_ENUM(ENUMERATION) \
 			push(L, ENUMERATION);				/*s: ENUM_NAME, ENUMERATION */ \
 			lua_setfield(L, -2, #ENUMERATION );	/*s: ENUM_NAME */ 
-// #define LUA_ENUM
 
 /**
 the sentinel entry in a lua library
@@ -831,7 +856,6 @@ the sentinel entry in a lua library
 // #define LUA_FINAL_ENTRY
 
 /** 
-\def LUA_FUNC
 Declares a (static) lua function.  Declares a function that
 takes a single lua_State argument, and returns an integer,
 the number of arguments it has added to the stack.
@@ -840,10 +864,8 @@ the number of arguments it has added to the stack.
 */
 #define LUA_FUNC(name) \
 	sint name##(lua_State* L)
-// #define LUA_FUNC
 
 /**  
-\def LUA_NAMED_ENTRY
 add a lua method to a definition by a different name 
 \note compile-time directive
 \param name a string delimited name
@@ -851,22 +873,25 @@ add a lua method to a definition by a different name
 */
 #define LUA_NAMED_ENTRY(name, function)	\
 	{(name), (function)}, 
-// #define LUA_NAMED_ENTRY
 
+/** 
+*/
 #define OPEN_LUA_LIB(NAME) \
 	static const luaL_reg NAME##_library[] = \
 	{	/* begin function list */
 
+/** 
+*/
 #define OPEN_LUA_NS(NAME) \
 	namespace lua_library_##NAME \
 	{ 
 
+/** 
+*/
 #define REGISTER_LUA_ENUM(LUA_OBJECT_PTR, ENUM_NAME) \
 	lua_extension::register_##ENUM_NAME##(LUA_OBJECT_PTR->getState());
-// #define REGISTER_LUA_ENUM
 
 /** 
-\def REGISTER_LUA_LIBRARY
 register a library with a lua state 
 \warning registration MUST be done in dependency order, or the behavior
 is undefined
@@ -878,7 +903,6 @@ behavior is undefined
 */
 #define REGISTER_LUA_LIBRARY(LUA_OBJECT_PTR, MODULE) \
 	LUA_OBJECT_PTR->openLibrary(lua_library_##MODULE::key);		
-// #define REGISTER_LUA_LIBRARY
 
 /** @} */
 
