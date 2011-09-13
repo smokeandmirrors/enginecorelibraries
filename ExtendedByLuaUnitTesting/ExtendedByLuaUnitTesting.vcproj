@@ -396,11 +396,11 @@
 						>
 					</File>
 					<File
-						RelativePath="..\LuaFiles\UTOOP.lua"
+						RelativePath="..\LuaFiles\UTLuaFiles\UTOOP.lua"
 						>
 					</File>
 					<File
-						RelativePath="..\LuaFiles\UTProxyClasses.lua"
+						RelativePath="..\LuaFiles\UTLuaFiles\UTProxyClasses.lua"
 						>
 					</File>
 					<Filter

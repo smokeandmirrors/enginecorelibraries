@@ -112,6 +112,9 @@ UT.test('inheritance',
 		UT.checkEqual(g:getNumberOfParents(), 2)		
 		UT.checkT(g.getNumberOfGrandparents, 'function')
 		UT.checkEqual(g:getNumberOfGrandparents(), 4)	
+		-- new indices
+		g.farlyMonkey = 'farlyMonkey'
+		UT.checkEqual(g.farlyMonkey, 'farlyMonkey')
 	end
 )
 ----------------------------------------------------------------------

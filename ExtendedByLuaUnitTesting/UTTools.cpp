@@ -37,6 +37,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	if (!lua)
 	{
 		lua = new Lua();
+		lua->setPackagePath(UNIT_TESTING_LUA_PACKAGE_PATH);
 		delete_lua = true;
 	}
 
