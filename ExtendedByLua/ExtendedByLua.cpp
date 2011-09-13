@@ -48,6 +48,8 @@ are included in the macro below
 class AllPublic
 {
 public:
+	AllPublic(void) : one(1), two(true), three(3.0f) {}
+	virtual ~AllPublic(void) {}
 	sint 
 		one;
 	bool 
@@ -58,34 +60,30 @@ public:
 	sint method(void) const { return 17; }
 };
 
-class AllPublicChild
+class AllPublicChild : public AllPublic
 {
 public:
-	AllPublicChild() : four(NULL) {}
+	AllPublicChild() : four(NULL), five(5) {}
 	AllPublic* four;
 	sint five;
+
+	sint childMethod(void) const { return 1717; }
 };
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublic);
 
-// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
-LUA_FUNC(AllPublic__index) 
-{ 
-	const schar* k = to<const schar*>(L, -1); 
-	const AllPublic& t = to<const AllPublic&>(L, -2); 
-	if (!strcmp(k, "one" )) { pushTrue(L); push(L, t.one); return 2; }// __index_FUNCTION_ENTRY(one)
-	if (!strcmp(k, "two" )) { pushTrue(L);  push(L, t.two); return 2; }// __index_FUNCTION_ENTRY(two)
-	if (!strcmp(k, "three" )) { pushTrue(L);  push(L, t.three); return 2; } // __index_FUNCTION_ENTRY(three)
-	pushFalse(L); return 1; 
-} 
-// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
+	__index_FUNCTION_ENTRY(one)
+	__index_FUNCTION_ENTRY(two)
+	__index_FUNCTION_ENTRY(three)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 	__newindex_FUNCTION_ENTRY(one, sint)
 	__newindex_FUNCTION_ENTRY(two, bool)
 	__newindex_FUNCTION_ENTRY(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
 	LUA_NAMED_ENTRY("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
@@ -93,27 +91,19 @@ END_LUA_CLASS(AllPublic, AllPublic)
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublicChild);
-/*
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild)
+
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 	__index_FUNCTION_ENTRY(four)
 	__index_FUNCTION_ENTRY(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
-*/
-LUA_FUNC(AllPublicChild__index) 
-{ 
-	const schar* k = to<const schar*>(L, -1); 
-	const AllPublicChild& t = to<const AllPublicChild&>(L, -2); 
-	if (!strcmp(k, "four" )) { pushTrue(L); push(L, t.four); return 2; }// __index_FUNCTION_ENTRY(one)
-	if (!strcmp(k, "five" )) { pushTrue(L);  push(L, t.five); return 2; }// __index_FUNCTION_ENTRY(two)
-	pushFalse(L); return 1; 
-} 
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild)
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 	__newindex_FUNCTION_ENTRY(four, AllPublic*)
 	__newindex_FUNCTION_ENTRY(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
+	LUA_NAMED_ENTRY("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
 END_LUA_CLASS(AllPublicChild, AllPublic)
 
 //////////////////////////////////////////////////////////////////////////
@@ -139,23 +129,25 @@ enum ReadOnly
 	TwoRO
 };
 
+//////////////////////////////////////////////////////////////////////////
 DEFINE_LUA_ENUM(ReadOnly)
 	LUA_ENUM(ZeroRO)
 	LUA_ENUM(OneRO)
 	LUA_ENUM(TwoRO)
 END_LUA_ENUM(ReadOnly)
 
+//////////////////////////////////////////////////////////////////////////
 DEFINE_LUA_ENUM_BOUND(eDirections, Up, Right)
 	LUA_ENUM(Down)
 	LUA_ENUM(Left)
 END_LUA_ENUM_BOUND(eDirections, Right)
 
+//////////////////////////////////////////////////////////////////////////
 DEFINE_LUA_ENUM(eNumbers)
 	LUA_ENUM(One)
 	LUA_ENUM(Two)
 	LUA_ENUM(Three)
 END_LUA_ENUM(eNumbers)
-
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {

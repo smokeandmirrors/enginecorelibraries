@@ -157,7 +157,7 @@ EFL_GET_ARGS_
 EFL_PUSH_RETS_
 EFL_GET_INSTANCE_ARGS_
 
-\todo optional arguments (should be nearly trivial)
+\todo optional arguments (should be nearly trivial, but annoying to write)
 
 */
 

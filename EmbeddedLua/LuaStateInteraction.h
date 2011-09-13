@@ -257,6 +257,12 @@ inline sint pushFalse(lua_State* L)
 	return push(L, false);
 }
 
+inline sint pushNil(lua_State* L)
+{
+	lua_pushnil(L);
+	return 1;
+}
+
 inline sint pushTrue(lua_State* L)
 {
 	return push(L, true);

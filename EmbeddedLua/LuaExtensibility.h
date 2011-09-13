@@ -105,16 +105,15 @@ for public members that can be pushed directly into %Lua
 \todo replace with a string -> offset map 
 \*/
 #define __index_FUNCTION_ENTRY(INDEX) \
-	if (!strcmp(k, #INDEX )) return push(L, t.##INDEX##);	
+	if (!strcmp(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
 
 /**
 used for an entry in a "setter" function 
 for public members that can be set directly from %Lua
 \todo replace with a string -> offset map
-\todo there is a significant inheritance problem here that needs to be solved
 */
 #define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
-	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
+	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
 
 /**
 used to end a function list of functions to expose to %Lua
@@ -508,22 +507,52 @@ empty for now, but makes things easier
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
 /** 
-\todo there is a significant inheritance problem here that needs to be solved
+\todo this is only for CLASS functions, not LuaExtendable
+\todo replace with a string -> offset map 
 */
-#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
+#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
+	inline bool CLASS##__indexSupport(const CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName); \
 	LUA_FUNC(##CLASS##__index) \
 	{ \
 		const schar* k = to<const schar*>(L, -1); \
-		const CLASS& t = to<const CLASS&>(L, -2); 
-
+		const CLASS& t = to<const CLASS&>(L, -2); \
+		if (CLASS##__indexSupport(t, k, L, #CLASS, #SUPER_CLASS)) \
+		{ \
+			return 1; \
+		} \
+		else \
+		{ \
+			lua_getglobal(L, "getClass");	/*s: getClass */ \
+			push(L, #CLASS);				/*s: getClass, "CLASS" */ \
+			lua_call(L, 1, 1);				/*s: CLASS */ \
+			lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
+			return 1; \
+		} \
+	} \
+	inline bool CLASS##__indexSupport(const CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
+	{
+	
 /** 
-\todo there is a significant inheritance problem here that needs to be solved
+\todo this is only for CLASS functions, not LuaExtendable
+\todo replace with a string -> offset map 
 */
-#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
+#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
+	inline bool CLASS##__newindexSupport(##CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName); \
 	LUA_FUNC(##CLASS##__newindex) \
-	{ \
+	{\
 		const schar* k = to<const schar*>(L, -2); \
-		CLASS& t = to<CLASS&>(L, -3); 
+		CLASS& t = to<CLASS&>(L, -3); \
+		if (##CLASS##__newindexSupport(t, k, L, #CLASS, #SUPER_CLASS )) \
+		{ \
+			return 0; \
+		} \
+		else \
+		{ \
+			return luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
+		} \
+	} \
+	inline bool CLASS##__newindexSupport(##CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
+	{
 
 /** 
 Begin a library definition for registration
@@ -853,21 +882,34 @@ calls nilLoadedStatus() in declareLuaClass
 	} // end namespace lua_extension
 
 /** 
-\todo there is a significant inheritance problem here that needs to be solved
+\todo this is only for CLASS functions, not LuaExtendable
+\todo replace with a string -> offset map 
 */
-#define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
-		lua_getglobal(L, "getClass");	/*s: getClass */ \
-		push(L, #CLASS);				/*s: getClass, "CLASS" */ \
-		lua_call(L, 1, 1);				/*s: CLASS */ \
-		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
-		return 1; \
-	} 
+#define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
+		if (strcmp(className, superClassName)) \
+		{	/* here would be a recursive call that would be never called */ \
+			return SUPER_CLASS##__indexSupport(t, k, L, #CLASS, #SUPER_CLASS); \
+		} \
+		else \
+		{ \
+			return false; /*  must tell the main calling function if something was pushed */ \
+		} \
+	}
+
 
 /** 
-\todo there is a significant inheritance problem here that needs to be solved
+\todo this is only for CLASS functions, not LuaExtendable
+\todo replace with a string -> offset map 
 */
-#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
-		return luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
+#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
+		if (strcmp(className, superClassName)) \
+		{	/* here would be a recursive call that would be never called */ \
+			return SUPER_CLASS##__newindexSupport(t, k, L, #CLASS, #SUPER_CLASS); \
+		} \
+		else \
+		{ \
+			return false; /* must tell the main calling function if something was pushed */ \
+		} \
 	}
 
 /** 
