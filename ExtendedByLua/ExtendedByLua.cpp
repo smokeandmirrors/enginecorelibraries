@@ -45,8 +45,9 @@ are included in the macro below
 #endif//UNIT_TEST_VERIFICATION
 
 
-struct AllPublic
+class AllPublic
 {
+public:
 	sint 
 		one;
 	bool 
@@ -57,6 +58,65 @@ struct AllPublic
 	sint method(void) const { return 17; }
 };
 
+class AllPublicChild
+{
+public:
+	AllPublicChild() : four(NULL) {}
+	AllPublic* four;
+	sint five;
+};
+
+//////////////////////////////////////////////////////////////////////////
+DECLARE_LUA_CLASS(AllPublic);
+
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
+LUA_FUNC(AllPublic__index) 
+{ 
+	const schar* k = to<const schar*>(L, -1); 
+	const AllPublic& t = to<const AllPublic&>(L, -2); 
+	if (!strcmp(k, "one" )) { pushTrue(L); push(L, t.one); return 2; }// __index_FUNCTION_ENTRY(one)
+	if (!strcmp(k, "two" )) { pushTrue(L);  push(L, t.two); return 2; }// __index_FUNCTION_ENTRY(two)
+	if (!strcmp(k, "three" )) { pushTrue(L);  push(L, t.three); return 2; } // __index_FUNCTION_ENTRY(three)
+	pushFalse(L); return 1; 
+} 
+// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
+
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
+	__newindex_FUNCTION_ENTRY(one, sint)
+	__newindex_FUNCTION_ENTRY(two, bool)
+	__newindex_FUNCTION_ENTRY(three, sreal)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
+
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+	LUA_NAMED_ENTRY("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
+END_LUA_CLASS(AllPublic, AllPublic)
+
+//////////////////////////////////////////////////////////////////////////
+DECLARE_LUA_CLASS(AllPublicChild);
+/*
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild)
+	__index_FUNCTION_ENTRY(four)
+	__index_FUNCTION_ENTRY(five)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
+*/
+LUA_FUNC(AllPublicChild__index) 
+{ 
+	const schar* k = to<const schar*>(L, -1); 
+	const AllPublicChild& t = to<const AllPublicChild&>(L, -2); 
+	if (!strcmp(k, "four" )) { pushTrue(L); push(L, t.four); return 2; }// __index_FUNCTION_ENTRY(one)
+	if (!strcmp(k, "five" )) { pushTrue(L);  push(L, t.five); return 2; }// __index_FUNCTION_ENTRY(two)
+	pushFalse(L); return 1; 
+} 
+
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild)
+	__newindex_FUNCTION_ENTRY(four, AllPublic*)
+	__newindex_FUNCTION_ENTRY(five, sint)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild)
+
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
+END_LUA_CLASS(AllPublicChild, AllPublic)
+
+//////////////////////////////////////////////////////////////////////////
 enum eNumbers
 {
 	One,
@@ -96,25 +156,6 @@ DEFINE_LUA_ENUM(eNumbers)
 	LUA_ENUM(Three)
 END_LUA_ENUM(eNumbers)
 
-DECLARE_LUA_CLASS(AllPublic);
-
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
-	__index_FUNCTION_ENTRY(one)
-	__index_FUNCTION_ENTRY(two)
-	__index_FUNCTION_ENTRY(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic)
-
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
-	__newindex_FUNCTION_ENTRY(one, sint)
-	__newindex_FUNCTION_ENTRY(two, bool)
-	__newindex_FUNCTION_ENTRY(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic)
-
-DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
-			// LUA_NAMED_ENTRY("__index", AllPublic__index)
-			// LUA_NAMED_ENTRY("__newindex", AllPublic__newindex)
-			LUA_NAMED_ENTRY("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
-END_LUA_CLASS(AllPublic, AllPublic)
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
@@ -130,6 +171,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		REGISTER_LUA_LIBRARY((&lua), Vector2);
 		REGISTER_LUA_LIBRARY((&lua), Vector3);
 		REGISTER_LUA_LIBRARY((&lua), AllPublic);
+		REGISTER_LUA_LIBRARY((&lua), AllPublicChild);
 		REGISTER_LUA_ENUM((&lua), eNumbers)
 		REGISTER_LUA_ENUM((&lua), eDirections)
 		REGISTER_LUA_ENUM((&lua), ReadOnly)
@@ -141,18 +183,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif // UNIT_TEST_VERIFICATION
 
 		// get the user file for easier rapid iteration
-
-		lua_State* L = lua.getState();
-		push(L, One);
-		eNumbers en = to<eNumbers>(L, -1);
-		lua_pop(L, 1);
-
-		push(L, Down);
-		eDirections dir = to<eDirections>(L, -1);
-		lua_pop(L, 1);		
-
-
-		// lua.require("User");
+		lua.require("User");
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA

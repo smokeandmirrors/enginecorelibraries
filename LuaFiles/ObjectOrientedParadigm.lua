@@ -155,9 +155,16 @@ end
 
 ----------------------------------------------------------------------
 -- Create a new instance of a class
+if DEBUG_INTERPRETATION then
 function _G.new(class_name, ...)
-	-- assert(classes_PRIVATE[class_name], 'No such class: '..class_name..' !')
+	local constructor = constructors_PRIVATE[class_name]
+	assert(type(constructor) == 'function', 'No such class: '..class_name..' !')
+	return constructor(...)
+end
+else
+function _G.new(class_name, ...)
 	return constructors_PRIVATE[class_name](...)
+end
 end
 
 ----------------------------------------------------------------------
@@ -266,6 +273,7 @@ end --- DEBUG_INTERPRETATION
 ----------------------------------------------------------------------
 
 -- hold the necessary composition of classes
+--[[ these should all be able to be local --]]
 classes_PRIVATE 		= {}
 constructors_PRIVATE	= {}
 destructors_PRIVATE		= {}
@@ -485,7 +493,7 @@ function createClassProperties_PRIVATE(name, superclass, custom__index)
 	-- implement inheritance from super classes
 	setmetatable(class, {__index = superclass}) 
 	-- implement inheritance for instantiated objects
-	metatables_PRIVATE[name] = {__index = custom__index or class} 
+		metatables_PRIVATE[name] = {__index = custom__index or class} 
 	-- return the class definition
 	return class
 end

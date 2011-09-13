@@ -13,26 +13,32 @@ BE PASSED IN TO THE FUNCTION
 
 sint lua_extension::push(lua_State* L, LuaExtendable* value)
 {
-	pushRegisteredClass(L, value);					//s: ud
-	lua_getglobal(L, "getmetatable");				//s: ud, getmetatable	
-	lua_pushvalue(L, -2);							//s: ud, getmetatable, ud
-	lua_call(L, 1, 1);								//s: ud, getmetatable, ?
+	if (value)
+	{
+		pushRegisteredClass(L, value);					//s: ud
+		lua_getglobal(L, "getmetatable");				//s: ud, getmetatable	
+		lua_pushvalue(L, -2);							//s: ud, getmetatable, ud
+		lua_call(L, 1, 1);								//s: ud, getmetatable, ?
 
-	if (lua_istable(L, -1))
-	{												//s: ud, mt
-		lua_pop(L, 1);								//s: ud
+		if (lua_istable(L, -1))
+		{												//s: ud, mt
+			lua_pop(L, 1);								//s: ud
+		}
+		else
+		{												//s: ud, nil	
+			lua_pop(L, 1);								//s: ud
+			lua_getglobal(L, "ObjectOrientedParadigm"); //s: ud, OOP
+			lua_getfield(L, -1, "initializers_PRIVATE");//s: ud, OOP, initializers
+			lua_replace(L, -2);							//s: ud, initializers
+			lua_getfield(L, -1, value->getClassName());	//s: ud, initializers, "class_name"
+			lua_replace(L, -2);							//s: ud, class()
+			lua_pushvalue(L, -2);						//s: ud, class(), ud
+			lua_call(L, 1, 0);							//s: ud
+		}
 	}
-	else
-	{												//s: ud, nil	
-		lua_pop(L, 1);								//s: ud
-		lua_getglobal(L, "ObjectOrientedParadigm"); //s: ud, OOP
-		lua_getfield(L, -1, "initializers_PRIVATE");//s: ud, OOP, initializers
-		lua_replace(L, -2);							//s: ud, initializers
-		lua_getfield(L, -1, value->getClassName());	//s: ud, initializers, "class_name"
-		lua_replace(L, -2);							//s: ud, class()
-		lua_pushvalue(L, -2);						//s: ud, class(), ud
-		lua_call(L, 1, 0);							//s: ud
+	else 
+	{
+		lua_pushnil(L);
 	}
-
 	return 1;
 }

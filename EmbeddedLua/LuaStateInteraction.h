@@ -146,7 +146,11 @@ template<> inline LuaExtendable* to<LuaExtendable*>(lua_State* L, sint index)
 {
 #if ARGUMENT_ERRORS 
 	lua_assertIndexInStack(L, index);
-	if (!lua_isuserdata(L, index)) 
+	if (lua_isnil(L, index))
+	{
+		return NULL;
+	}
+	else if (!lua_isuserdata(L, index)) 
 	{ 
 		const schar* actual = luaL_typename(L, index); 
 		luaL_error(L, "argument type error! argument at index %d expected: %s actual: %s ", index, "LuaExtendable", actual); 

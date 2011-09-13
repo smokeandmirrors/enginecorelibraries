@@ -110,7 +110,8 @@ for public members that can be pushed directly into %Lua
 /**
 used for an entry in a "setter" function 
 for public members that can be set directly from %Lua
-\todo replace with a string -> offset map 
+\todo replace with a string -> offset map
+\todo there is a significant inheritance problem here that needs to be solved
 */
 #define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return 0; }	
@@ -218,7 +219,7 @@ the LuaExtendable interface.
 	}
 
 #if DEBUG 
-/** 
+/**
 */
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
@@ -227,7 +228,7 @@ the LuaExtendable interface.
 		"Use DEFINE_LUA_CLASS_BY_PROXY to expose this class to Lua if that is desired.", #CLASS); \
 	}
 #else 
-/** 
+/**
 */
 #define DEFINE_LUA_CLASS__newindex_ERROR(CLASS) \
 	LUA_FUNC(__newindexError##CLASS) \
@@ -339,6 +340,17 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
 
+/** 
+\todo these need matching DEFINE LIB defines
+*/
+#define DEFINE_LUA_CLASS_NO_DTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
+
 /**
 Define a %Lua library around a class, so that instances of the 
 controlled in %Lua. This also exposes simple userdata pointers with all 
@@ -374,6 +386,26 @@ or the same if it has no parent class
 		LUA_NAMED_ENTRY("__index", CLASS##__index) \
 		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
 
+
+#define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NODTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
+		LUA_NAMED_ENTRY("__index", CLASS##__index) \
+		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+
+
+#define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NOCTOR_NODTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_CLASS__isnewindexable_FALSE \
+		LUA_ENTRY_CLASS__setmetatable_USERDATA \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
+		LUA_NAMED_ENTRY("__index", CLASS##__index) \
+		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+
+
 /**
 \note when pushing an object into %Lua, it might not be because the 
 object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this
@@ -387,24 +419,31 @@ BE PASSED IN TO THE FUNCTION
 #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) \
 	sint lua_extension::push(lua_State* L, CLASS * value) \
 	{ \
-		pushRegisteredClass(L, value); \
-		lua_getglobal(L, "getmetatable"); \
-		lua_pushvalue(L, -2); \
-		lua_call(L, 1, 1); \
-		if (lua_istable(L, -1)) \
+		if (value) \
 		{ \
-			lua_pop(L, 1); \
-		} \
+			pushRegisteredClass(L, value); \
+			lua_getglobal(L, "getmetatable"); \
+			lua_pushvalue(L, -2); \
+			lua_call(L, 1, 1); \
+			if (lua_istable(L, -1)) \
+			{ \
+				lua_pop(L, 1); \
+			} \
+			else \
+			{ \
+				lua_pop(L, 1); \
+				lua_getglobal(L, "ObjectOrientedParadigm"); \
+				lua_getfield(L, -1, "initializers_PRIVATE"); \
+				lua_replace(L, -2); \
+				lua_getfield(L, -1, #CLASS ); \
+				lua_replace(L, -2); \
+				lua_pushvalue(L, -2); \
+				lua_call(L, 1, 0); \
+			} \
+		}\
 		else \
 		{ \
-			lua_pop(L, 1); \
-			lua_getglobal(L, "ObjectOrientedParadigm"); \
-			lua_getfield(L, -1, "initializers_PRIVATE"); \
-			lua_replace(L, -2); \
-			lua_getfield(L, -1, #CLASS ); \
-			lua_replace(L, -2); \
-			lua_pushvalue(L, -2); \
-			lua_call(L, 1, 0); \
+			lua_pushnil(L); \
 		} \
 		return 1; \
 	} \
@@ -443,6 +482,17 @@ BE PASSED IN TO THE FUNCTION
 			LUA_ENUM(MIN_VALUE)
 
 /**
+*/
+#define DEFINE_LUA_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN_VALUE, MAX_VALUE) \
+	DEFINE_TO_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN_VALUE, MAX_VALUE) \
+	namespace lua_extension \
+	{ \
+		inline sint register_##ENUM(struct lua_State* L) /* LUA_FUNC(register_##ENUM)*/ \
+		{ \
+			lua_newtable(L);			/*s: {} */ \
+			LUA_ENUM_NS(NAMESPACE, MIN_VALUE)
+
+/**
 empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE__tostring(CLASS)
@@ -458,6 +508,7 @@ empty for now, but makes things easier
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
 /** 
+\todo there is a significant inheritance problem here that needs to be solved
 */
 #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
 	LUA_FUNC(##CLASS##__index) \
@@ -466,12 +517,13 @@ empty for now, but makes things easier
 		const CLASS& t = to<const CLASS&>(L, -2); 
 
 /** 
+\todo there is a significant inheritance problem here that needs to be solved
 */
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
 	LUA_FUNC(##CLASS##__newindex) \
 	{ \
-	const schar* k = to<const schar*>(L, -2); \
-	CLASS& t = to<CLASS&>(L, -3); 
+		const schar* k = to<const schar*>(L, -2); \
+		CLASS& t = to<CLASS&>(L, -3); 
 
 /** 
 Begin a library definition for registration
@@ -535,93 +587,92 @@ This method is ideal for static classes or libraries.
 		return setProxyMetatable(L); \
 	}
 
+
+/** 
+*/
 #if ARGUMENT_ERRORS
-/** 
-*/
-#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
-	namespace lua_extension \
-	{ \
-		template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
+	#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
+		namespace lua_extension \
 		{ \
-			lua_assertIndexInStack(L, index); \
-			if (!lua_isuserdata(L, index)) \
+			template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
 			{ \
-				const char* actual = luaL_typename(L, index); \
-				luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				lua_assertIndexInStack(L, index); \
+				if (lua_isnil(L, index)) \
+				{ \
+					return NULL; \
+				} \
+				if (!lua_isuserdata(L, index)) \
+				{ \
+					const char* actual = luaL_typename(L, index); \
+					luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				} \
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
-			return *static_cast< CLASS** >(lua_touserdata(L, index)); \
-		} \
-		template<> inline const CLASS* to< const CLASS* >(lua_State* L, int index) \
-		{ \
-			lua_assertIndexInStack(L, index); \
-			if (!lua_isuserdata(L, index)) \
+			template<> inline const CLASS* to< const CLASS* >(lua_State* L, int index) \
 			{ \
-				const char* actual = luaL_typename(L, index); \
-				luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				lua_assertIndexInStack(L, index); \
+				if (lua_isnil(L, index)) \
+				{ \
+					return NULL; \
+				} \
+				if (!lua_isuserdata(L, index)) \
+				{ \
+					const char* actual = luaL_typename(L, index); \
+					luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				} \
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
-			return *static_cast< CLASS** >(lua_touserdata(L, index)); \
-		} \
-		template<> inline CLASS& to< CLASS& >(lua_State* L, int index) \
-		{ \
-			lua_assertIndexInStack(L, index); \
-			if (!lua_isuserdata(L, index)) \
+			template<> inline CLASS& to< CLASS& >(lua_State* L, int index) \
 			{ \
-				const char* actual = luaL_typename(L, index); \
-				luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				lua_assertIndexInStack(L, index); \
+				if (!lua_isuserdata(L, index)) \
+				{ \
+					const char* actual = luaL_typename(L, index); \
+					luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				} \
+				return **static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
-			return **static_cast< CLASS** >(lua_touserdata(L, index)); \
-		} \
-		template<> inline const CLASS& to< const CLASS& >(lua_State* L, int index) \
-		{ \
-			lua_assertIndexInStack(L, index); \
-			if (!lua_isuserdata(L, index)) \
+			template<> inline const CLASS& to< const CLASS& >(lua_State* L, int index) \
 			{ \
-				const char* actual = luaL_typename(L, index); \
-				luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				lua_assertIndexInStack(L, index); \
+				if (!lua_isuserdata(L, index)) \
+				{ \
+					const char* actual = luaL_typename(L, index); \
+					luaL_error(L, "argument type error! argument at index %d expected: userdata actual: %s ", index, actual); \
+				} \
+				return **static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
-			return **static_cast< CLASS** >(lua_touserdata(L, index)); \
-		} \
-	} // namespace lua_extension 
-
-/** helps compilers with enums as paramenters in template wrapped functions */
-#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
-	template<> inline ENUM lua_extension::to< ##ENUM## >(lua_State* L, sint index) \
-	{ \
-		ENUM value = static_cast< ##ENUM## >(to<sint>(L, index)); \
-		if (value > MAX || value < MIN) \
-		{ \
-			luaL_error(L, "argument type error! enum:" #ENUM " must be >= " #MIN ":%d and <= " #MAX ":%d but is %d", MIN, MAX, value); \
-		} \
-		return value; \
-	}
+		} // namespace lua_extension 
 #else // #if ARGUMENT_ERRORS
-/** 
-*/
-#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
-	namespace lua_extension \
-	{ \
-		template<> inline const CLASS* to< const CLASS* >(lua_State* L, int index) \
+	#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
+		namespace lua_extension \
 		{ \
-			return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
-		} \
-		template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
-		{ \
-			return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
-		} \
-		template<> inline CLASS& to< CLASS& >(lua_State* L, int index) \
-		{ \
-			return **static_cast<CLASS**>(lua_touserdata(L, index)); \
-		} \
-		template<> inline const CLASS& to< const CLASS& >(lua_State* L, int index) \
-		{ \
-			return **static_cast<CLASS**>(lua_touserdata(L, index)); \
-		} \
-	} // namespace lua_extension 
-
-/** helps compilers with enums as paramenters in template wrapped functions */
-#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
-	DEFINE_TO_ENUM(ENUM)		
-#endif//ARGUMENT_ERRORS
+			template<> inline const CLASS* to< const CLASS* >(lua_State* L, int index) \
+			{ \
+				if (lua_isnil(L, index)) \
+				{ \
+					return NULL; \
+				} \
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
+			} \
+			template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
+			{ \
+				if (lua_isnil(L, index)) \
+				{ \
+					return NULL; \
+				} \
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
+			} \
+			template<> inline CLASS& to< CLASS& >(lua_State* L, int index) \
+			{ \
+				return **static_cast<CLASS**>(lua_touserdata(L, index)); \
+			} \
+			template<> inline const CLASS& to< const CLASS& >(lua_State* L, int index) \
+			{ \
+				return **static_cast<CLASS**>(lua_touserdata(L, index)); \
+			} \
+		} // namespace lua_extension 
+#endif
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM(ENUM) \
@@ -629,6 +680,51 @@ This method is ideal for static classes or libraries.
 	{ \
 		return static_cast<##ENUM##>(to<sint>(L, index)); \
 	}
+
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#if ARGUMENT_ERRORS	
+	#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
+		template<> inline ENUM lua_extension::to< ##ENUM## >(lua_State* L, sint index) \
+		{ \
+			ENUM value = static_cast< ##ENUM## >(to<sint>(L, index)); \
+			if (value > MAX || value < MIN) \
+			{ \
+				luaL_error(L, "argument type error! enum:" #ENUM " must be >= " #MIN ":%d and <= " #MAX ":%d but is %d", MIN, MAX, value); \
+			} \
+			return value; \
+		}
+#else
+	#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
+		DEFINE_TO_ENUM(ENUM)		
+#endif//ARGUMENT_ERRORS
+
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#if ARGUMENT_ERRORS
+	#define DEFINE_TO_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN, MAX) \
+		template<> inline NAMESPACE##::##ENUM lua_extension::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
+		{ \
+			NAMESPACE##::##ENUM value = static_cast< NAMESPACE##::##ENUM >(to<sint>(L, index)); \
+			if (value >NAMESPACE##::##MAX || value < NAMESPACE##::##MIN) \
+			{ \
+				luaL_error(L, "argument type error! enum:" #NAMESPACE "::" #ENUM " must be >= " #MIN ":%d and <= " #MAX ":%d but is %d",NAMESPACE##::##MIN, NAMESPACE##::##MAX, value); \
+			} \
+			return value; \
+		}
+#else
+	#define DEFINE_TO_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN, MAX) \
+		DEFINE_TO_ENUM_NS(NAMESPACE, ENUM)
+#endif//ARGUMENT_ERRORS
+
+
+/** helps compilers with enums as paramenters in template wrapped functions */
+#define DEFINE_TO_ENUM_NS(NAMESPACE, ENUM)\
+	template<> inline NAMESPACE##::##ENUM lua_extension::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
+	{ \
+		return static_cast< NAMESPACE##::##ENUM >(to<sint>(L, index));\
+	}
+
 
 /**
 defines functions that can be used to get specific class pointers
@@ -639,51 +735,51 @@ back out of %Lua.
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
 	namespace lua_extension \
 	{ \
-	template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
+		template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
 		{ \
-		LuaExtendable* le = to<LuaExtendable*>(L, index); \
-		CLASS* object = dynamic_cast< CLASS* >(le); \
-		if (object == static_cast< CLASS* >(le)) \
-		return object; \
-		luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, #CLASS, typeid(object).name()); \
-		return NULL; \
+			LuaExtendable* le = to<LuaExtendable*>(L, index); \
+			CLASS* object = dynamic_cast< CLASS* >(le); \
+			if (object == static_cast< CLASS* >(le)) \
+				return object; \
+			luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, #CLASS, typeid(object).name()); \
+			return NULL; \
 		} \
 		template<> inline const CLASS* to< const CLASS* >(lua_State* L, sint index) \
 		{ \
-		return to< CLASS* >(L, index); \
+			return to< CLASS* >(L, index); \
 		} \
 		template<> inline CLASS& to< CLASS& >(lua_State* L, sint index) \
 		{ \
-		CLASS* object = to< CLASS* >(L, index); \
-		return *object; \
+			CLASS* object = to< CLASS* >(L, index); \
+			return *object; \
 		} \
 		template<> inline const CLASS& to< const CLASS& >(lua_State* L, sint index) \
 		{ \
-		CLASS* object = to< CLASS* >(L, index); \
-		return *object; \
+			CLASS* object = to< CLASS* >(L, index); \
+			return *object; \
 		} \
-		}
+	}
 #else
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
 	namespace lua_extension \
 	{ \
-	template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
+		template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
 		{ \
-		return static_cast< CLASS* >(to<LuaExtendable*>(L, index)); \
+			return static_cast< CLASS* >(to<LuaExtendable*>(L, index)); \
 		} \
 		template<> inline const CLASS* to< const CLASS* >(lua_State* L, sint index) \
 		{ \
-		return to< CLASS* >(L, index); \
+			return to< CLASS* >(L, index); \
 		} \
 		template<> inline CLASS& to<CLASS&>(lua_State* L, sint index) \
 		{ \
-		return *to< CLASS* >(L, index); \
+			return *to< CLASS* >(L, index); \
 		} \
 		template<> inline const CLASS& to< const CLASS& >(lua_State* L, sint index) \
 		{ \
-		return *to< CLASS* >(L, index); \
+			return *to< CLASS* >(L, index); \
 		} \
-		}
+	}
 #endif//ARGUMENT_ERRORS
 
 /** 
@@ -731,20 +827,44 @@ calls nilLoadedStatus() in declareLuaClass
 /** 
 */
 #define END_LUA_ENUM_BOUND(ENUM, MAX_ENUM_VALUE) \
-			LUA_ENUM(MAX_ENUM_VALUE)	/*s: MAX_ENUM_VALUE */ \
-		END_LUA_ENUM(ENUM)
+		LUA_ENUM(MAX_ENUM_VALUE)	/*s: MAX_ENUM_VALUE */ \
+	END_LUA_ENUM(ENUM)
+
+/**
+*/
+#define END_LUA_ENUM_BOUND_NS(NAMESPACE, ENUM, MAX_ENUM_VALUE) \
+		LUA_ENUM_NS(NAMESPACE, MAX_ENUM_VALUE)	/*s: MAX_ENUM_VALUE */ \
+	END_LUA_ENUM_NS(NAMESPACE, ENUM)
+
+/**
+*/
+#define END_LUA_ENUM_NS(NAMESPACE, ENUM) \
+			lua_newtable(L);						/*s: ReadOnly proxy */ \
+			lua_newtable(L);						/*s: ReadOnly proxy mt */ \
+			lua_pushvalue(L, -3);					/*s: ReadOnly proxy mt ReadOnly */ \
+			lua_setfield(L, -2, "__index");			/*s: ReadOnly proxy mt */ \
+			lua_pushcfunction(L, lua_extension::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
+			lua_setfield(L, -2, "__newindex");		/*s: ReadOnly proxy mt */ \
+			lua_setmetatable(L, -2);				/*s: ReadOnly proxy */ \
+			lua_replace(L, -2);						/*s: proxy */ \
+			lua_setglobal(L, #ENUM );				/*s: */ \
+			return 0; \
+		} \
+	} // end namespace lua_extension
 
 /** 
+\todo there is a significant inheritance problem here that needs to be solved
 */
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS) \
 		lua_getglobal(L, "getClass");	/*s: getClass */ \
 		push(L, #CLASS);				/*s: getClass, "CLASS" */ \
-		lua_call(L, 1, 1);				/*s: AllPublic */ \
-		lua_getfield(L, -1, k);			/*s: AllPublic[k] */ \
+		lua_call(L, 1, 1);				/*s: CLASS */ \
+		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
 		return 1; \
 	} 
 
 /** 
+\todo there is a significant inheritance problem here that needs to be solved
 */
 #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS) \
 		return luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
@@ -767,12 +887,12 @@ adds shortcut to allow extending the library in %Lua with
 the require() function.
 \note compile-time directive
 \note highly recommended to follow define_lua_library_extensible
-\param CLASS name of the library without string delimiters
+\param NAME name of the library without string delimiters
 */
-#define END_LUA_LIBRARY_EXTENSIBLE(CLASS) \
-		CLOSE_LUA_LIB(CLASS) \
+#define END_LUA_LIBRARY_EXTENSIBLE(NAME) \
+		CLOSE_LUA_LIB(NAME) \
 		DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
-	CLOSE_LUA_NS(CLASS)
+	CLOSE_LUA_NS(NAME)
 
 /** 
 */
@@ -847,6 +967,12 @@ add a lua method to a definition by the same name
 #define LUA_ENUM(ENUMERATION) \
 			push(L, ENUMERATION);				/*s: ENUM_NAME, ENUMERATION */ \
 			lua_setfield(L, -2, #ENUMERATION );	/*s: ENUM_NAME */ 
+
+/**
+*/
+#define LUA_ENUM_NS(NAMESPACE, ENUMERATION) \
+			push(L, NAMESPACE##::##ENUMERATION);		/*s: ENUM_NAME, ENUMERATION */ \
+			lua_setfield(L, -2, #ENUMERATION);			/*s: ENUM_NAME */ 
 
 /**
 the sentinel entry in a lua library
@@ -996,6 +1122,7 @@ __gcmetamethod(lua_State* L)
 {
 	CLASS* udata = to<CLASS*>(L, -1);
 	delete udata;
+	// hkMemHeapBlockFree<CLASS>(udata, 1);
 	return 0;
 }
 
@@ -1003,6 +1130,7 @@ template<typename CLASS> sint
 __new(lua_State* L)
 {
 	return pushRegisteredClass(L, new CLASS());
+	// return pushRegisteredClass(L, hkMemHeapBlockAlloc<CLASS>(1));
 }
 
 /**
