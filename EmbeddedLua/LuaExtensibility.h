@@ -28,7 +28,7 @@ namespace lua_library_example
 
 // for the .cpp file 
 DEFINE_LUA_LIBRARY(example)
-	LUA_NAMED_ENTRY("Method", method)
+	LUA_ENTRY_NAMED("Method", method)
 	...
 END_LUA_LIBRARY(example)
 // would generate:
@@ -382,8 +382,8 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
-		LUA_NAMED_ENTRY("__index", CLASS##__index) \
-		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+		LUA_ENTRY__index(CLASS) \
+		LUA_ENTRY__newindex(CLASS)
 
 
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NODTOR(TYPE, CLASS, SUPER_CLASS) \
@@ -392,8 +392,8 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
-		LUA_NAMED_ENTRY("__index", CLASS##__index) \
-		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+		LUA_ENTRY__index(CLASS) \
+		LUA_ENTRY__newindex(CLASS)
 
 
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NOCTOR_NODTOR(TYPE, CLASS, SUPER_CLASS) \
@@ -401,8 +401,8 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__isnewindexable_FALSE \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
-		LUA_NAMED_ENTRY("__index", CLASS##__index) \
-		LUA_NAMED_ENTRY("__newindex", CLASS##__newindex)
+		LUA_ENTRY__index(CLASS) \
+		LUA_ENTRY__newindex(CLASS)
 
 
 /**
@@ -938,48 +938,58 @@ the require() function.
 
 /** 
 */
+#define LUA_ENTRY__index(CLASS) \
+	LUA_ENTRY_NAMED("__index", CLASS##__index)
+
+/** 
+*/
+#define LUA_ENTRY__newindex(CLASS) \
+	LUA_ENTRY_NAMED("__newindex", CLASS##__newindex)
+
+/** 
+*/
 #define LUA_ENTRY_CLASS__gc_DESTRUCTOR(CLASS) \
-	LUA_NAMED_ENTRY("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
+	LUA_ENTRY_NAMED("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isExtendableByProxy \
-	LUA_NAMED_ENTRY("__isExtendableByProxy", lua_extension::pushTrue) 
+	LUA_ENTRY_NAMED("__isExtendableByProxy", lua_extension::pushTrue) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isnewindexable_TRUE \
-	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushTrue) 
+	LUA_ENTRY_NAMED("__isnewindexable", lua_extension::pushTrue) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isnewindexable_FALSE \
-	LUA_NAMED_ENTRY("__isnewindexable", lua_extension::pushFalse) 
+	LUA_ENTRY_NAMED("__isnewindexable", lua_extension::pushFalse) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__new_AUTO(CLASS) \
-	LUA_NAMED_ENTRY("__new", lua_extension::__new<##CLASS##>) 
+	LUA_ENTRY_NAMED("__new", lua_extension::__new<##CLASS##>) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__newindex_ERROR_AUTO(CLASS) \
-	LUA_NAMED_ENTRY("__newindex", lua_library_##CLASS##::__newindexError##CLASS) 
+	LUA_ENTRY_NAMED("__newindex", lua_library_##CLASS##::__newindexError##CLASS) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__setmetatable_PROXY \
-	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setProxyMetatable) 
+	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setProxyMetatable) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__setmetatable_USERDATA \
-	LUA_NAMED_ENTRY("__setmetatable", lua_extension::setUserdataMetatable) 
+	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setUserdataMetatable) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__tostring_AUTO(CLASS) \
-	LUA_NAMED_ENTRY("__tostring", __tostring##CLASS)
+	LUA_ENTRY_NAMED("__tostring", __tostring##CLASS)
 
 /** 
 add a lua method to a definition by the same name 
@@ -992,17 +1002,17 @@ add a lua method to a definition by the same name
 /** 
 */
 #define LUA_ENTRY_EXTENDABLE__gc_DESTRUCTOR(CLASS) \
-	LUA_NAMED_ENTRY("__gc", LuaExtendable::__gcmetamethod)
+	LUA_ENTRY_NAMED("__gc", LuaExtendable::__gcmetamethod)
 
 /** 
 */
 #define LUA_ENTRY_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
-	LUA_NAMED_ENTRY("__newindex", LuaExtendable::__newindexError) 
+	LUA_ENTRY_NAMED("__newindex", LuaExtendable::__newindexError) 
 
 /** 
 */
 #define LUA_ENTRY_EXTENDABLE__tostring_AUTO(CLASS) \
-	LUA_NAMED_ENTRY("__tostring", LuaExtendable::__tostring) 
+	LUA_ENTRY_NAMED("__tostring", LuaExtendable::__tostring) 
 
 /** 
 */
@@ -1039,7 +1049,7 @@ add a lua method to a definition by a different name
 \param name a string delimited name
 \param function a lua_function
 */
-#define LUA_NAMED_ENTRY(name, function)	\
+#define LUA_ENTRY_NAMED(name, function)	\
 	{(name), (function)}, 
 
 /** 
@@ -1164,7 +1174,6 @@ __gcmetamethod(lua_State* L)
 {
 	CLASS* udata = to<CLASS*>(L, -1);
 	delete udata;
-	// hkMemHeapBlockFree<CLASS>(udata, 1);
 	return 0;
 }
 
@@ -1172,7 +1181,6 @@ template<typename CLASS> sint
 __new(lua_State* L)
 {
 	return pushRegisteredClass(L, new CLASS());
-	// return pushRegisteredClass(L, hkMemHeapBlockAlloc<CLASS>(1));
 }
 
 /**
@@ -1348,8 +1356,8 @@ return 0;
 }
 
 DEFINE_LUA_CLASS(CLASS, AllPublic, AllPublic)
-LUA_NAMED_ENTRY("getOne", AllPublic_getone)
-LUA_NAMED_ENTRY("setOne", AllPublic_setone)
+LUA_ENTRY_NAMED("getOne", AllPublic_getone)
+LUA_ENTRY_NAMED("setOne", AllPublic_setone)
 END_LUA_CLASS(AllPublic, AllPublic)
 
 

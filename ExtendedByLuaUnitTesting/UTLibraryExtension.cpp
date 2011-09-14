@@ -34,10 +34,10 @@ static sreal addAndSubtract(sreal& subtracted, sreal operand)
 DECLARE_LUA_LIBRARY(UnitTestLibrary)
 
 DEFINE_LUA_LIBRARY(UnitTestLibrary)
-	LUA_NAMED_ENTRY("getOne",			(staticReturn1Param0<sint, getOne>))
-	LUA_NAMED_ENTRY("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
-	LUA_NAMED_ENTRY("incrementByOne",	(staticReturn1Param1<sreal, sreal, incrementByOne>))
-	LUA_NAMED_ENTRY("addAndSubtract",	(staticReturn2Param1<sreal, sreal, sreal, addAndSubtract>))
+	LUA_ENTRY_NAMED("getOne",			(staticReturn1Param0<sint, getOne>))
+	LUA_ENTRY_NAMED("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
+	LUA_ENTRY_NAMED("incrementByOne",	(staticReturn1Param1<sreal, sreal, incrementByOne>))
+	LUA_ENTRY_NAMED("addAndSubtract",	(staticReturn2Param1<sreal, sreal, sreal, addAndSubtract>))
 END_LUA_LIBRARY(UnitTestLibrary)
 
 class LibraryExtensionUT : public cfixcc::TestFixture
