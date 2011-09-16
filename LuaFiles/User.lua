@@ -29,12 +29,18 @@ _G.loader = function(modulename)
 end
 
 _G.test = function()
+	indices = {"one", "two","three", "four", "five", "six", "seven" }
+	agp = new'AllPublicGrandChild'
+	for k, v in pairs(indices) do 
+		print(v, agp[v])
+	end
+--[[	
 	local v = new'Value_sint4'
 	v:setValue(7)
 	assert(v:getValue() == 7)
 	print(v:getValue())
 
---[[
+
 	vpt(1000)
 	vpt(10000)
 	vpt(100000)

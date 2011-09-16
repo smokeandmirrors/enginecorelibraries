@@ -70,116 +70,201 @@ public:
 	sint childMethod(void) const { return 1717; }
 };
 
-
-//////////////////////////////////////////////////////////////////////////
-class AllPublicLE 
-	: public LuaExtendable
+class AllPublicGrandChild : public AllPublicChild
 {
 public:
-	AllPublicLE(void) : one(1), two(true), three(3.0f) {}
-	virtual ~AllPublicLE(void) {}
-	sint 
-		one;
-	bool 
-		two;
-	sreal 
-		three;
+	AllPublicGrandChild() : six(NULL), seven(7) {}
+	AllPublicChild* six;
+	uint seven;
 
-	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(AllPublicLE)
-
-	sint method(void) const { return 17; }
+	sint grandChildMethod(void) const { return 171717; }
 };
-DECLARE_LUA_LUAEXTENDABLE(AllPublicLE)
-
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
-		__index_FUNCTION_ENTRY(one)
-		__index_FUNCTION_ENTRY(two)
-		__index_FUNCTION_ENTRY(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
-
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
-	__newindex_FUNCTION_ENTRY(one, sint)
-	__newindex_FUNCTION_ENTRY(two, bool)
-	__newindex_FUNCTION_ENTRY(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
-
-DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, AllPublicLE, AllPublicLE)
-	LUA_ENTRY__index(AllPublicLE)
-	LUA_ENTRY__newindex(AllPublicLE)
-END_LUA_CLASS(AllPublicLE, AllPublicLE)
 
 
 //////////////////////////////////////////////////////////////////////////
-class AllPublicChildLE : public AllPublicLE
-{
-public:
-	AllPublicChildLE() : four(NULL), five(5) {}
-	AllPublicLE* four;
-	sint five;
+// class AllPublicLE 
+// 	: public LuaExtendable
+// {
+// public:
+// 	AllPublicLE(void) : one(1), two(true), three(3.0f) {}
+// 	virtual ~AllPublicLE(void) {}
+// 	sint 
+// 		one;
+// 	bool 
+// 		two;
+// 	sreal 
+// 		three;
+// 
+// 	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(AllPublicLE)
+// 
+// 	sint grandChildMethod(void) const { return 17; }
+// };
+// DECLARE_LUA_LUAEXTENDABLE(AllPublicLE)
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
+// 		__index_FUNCTION_ENTRY(one)
+// 		__index_FUNCTION_ENTRY(two)
+// 		__index_FUNCTION_ENTRY(three)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
+// 
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
+// 	__newindex_FUNCTION_ENTRY(one, sint)
+// 	__newindex_FUNCTION_ENTRY(two, bool)
+// 	__newindex_FUNCTION_ENTRY(three, sreal)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
+// 
+// DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, AllPublicLE, AllPublicLE)
+// 	LUA_ENTRY__index(AllPublicLE)
+// 	LUA_ENTRY__newindex(AllPublicLE)
+// END_LUA_CLASS(AllPublicLE, AllPublicLE)
 
-	DEFINE_DEFAULT_TOSTRING(AllPublicChildLE)
-	DEFINE_DEFAULT_GETCLASSNAME(AllPublicChildLE)
 
-	sint childMethod(void) const { return 1717; }
-};
-DECLARE_LUA_LUAEXTENDABLE(AllPublicChildLE)
+//////////////////////////////////////////////////////////////////////////
+// class AllPublicChildLE : public AllPublicLE
+// {
+// public:
+// 	AllPublicChildLE() : four(NULL), five(5) {}
+// 	AllPublicLE* four;
+// 	sint five;
+// 
+// 	DEFINE_DEFAULT_TOSTRING(AllPublicChildLE)
+// 	DEFINE_DEFAULT_GETCLASSNAME(AllPublicChildLE)
+// 
+// 	sint childMethod(void) const { return 1717; }
+// };
+// DECLARE_LUA_LUAEXTENDABLE(AllPublicChildLE)
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
+// 	__index_FUNCTION_ENTRY(four)
+// 	__index_FUNCTION_ENTRY(five)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
+// 
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
+// 	__newindex_FUNCTION_ENTRY(four, AllPublicLE*)
+// 	__newindex_FUNCTION_ENTRY(five, sint)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
+// 
+// DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, AllPublicChildLE, AllPublicLE)
+// 	LUA_ENTRY__index(AllPublicChildLE)
+// 	LUA_ENTRY__newindex(AllPublicChildLE)
+// END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
-	__index_FUNCTION_ENTRY(four)
-	__index_FUNCTION_ENTRY(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
+// proxy versions
+//////////////////////////////////////////////////////////////////////////
+// DECLARE_LUA_CLASS(AllPublic);
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+// 	__index_PROXY_FUNCTION_ENTRY(one)
+// 	__index_PROXY_FUNCTION_ENTRY(two)
+// 	__index_PROXY_FUNCTION_ENTRY(three)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+// 
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+// 	__newindex_PROXY_FUNCTION_ENTRY(one, sint)
+// 	__newindex_PROXY_FUNCTION_ENTRY(two, bool)
+// 	__newindex_PROXY_FUNCTION_ENTRY(three, sreal)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+// 
+// DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+// 	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
+// 	LUA_ENTRY__indexSupport(AllPublic)
+// 	LUA_ENTRY__newindexSupport(AllPublic)
+// END_LUA_CLASS(AllPublic, AllPublic)
+// 
+// 
+// //////////////////////////////////////////////////////////////////////////
+// DECLARE_LUA_CLASS(AllPublicChild);
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+// 	__index_PROXY_FUNCTION_ENTRY(four)
+// 	__index_PROXY_FUNCTION_ENTRY(five)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+// 
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+// 	__newindex_PROXY_FUNCTION_ENTRY(four, AllPublic*)
+// 	__newindex_PROXY_FUNCTION_ENTRY(five, sint)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+// 
+// DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
+// 	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
+// 	LUA_ENTRY__indexSupport(AllPublicChild)
+// 	LUA_ENTRY__newindexSupport(AllPublicChild)
+// END_LUA_CLASS(AllPublicChild, AllPublic)
+// 
+// //////////////////////////////////////////////////////////////////////////
+// DECLARE_LUA_CLASS(AllPublicGrandChild);
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
+// 	__index_PROXY_FUNCTION_ENTRY(six)
+// 	__index_PROXY_FUNCTION_ENTRY(seven)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
+// 
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
+// 	__newindex_PROXY_FUNCTION_ENTRY(six, AllPublicChild*)
+// 	__newindex_PROXY_FUNCTION_ENTRY(seven, uint)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
+// 
+// DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
+// 	LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
+// 	LUA_ENTRY__indexSupport(AllPublicGrandChild)
+// 	LUA_ENTRY__newindexSupport(AllPublicGrandChild)
+// END_LUA_CLASS(AllPublicGrandChild, AllPublicChild)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
-	__newindex_FUNCTION_ENTRY(four, AllPublicLE*)
-	__newindex_FUNCTION_ENTRY(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChildLE, AllPublicLE)
 
-DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, AllPublicChildLE, AllPublicLE)
-	LUA_ENTRY__index(AllPublicChildLE)
-	LUA_ENTRY__newindex(AllPublicChildLE)
-END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
-
-
+// non proxy versions
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublic);
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
-	__index_PROXY_FUNCTION_ENTRY(one)
-	__index_PROXY_FUNCTION_ENTRY(two)
-	__index_PROXY_FUNCTION_ENTRY(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
+	__index_FUNCTION_ENTRY(one)
+	__index_FUNCTION_ENTRY(two)
+	__index_FUNCTION_ENTRY(three)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
-	__newindex_PROXY_FUNCTION_ENTRY(one, sint)
-	__newindex_PROXY_FUNCTION_ENTRY(two, bool)
-	__newindex_PROXY_FUNCTION_ENTRY(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
+	__newindex_FUNCTION_ENTRY(one, sint)
+	__newindex_FUNCTION_ENTRY(two, bool)
+	__newindex_FUNCTION_ENTRY(three, sreal)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
 	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
-	LUA_ENTRY__indexSupport(AllPublic)
-	LUA_ENTRY__newindexSupport(AllPublic)
 END_LUA_CLASS(AllPublic, AllPublic)
 
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublicChild);
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
-	__index_PROXY_FUNCTION_ENTRY(four)
-	__index_PROXY_FUNCTION_ENTRY(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
+	__index_FUNCTION_ENTRY(four)
+	__index_FUNCTION_ENTRY(five)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
-	__newindex_PROXY_FUNCTION_ENTRY(four, AllPublic*)
-	__newindex_PROXY_FUNCTION_ENTRY(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
+__newindex_FUNCTION_ENTRY(four, AllPublic*)
+__newindex_FUNCTION_ENTRY(five, sint)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
-DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
 	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
-	LUA_ENTRY__indexSupport(AllPublicChild)
-	LUA_ENTRY__newindexSupport(AllPublicChild)
 END_LUA_CLASS(AllPublicChild, AllPublic)
+
+//////////////////////////////////////////////////////////////////////////
+DECLARE_LUA_CLASS(AllPublicGrandChild);
+
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
+	__index_FUNCTION_ENTRY(six)
+	__index_FUNCTION_ENTRY(seven)
+END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
+
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
+	__newindex_FUNCTION_ENTRY(six, AllPublicChild*)
+	__newindex_FUNCTION_ENTRY(seven, uint)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
+
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
+	LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
+END_LUA_CLASS(AllPublicGrandChild, AllPublicChild)
 
 //////////////////////////////////////////////////////////////////////////
 enum eNumbers
@@ -241,8 +326,9 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 
 		REGISTER_LUA_LIBRARY((&lua), AllPublic);
 		REGISTER_LUA_LIBRARY((&lua), AllPublicChild);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicLE);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE);
+		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChild);
+		// REGISTER_LUA_LIBRARY((&lua), AllPublicLE);
+		// REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE);
 		REGISTER_LUA_LIBRARY((&lua), Vector2);
 		REGISTER_LUA_LIBRARY((&lua), Vector3);
 		
