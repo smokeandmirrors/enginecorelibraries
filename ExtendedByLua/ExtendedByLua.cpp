@@ -89,55 +89,9 @@ public:
 
 	sint method(void) const { return 17; }
 };
-DECLARE_LUA_LIBRARY(AllPublicLE)
-namespace lua_extension 
-{ 
-	template<> inline AllPublicLE* to< AllPublicLE* >(lua_State* L, sint index) 
-	{ 
-		LuaExtendable* le = to<LuaExtendable*>(L, index); 
-		AllPublicLE* object = dynamic_cast< AllPublicLE* >(le); 
-		if (object == static_cast< AllPublicLE* >(le)) 
-			return object; 
-		luaL_error(L, "argument type error! argument at index %d: expected: %s actual: %s", index, "AllPublicLE", typeid(object).name()); 
-		return NULL; 
-	} 
-	template<> inline const AllPublicLE* to< const AllPublicLE* >(lua_State* L, sint index) 
-	{ 
-		return to< AllPublicLE* >(L, index); 
-	} 
-	template<> inline AllPublicLE& to< AllPublicLE& >(lua_State* L, sint index) 
-	{ 
-		AllPublicLE* object = to< AllPublicLE* >(L, index); 
-		return *object; 
-	} 
-	template<> inline const AllPublicLE& to< const AllPublicLE& >(lua_State* L, sint index) 
-	{ 
-		AllPublicLE* object = to< AllPublicLE* >(L, index); 
-		return *object; 
-	} 
-}
-// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
-	inline bool AllPublicLE__indexSupport(const AllPublicLE& t, const char* k, lua_State* L, const char* className, const char* superClassName); 
-	LUA_FUNC(AllPublicLE__index) 
-	{ 
-		const schar* k = to<const schar*>(L, -1); 
-		const AllPublicLE& t = to<const AllPublicLE&>(L, -2); 
-		if (AllPublicLE__indexSupport(t, k, L, "AllPublicLE", "AllPublicLE")) 
-		{ 
-			return 1; 
-		} 
-		else 
-		{ 
-			lua_getglobal(L, "getClass");	/*s: getClass */ 
-			push(L, "AllPublicLE");			/*s: getClass, "CLASS" */ 
-			lua_call(L, 1, 1);				/*s: CLASS */ 
-			lua_getfield(L, -1, k);			/*s: CLASS[k] */ 
-			return 1; 
-		} 
-	} 
+DECLARE_LUA_LUAEXTENDABLE(AllPublicLE)
 
-	inline bool AllPublicLE__indexSupport(const AllPublicLE& t, const char* k, lua_State* L, const char* className, const char* superClassName) 
-	{
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicLE, AllPublicLE)
 		__index_FUNCTION_ENTRY(one)
 		__index_FUNCTION_ENTRY(two)
 		__index_FUNCTION_ENTRY(three)
@@ -188,12 +142,34 @@ END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublic);
+// 
+// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
+// 	__index_FUNCTION_ENTRY(one)
+// 	__index_FUNCTION_ENTRY(two)
+// 	__index_FUNCTION_ENTRY(three)
+// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
-	__index_FUNCTION_ENTRY(one)
-	__index_FUNCTION_ENTRY(two)
-	__index_FUNCTION_ENTRY(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
+inline sint AllPublic__indexSupport(const AllPublic& t, const char* k, lua_State* L, const char* className, const char* superClassName)
+{
+	if (!strcmp(k, "one" )) { pushTrue(L); push(L, t.one); return 2; }	
+	if (!strcmp(k, "two" )) { pushTrue(L); push(L, t.two); return 2; }	
+	if (!strcmp(k, "three" )) { pushTrue(L); push(L, t.three); return 2; }	
+
+	if (strcmp(className, superClassName)) 
+	{	/* here would be a recursive call that would be never called */ 
+		return AllPublic__indexSupport(t, k, L, "AllPublic", "AllPublic"); 
+	} 
+	else 
+	{ 
+		pushFalse(L);
+		pushNil(L);
+		return 2;
+	} 
+}
+LUA_FUNC(AllPublic__indexSupportExposed)
+{
+	return AllPublic__indexSupport(to<const AllPublic&>(L, -2), to<const char*>(L, -1), L, "AllPublic", "AllPublic");
+}
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 	__newindex_FUNCTION_ENTRY(one, sint)
@@ -201,8 +177,11 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 	__newindex_FUNCTION_ENTRY(three, sreal)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+
+
+DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
 	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
+	LUA_ENTRY_NAMED("__indexSupport", AllPublic__indexSupportExposed)
 END_LUA_CLASS(AllPublic, AllPublic)
 
 

@@ -313,6 +313,15 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__setmetatable_PROXY \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 
+#define DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_CLASS__isExtendableByProxy \
+		LUA_ENTRY_CLASS__isnewindexable_TRUE \
+		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
+		LUA_ENTRY_CLASS__setmetatable_PROXY_PUBLIC_MEMBERS \
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
+
 /** 
 */
 #define DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
@@ -382,8 +391,9 @@ or the same if it has no parent class
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
-		LUA_ENTRY__index(CLASS) \
+		/* LUA_ENTRY__index(CLASS) */ \
 		LUA_ENTRY__newindex(CLASS)
+
 
 
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NODTOR(TYPE, CLASS, SUPER_CLASS) \
@@ -983,6 +993,11 @@ the require() function.
 
 /** 
 */
+#define LUA_ENTRY_CLASS__setmetatable_PROXY_PUBLIC_MEMBERS \
+	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setProxyMetatablePublicMembers) 
+
+/** 
+*/
 #define LUA_ENTRY_CLASS__setmetatable_USERDATA \
 	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setUserdataMetatable) 
 
@@ -1184,12 +1199,7 @@ __new(lua_State* L)
 }
 
 /**
-experimental, trying to get the local proxy table on the top of the 
-stack
 */
-sint
-	__getProxy(lua_State* L);
-
 sint 
 	__newindexEnum(lua_State* L);
 
@@ -1199,6 +1209,14 @@ via the proxy method that will allow it to be assigned new fields
 */
 sint 
 	__newindexProxy(lua_State* L);
+
+/**
+__newindex method for the metatable of a class exposed to %Lua 
+via the proxy method that will allow it to be assigned new fields
+but also has exposed public members
+*/
+sint 
+	__newindexProxyPublicMembers(lua_State* L);
 
 /**
 completes a %Lua class declaration in case no script accompanied
@@ -1244,6 +1262,13 @@ helps set a userdata metatable from script
 */
 sint				
 	setProxyMetatable(lua_State* L);
+
+/**
+helps set a userdata metatable from script
+\warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
+*/
+sint 
+	setProxyMetatablePublicMembers(lua_State* L);
 
 /**
 helps set a userdata metatable from script, this is a exact C version of the function in %Lua,

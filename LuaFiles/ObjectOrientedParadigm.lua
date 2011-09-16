@@ -282,24 +282,25 @@ interfaces_PRIVATE 		= {}
 metatables_PRIVATE 		= {}
 -- helper table
 metamethods = {
-	__add 		= true,
-	__call 		= true,
-	__concat 	= true,
-	__div 		= true,
-	__eq 		= true,
-	__gc 		= true,
-	__le 		= true,
-	__len 		= true,
-	__lt 		= true,
-	__metatable = true,
-	__mod 		= true,
-	__mode 		= true,
-	__mul 		= true,
-	__newindex 	= true,
-	__pow 		= true,
-	__sub 		= true,
-	__tostring 	= true,
-	__unm 		= true
+	__add 			= true,
+	__call 			= true,
+	__concat 		= true,
+	__div 			= true,
+	__eq 			= true,
+	__gc 			= true,
+	__indexSupport 	= true,
+	__le 			= true,
+	__len 			= true,
+	__lt 			= true,
+	__metatable 	= true,
+	__mod 			= true,
+	__mode 			= true,
+	__mul 			= true,
+	__newindex 		= true,
+	__pow 			= true,
+	__sub 			= true,
+	__tostring 		= true,
+	__unm 			= true,
 -- @note __index gets set automatically to base class
 -- @note the use of __metatable will interfere with the ability
 -- to refresh a class definition on instances at runtime
