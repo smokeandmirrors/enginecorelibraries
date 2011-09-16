@@ -20,4 +20,4 @@
 
 #define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS)
 	
-// PROXY / PUBLIC_MEMBERS / CTOR / DTOR / 
+// PROXY / PUBLIC_MEMBERS / CTOR / DTOR / DERIVED (DERIVED can save a ton on code size, as long as all the metamethods can be inherited properly)

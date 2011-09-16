@@ -324,13 +324,15 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 
 #define DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
-	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
 		LUA_ENTRY_CLASS__isExtendableByProxy \
 		LUA_ENTRY_CLASS__isnewindexable_TRUE \
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
 		LUA_ENTRY_CLASS__setmetatable_PROXY_PUBLIC_MEMBERS \
-		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
+		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) \
+		LUA_ENTRY__indexSupport(CLASS) \
+		LUA_ENTRY__newindexSupport(CLASS)
 
 /** 
 */
@@ -595,6 +597,13 @@ This method is ideal for static classes or libraries.
 
 /** 
 */
+#define DEFINE_LUAEXTENDABLE_PROXY_PUBLIC_MEMBERS_DEFAULT_FUNCTIONS(CLASS) \
+	DEFINE_DEFAULT_TOSTRING(CLASS) \
+	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
+	DEFINE_PROXY_SETMETATABLE_PUBLIC_MEMBERS(CLASS)
+
+/** 
+*/
 #define DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(CLASS) \
 	DEFINE_DEFAULT_TOSTRING(CLASS) \
 	DEFINE_DEFAULT_GETCLASSNAME(CLASS) \
@@ -615,6 +624,13 @@ This method is ideal for static classes or libraries.
 		return setProxyMetatable(L); \
 	}
 
+/** 
+*/
+#define DEFINE_PROXY_SETMETATABLE_PUBLIC_MEMBERS(CLASS) \
+	virtual sint setMetatable(lua_State* L) \
+	{ \
+		return setProxyMetatablePublicMembers(L); \
+	}
 
 /** 
 */
