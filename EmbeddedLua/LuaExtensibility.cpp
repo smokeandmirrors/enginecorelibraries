@@ -19,20 +19,11 @@ sint __newindexEnum(lua_State* L)
 	return luaL_error(L, "attempt to assign a value to an enum!");
 }
 
-sint __newindexProxy(lua_State* L) 
-{											//s: ud, k, v 	
-	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
-	lua_replace(L, -4);						//s: proxy, k, v
-	lua_rawset(L, -3);						//s: proxy
-	lua_pop(L, 1);							//s: 
-	return 0;
-}
-
 sint __indexProxyPublicMembers(lua_State* L)
 {												//s: ud k
-	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k __indexProxySupport
-	lua_pushvalue(L, -3);						//s: ud k __indexProxySupport ud 
-	lua_pushvalue(L, -3);						//s: ud k __indexProxySupport ud k
+	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k __indexSupport
+	lua_pushvalue(L, -3);						//s: ud k __indexSupport ud 
+	lua_pushvalue(L, -3);						//s: ud k __indexSupport ud k
 	lua_call(L, 2, 2);							//s: ud k bool v
 	
 	if (to<bool>(L, -2))
@@ -50,6 +41,38 @@ sint __indexProxyPublicMembers(lua_State* L)
 	}
 
 	return 1;
+}
+
+sint __newindexProxy(lua_State* L) 
+{											//s: ud, k, v 	
+	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
+	lua_replace(L, -4);						//s: proxy k, v
+	lua_rawset(L, -3);						//s: proxy
+	lua_pop(L, 1);							//s: 
+	return 0;
+}
+
+sint __newindexProxyPublicMembers(lua_State* L)
+{											//s: ud k v 
+	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud k v __newindexSupport
+	lua_pushvalue(L, -3);					//s: ud k v __newindexSupport k
+	lua_pushvalue(L, -3);					//s: ud k v __newindexSupport k v
+	lua_call(L, 2, 1);						//s: ud k v bool
+	
+	if (to<bool>(L, -2))
+	{										//s: ud k v true
+		lua_pop(L, 4);							//s:
+	}
+	else
+	{											//s: ud k v false
+		lua_pop(L, 1);							//s: ud k v
+		lua_pushvalue(L, lua_upvalueindex(2));	//s: ud k v proxy
+		lua_insert(L, -3);						//s: ud proxy k v
+		lua_settable(L, -3);					//s: ud proxy
+		lua_pop(L, 4);								//s:
+	}
+
+	return 0;
 }
 
 void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar* super)
@@ -136,7 +159,7 @@ void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 }
 
 inline bool isInstanceBeingRefreshed(lua_State* L)
-{	//s: userdata, lua_class_mt
+{	//s: userdata class_mt
 	if (lua_getmetatable(L, -2))
 	{
 		lua_pop(L, 1);
@@ -179,10 +202,10 @@ sint pushRegisteredClass(lua_State* L, void* pushee)
 sint setProxyMetatable(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
-	function(userdata, class_mt)
+	function(userdata class_mt)
 		local proxy = setmetatable({}, class_mt) -- class_mt is from ObjectOrientedParadigm
 		local instance_mt = {
-			__index = proxy,
+			__index = proxy
 			__newindex = function(t, k, v)
 				proxy[k] = v
 			end,
@@ -192,58 +215,57 @@ sint setProxyMetatable(lua_State* L)
 				instance_mt[name] = method
 			end
 		end
-		return setmetatable(userdata, instance_mt) -- can't be done from Lua
+		return setmetatable(userdata instance_mt) -- can't be done from Lua
 	end
 	*/
 												
-	if (isInstanceBeingRefreshed(L))			//s: userdata, lua_class_mt
+	if (isInstanceBeingRefreshed(L))			//s: userdata class_mt
 	{	
-		// the class is being redefined			//s: userdata, lua_class_mt
-		lua_pushvalue(L, -1);					//s: userdata, lua_class_mt, lua_class_mt
-		lua_getmetatable(L, -3);				//s: userdata, lua_class_mt, lua_class_mt, userdata_mt
-		lua_pushvalue(L, lua_upvalueindex(1));	//s: userdata, lua_class_mt, lua_class_mt, userdata_mt, proxy
-		lua_replace(L, -2);						//s: userdata, lua_class_mt, lua_class_mt, proxy
+		// the class is being redefined			//s: userdata class_mt
+		lua_pushvalue(L, -1);					//s: userdata class_mt class_mt
+		lua_getmetatable(L, -3);				//s: userdata class_mt class_mt userdata_mt
+		lua_pushvalue(L, lua_upvalueindex(1));	//s: userdata class_mt class_mt userdata_mt proxy
+		lua_replace(L, -2);						//s: userdata class_mt class_mt proxy
 		
 		// initialize proxy
-		lua_insert(L, -2);						//s: userdata, lua_class_mt, proxy, lua_class_mt
-		lua_setmetatable(L, -2);				//s: userdata, lua_class_mt, proxy/mt
-		lua_getmetatable(L, -3);				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+		lua_insert(L, -2);						//s: userdata class_mt proxy class_mt
+		lua_setmetatable(L, -2);				//s: userdata class_mt proxy/mt
+		lua_getmetatable(L, -3);				//s: userdata class_mt proxy/mt userdata_mt
 	}
 	else
-	{	// the class is being defined			//s: userdata, lua_class_mt
-		lua_pushvalue(L, -1);					//s: userdata, lua_class_mt, lua_class_mt
-		lua_newtable(L);						//s: userdata, lua_class_mt, lua_class_mt, proxy
-		
+	{	// the class is being defined			//s: userdata class_mt
+		lua_pushvalue(L, -1);					//s: userdata class_mt class_mt
+		lua_newtable(L);						//s: userdata class_mt class_mt proxy
 		// initialize proxy
-		lua_insert(L, -2);						//s: userdata, lua_class_mt, proxy, lua_class_mt
-		lua_setmetatable(L, -2);				//s: userdata, lua_class_mt, proxy/mt
-		lua_newtable(L);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+		lua_insert(L, -2);						//s: userdata class_mt proxy class_mt
+		lua_setmetatable(L, -2);				//s: userdata class_mt proxy/mt
+		lua_newtable(L);						//s: userdata class_mt proxy/mt userdata_mt
 	}
 	
-	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_setfield(L, -2, "__index");				//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_pushvalue(L, -2);						//s: userdata, lua_class_mt, proxy/mt, userdata_mt, proxy/mt
-	lua_pushcclosure(L, __newindexProxy, 1);	//s: userdata, lua_class_mt, proxy/mt, userdata_mt, __newindex
-	lua_setfield(L, -2, "__newindex");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
+	lua_pushvalue(L, -2);						//s: userdata class_mt proxy/mt userdata_mt proxy/mt
+	lua_setfield(L, -2, "__index");				//s: userdata class_mt proxy/mt userdata_mt
+	lua_pushvalue(L, -2);						//s: userdata class_mt proxy/mt userdata_mt proxy/mt
+	lua_pushcclosure(L, __newindexProxy, 1);	//s: userdata class_mt proxy/mt userdata_mt __newindex
+	lua_setfield(L, -2, "__newindex");			//s: userdata class_mt proxy/mt userdata_mt
 	
 	// define/redefine every other metamethod
-	setUserdataMetamethod(L, "__add");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__call");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__concat");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__div");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__eq");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__gc");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__le");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__len");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__lt");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__metatable");	//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__mod");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__mul");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__pow");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__sub");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__unm");			//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	setUserdataMetamethod(L, "__tostring");		//s: userdata, lua_class_mt, proxy/mt, userdata_mt
-	lua_setmetatable(L, -4);					//s: userdata/mt, lua_class_mt, proxy/mt
+	setUserdataMetamethod(L, "__add");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__call");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__concat");		//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__div");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__eq");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__gc");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__le");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__len");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__lt");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__metatable");	//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__mod");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__mul");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__pow");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__sub");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__unm");			//s: userdata class_mt proxy/mt userdata_mt
+	setUserdataMetamethod(L, "__tostring");		//s: userdata class_mt proxy/mt userdata_mt
+	lua_setmetatable(L, -4);					//s: userdata/mt, class_mt proxy/mt
 	lua_pop(L, 2);								//s: userdata/mt
 	return 1;
 }
@@ -251,7 +273,7 @@ sint setProxyMetatable(lua_State* L)
 sint setProxyMetatablePublicMembers(lua_State* L)
 {	/**
 	-- will be called by lua constructor, as defined in ObjectOrientedParadigm.lua
-	function(userdata, class_mt)
+	function(userdata class_mt)
 		local __indexSupport = class_mt.__indexSupport
 		local proxy = setmetatable({}, class_mt) -- class_mt is from ObjectOrientedParadigm
 		local __indexFunction = function(t, k)
@@ -276,7 +298,7 @@ sint setProxyMetatablePublicMembers(lua_State* L)
 				instance_mt[name] = method
 			end
 		end
-		return setmetatable(userdata, userdata_mt) -- can't be done from Lua
+		return setmetatable(userdata userdata_mt) -- can't be done from Lua
 	end
 	*/
 												//s: userdata class_mt
@@ -294,25 +316,27 @@ sint setProxyMetatablePublicMembers(lua_State* L)
 	}
 	else
 	{	// the class is being defined			//s: userdata class_mt
-		lua_getfield(L, -1, "__indexSupport");	//s: userdata class_mt __indexSupport
-		lua_pushvalue(L, -2);					//s: userdata class_mt __indexSupport class_mt
-		lua_newtable(L);						//s: userdata class_mt __indexSupport class_mt proxy
+		lua_pushvalue(L, -1);					//s: userdata class_mt class_mt
+		lua_newtable(L);						//s: userdata class_mt class_mt proxy
 		// initialize proxy
-		lua_insert(L, -2);						//s: userdata class_mt __indexSupport proxy class_mt
-		lua_setmetatable(L, -2);				//s: userdata class_mt __indexSupport proxy/mt
-		lua_pushvalue(L, -1);					//s: userdata class_mt __indexSupport proxy/mt proxy/mt
-		lua_insert(L, -3);						//s: userdata class_mt proxy/mt __indexSupport proxy/mt 
-		// initialize __indexFunction
-		lua_pushcclosure(L, __indexProxyPublicMembers, 2);
-												//s: userdata class_mt proxy/mt __indexProxyPublicMembers 	
-		lua_newtable(L);						//s: userdata class_mt proxy/mt __indexProxyPublicMembers userdata_mt
+		lua_insert(L, -2);						//s: userdata class_mt proxy class_mt
+		lua_setmetatable(L, -2);				//s: userdata class_mt proxy/mt
+		lua_newtable(L);						//s: userdata class_mt proxy/mt userdata_mt
 	}
-
-	lua_pushvalue(L, -2);						//s: userdata class_mt proxy/mt __indexProxyPublicMembers userdata_mt __indexProxyPublicMembers
-	lua_setfield(L, -2, "__index");				//s: userdata class_mt proxy/mt __indexProxyPublicMembers userdata_mt
-	lua_replace(L, -2);							//s: userdata class_mt proxy/mt userdata_mt
-	lua_pushvalue(L, -2);						//s: userdata class_mt proxy/mt userdata_mt proxy/mt
-	lua_pushcclosure(L, __newindexProxy, 1);	//s: userdata class_mt proxy/mt userdata_mt __newindex
+	// initialize __index function
+	push(L, "__indexSupport");					//s: userdata class_mt proxy/mt userdata_mt "__indexSupport"
+	lua_gettable(L, -4);						//s: userdata class_mt proxy/mt userdata_mt __indexSupport
+	lua_pushvalue(L, -3);						//s: userdata class_mt proxy/mt userdata_mt __indexSupport proxy/mt
+	lua_pushcclosure(L, __indexProxyPublicMembers, 2);
+												//s: userdata class_mt proxy/mt userdata_mt __indexProxyPublicMembers
+	lua_setfield(L, -2, "__index");				//s: userdata class_mt proxy/mt userdata_mt
+	
+	// initialize __newindex function
+	push(L, "__newindexSupport");				//s: userdata class_mt proxy/mt userdata_mt "__newindexSupport"
+	lua_gettable(L, -4);						//s: userdata class_mt proxy/mt userdata_mt __newindexSupport
+	lua_pushvalue(L, -3);						//s: userdata class_mt proxy/mt userdata_mt __newindexSupport proxy/mt
+	lua_pushcclosure(L, __newindexProxyPublicMembers, 2);	
+												//s: userdata class_mt proxy/mt userdata_mt __newindexProxyPublicMembers
 	lua_setfield(L, -2, "__newindex");			//s: userdata class_mt proxy/mt userdata_mt
 
 	// define/redefine every other metamethod
@@ -338,13 +362,13 @@ sint setProxyMetatablePublicMembers(lua_State* L)
 }
 
 inline void setUserdataMetamethod(lua_State* L, const char* method)	
-{												/*s: userdata, lua_class_mt, proxy/mt, userdata_mt */
-	lua_getfield(L, -3, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt, ? */
-	lua_setfield(L, -2, method);				/*s: userdata, lua_class_mt, proxy/mt, userdata_mt	  */
+{												/*s: userdata class_mt proxy/mt userdata_mt */
+	lua_getfield(L, -3, method);				/*s: userdata class_mt proxy/mt userdata_mt ? */
+	lua_setfield(L, -2, method);				/*s: userdata class_mt proxy/mt userdata_mt	  */
 }
 
 sint setUserdataMetatable(lua_State* L)
-{								//s: userdata, lua_class_mt
+{								//s: userdata class_mt
 	lua_setmetatable(L, -2);	//s: userdata/mt
 	return 1;
 }

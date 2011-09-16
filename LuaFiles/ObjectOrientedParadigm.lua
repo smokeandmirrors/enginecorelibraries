@@ -297,6 +297,7 @@ metamethods = {
 	__mode 			= true,
 	__mul 			= true,
 	__newindex 		= true,
+	__newindexSupport = true,
 	__pow 			= true,
 	__sub 			= true,
 	__tostring 		= true,
