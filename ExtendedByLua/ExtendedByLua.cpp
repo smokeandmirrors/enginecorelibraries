@@ -142,86 +142,43 @@ END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublic);
-// 
-// DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
-// 	__index_FUNCTION_ENTRY(one)
-// 	__index_FUNCTION_ENTRY(two)
-// 	__index_FUNCTION_ENTRY(three)
-// END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-inline sint AllPublic__indexSupport(const AllPublic& t, const char* k, lua_State* L, const char* className, const char* superClassName)
-{
-	if (!strcmp(k, "one" )) { pushTrue(L); push(L, t.one); return 2; }	
-	if (!strcmp(k, "two" )) { pushTrue(L); push(L, t.two); return 2; }	
-	if (!strcmp(k, "three" )) { pushTrue(L); push(L, t.three); return 2; }	
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+	__index_PROXY_FUNCTION_ENTRY(one)
+	__index_PROXY_FUNCTION_ENTRY(two)
+	__index_PROXY_FUNCTION_ENTRY(three)
+END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
 
-	if (strcmp(className, superClassName)) 
-	{	/* here would be a recursive call that would be never called */ 
-		return AllPublic__indexSupport(t, k, L, "AllPublic", "AllPublic"); 
-	} 
-	else 
-	{ 
-		pushFalse(L);
-		pushNil(L);
-		return 2;
-	} 
-}
-LUA_FUNC(AllPublic__indexSupportExposed)
-{
-	return AllPublic__indexSupport(to<const AllPublic&>(L, -2), to<const char*>(L, -1), L, "AllPublic", "AllPublic");
-}
-
-// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
-// 	__newindex_FUNCTION_ENTRY(one, sint)
-// 	__newindex_FUNCTION_ENTRY(two, bool)
-// 	__newindex_FUNCTION_ENTRY(three, sreal)
-// END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
-
-inline bool AllPublic__newindexSupport(AllPublic& t, const char* k, lua_State* L, const char* className, const char* superClassName) 
-{
-	if (!strcmp(k, "one")) { t.one = to<sint>(L, -1); pushTrue(L); return 1; }	
-	if (!strcmp(k, "two")) { t.two = to<bool>(L, -1); pushTrue(L); return 1; }	
-	if (!strcmp(k, "three")) { t.three = to<sreal>(L, -1); pushTrue(L); return 1; }	
-
-	if (strcmp(className, superClassName)) 
-	{	/* here would be a recursive call that would be never called */ 
-		return AllPublic__newindexSupport(t, k, L, "AllPublic", "AllPublic"); 
-	} 
-	else 
-	{ 
-		pushFalse(L); 
-		return 1;
-	} 
-}
-
-LUA_FUNC(AllPublic__newindexSupportExposed) 
-{
-	return AllPublic__newindexSupport(to<AllPublic&>(L, -3), to<const schar*>(L, -2), L, "AllPublic", "AllPublic");
-} 
-
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
+	__newindex_PROXY_FUNCTION_ENTRY(one, sint)
+	__newindex_PROXY_FUNCTION_ENTRY(two, bool)
+	__newindex_PROXY_FUNCTION_ENTRY(three, sreal)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
 	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
-	LUA_ENTRY_NAMED("__indexSupport", AllPublic__indexSupportExposed)
-	LUA_ENTRY_NAMED("__newindexSupport", AllPublic__newindexSupportExposed)
+	LUA_ENTRY__indexSupport(AllPublic)
+	LUA_ENTRY__newindexSupport(AllPublic)
 END_LUA_CLASS(AllPublic, AllPublic)
 
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublicChild);
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
-	__index_FUNCTION_ENTRY(four)
-	__index_FUNCTION_ENTRY(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+	__index_PROXY_FUNCTION_ENTRY(four)
+	__index_PROXY_FUNCTION_ENTRY(five)
+END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
-	__newindex_FUNCTION_ENTRY(four, AllPublic*)
-	__newindex_FUNCTION_ENTRY(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
+DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
+	__newindex_PROXY_FUNCTION_ENTRY(four, AllPublic*)
+	__newindex_PROXY_FUNCTION_ENTRY(five, sint)
+END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
 
-DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
+DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
 	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
+	LUA_ENTRY__indexSupport(AllPublicChild)
+	LUA_ENTRY__newindexSupport(AllPublicChild)
 END_LUA_CLASS(AllPublicChild, AllPublic)
 
 //////////////////////////////////////////////////////////////////////////

@@ -108,12 +108,22 @@ for public members that can be pushed directly into %Lua
 	if (!strcmp(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
 
 /**
+*/
+#define __index_PROXY_FUNCTION_ENTRY(INDEX) \
+	if (!strcmp(k, #INDEX )) { pushTrue(L); push(L, t.##INDEX##); return 2; }
+
+/**
 used for an entry in a "setter" function 
 for public members that can be set directly from %Lua
 \todo replace with a string -> offset map
 */
 #define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
+
+/**
+*/
+#define __newindex_PROXY_FUNCTION_ENTRY(INDEX, TYPE) \
+	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); pushTrue(L); return 1; }
 
 /**
 used to end a function list of functions to expose to %Lua
@@ -517,7 +527,7 @@ empty for now, but makes things easier
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
 /** 
-\todo this is only for CLASS functions, not LuaExtendable
+\todo this is only for not proxy functions
 \todo replace with a string -> offset map 
 */
 #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
@@ -541,9 +551,16 @@ empty for now, but makes things easier
 	} \
 	inline bool CLASS##__indexSupport(const CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
 	{
-	
+
+/*
+*/
+#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
+	inline sint CLASS##__indexSupportImplementation(const CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
+	{
+
+
 /** 
-\todo this is only for CLASS functions, not LuaExtendable
+\todo this is only for not proxy functions
 \todo replace with a string -> offset map 
 */
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
@@ -562,6 +579,12 @@ empty for now, but makes things easier
 		} \
 	} \
 	inline bool CLASS##__newindexSupport(##CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
+	{
+
+/**
+*/
+#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
+	inline bool CLASS##__newindexImplementation(##CLASS##& t, const char* k, lua_State* L, const char* className, const char* superClassName) \
 	{
 
 /** 
@@ -906,6 +929,24 @@ calls nilLoadedStatus() in declareLuaClass
 		} \
 	}
 
+/**
+*/
+#define END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
+		if (strcmp(className, superClassName))\
+		{	/* here would be a recursive call that would be never called */ \
+			return SUPER_CLASS##__indexSupportImplementation(t, k, L, #SUPER_CLASS, #SUPER_CLASS); \
+		} \
+		else \
+		{ \
+			pushFalse(L);\
+			pushNil(L); \
+			return 2; \
+		} \
+	} \
+	LUA_FUNC(CLASS##__indexSupport) \
+	{ \
+		return CLASS##__indexSupportImplementation(to<const CLASS##&>(L, -2), to<const char*>(L, -1), L, #CLASS, #SUPER_CLASS); \
+	}
 
 /** 
 \todo this is only for CLASS functions, not LuaExtendable
@@ -921,6 +962,24 @@ calls nilLoadedStatus() in declareLuaClass
 			return false; /* must tell the main calling function if something was pushed */ \
 		} \
 	}
+
+/**
+*/
+#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
+		if (strcmp(className, superClassName)) \
+		{	/* here would be a recursive call that would be never called */ \
+			return SUPER_CLASS##__newindexImplementation(t, k, L, #SUPER_CLASS, #SUPER_CLASS); \
+		} \
+		else \
+		{ \
+			pushFalse(L); \
+			return 1; \
+		} \
+	} \
+	LUA_FUNC(CLASS##__newindexSupport) \
+	{ \
+		return CLASS##__newindexImplementation(to<##CLASS##&>(L, -3), to<const schar*>(L, -2), L, #CLASS, #SUPER_CLASS); \
+	} 
 
 /** 
 end a library definition for registration
@@ -953,8 +1012,18 @@ the require() function.
 
 /** 
 */
+#define LUA_ENTRY__indexSupport(CLASS) \
+	LUA_ENTRY_NAMED("__indexSupport", CLASS##__indexSupport)
+
+/** 
+*/
 #define LUA_ENTRY__newindex(CLASS) \
 	LUA_ENTRY_NAMED("__newindex", CLASS##__newindex)
+
+/** 
+*/
+#define LUA_ENTRY__newindexSupport(CLASS) \
+	LUA_ENTRY_NAMED("__newindexSupport", CLASS##__newindexSupport)
 
 /** 
 */
