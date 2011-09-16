@@ -171,17 +171,39 @@ LUA_FUNC(AllPublic__indexSupportExposed)
 	return AllPublic__indexSupport(to<const AllPublic&>(L, -2), to<const char*>(L, -1), L, "AllPublic", "AllPublic");
 }
 
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
-	__newindex_FUNCTION_ENTRY(one, sint)
-	__newindex_FUNCTION_ENTRY(two, bool)
-	__newindex_FUNCTION_ENTRY(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
+// DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
+// 	__newindex_FUNCTION_ENTRY(one, sint)
+// 	__newindex_FUNCTION_ENTRY(two, bool)
+// 	__newindex_FUNCTION_ENTRY(three, sreal)
+// END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
+inline bool AllPublic__newindexSupport(AllPublic& t, const char* k, lua_State* L, const char* className, const char* superClassName) 
+{
+	if (!strcmp(k, "one")) { t.one = to<sint>(L, -1); pushTrue(L); return 1; }	
+	if (!strcmp(k, "two")) { t.two = to<bool>(L, -1); pushTrue(L); return 1; }	
+	if (!strcmp(k, "three")) { t.three = to<sreal>(L, -1); pushTrue(L); return 1; }	
+
+	if (strcmp(className, superClassName)) 
+	{	/* here would be a recursive call that would be never called */ 
+		return AllPublic__newindexSupport(t, k, L, "AllPublic", "AllPublic"); 
+	} 
+	else 
+	{ 
+		pushFalse(L); 
+		return 1;
+	} 
+}
+
+LUA_FUNC(AllPublic__newindexSupportExposed) 
+{
+	return AllPublic__newindexSupport(to<AllPublic&>(L, -3), to<const schar*>(L, -2), L, "AllPublic", "AllPublic");
+} 
 
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
 	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
 	LUA_ENTRY_NAMED("__indexSupport", AllPublic__indexSupportExposed)
+	LUA_ENTRY_NAMED("__newindexSupport", AllPublic__newindexSupportExposed)
 END_LUA_CLASS(AllPublic, AllPublic)
 
 

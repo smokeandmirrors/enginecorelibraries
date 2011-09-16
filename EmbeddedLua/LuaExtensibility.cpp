@@ -53,14 +53,19 @@ sint __newindexProxy(lua_State* L)
 }
 
 sint __newindexProxyPublicMembers(lua_State* L)
-{											//s: ud k v 
-	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud k v __newindexSupport
-	lua_pushvalue(L, -3);					//s: ud k v __newindexSupport k
-	lua_pushvalue(L, -3);					//s: ud k v __newindexSupport k v
-	lua_call(L, 2, 1);						//s: ud k v bool
+{												//s: ud k v
+// 	sint stack_size;
+// 	stack_size = lua_gettop(L);
+// 	const char* type;
+// 	type = 
+	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k v __newindexSupport
+	lua_pushvalue(L, -4);						//s: ud k v __newindexSupport ud
+	lua_pushvalue(L, -4);						//s: ud k v __newindexSupport ud k 
+	lua_pushvalue(L, -4);						//s: ud k v __newindexSupport ud k v
+	lua_call(L, 3, 1);							//s: ud k v bool
 	
-	if (to<bool>(L, -2))
-	{										//s: ud k v true
+	if (to<bool>(L, -1))
+	{											//s: ud k v true
 		lua_pop(L, 4);							//s:
 	}
 	else
@@ -69,7 +74,7 @@ sint __newindexProxyPublicMembers(lua_State* L)
 		lua_pushvalue(L, lua_upvalueindex(2));	//s: ud k v proxy
 		lua_insert(L, -3);						//s: ud proxy k v
 		lua_settable(L, -3);					//s: ud proxy
-		lua_pop(L, 4);								//s:
+		lua_pop(L, 2);							//s:
 	}
 
 	return 0;
