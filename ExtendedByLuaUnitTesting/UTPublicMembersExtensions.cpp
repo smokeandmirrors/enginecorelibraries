@@ -313,6 +313,18 @@ public:
 	void LuaPublicMemberTesting()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT
+		REGISTER_LUA_LIBRARY((&lua), TC);
+		REGISTER_LUA_LIBRARY((&lua), TCChild);
+		REGISTER_LUA_LIBRARY((&lua), TCGrandChild);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTC);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTCChild);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTCGrandChild);
+		REGISTER_LUA_LIBRARY((&lua), TCLE);
+		REGISTER_LUA_LIBRARY((&lua), TCLEChild);
+		REGISTER_LUA_LIBRARY((&lua), TCLEGrandChild);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTCLE);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTCLEChild);
+		REGISTER_LUA_LIBRARY((&lua), ProxyTCLEGrandChild);
 		unit_testing_tools::executeLuaUnitTest("UTPublicMembers", &lua);
 	}
 };
