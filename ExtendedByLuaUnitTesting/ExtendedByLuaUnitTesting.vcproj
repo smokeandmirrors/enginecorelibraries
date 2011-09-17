@@ -374,6 +374,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UTPublicMembersExtensions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UTTemplateExtension.cpp"
 				>
 			</File>

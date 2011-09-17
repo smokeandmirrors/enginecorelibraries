@@ -44,7 +44,6 @@ are included in the macro below
 
 #endif//UNIT_TEST_VERIFICATION
 
-
 class AllPublic
 {
 public:
@@ -128,15 +127,15 @@ public:
 DECLARE_LUA_LUAEXTENDABLE(AllPublicLE)
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
-	__index_PROXY_FUNCTION_ENTRY(one)
-	__index_PROXY_FUNCTION_ENTRY(two)
-	__index_PROXY_FUNCTION_ENTRY(three)
+	__index_PROXY_MEMBER(one)
+	__index_PROXY_MEMBER(two)
+	__index_PROXY_MEMBER(three)
 END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
-	__newindex_PROXY_FUNCTION_ENTRY(one, sint)
-	__newindex_PROXY_FUNCTION_ENTRY(two, bool)
-	__newindex_PROXY_FUNCTION_ENTRY(three, sreal)
+	__newindex_PROXY_MEMBER(one, sint)
+	__newindex_PROXY_MEMBER(two, bool)
+	__newindex_PROXY_MEMBER(three, sreal)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicLE, AllPublicLE)
@@ -148,13 +147,13 @@ END_LUA_CLASS(AllPublicLE, AllPublicLE)
 DECLARE_LUA_LUAEXTENDABLE(AllPublicChildLE)
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
-	__index_PROXY_FUNCTION_ENTRY(four)
-	__index_PROXY_FUNCTION_ENTRY(five)
+	__index_PROXY_MEMBER(four)
+	__index_PROXY_MEMBER(five)
 END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
-	__newindex_PROXY_FUNCTION_ENTRY(four, AllPublicLE*)
-	__newindex_PROXY_FUNCTION_ENTRY(five, sint)
+	__newindex_PROXY_MEMBER(four, AllPublicLE*)
+	__newindex_PROXY_MEMBER(five, sint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicChildLE, AllPublicLE)
@@ -165,13 +164,13 @@ END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 DECLARE_LUA_CLASS(AllPublicGrandChildLE);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
-	__index_PROXY_FUNCTION_ENTRY(six)
-	__index_PROXY_FUNCTION_ENTRY(seven)
+	__index_PROXY_MEMBER(six)
+	__index_PROXY_MEMBER(seven)
 END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
-	__newindex_PROXY_FUNCTION_ENTRY(six, AllPublicChildLE*)
-	__newindex_PROXY_FUNCTION_ENTRY(seven, uint)
+	__newindex_PROXY_MEMBER(six, AllPublicChildLE*)
+	__newindex_PROXY_MEMBER(seven, uint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicGrandChildLE, AllPublicChildLE)
@@ -185,15 +184,15 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  DECLARE_LUA_CLASS(AllPublic);
 //  
 //  DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
-//  	__index_PROXY_FUNCTION_ENTRY(one)
-//  	__index_PROXY_FUNCTION_ENTRY(two)
-//  	__index_PROXY_FUNCTION_ENTRY(three)
+//  	__index_PROXY_MEMBER(one)
+//  	__index_PROXY_MEMBER(two)
+//  	__index_PROXY_MEMBER(three)
 //  END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
 //  
 //  DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
-//  	__newindex_PROXY_FUNCTION_ENTRY(one, sint)
-//  	__newindex_PROXY_FUNCTION_ENTRY(two, bool)
-//  	__newindex_PROXY_FUNCTION_ENTRY(three, sreal)
+//  	__newindex_PROXY_MEMBER(one, sint)
+//  	__newindex_PROXY_MEMBER(two, bool)
+//  	__newindex_PROXY_MEMBER(three, sreal)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
@@ -207,13 +206,13 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  DECLARE_LUA_CLASS(AllPublicChild);
 //  
 //  DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
-//  	__index_PROXY_FUNCTION_ENTRY(four)
-//  	__index_PROXY_FUNCTION_ENTRY(five)
+//  	__index_PROXY_MEMBER(four)
+//  	__index_PROXY_MEMBER(five)
 //  END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
 //  
 //  DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
-//  	__newindex_PROXY_FUNCTION_ENTRY(four, AllPublic*)
-//  	__newindex_PROXY_FUNCTION_ENTRY(five, sint)
+//  	__newindex_PROXY_MEMBER(four, AllPublic*)
+//  	__newindex_PROXY_MEMBER(five, sint)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
@@ -226,13 +225,13 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  DECLARE_LUA_CLASS(AllPublicGrandChild);
 //  
 //  DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
-//  	__index_PROXY_FUNCTION_ENTRY(six)
-//  	__index_PROXY_FUNCTION_ENTRY(seven)
+//  	__index_PROXY_MEMBER(six)
+//  	__index_PROXY_MEMBER(seven)
 //  END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
 //  
 //  DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
-//  	__newindex_PROXY_FUNCTION_ENTRY(six, AllPublicChild*)
-//  	__newindex_PROXY_FUNCTION_ENTRY(seven, uint)
+//  	__newindex_PROXY_MEMBER(six, AllPublicChild*)
+//  	__newindex_PROXY_MEMBER(seven, uint)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
@@ -247,15 +246,15 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 DECLARE_LUA_CLASS(AllPublic);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
-	__index_FUNCTION_ENTRY(one)
-	__index_FUNCTION_ENTRY(two)
-	__index_FUNCTION_ENTRY(three)
+	__index_MEMBER(one)
+	__index_MEMBER(two)
+	__index_MEMBER(three)
 END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
-	__newindex_FUNCTION_ENTRY(one, sint)
-	__newindex_FUNCTION_ENTRY(two, bool)
-	__newindex_FUNCTION_ENTRY(three, sreal)
+	__newindex_MEMBER(one, sint)
+	__newindex_MEMBER(two, bool)
+	__newindex_MEMBER(three, sreal)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
@@ -267,13 +266,13 @@ END_LUA_CLASS(AllPublic, AllPublic)
 DECLARE_LUA_CLASS(AllPublicChild);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
-	__index_FUNCTION_ENTRY(four)
-	__index_FUNCTION_ENTRY(five)
+	__index_MEMBER(four)
+	__index_MEMBER(five)
 END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
-__newindex_FUNCTION_ENTRY(four, AllPublic*)
-__newindex_FUNCTION_ENTRY(five, sint)
+__newindex_MEMBER(four, AllPublic*)
+__newindex_MEMBER(five, sint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
@@ -284,13 +283,13 @@ END_LUA_CLASS(AllPublicChild, AllPublic)
 DECLARE_LUA_CLASS(AllPublicGrandChild);
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
-	__index_FUNCTION_ENTRY(six)
-	__index_FUNCTION_ENTRY(seven)
+	__index_MEMBER(six)
+	__index_MEMBER(seven)
 END_LUA_FUNC__index_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
 
 DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
-	__newindex_FUNCTION_ENTRY(six, AllPublicChild*)
-	__newindex_FUNCTION_ENTRY(seven, uint)
+	__newindex_MEMBER(six, AllPublicChild*)
+	__newindex_MEMBER(seven, uint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)

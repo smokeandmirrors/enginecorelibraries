@@ -104,12 +104,12 @@ used for an entry in a "getter" function
 for public members that can be pushed directly into %Lua
 \todo replace with a string -> offset map 
 \*/
-#define __index_FUNCTION_ENTRY(INDEX) \
+#define __index_MEMBER(INDEX) \
 	if (!strcmp(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
 
 /**
 */
-#define __index_PROXY_FUNCTION_ENTRY(INDEX) \
+#define __index_PROXY_MEMBER(INDEX) \
 	if (!strcmp(k, #INDEX )) { pushTrue(L); push(L, t.##INDEX##); return 2; }
 
 /**
@@ -117,12 +117,12 @@ used for an entry in a "setter" function
 for public members that can be set directly from %Lua
 \todo replace with a string -> offset map
 */
-#define __newindex_FUNCTION_ENTRY(INDEX, TYPE) \
+#define __newindex_MEMBER(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
 
 /**
 */
-#define __newindex_PROXY_FUNCTION_ENTRY(INDEX, TYPE) \
+#define __newindex_PROXY_MEMBER(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); pushTrue(L); return 1; }
 
 /**
