@@ -959,7 +959,7 @@ calls nilLoadedStatus() in declareLuaClass
 LUA_FUNC(##CLASS##__newindex) \
 { \
 	const char* k = to<const schar*>(L, -2); \
-	if (!##CLASS##__newindexSupport(to<CLASS&>(L, -3), k, L, #SUPER_CLASS )) \
+	if (!##CLASS##__newindexSupport(to<CLASS&>(L, -3), k, L, #CLASS )) \
 	{ \
 		luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
 	} \

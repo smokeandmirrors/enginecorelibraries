@@ -12,7 +12,7 @@ using namespace lua_extension;
 class TC
 {
 public:
-	TC(void) : one(1), two(true), three(3.0f) {}
+	TC(void) : one(1), two(true), three(3.5f) {}
 	virtual ~TC(void) {}
 	sint method(void) const { return 17; }
 	sint one;
@@ -37,7 +37,7 @@ END_LUA_CLASS(TC, TC)
 class TCChild : public TC
 {
 public:
-	TCChild() : four(NULL), five(5) {}
+	TCChild() : four(NULL), five(-5) {}
 	sint childMethod(void) const { return 1717; }
 	TC* four;
 	sint five;
@@ -79,7 +79,7 @@ END_LUA_CLASS(TCGrandChild, TCChild)
 class ProxyTC
 {
 public:
-	ProxyTC(void) : one(1), two(true), three(3.0f) {}
+	ProxyTC(void) : one(1), two(true), three(3.5f) {}
 	virtual ~ProxyTC(void) {}
 	sint method(void) const { return 17; }
 	sint one;
@@ -106,7 +106,7 @@ END_LUA_CLASS(ProxyTC, ProxyTC)
 class ProxyTCChild : public ProxyTC
 {
 public:
-	ProxyTCChild() : four(NULL), five(5) {}
+	ProxyTCChild() : four(NULL), five(-5) {}
 	sint childMethod(void) const { return 1717; }
 	ProxyTC* four;
 	sint five;
@@ -154,7 +154,7 @@ END_LUA_CLASS(ProxyTCGrandChild, ProxyTCChild)
 class TCLE : public LuaExtendable
 {
 public:
-	TCLE(void) : one(1), two(true), three(3.0f) {}
+	TCLE(void) : one(1), two(true), three(3.5f) {}
 	virtual ~TCLE(void) {}
 	sint method(void) const { return 17; }
 	sint one;
@@ -163,7 +163,7 @@ public:
 
 	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(TCLE)
 };
-DECLARE_LUA_CLASS(TCLE);
+DECLARE_LUA_LUAEXTENDABLE(TCLE);
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLE, TCLE)
 __index_MEMBER(one)
 __index_MEMBER(two)
@@ -182,7 +182,7 @@ END_LUA_CLASS(TCLE, TCLE)
 class TCLEChild : public TCLE
 {
 public:
-	TCLEChild() : four(NULL), five(5) {}
+	TCLEChild() : four(NULL), five(-5) {}
 	sint childMethod(void) const { return 1717; }
 	TCLE* four;
 	sint five;
@@ -190,7 +190,7 @@ public:
 	DEFINE_DEFAULT_TOSTRING(TCLEChild)
 	DEFINE_DEFAULT_GETCLASSNAME(TCLEChild)
 };
-DECLARE_LUA_CLASS(TCLEChild);
+DECLARE_LUA_LUAEXTENDABLE(TCLEChild);
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEChild, TCLE)
 __index_MEMBER(four)
 __index_MEMBER(five)
@@ -215,7 +215,7 @@ public:
 	DEFINE_DEFAULT_TOSTRING(TCLEGrandChild)
 	DEFINE_DEFAULT_GETCLASSNAME(TCLEGrandChild)
 };
-DECLARE_LUA_CLASS(TCLEGrandChild);
+DECLARE_LUA_LUAEXTENDABLE(TCLEGrandChild);
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
 __index_MEMBER(six)
 __index_MEMBER(seven)
@@ -224,7 +224,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
 __newindex_MEMBER(six, TCLEChild*)
 __newindex_MEMBER(seven, uint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
-DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, TCLEGrandChild, TCLEChild)
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(EXTENDABLE, TCLEGrandChild, TCLEChild)
 LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<TCLEGrandChild, sint, &TCLEGrandChild::grandChildMethod>))
 END_LUA_CLASS(TCLEGrandChild, TCLEChild)
 
@@ -232,7 +232,7 @@ END_LUA_CLASS(TCLEGrandChild, TCLEChild)
 class ProxyTCLE : public LuaExtendable
 {
 public:
-	ProxyTCLE(void) : one(1), two(true), three(3.0f) {}
+	ProxyTCLE(void) : one(1), two(true), three(3.5f) {}
 	virtual ~ProxyTCLE(void) {}
 	sint method(void) const { return 17; }
 	sint one;
@@ -259,7 +259,7 @@ END_LUA_CLASS(ProxyTCLE, ProxyTCLE)
 class ProxyTCLEChild : public ProxyTCLE
 {
 public:
-	ProxyTCLEChild() : four(NULL), five(5) {}
+	ProxyTCLEChild() : four(NULL), five(-5) {}
 	sint childMethod(void) const { return 1717; }
 	ProxyTCLE* four;
 	sint five;
@@ -291,7 +291,7 @@ public:
 	DEFINE_DEFAULT_TOSTRING(ProxyTCLEGrandChild)
 	DEFINE_DEFAULT_GETCLASSNAME(ProxyTCLEGrandChild)
 };
-DECLARE_LUA_CLASS(ProxyTCLEGrandChild);
+DECLARE_LUA_LUAEXTENDABLE(ProxyTCLEGrandChild);
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLEGrandChild, ProxyTCLEChild)
 __index_PROXY_MEMBER(six)
 __index_PROXY_MEMBER(seven)

@@ -10,7 +10,7 @@
 
 #define CONDITIONAL_STANDARD_LIB_OPEN(L, libname) \
 	{ \
-		lua_getfield(L, LUA_GLOBALSINDEX, #libname); \
+		lua_getglobal(L, #libname); \
 		if (!lua_istable(L, -1)) \
 		{ \
 			openLibrary(luaopen_##libname); \
@@ -29,7 +29,7 @@ static sint traceback (lua_State* L)
 {
   // if (!lua_isstring(L, 1))  /* 'message' not a string? */
   //  return 1;  /* keep it intact */
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  lua_getglobal(L, "debug");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return 1;
