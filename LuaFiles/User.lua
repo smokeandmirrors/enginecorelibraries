@@ -28,6 +28,16 @@ _G.loader = function(modulename)
 	return errmsg
 end
 
+_G.callable = function(aNumber, aBoolean)
+	aNumber = aNumber + 1
+	aBoolean = not aBoolean
+	return aNumber, aBoolean
+end
+
+_G.callable2 = function(aNumber, anotherNumber)
+	return aNumber + anotherNumber
+end
+
 _G.test = function()
 	indices = {"one", "two","three", "four", "five", "six", "seven" }
 	agp = new'AllPublicGrandChild'

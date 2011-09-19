@@ -74,6 +74,7 @@ code bloat.
 \todo document these in terms of the methods required by 
 the ObjectOrientedParadigm
 
+\todo replace __index/__newindex functionality with string -> offset map
 */
 
 #include <typeinfo>
@@ -102,7 +103,7 @@ to %Lua and the %Lua C API.
 /** 
 used for an entry in a "getter" function 
 for public members that can be pushed directly into %Lua
-\todo replace with a string -> offset map 
+ 
 \*/
 #define __index_MEMBER(INDEX) \
 	if (!strcmp(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
@@ -115,7 +116,6 @@ for public members that can be pushed directly into %Lua
 /**
 used for an entry in a "setter" function 
 for public members that can be set directly from %Lua
-\todo replace with a string -> offset map
 */
 #define __newindex_MEMBER(INDEX, TYPE) \
 	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
@@ -527,8 +527,6 @@ empty for now, but makes things easier
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
 /** 
-\todo this is only for not proxy functions
-\todo replace with a string -> offset map 
 */
 #define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
 	inline bool CLASS##__indexSupport(const CLASS##& t, const char* k, lua_State* L, const char* className) \
@@ -542,14 +540,14 @@ empty for now, but makes things easier
 
 
 /** 
-\todo replace with a string -> offset map 
+ 
 */
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
 	inline bool CLASS##__newindexSupport(##CLASS##& t, const char* k, lua_State* L, const char* className) \
 	{
 
 /** 
-\todo replace with a string -> offset map 
+ 
 */
 #define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
 	inline bool CLASS##__newindexImplementation(##CLASS##& t, const char* k, lua_State* L, const char* className) \
@@ -897,8 +895,7 @@ calls nilLoadedStatus() in declareLuaClass
 	} // end namespace lua_extension
 
 /** 
-\todo this is only for CLASS functions, not LuaExtendable
-\todo replace with a string -> offset map 
+ 
 */
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
 		if (strcmp(className, #SUPER_CLASS)) \
@@ -944,7 +941,7 @@ calls nilLoadedStatus() in declareLuaClass
 	}
 
 /** 
-\todo replace with a string -> offset map 
+ 
 */
 #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
 	if (strcmp(className, #SUPER_CLASS)) \
@@ -1352,114 +1349,6 @@ sint
 } // namespace lua_extension 
 
 /** @} */
-
-/*
-\todo if ever desired, finish looking into this:
-
-
-struct AllPublic
-{
-sint 
-one;
-bool 
-two;
-sreal 
-three;
-}
-
-DECLARE_LUA_CLASS(AllPublic);
-
-LUA_FUNC(AllPublic__index)
-{
-const schar* k = to<const schar*>(L, -1);
-const AllPublic& t = to<const AllPublic&>(L, -2);
-
-if (!strcmp(k,"one")) return push(L, t.one);
-if (!strcmp(k,"two")) return push(L, t.two);
-if (!strcmp(k,"three")) return push(L, t.three);
-
-lua_getglobal(L, "getClass");	//s: getClass
-push(L, "AllPublic");			//s: getClass, "AllPublic"
-lua_call(L, 1, 1);				//s: AllPublic
-lua_getfield(L, -1, key);		//s: AllPublic[key]
-return 1;
-}
-
-LUA_FUNC(AllPublic__newindex)
-{
-const schar* k = to<const schar*>(L, -2);
-const AllPublic& t = to<const AllPublic&>(L, -3);
-
-if (!strcmp(k,"one")) { t.one = to<sint>(L, -1); return 0; }
-if (!strcmp(k,"two")) { t.two = to<bool>(L, -1); return 0; }
-if (!strcmp(k,"three")) { t.three = to<sreal>(L, -1); return 0; }
-
-return luaL_error(L, "ERROR! nonassignable index %s for AllPublic", k);
-}
-
-DEFINE_LUA_##TYPE##_PUSH_FUNCTION(CLASS) \
-OPEN_LUA_NS(CLASS) \
-DEFINE_LUA_##TYPE##_AUTO_METAMETHODS(CLASS) \
-OPEN_LUA_LIB(CLASS)
-LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
-LUA_ENTRY_CLASS__isnewindexable_FALSE \
-LUA_ENTRY_CLASS__new_AUTO(CLASS) \
-LUA_ENTRY_##TYPE##__newindex_ERROR_AUTO(CLASS) \
-LUA_ENTRY_CLASS__setmetatable_USERDATA \
-LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
-END_LUA_CLASS(AllPublic, AllPublic)
-
-
-struct AllPublic
-{
-sint 
-one;
-bool 
-two;
-sreal 
-three;
-};
-
-DECLARE_LUA_CLASS(AllPublic);
-
-LUA_FUNC(AllPublic_getone)
-{
-return push(L, to<const AllPublic&>(L, -1).one);
-}
-LUA_FUNC(AllPublic_setone)
-{
-to<AllPublic&>(L, -2).one = to<sint>(L, -1);
-return 0;
-}
-
-LUA_FUNC(AllPublic_gettwo)
-{
-return push(L, to<const AllPublic&>(L, -1).two);
-}
-LUA_FUNC(AllPublic_settwo)
-{
-to<AllPublic&>(L, -2).two = to<bool>(L, -1);
-return 0;
-}
-
-LUA_FUNC(AllPublic_getthree)
-{
-return push(L, to<const AllPublic&>(L, -1).three);
-}
-LUA_FUNC(AllPublic_setthree)
-{
-to<AllPublic&>(L, -2).three = to<sreal>(L, -1);
-return 0;
-}
-
-DEFINE_LUA_CLASS(CLASS, AllPublic, AllPublic)
-LUA_ENTRY_NAMED("getOne", AllPublic_getone)
-LUA_ENTRY_NAMED("setOne", AllPublic_setone)
-END_LUA_CLASS(AllPublic, AllPublic)
-
-
-*/
-
 
 #endif//LUAEXTENSIBILITY_H
 

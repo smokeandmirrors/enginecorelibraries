@@ -22,3 +22,13 @@
 #define DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS)
 */
 // PROXY / PUBLIC_MEMBERS / CTOR / DTOR / DERIVED (DERIVED can save a ton on code size, as long as all the metamethods can be inherited properly)
+#define DEFINE_LUA_(MODE_NAME, NAME, CLASS, PROXY, MEMBERS, CTOR, DTOR)
+
+#define DEFINE_LUA_CLASS(NAME, SUPER, CTOR1, DTOR1, PROXY1, MEMBERS1)
+#define DEFINE_LUA_CLASS(NAME, SUPER, 1,1,1,1)
+#define DEFINE_LUA_CLASS(NAME, SUPER, 0,0,0,0)
+#define DEFINE_LUA_(NAME, NAME, CLASS, PROXY, MEMBERS, CTOR, DTOR)
+
+lua_call<bool, float>(L, "awesome");
+
+lua_pcall<bool, float>(L, "sweet");
