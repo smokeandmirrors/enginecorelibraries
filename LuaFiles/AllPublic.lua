@@ -10,3 +10,10 @@ end
 function AllPublic:sweet()
 	print('Sweet:', self.two)
 end
+
+--[[
+function AllPublic:method2()
+	-- dassert(self == nil)
+	return 4
+end
+--]]

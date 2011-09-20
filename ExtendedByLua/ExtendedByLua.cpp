@@ -57,6 +57,7 @@ public:
 		three;
 
 	sint method(void) const { return 17; }
+	sint method2(void) const { return 3; }
 };
 
 class AllPublicChild : public AllPublic
@@ -354,6 +355,21 @@ RET_1 nativeLuaCall(lua_State* L, const char* function, RET_2& ret_2, ARG_1 arg_
 	return ret_1;
 }
 
+template<typename ARG_1, typename ARG_2, typename RET_1, typename RET_2>
+RET_1 nativeLuaPCall(lua_State* L, const char* function, RET_2& ret_2, ARG_1 arg_1, ARG_2 arg_2, const char* module="_G")
+{
+	lua_getglobal(L, module);		//s: module
+	lua_getfield(L, -1, function);	//s: module function
+	assert(lua_isfunction(L, -1));	
+	push(L, arg_1);					//s: module function arg_1
+	push(L, arg_2);					//s: module function arg_1 arg_2
+	Lua::callProtected(L, 2, 2);	//s: module ret_1, ret_2
+	ret_2 = to<RET_2>(L, -1);
+	RET_1 ret_1 = to<RET_1>(L, -2);
+	lua_pop(L, 3);					//s: 
+	return ret_1;
+}
+
 template<typename RET_1, typename ARG_1, typename ARG_2>
 RET_1 nativeLuaCall(lua_State* L, const char* function, ARG_1 arg_1, ARG_2 arg_2, const char* module="_G")
 {
@@ -366,6 +382,34 @@ RET_1 nativeLuaCall(lua_State* L, const char* function, ARG_1 arg_1, ARG_2 arg_2
 	RET_1 ret_1 = to<RET_1>(L, -1);
 	lua_pop(L, 3);					//s: 
 	return ret_1;
+}
+
+template<typename CLASS, typename RET_1, RET_1(CLASS::*function)(void) const>
+RET_1 nativeLuaCall2(lua_State* L, const char* function_name, CLASS* object, const char* module="_G")
+{
+	lua_getglobal(L, module);			//s: module
+	lua_getfield(L, -1, function_name);	//s: module ?
+	
+	if (lua_isfunction(L, -1))
+	{									//s: module function
+		push(L, object);				//s: module function self
+		if (!Lua::callProtected(L, 1, 1))
+		{								//s: module ret_1
+			RET_1 ret_1 = to<RET_1>(L, -1);
+			lua_pop(L, 2);				//s: 
+			return ret_1;
+		}
+		else
+		{								//s: module
+			lua_pop(L, 1);				//s:
+		}
+	}
+	else
+	{									//s: module nil
+		lua_pop(L, 2);					//s: 
+	}
+	
+	return (object->*function)();
 }
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
@@ -400,10 +444,18 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 
 		// get the user file for easier rapid iteration
 		lua.require("User");
+		lua_State* L = lua.getState();
 		sreal return2(4);
 		bool return1(false);
-		return2 = nativeLuaCall<sreal, bool, sreal, bool>(lua.getState(), "callable", return1, return2, return1);
-		sreal ret1 = nativeLuaCall<sreal, sreal, sreal>(lua.getState(), "callable2", 3.0f, 4.0f);
+		
+		return2 = nativeLuaCall<sreal, bool, sreal, bool>(L, "callable", return1, return2, return1);
+		sreal ret1 = nativeLuaCall<sreal, sreal, sreal>(L, "callable2", 3.0f, 4.0f);
+		
+		AllPublic* ap = new AllPublic();
+		
+		sint value = nativeLuaCall2<AllPublic, sint, &AllPublic::method>(L, "method", ap, "AllPublic");
+		sint value2 = nativeLuaCall2<AllPublic, sint, &AllPublic::method2>(L, "method2", ap, "AllPublic");
+
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
