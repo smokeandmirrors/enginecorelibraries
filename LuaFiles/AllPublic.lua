@@ -17,3 +17,12 @@ function AllPublic:method2()
 	return 4
 end
 --]]
+
+function AllPublic:method0()
+	printf("script method0")
+end
+
+function AllPublic:method0C()
+	printf("script method0C")
+end
+	

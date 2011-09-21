@@ -30,5 +30,6 @@ smokeandmirrorsdevelopment@gmail.com</A>
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 #include "LuaExposeNativeToScript.h"
+#include "LuaExposeScriptToNative.h"
 
 #endif//LUAEXTENSIONINCLUSIONS_H

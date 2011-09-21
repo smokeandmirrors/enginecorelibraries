@@ -56,6 +56,8 @@ public:
 	sreal 
 		three;
 
+	void method0(void) { printf("native method0"); }
+	void method0C(void) const { printf("native method0"); }
 	sint method(void) const { return 17; }
 	sint method2(void) const { return 3; }
 };
@@ -178,9 +180,7 @@ DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicGrandChildLE, AllP
 	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<AllPublicGrandChildLE, sint, &AllPublicGrandChildLE::grandChildMethod>))
 END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 
-
-
- // proxy versions
+// proxy versions
 ////////////////////////////////////////////////////////////////////////
 //  DECLARE_LUA_CLASS(AllPublic);
 //  
@@ -340,76 +340,9 @@ DEFINE_LUA_ENUM(eNumbers)
 	LUA_ENUM(Three)
 END_LUA_ENUM(eNumbers)
 
-template<typename ARG_1, typename ARG_2, typename RET_1, typename RET_2>
-RET_1 nativeLuaCall(lua_State* L, const char* function, RET_2& ret_2, ARG_1 arg_1, ARG_2 arg_2, const char* module="_G")
+void returnZeroParamZero(void)
 {
-	lua_getglobal(L, module);		//s: module
-	lua_getfield(L, -1, function);	//s: module function
-	assert(lua_isfunction(L, -1));	
-	push(L, arg_1);					//s: module function arg_1
-	push(L, arg_2);					//s: module function arg_1 arg_2
-	lua_call(L, 2, 2);				//s: module ret_1, ret_2
-	ret_2 = to<RET_2>(L, -1);
-	RET_1 ret_1 = to<RET_1>(L, -2);
-	lua_pop(L, 3);					//s: 
-	return ret_1;
-}
-
-template<typename ARG_1, typename ARG_2, typename RET_1, typename RET_2>
-RET_1 nativeLuaPCall(lua_State* L, const char* function, RET_2& ret_2, ARG_1 arg_1, ARG_2 arg_2, const char* module="_G")
-{
-	lua_getglobal(L, module);		//s: module
-	lua_getfield(L, -1, function);	//s: module function
-	assert(lua_isfunction(L, -1));	
-	push(L, arg_1);					//s: module function arg_1
-	push(L, arg_2);					//s: module function arg_1 arg_2
-	Lua::callProtected(L, 2, 2);	//s: module ret_1, ret_2
-	ret_2 = to<RET_2>(L, -1);
-	RET_1 ret_1 = to<RET_1>(L, -2);
-	lua_pop(L, 3);					//s: 
-	return ret_1;
-}
-
-template<typename RET_1, typename ARG_1, typename ARG_2>
-RET_1 nativeLuaCall(lua_State* L, const char* function, ARG_1 arg_1, ARG_2 arg_2, const char* module="_G")
-{
-	lua_getglobal(L, module);		//s: module
-	lua_getfield(L, -1, function);	//s: module function
-	assert(lua_isfunction(L, -1));	
-	push(L, arg_1);					//s: module function arg_1
-	push(L, arg_2);					//s: module function arg_1 arg_2
-	lua_call(L, 2, 1);				//s: module ret_1
-	RET_1 ret_1 = to<RET_1>(L, -1);
-	lua_pop(L, 3);					//s: 
-	return ret_1;
-}
-
-template<typename CLASS, typename RET_1, RET_1(CLASS::*function)(void) const>
-RET_1 nativeLuaCall2(lua_State* L, const char* function_name, CLASS* object, const char* module="_G")
-{
-	lua_getglobal(L, module);			//s: module
-	lua_getfield(L, -1, function_name);	//s: module ?
-	
-	if (lua_isfunction(L, -1))
-	{									//s: module function
-		push(L, object);				//s: module function self
-		if (!Lua::callProtected(L, 1, 1))
-		{								//s: module ret_1
-			RET_1 ret_1 = to<RET_1>(L, -1);
-			lua_pop(L, 2);				//s: 
-			return ret_1;
-		}
-		else
-		{								//s: module
-			lua_pop(L, 1);				//s:
-		}
-	}
-	else
-	{									//s: module nil
-		lua_pop(L, 2);					//s: 
-	}
-	
-	return (object->*function)();
+	printf("native zero zero\n");
 }
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
@@ -455,6 +388,22 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		
 		sint value = nativeLuaCall2<AllPublic, sint, &AllPublic::method>(L, "method", ap, "AllPublic");
 		sint value2 = nativeLuaCall2<AllPublic, sint, &AllPublic::method2>(L, "method2", ap, "AllPublic");
+
+		phybridConstReturn0Param0<AllPublic, &AllPublic::method0C>(L, "method0C", *ap);
+		phybridMemberReturn0Param0<AllPublic, &AllPublic::method0>(L, "method0", *ap);
+
+		returnZeroParamZero();
+		phybridStaticReturn0Param0<returnZeroParamZero>(L, "returnZeroParamZero");
+
+		pscriptStaticReturn0Param0(L, "returnZeroParamZero");
+		pscriptStaticReturn0Param0(L, "returnZeroParamZero1");
+		pscriptStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
+		pscriptStaticReturn0Param0(L, "throwError");
+
+		scriptStaticReturn0Param0(L, "returnZeroParamZero");
+		scriptStaticReturn0Param0(L, "returnZeroParamZero1");
+		scriptStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
+		// scriptStaticReturn0Param0(L, "throwError");
 
 		lua.runConsole();
 	}

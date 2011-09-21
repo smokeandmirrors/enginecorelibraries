@@ -9,6 +9,16 @@ _G.u = function()
 	rerequire'User'
 end
 
+---[[
+function _G.returnZeroParamZero()
+	printf'script zero zero'
+end
+--]]
+
+function _G.throwError()
+	error'FAIL!'
+end
+
 _G.loader = function(modulename)
 	local errmsg = ""
 	-- Find source
