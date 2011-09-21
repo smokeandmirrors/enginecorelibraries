@@ -10,7 +10,7 @@
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
-#include "LuaFunctionExposition.h"
+#include "LuaExposeNativeToScript.h"
 #include "LuaMathExtensions.h"
 using namespace lua_extension;
 #endif//EXTENDED_BY_LUA
@@ -68,7 +68,7 @@ namespace lua_library_Vector2
 		LUA_ENTRY_CLASS__tostring_AUTO(Vector2)
 		LUA_ENTRY_NAMED("__index", __indexVector2)
 		LUA_ENTRY_NAMED("__newindex", __newindexVector2)
-		LUA_ENTRY_NAMED("add", (memberReturn0Param1<Vector2, const Vector2&, &Vector2::add>))
+		LUA_ENTRY_NAMED("add", (nativeMemberReturn0Param1<Vector2, const Vector2&, &Vector2::add>))
 END_LUA_CLASS(Vector2, Vector2)
 
 namespace lua_library_Vector3
@@ -295,41 +295,41 @@ namespace lua_library_Vector3
 		LUA_ENTRY_CLASS__tostring_AUTO(Vector3)
 		LUA_ENTRY_NAMED("__index", __indexVector3)
 		LUA_ENTRY_NAMED("__newindex", __newindexVector3)
-		LUA_ENTRY_NAMED("__eq", (const_Return1Param1<Vector3, bool, const Vector3&, &V3<float>::operator==>))
+		LUA_ENTRY_NAMED("__eq", (nativeConstReturn1Param1<Vector3, bool, const Vector3&, &V3<float>::operator==>))
 		LUA_ENTRY_CLASS__isnewindexable_FALSE
 		LUA_ENTRY(		 add)
 		LUA_ENTRY_NAMED("construct", initialize)
 		LUA_ENTRY(		 cross)
-		LUA_ENTRY_NAMED("distance", (const_Return1Param1<Vector3, sreal, const Vector3&, &V3<float>::distance>))
-		LUA_ENTRY_NAMED("distanceSqr", (const_Return1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceSqr>))
-		LUA_ENTRY_NAMED("distanceXY", (const_Return1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceXY>))
-		LUA_ENTRY_NAMED("distanceXYSqr", (const_Return1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceXYSqr>))
+		LUA_ENTRY_NAMED("distance", (nativeConstReturn1Param1<Vector3, sreal, const Vector3&, &V3<float>::distance>))
+		LUA_ENTRY_NAMED("distanceSqr", (nativeConstReturn1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceSqr>))
+		LUA_ENTRY_NAMED("distanceXY", (nativeConstReturn1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceXY>))
+		LUA_ENTRY_NAMED("distanceXYSqr", (nativeConstReturn1Param1<Vector3, sreal, const Vector3&, &V3<float>::distanceXYSqr>))
 		LUA_ENTRY(		 divide)
-		LUA_ENTRY_NAMED("dot", (const_Return1Param1<Vector3, sreal, const Vector3&, &V3<float>::dot>))
+		LUA_ENTRY_NAMED("dot", (nativeConstReturn1Param1<Vector3, sreal, const Vector3&, &V3<float>::dot>))
 		LUA_ENTRY(		 equals)
-		LUA_ENTRY_NAMED("isFar", (const_Return1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isFar>))
-		LUA_ENTRY_NAMED("isFarXY", (const_Return1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isFarXY>))
-		LUA_ENTRY_NAMED("isNear", (const_Return1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isNear>))
-		LUA_ENTRY_NAMED("isNearXY", (const_Return1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isNearXY>))
-		LUA_ENTRY_NAMED("isNormal", (const_Return1Param0<Vector3, bool, &V3<float>::isNormal>))
-		LUA_ENTRY_NAMED("isZero", (const_Return1Param0<Vector3, bool, &V3<float>::isZero>))
-		LUA_ENTRY_NAMED("magnitude", (const_Return1Param0<Vector3, sreal, &V3<float>::magnitude>))
-		LUA_ENTRY_NAMED("magnitudeSqr", (const_Return1Param0<Vector3, sreal, &V3<float>::magnitudeSqr>))
-		LUA_ENTRY_NAMED("magnitudeXY", (const_Return1Param0<Vector3, sreal, &V3<float>::magnitudeXY>))
-		LUA_ENTRY_NAMED("magnitudeXYSqr", (const_Return1Param0<Vector3, sreal, &V3<float>::magnitudeXYSqr>))
+		LUA_ENTRY_NAMED("isFar", (nativeConstReturn1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isFar>))
+		LUA_ENTRY_NAMED("isFarXY", (nativeConstReturn1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isFarXY>))
+		LUA_ENTRY_NAMED("isNear", (nativeConstReturn1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isNear>))
+		LUA_ENTRY_NAMED("isNearXY", (nativeConstReturn1Param2<Vector3, bool, const Vector3&, sreal, &V3<float>::isNearXY>))
+		LUA_ENTRY_NAMED("isNormal", (nativeConstReturn1Param0<Vector3, bool, &V3<float>::isNormal>))
+		LUA_ENTRY_NAMED("isZero", (nativeConstReturn1Param0<Vector3, bool, &V3<float>::isZero>))
+		LUA_ENTRY_NAMED("magnitude", (nativeConstReturn1Param0<Vector3, sreal, &V3<float>::magnitude>))
+		LUA_ENTRY_NAMED("magnitudeSqr", (nativeConstReturn1Param0<Vector3, sreal, &V3<float>::magnitudeSqr>))
+		LUA_ENTRY_NAMED("magnitudeXY", (nativeConstReturn1Param0<Vector3, sreal, &V3<float>::magnitudeXY>))
+		LUA_ENTRY_NAMED("magnitudeXYSqr", (nativeConstReturn1Param0<Vector3, sreal, &V3<float>::magnitudeXYSqr>))
 		LUA_ENTRY(		 nearlyEquals)
-		LUA_ENTRY_NAMED("negate", (memberReturn0Param0<Vector3, &V3<float>::negate>))
-		LUA_ENTRY_NAMED("normalize", (memberReturn1Param0<Vector3, sreal, &V3<float>::normalize>))
-		LUA_ENTRY_NAMED("perpendicular", (memberReturn0Param0<Vector3, &V3<float>::perpendicular>))
+		LUA_ENTRY_NAMED("negate", (nativeMemberReturn0Param0<Vector3, &V3<float>::negate>))
+		LUA_ENTRY_NAMED("normalize", (nativeMemberReturn1Param0<Vector3, sreal, &V3<float>::normalize>))
+		LUA_ENTRY_NAMED("perpendicular", (nativeMemberReturn0Param0<Vector3, &V3<float>::perpendicular>))
 		LUA_ENTRY(		 scale)
 		LUA_ENTRY_NAMED("set", initialize)
 		// slightly higher performance options for Lua
-		LUA_ENTRY_NAMED("setAll", (memberReturn0Param1<Vector3, sreal, &V3<float>::set>))
-		LUA_ENTRY_NAMED("setEach", (memberReturn0Param3<Vector3, sreal, sreal, sreal, &V3<float>::set>))
-		LUA_ENTRY_NAMED("setEqual", (memberReturn0Param1<Vector3, const Vector3&, &V3<float>::set>))
-		LUA_ENTRY_NAMED("setIndex", (memberReturn0Param2<Vector3, uint, sreal, &V3<float>::set>))
+		LUA_ENTRY_NAMED("setAll", (nativeMemberReturn0Param1<Vector3, sreal, &V3<float>::set>))
+		LUA_ENTRY_NAMED("setEach", (nativeMemberReturn0Param3<Vector3, sreal, sreal, sreal, &V3<float>::set>))
+		LUA_ENTRY_NAMED("setEqual", (nativeMemberReturn0Param1<Vector3, const Vector3&, &V3<float>::set>))
+		LUA_ENTRY_NAMED("setIndex", (nativeMemberReturn0Param2<Vector3, uint, sreal, &V3<float>::set>))
 		LUA_ENTRY(		 subtract)
-		LUA_ENTRY_NAMED("zero", (memberReturn0Param0<Vector3, &V3<float>::zero>))
+		LUA_ENTRY_NAMED("zero", (nativeMemberReturn0Param0<Vector3, &V3<float>::zero>))
 END_LUA_CLASS(Vector3, Vector3)
 
 #endif//EXTENDED_BY_LUA

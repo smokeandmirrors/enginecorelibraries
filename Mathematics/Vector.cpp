@@ -8,7 +8,7 @@
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
-#include "LuaFunctionExposition.h"
+#include "LuaExposeNativeToScript.h"
 #include "LuaMathExtensions.h"
 using namespace lua_extension;
 #endif//EXTENDED_BY_LUA

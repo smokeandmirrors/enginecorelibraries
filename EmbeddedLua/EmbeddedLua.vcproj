@@ -445,15 +445,19 @@
 			Name="Library"
 			>
 			<File
+				RelativePath=".\LuaExposeNativeToScript.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LuaExposeScriptToNative.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaExtensibility.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\LuaExtensibility.h"
-				>
-			</File>
-			<File
-				RelativePath=".\LuaFunctionExposition.h"
 				>
 			</File>
 			<File

@@ -1,8 +1,8 @@
 #pragma once
-#ifndef LUAFUNCTIONEXPOSITION_H
-#define LUAFUNCTIONEXPOSITION_H
+#ifndef LUA_EXPOSE_NATIVE_TO_SCRIPT_H
+#define LUA_EXPOSE_NATIVE_TO_SCRIPT_H
 /**
-\file LuaFunctionExposition.h
+\file LuaExposeNativeToScript.h
 
 \brief This file attempts to make even easier the generation C++ functions
 that are exposed to Lua.
@@ -40,7 +40,7 @@ There are 2 major types of template function wrappers:\n
 an userdata pointer of the type of the class)
 
 The naming convention is as follows:\n
-1. static:	staticReturn<# of return values>Param<# of parameters>\n
+1. static:	nativeStaticReturn<# of return values>Param<# of parameters>\n
 2. class:	return<# of return values>Param<# of parameters>{const}\n
 
 The following templates are currently defined by way of the macros below:
@@ -48,15 +48,15 @@ The following templates are currently defined by way of the macros below:
 //////////////////////////////////////////////////////////////////////////
 // static non member functions: 
 template<typename ARG_1, void (* function)(ARG_1)> 
-inline sint staticReturn0Param1(lua_State* L);
+inline sint nativeStaticReturn0Param1(lua_State* L);
 
 template<typename RET_1, RET_1 (* function)(void)>
-inline sint staticReturn1Param0(lua_State* L);
+inline sint nativeStaticReturn1Param0(lua_State* L);
 
 // ... 
 
 template<typename RET_1, typename RET_2, typename ARG_1, typename ARG_2, RET_1 (*function)(RET_2&, ARG_1, ARG_2)>
-inline sint staticReturn2Param2(lua_State* L);
+inline sint nativeStaticReturn2Param2(lua_State* L);
 
 // ...
 
@@ -71,10 +71,10 @@ inline sint return5Param5(lua_State* L);
 //////////////////////////////////////////////////////////////////////////
 // class member functions: 
 template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1)> 
-inline sint memberReturn0Param1(lua_State* L);
+inline sint nativeReturn0Param1(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void)>
-inline sint memberReturn1Param0(lua_State* L);
+inline sint nativeReturn1Param0(lua_State* L);
 
 // ... 
 
@@ -97,7 +97,7 @@ template<typename CLASS, typename ARG_1, void (CLASS::* function)(ARG_1) const>
 inline sint return0Param1const(lua_State* L);
 
 template<typename CLASS, typename RET_1, RET_1 (CLASS::* function)(void) const>
-inline sint const_Return1Param0(lua_State* L);
+inline sint nativeReturn1Param0(lua_State* L);
 
 // ... 
 
@@ -123,7 +123,7 @@ sreal Vector3::dot(const Vector3& v) const; // member function, 1 return value, 
 
 wrapper:
 \code
-const_Return1Param1<Vector3, sreal, const Vector3&, &Vector3::dot>
+nativeReturn1Param1<Vector3, sreal, const Vector3&, &Vector3::dot>
 \endcode
 
 %Lua call:
@@ -168,16 +168,16 @@ EFL_GET_INSTANCE_ARGS_
 #include "TemplateArguments.h"
 
 namespace lua_extension
-{
+{	
 	template<void(* function)(void)> 
-	inline sint staticReturn0Param0(lua_State* L)
+	inline sint nativeStaticReturn0Param0(lua_State*)
 	{
 		(*function)();
 		return 0;
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void)>
-	inline sint memberReturn0Param0(lua_State* L)
+	inline sint nativeMemberReturn0Param0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -187,7 +187,7 @@ namespace lua_extension
 	}
 
 	template<typename CLASS, void(CLASS::* function)(void) const>
-	inline sint const_Return0Param0(lua_State* L)
+	inline sint nativeConstReturn0Param0(lua_State* L)
 	{
 		if (CLASS* object = to<CLASS*>(L, -1))
 		{
@@ -260,7 +260,7 @@ namespace lua_extension
 
 // declare and implement the template non-member static function
 #define EFL_STATIC(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(staticReturn##NUM_RETS##Param##NUM_ARGS) \
+	inline LUA_FUNC(nativeStaticReturn##NUM_RETS##Param##NUM_ARGS) \
 	{ \
 		sint pushed(0); \
 		CW_DECLARE_RETS_##NUM_RETS \
@@ -272,12 +272,12 @@ namespace lua_extension
 
 // declare and implement the class member function
 #define EFL_CLASS(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(memberReturn##NUM_RETS##Param##NUM_ARGS) \
+	inline LUA_FUNC(nativeMemberReturn##NUM_RETS##Param##NUM_ARGS) \
 	EFL_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
 
 // declare and implement the class const member function
 #define EFL_CONST_CLASS(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(const_Return##NUM_RETS##Param##NUM_ARGS) \
+	inline LUA_FUNC(nativeConstReturn##NUM_RETS##Param##NUM_ARGS) \
 	EFL_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
 
 // define a static function with the specified number of arguments
@@ -349,5 +349,5 @@ EFL_GENERATE_ALL(EFL_GENERATE_CLASS_TEMPLATE)
 EFL_GENERATE_ALL(EFL_GENERATE_CLASS_CONST_TEMPLATE)
 } // namespace lua_extension
 
-#endif//LUAFUNCTIONEXPOSITION_H
+#endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H
 

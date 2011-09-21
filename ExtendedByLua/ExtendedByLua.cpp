@@ -140,7 +140,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicLE, AllPublicLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicLE, AllPublicLE)
-	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublicLE, sint, &AllPublicLE::method>))
+	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<AllPublicLE, sint, &AllPublicLE::method>))
 END_LUA_CLASS(AllPublicLE, AllPublicLE)
 
 
@@ -158,7 +158,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChildLE, AllPublicLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicChildLE, AllPublicLE)
-	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChildLE, sint, &AllPublicChildLE::childMethod>))
+	LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<AllPublicChildLE, sint, &AllPublicChildLE::childMethod>))
 END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 
 //////////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicC
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
 
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicGrandChildLE, AllPublicChildLE)
-	LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<AllPublicGrandChildLE, sint, &AllPublicGrandChildLE::grandChildMethod>))
+	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<AllPublicGrandChildLE, sint, &AllPublicGrandChildLE::grandChildMethod>))
 END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 
 
@@ -197,7 +197,7 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublic, AllPublic)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
-//  	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
+//  	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<AllPublic, sint, &AllPublic::method>))
 //  	LUA_ENTRY__indexSupport(AllPublic)
 //  	LUA_ENTRY__newindexSupport(AllPublic)
 //  END_LUA_CLASS(AllPublic, AllPublic)
@@ -217,7 +217,7 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicChild, AllPublic)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
-//  	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
+//  	LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
 //  	LUA_ENTRY__indexSupport(AllPublicChild)
 //  	LUA_ENTRY__newindexSupport(AllPublicChild)
 //  END_LUA_CLASS(AllPublicChild, AllPublic)
@@ -236,7 +236,7 @@ END_LUA_CLASS(AllPublicGrandChildLE, AllPublicChildLE)
 //  END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(AllPublicGrandChild, AllPublicChild)
 //  
 //  DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
-//  	LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
+//  	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
 //  	LUA_ENTRY__indexSupport(AllPublicGrandChild)
 //  	LUA_ENTRY__newindexSupport(AllPublicGrandChild)
 //  END_LUA_CLASS(AllPublicGrandChild, AllPublicChild)
@@ -259,7 +259,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
-	LUA_ENTRY_NAMED("method", (const_Return1Param0<AllPublic, sint, &AllPublic::method>))
+	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<AllPublic, sint, &AllPublic::method>))
 END_LUA_CLASS(AllPublic, AllPublic)
 
 
@@ -277,7 +277,7 @@ __newindex_MEMBER(five, sint)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicChild, AllPublic)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicChild, AllPublic)
-	LUA_ENTRY_NAMED("childMethod", (const_Return1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
+	LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<AllPublicChild, sint, &AllPublicChild::childMethod>))
 END_LUA_CLASS(AllPublicChild, AllPublic)
 
 //////////////////////////////////////////////////////////////////////////
@@ -294,7 +294,7 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
-	LUA_ENTRY_NAMED("grandChildMethod", (const_Return1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
+	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
 END_LUA_CLASS(AllPublicGrandChild, AllPublicChild)
 
 //////////////////////////////////////////////////////////////////////////

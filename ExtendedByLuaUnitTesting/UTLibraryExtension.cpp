@@ -34,10 +34,10 @@ static sreal addAndSubtract(sreal& subtracted, sreal operand)
 DECLARE_LUA_LIBRARY(UnitTestLibrary)
 
 DEFINE_LUA_LIBRARY(UnitTestLibrary)
-	LUA_ENTRY_NAMED("getOne",			(staticReturn1Param0<sint, getOne>))
-	LUA_ENTRY_NAMED("getTwo",			(staticReturn2Param0<sint, sint, getTwo>))
-	LUA_ENTRY_NAMED("incrementByOne",	(staticReturn1Param1<sreal, sreal, incrementByOne>))
-	LUA_ENTRY_NAMED("addAndSubtract",	(staticReturn2Param1<sreal, sreal, sreal, addAndSubtract>))
+	LUA_ENTRY_NAMED("getOne",			(nativeStaticReturn1Param0<sint, getOne>))
+	LUA_ENTRY_NAMED("getTwo",			(nativeStaticReturn2Param0<sint, sint, getTwo>))
+	LUA_ENTRY_NAMED("incrementByOne",	(nativeStaticReturn1Param1<sreal, sreal, incrementByOne>))
+	LUA_ENTRY_NAMED("addAndSubtract",	(nativeStaticReturn2Param1<sreal, sreal, sreal, addAndSubtract>))
 END_LUA_LIBRARY(UnitTestLibrary)
 
 class LibraryExtensionUT : public cfixcc::TestFixture
@@ -91,7 +91,7 @@ public:
 		//s: 
 	}
 
-	void test_staticReturn2Param0()
+	void test_nativeStaticReturn2Param0()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
@@ -116,7 +116,7 @@ public:
 		//s: 
 	}
 
-	void test_staticReturn2Param1()
+	void test_nativeStaticReturn2Param1()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
@@ -146,8 +146,8 @@ public:
 CFIXCC_BEGIN_CLASS(LibraryExtensionUT)
 	CFIXCC_METHOD(test_staticParam0)
 	CFIXCC_METHOD(test_staticParam1)
-	CFIXCC_METHOD(test_staticReturn2Param0)
-	CFIXCC_METHOD(test_staticReturn2Param1)
+	CFIXCC_METHOD(test_nativeStaticReturn2Param0)
+	CFIXCC_METHOD(test_nativeStaticReturn2Param1)
 CFIXCC_END_CLASS()
 #endif//EXTENDED_BY_LUA
 #endif//WITH_UNIT_TESTING

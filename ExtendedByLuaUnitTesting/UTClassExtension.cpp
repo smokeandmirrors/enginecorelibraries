@@ -182,12 +182,12 @@ bool Simple::everCreated = false;
 DECLARE_LUA_LUAEXTENDABLE(Simple);
 
 DEFINE_LUA_CLASS(EXTENDABLE, Simple, Simple)
-	LUA_ENTRY_NAMED("__call", (const_Return1Param0<Simple, uint, &Simple::getValue>))
-	LUA_ENTRY_NAMED("getOther", (const_Return1Param0<Simple, Simple*, &Simple::getOther>))
-	LUA_ENTRY_NAMED("getValue", (const_Return1Param0<Simple, uint, &Simple::getValue>))
-	LUA_ENTRY_NAMED("isSimple", (const_Return1Param0<Simple, bool, &Simple::isSimple>))
-	LUA_ENTRY_NAMED("reproduce", (const_Return1Param0<Simple, Simple*, &Simple::reproduce>))
-	LUA_ENTRY_NAMED("setOther", (memberReturn0Param1<Simple, Simple*, &Simple::setOther>))
+	LUA_ENTRY_NAMED("__call", (nativeConstReturn1Param0<Simple, uint, &Simple::getValue>))
+	LUA_ENTRY_NAMED("getOther", (nativeConstReturn1Param0<Simple, Simple*, &Simple::getOther>))
+	LUA_ENTRY_NAMED("getValue", (nativeConstReturn1Param0<Simple, uint, &Simple::getValue>))
+	LUA_ENTRY_NAMED("isSimple", (nativeConstReturn1Param0<Simple, bool, &Simple::isSimple>))
+	LUA_ENTRY_NAMED("reproduce", (nativeConstReturn1Param0<Simple, Simple*, &Simple::reproduce>))
+	LUA_ENTRY_NAMED("setOther", (nativeMemberReturn0Param1<Simple, Simple*, &Simple::setOther>))
 END_LUA_CLASS(Simple, Simple)
 
 
@@ -263,7 +263,7 @@ LUA_FUNC(getUnexposed)
 }
 
 DEFINE_LUA_CLASS(EXTENDABLE, Derived, Simple)
-	LUA_ENTRY_NAMED("getDerivation", (const_Return1Param0<Derived, uint, &Derived::getDerivation>))
+	LUA_ENTRY_NAMED("getDerivation", (nativeConstReturn1Param0<Derived, uint, &Derived::getDerivation>))
 	LUA_ENTRY(getUnexposed)
 END_LUA_CLASS(Derived, Simple)
 
@@ -346,9 +346,9 @@ LUA_FUNC(__call)
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Grandparent, Grandparent)
 	LUA_ENTRY(__call) 
-	LUA_ENTRY_NAMED("getFamilyName",	(const_Return1Param0<Grandparent, const schar*, &Grandparent::getFamilyName>))
-	LUA_ENTRY_NAMED("getTitle",			(const_Return1Param0<Grandparent, const schar*, &Grandparent::getTitle>))
-	LUA_ENTRY_NAMED("__eq",				(const_Return1Param1<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
+	LUA_ENTRY_NAMED("getFamilyName",	(nativeConstReturn1Param0<Grandparent, const schar*, &Grandparent::getFamilyName>))
+	LUA_ENTRY_NAMED("getTitle",			(nativeConstReturn1Param0<Grandparent, const schar*, &Grandparent::getTitle>))
+	LUA_ENTRY_NAMED("__eq",				(nativeConstReturn1Param1<Grandparent, bool, const Grandparent&, &Grandparent::operator==>))
 END_LUA_CLASS(Grandparent, Grandparent)
 
 /**
@@ -375,9 +375,9 @@ private:
 DECLARE_LUA_LUAEXTENDABLE(Parent);
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Parent, Grandparent)
-LUA_ENTRY_NAMED("getGrandparent",		(const_Return1Param0<Parent, Grandparent*, &Parent::getGrandparent>))
-LUA_ENTRY_NAMED("getGrandparentName",	(const_Return1Param0<Parent, const schar*, &Parent::getGrandparentName>))
-LUA_ENTRY_NAMED("setGrandparent",		(memberReturn0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
+LUA_ENTRY_NAMED("getGrandparent",		(nativeConstReturn1Param0<Parent, Grandparent*, &Parent::getGrandparent>))
+LUA_ENTRY_NAMED("getGrandparentName",	(nativeConstReturn1Param0<Parent, const schar*, &Parent::getGrandparentName>))
+LUA_ENTRY_NAMED("setGrandparent",		(nativeMemberReturn0Param1<Parent, Grandparent*, &Parent::setGrandparent>))
 END_LUA_CLASS(Parent, Grandparent) 
 
 /**
@@ -412,10 +412,10 @@ private:
 DECLARE_LUA_LUAEXTENDABLE(Child);
 
 DEFINE_LUA_CLASS_BY_PROXY(EXTENDABLE, Child, Parent)
-	LUA_ENTRY_NAMED("get",				(staticReturn1Param0<Child*, &Child::get>))
-	LUA_ENTRY_NAMED("getParent",		(const_Return1Param0<Child, Parent*, &Child::getParent>))
-	LUA_ENTRY_NAMED("getParentName",	(const_Return1Param0<Child, const schar*, &Child::getParentName>))
-	LUA_ENTRY_NAMED("setParent",		(memberReturn0Param1<Child, Parent*, &Child::setParent>))
+	LUA_ENTRY_NAMED("get",				(nativeStaticReturn1Param0<Child*, &Child::get>))
+	LUA_ENTRY_NAMED("getParent",		(nativeConstReturn1Param0<Child, Parent*, &Child::getParent>))
+	LUA_ENTRY_NAMED("getParentName",	(nativeConstReturn1Param0<Child, const schar*, &Child::getParentName>))
+	LUA_ENTRY_NAMED("setParent",		(nativeMemberReturn0Param1<Child, Parent*, &Child::setParent>))
 END_LUA_CLASS(Child, Parent)
 
 // END PROXY
