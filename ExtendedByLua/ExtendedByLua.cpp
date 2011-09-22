@@ -392,8 +392,9 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua.require("User");
 		lua_State* L = lua.getState();
 		sreal return2(4);
+		return2 = 4;
 		bool return1(false);
-			
+		return1 = false;
 		AllPublic ap;
 				
 		hybridMemberReturn0Param0<AllPublic, &AllPublic::method0>(L, "method0", ap);
@@ -438,7 +439,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		// callStaticReturn0Param0(L, "throwError");
 		
 		printf("\n\nNEXT\n\n");
-		/*
 		value = -888;
 		hybridMemberReturn1Param0<AllPublic, int, &AllPublic::methodr1>(L, "methodr1", ap, value);
 		hybridConstReturn1Param0<AllPublic, int, &AllPublic::methodr1C>(L, "methodr1C", ap, value);
@@ -459,7 +459,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		callStaticReturn1Param0(L, "returnOneParamZero1", value);
 		callStaticReturn1Param0(L, "returnOneParamZero", value, "moochy");
 		// callStaticReturn0Param0(L, "throwError");
-		*/
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
