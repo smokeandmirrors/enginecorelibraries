@@ -21,7 +21,7 @@ function _G.returnZeroParamZero()
 end
 --]]
 
---[[
+---[[
 function _G.returnZeroParamOne(value)
 	printf('script zero one '..value)
 end

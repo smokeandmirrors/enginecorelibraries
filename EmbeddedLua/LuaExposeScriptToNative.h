@@ -36,13 +36,29 @@ Tested in the field	:	NO
 #include "LuaStateInteraction.h"
 #include "TemplateArguments.h"
 
-// begin the static function template signature
-#define ES2N_BEGIN_STATIC_TEMPLATE_ARGS \
-	template< 
+// assign the return values from the script call
+#define ES2N_ASSIGN_RETURN_VALUES_0 
+#define ES2N_ASSIGN_RETURN_VALUES_1 ret1 = to<RET_1>(L, -1);
+#define ES2N_ASSIGN_RETURN_VALUES_2 ret1 = to<RET_1>(L, -2); ret2 = to<RET_2>(L, -1);
+#define ES2N_ASSIGN_RETURN_VALUES_3 ret1 = to<RET_1>(L, -3); ret2 = to<RET_2>(L, -2); ret3 = to<RET_3>(L, -1);
+#define ES2N_ASSIGN_RETURN_VALUES_4 ret1 = to<RET_1>(L, -4); ret2 = to<RET_2>(L, -3); ret3 = to<RET_3>(L, -2); ret4 = to<RET_4>(L, -1);
+#define ES2N_ASSIGN_RETURN_VALUES_5 ret1 = to<RET_1>(L, -5); ret2 = to<RET_2>(L, -4); ret3 = to<RET_3>(L, -3); ret4 = to<RET_4>(L, -2); ret5 = to<RET_5>(L, -1);
 
 // begin the class function template signature
 #define ES2N_BEGIN_CLASS_TEMPLATE_ARGS \
 	template<typename CLASS
+
+// begin the static function template signature
+#define ES2N_BEGIN_STATIC_TEMPLATE_ARGS \
+	template< 
+
+// supply the correct number of arguments for the lua_call/lua_pcall function
+#define ES2N_CLASS_CALL_ARGS_0 1
+#define ES2N_CLASS_CALL_ARGS_1 2
+#define ES2N_CLASS_CALL_ARGS_2 3
+#define ES2N_CLASS_CALL_ARGS_3 4
+#define ES2N_CLASS_CALL_ARGS_4 5
+#define ES2N_CLASS_CALL_ARGS_5 6
 
 // end the const class member function template signature
 #define ES2N_END_CLASS_CONST_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
@@ -60,85 +76,8 @@ Tested in the field	:	NO
 #define ES2N_END_SIMPLE_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
 	>
 
-// declare and implement the hybrid const class function
-#define ES2N_HYBRID_CONST(NUM_RETS, NUM_ARGS) \
-	hybridConstReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, const CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
-
-// declare and implement the hybrid const class function
-#define ES2N_HYBRID_MEMBER(NUM_RETS, NUM_ARGS) \
-	hybridMemberReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
-
-// declare and implement the hybrid const class function with a protected call
-#define ES2N_PHYBRID_CONST(NUM_RETS, NUM_ARGS) \
-	phybridConstReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, const CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
-
-// declare and implement the hybrid const class function with a protected call
-#define ES2N_PHYBRID_MEMBER(NUM_RETS, NUM_ARGS) \
-	phybridMemberReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
-
-// declare and implement the * * function
-#define ES2N_SIMPLE_CALL(NUM_RETS, NUM_ARGS) \
-	callStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
-
-// declare and implement the * * function
-#define ES2N_SIMPLE_PCALL(NUM_RETS, NUM_ARGS) \
-	pcallStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
-
-// declare and implement the * * function
-#define ES2N_HYBRID_CALL(NUM_RETS, NUM_ARGS) \
-	hybridStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
-
-// declare and implement the * * function
-#define ES2N_HYBRID_PCALL(NUM_RETS, NUM_ARGS) \
-	phybridStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
-
-#define ES2N_PUSH_ARGS_0 
-#define ES2N_PUSH_ARGS_1 push(L, arg1); 
-#define ES2N_PUSH_ARGS_2 push(L, arg1);	push(L, arg2);
-#define ES2N_PUSH_ARGS_3 push(L, arg1);	push(L, arg2); push(L, arg3);
-#define ES2N_PUSH_ARGS_4 push(L, arg1);	push(L, arg2); push(L, arg3); push(L, arg4);
-#define ES2N_PUSH_ARGS_5 push(L, arg1);	push(L, arg2); push(L, arg3); push(L, arg4); push(L, arg5);
-
-#define ES2N_CLASS_CALL_ARGS_0 1
-#define ES2N_CLASS_CALL_ARGS_1 2
-#define ES2N_CLASS_CALL_ARGS_2 3
-#define ES2N_CLASS_CALL_ARGS_3 4
-#define ES2N_CLASS_CALL_ARGS_4 5
-#define ES2N_CLASS_CALL_ARGS_5 6
-
-#define ES2N_STATIC_CALL_ARGS_0 0
-#define ES2N_STATIC_CALL_ARGS_1 1
-#define ES2N_STATIC_CALL_ARGS_2 2
-#define ES2N_STATIC_CALL_ARGS_3 3
-#define ES2N_STATIC_CALL_ARGS_4 4
-#define ES2N_STATIC_CALL_ARGS_5 6
-
-#define ES2N_POP_RETURN_VALUES_0 lua_pop(L, 1);
-#define ES2N_POP_RETURN_VALUES_1 lua_pop(L, 2);
-#define ES2N_POP_RETURN_VALUES_2 lua_pop(L, 3);
-#define ES2N_POP_RETURN_VALUES_3 lua_pop(L, 4);
-#define ES2N_POP_RETURN_VALUES_4 lua_pop(L, 5);
-#define ES2N_POP_RETURN_VALUES_5 lua_pop(L, 6);
-
-#define ES2N_ASSIGN_RETURN_VALUES_0 
-#define ES2N_ASSIGN_RETURN_VALUES_1 ret1 = to<RET_1>(L, -1);
-#define ES2N_ASSIGN_RETURN_VALUES_2 ret1 = to<RET_1>(L, -2); ret2 = to<RET_2>(L, -1);
-#define ES2N_ASSIGN_RETURN_VALUES_3 ret1 = to<RET_1>(L, -3); ret2 = to<RET_2>(L, -2); ret3 = to<RET_3>(L, -1);
-#define ES2N_ASSIGN_RETURN_VALUES_4 ret1 = to<RET_1>(L, -4); ret2 = to<RET_2>(L, -3); ret3 = to<RET_3>(L, -2); ret4 = to<RET_4>(L, -1);
-#define ES2N_ASSIGN_RETURN_VALUES_5 ret1 = to<RET_1>(L, -5); ret2 = to<RET_2>(L, -4); ret3 = to<RET_3>(L, -3); ret4 = to<RET_4>(L, -2); ret5 = to<RET_5>(L, -1);
-
-#define ES2N_SIMPLE_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) 
-
-#define ES2N_HYBRID_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
-	CW_ASSIGN_RETS_##NUM_RETS (*nativeFunction)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS);
-
-#define ES2N_GENERATE_HYBRID_MEMBER_CALLS(NUM_RETS, NUM_ARGS) \
-	ES2N_GENERATE_HYBRID_CALL(NUM_RETS, NUM_ARGS, CONST) \
-	ES2N_GENERATE_CLASS_HYBRID_PCALL(NUM_RETS, NUM_ARGS, CONST) \
-	ES2N_GENERATE_HYBRID_CALL(NUM_RETS, NUM_ARGS, MEMBER) \
-	ES2N_GENERATE_CLASS_HYBRID_PCALL(NUM_RETS, NUM_ARGS, MEMBER)
-
-#define ES2N_GENERATE_HYBRID_CALL(NUM_RETS, NUM_ARGS, TYPE) \
+// generate the template function to override static native calls with lua_(p)calls of lua functions
+#define ES2N_GENERATE_CLASS_HYBRID_CALL(NUM_RETS, NUM_ARGS, TYPE) \
 	ES2N_BEGIN_CLASS_TEMPLATE_ARGS, \
 	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
 	ES2N_END_CLASS_##TYPE##_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
@@ -152,10 +91,10 @@ Tested in the field	:	NO
 			lua_pushvalue(L, -2);			/*s: object scriptFunction object */ \
 			ES2N_PUSH_ARGS_##NUM_ARGS		/*s: object scriptFunction object (arguments) */ \
 			lua_call(L, ES2N_CLASS_CALL_ARGS_##NUM_ARGS, NUM_RETS ); \
-											/*s: object (return values) */ \
+			/*s: object (return values) */ \
 			ES2N_ASSIGN_RETURN_VALUES_##NUM_RETS \
 			ES2N_POP_RETURN_VALUES_##NUM_RETS \
-											/*s: */ \
+			/*s: */ \
 			return lua_extension::functionSuccess; \
 		} \
 		else \
@@ -166,6 +105,7 @@ Tested in the field	:	NO
 		} \
 	}
 
+// generate the template function to override class native calls with lua_(p)calls of lua functions
 #define ES2N_GENERATE_CLASS_HYBRID_PCALL(NUM_RETS, NUM_ARGS, TYPE) \
 	ES2N_BEGIN_CLASS_TEMPLATE_ARGS, \
 	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
@@ -183,7 +123,7 @@ Tested in the field	:	NO
 			{ 								/*s: object (return values) */ \
 				ES2N_ASSIGN_RETURN_VALUES_##NUM_RETS \
 				ES2N_POP_RETURN_VALUES_##NUM_RETS \
-											/*s: */ \
+				/*s: */ \
 				return lua_extension::functionSuccess; \
 			} \
 			else \
@@ -200,48 +140,14 @@ Tested in the field	:	NO
 		} \
 	}
 
-#define ES2N_GENERATE_STATIC_PCALL(NUM_RETS, NUM_ARGS, TYPE) \
-	ES2N_BEGIN_STATIC_TEMPLATE_ARGS \
-	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS \
-	ES2N_END_##TYPE##_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	inline ScriptToNativeCallResult \
-	ES2N_##TYPE##_PCALL(NUM_RETS, NUM_ARGS) \
-	{ \
-		lua_getglobal(L, module);				/*s: ? */ \
-		if (lua_istable(L, -1)) \
-		{ \
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */ \
-			if (lua_isfunction(L, -1)) \
-			{									/*s: module scriptFunction */ \
-				ES2N_PUSH_ARGS_##NUM_ARGS		/*s: module scriptFunction (arguments) */ \
-				if (!Lua::callProtected(L, ES2N_STATIC_CALL_ARGS_##NUM_ARGS, NUM_RETS)) \
-				{								/*s: module (return values) */ \
-					ES2N_ASSIGN_RETURN_VALUES_##NUM_RETS \
-					ES2N_POP_RETURN_VALUES_##NUM_RETS \
-												/*s: */ \
-					return lua_extension::functionSuccess; \
-				} \
-				else \
-				{								/*s: module */ \
-					lua_pop(L, 1);				/*s: */ \
-					return lua_extension::functionError; \
-				} \
-			} \
-			else \
-			{									/*s: module nil */ \
-				lua_pop(L, 2);					/*s: */ \
-				ES2N_##TYPE##_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
-				return lua_extension::functionNotFound; \
-			} \
-		} \
-		else \
-		{										/*s: !table */ \
-			lua_pop(L, 1); \
-			ES2N_##TYPE##_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
-			return lua_extension::moduleNotFound; \
-		} \
-	}
+// generate all the member functions for the supplied number of return values and arguments
+#define ES2N_GENERATE_HYBRID_MEMBER_CALLS(NUM_RETS, NUM_ARGS) \
+	ES2N_GENERATE_CLASS_HYBRID_CALL(NUM_RETS, NUM_ARGS, CONST) \
+	ES2N_GENERATE_CLASS_HYBRID_PCALL(NUM_RETS, NUM_ARGS, CONST) \
+	ES2N_GENERATE_CLASS_HYBRID_CALL(NUM_RETS, NUM_ARGS, MEMBER) \
+	ES2N_GENERATE_CLASS_HYBRID_PCALL(NUM_RETS, NUM_ARGS, MEMBER)
 
+// generate the template function to call script functions from native
 #define ES2N_GENERATE_STATIC_CALL(NUM_RETS, NUM_ARGS, TYPE) \
 	ES2N_BEGIN_STATIC_TEMPLATE_ARGS \
 	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS \
@@ -278,11 +184,118 @@ Tested in the field	:	NO
 		} \
 	}
 
+// generate the template function to protected call script functions from native
+#define ES2N_GENERATE_STATIC_PCALL(NUM_RETS, NUM_ARGS, TYPE) \
+	ES2N_BEGIN_STATIC_TEMPLATE_ARGS \
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS \
+	ES2N_END_##TYPE##_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	inline ScriptToNativeCallResult \
+	ES2N_##TYPE##_PCALL(NUM_RETS, NUM_ARGS) \
+	{ \
+		lua_getglobal(L, module);				/*s: ? */ \
+		if (lua_istable(L, -1)) \
+		{ \
+			lua_getfield(L, -1, scriptFunction);/*s: module ? */ \
+			if (lua_isfunction(L, -1)) \
+			{									/*s: module scriptFunction */ \
+				ES2N_PUSH_ARGS_##NUM_ARGS		/*s: module scriptFunction (arguments) */ \
+				if (!Lua::callProtected(L, ES2N_STATIC_CALL_ARGS_##NUM_ARGS, NUM_RETS)) \
+				{								/*s: module (return values) */ \
+					ES2N_ASSIGN_RETURN_VALUES_##NUM_RETS \
+					ES2N_POP_RETURN_VALUES_##NUM_RETS \
+					/*s: */ \
+					return lua_extension::functionSuccess; \
+				} \
+				else \
+				{								/*s: module */ \
+					lua_pop(L, 1);				/*s: */ \
+					return lua_extension::functionError; \
+				} \
+			} \
+			else \
+			{									/*s: module nil */ \
+				lua_pop(L, 2);					/*s: */ \
+				ES2N_##TYPE##_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
+				return lua_extension::functionNotFound; \
+			} \
+		} \
+		else \
+		{										/*s: !table */ \
+			lua_pop(L, 1); \
+			ES2N_##TYPE##_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
+			return lua_extension::moduleNotFound; \
+		} \
+	}
+
+// generate all the static functions for the supplied number of return values and arguments
 #define ES2N_GENERATE_STATIC_CALLS(NUM_RETS, NUM_ARGS) \
 	ES2N_GENERATE_STATIC_CALL(NUM_RETS, NUM_ARGS, HYBRID) \
 	ES2N_GENERATE_STATIC_CALL(NUM_RETS, NUM_ARGS, SIMPLE) \
 	ES2N_GENERATE_STATIC_PCALL(NUM_RETS, NUM_ARGS, HYBRID) \
 	ES2N_GENERATE_STATIC_PCALL(NUM_RETS, NUM_ARGS, SIMPLE) 
+
+// call the native function with the number of return values and arguments
+#define ES2N_HYBRID_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) \
+	CW_ASSIGN_RETS_##NUM_RETS (*nativeFunction)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS);
+
+// declare and implement the hybrid const class function
+#define ES2N_HYBRID_CONST(NUM_RETS, NUM_ARGS) \
+	hybridConstReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, const CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
+
+// declare and implement the hybrid const class function
+#define ES2N_HYBRID_MEMBER(NUM_RETS, NUM_ARGS) \
+	hybridMemberReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
+
+// declare and implement the * * function
+#define ES2N_HYBRID_CALL(NUM_RETS, NUM_ARGS) \
+	hybridStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
+
+// declare and implement the * * function
+#define ES2N_HYBRID_PCALL(NUM_RETS, NUM_ARGS) \
+	phybridStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
+
+// declare and implement the hybrid const class function with a protected call
+#define ES2N_PHYBRID_CONST(NUM_RETS, NUM_ARGS) \
+	phybridConstReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, const CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
+
+// declare and implement the hybrid const class function with a protected call
+#define ES2N_PHYBRID_MEMBER(NUM_RETS, NUM_ARGS) \
+	phybridMemberReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CLASS& object, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) 
+
+// pop the appropriate number of values from the stack
+#define ES2N_POP_RETURN_VALUES_0 lua_pop(L, 1);
+#define ES2N_POP_RETURN_VALUES_1 lua_pop(L, 2);
+#define ES2N_POP_RETURN_VALUES_2 lua_pop(L, 3);
+#define ES2N_POP_RETURN_VALUES_3 lua_pop(L, 4);
+#define ES2N_POP_RETURN_VALUES_4 lua_pop(L, 5);
+#define ES2N_POP_RETURN_VALUES_5 lua_pop(L, 6);
+
+// push the appropriate number of values on to the stack
+#define ES2N_PUSH_ARGS_0 
+#define ES2N_PUSH_ARGS_1 push(L, arg1); 
+#define ES2N_PUSH_ARGS_2 push(L, arg1);	push(L, arg2);
+#define ES2N_PUSH_ARGS_3 push(L, arg1);	push(L, arg2); push(L, arg3);
+#define ES2N_PUSH_ARGS_4 push(L, arg1);	push(L, arg2); push(L, arg3); push(L, arg4);
+#define ES2N_PUSH_ARGS_5 push(L, arg1);	push(L, arg2); push(L, arg3); push(L, arg4); push(L, arg5);
+
+// declare and implement the * * function
+#define ES2N_SIMPLE_CALL(NUM_RETS, NUM_ARGS) \
+	callStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
+
+// call the functions (left empty for the simple calls, but it makes the macro easier to write
+#define ES2N_SIMPLE_CALL_NOT_FOUND(NUM_RETS, NUM_ARGS) 
+
+// declare and implement the * * function
+#define ES2N_SIMPLE_PCALL(NUM_RETS, NUM_ARGS) \
+	pcallStaticReturn##NUM_RETS##Param##NUM_ARGS(lua_State* L, const char* scriptFunction, CW_DECLARE_FUNCTION_REF_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, const char* module="_G")
+
+// supply the correct number of arguments for the lua_call/lua_pcall function
+#define ES2N_STATIC_CALL_ARGS_0 0
+#define ES2N_STATIC_CALL_ARGS_1 1
+#define ES2N_STATIC_CALL_ARGS_2 2
+#define ES2N_STATIC_CALL_ARGS_3 3
+#define ES2N_STATIC_CALL_ARGS_4 4
+#define ES2N_STATIC_CALL_ARGS_5 6
 
 namespace lua_extension
 {

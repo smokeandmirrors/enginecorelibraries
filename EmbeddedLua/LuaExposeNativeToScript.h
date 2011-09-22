@@ -167,8 +167,110 @@ EN2S_GET_INSTANCE_ARGS_
 #include "LuaStateInteraction.h"
 #include "TemplateArguments.h"
 
+// begin the class function template declaration
+#define EN2S_BEGIN_CLASS_TEMPLATE_ARGS \
+	template<typename CLASS
+
+// begin the static function template declaration
+#define EN2S_BEGIN_STATIC_TEMPLATE_ARGS \
+	template< 
+
+// declare and implement the class member function
+#define EN2S_CLASS(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(nativeMemberReturn##NUM_RETS##Param##NUM_ARGS) \
+	EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
+
+// and implement the class member function
+#define EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS) \
+	{ \
+		if (CLASS* object = EN2S_GET_INSTANCE_ARGS_##NUM_ARGS) \
+		{ \
+			sint pushed(0); \
+			CW_DECLARE_RETS_##NUM_RETS \
+			EN2S_GET_ARGS_##NUM_ARGS \
+			CW_DECLARE_1_ASSIGN_RETS_##NUM_RETS (object->*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
+			EN2S_PUSH_RETS_##NUM_RETS \
+			return pushed; \
+		} \
+		return 0; \
+	}
+
+// declare and implement the class const member function
+#define EN2S_CONST_CLASS(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(nativeConstReturn##NUM_RETS##Param##NUM_ARGS) \
+	EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
+
+// end the class member function template declaration
+#define EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
+
+// end the class const member function template declaration
+#define EN2S_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) const>
+
+// end the static function template declaration
+#define EN2S_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
+
+// define a class const member function with the specified number of arguments
+#define EN2S_GENERATE_CLASS_CONST_TEMPLATE(NUM_RETS, NUM_ARGS) \
+	EN2S_BEGIN_CLASS_TEMPLATE_ARGS, \
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EN2S_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EN2S_CONST_CLASS(NUM_RETS, NUM_ARGS)
+
+// define a class member function with the specified number of arguments
+#define EN2S_GENERATE_CLASS_TEMPLATE(NUM_RETS, NUM_ARGS) \
+	EN2S_BEGIN_CLASS_TEMPLATE_ARGS, \
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EN2S_CLASS(NUM_RETS, NUM_ARGS)
+
+// define a static function with the specified number of arguments
+#define EN2S_GENERATE_STATIC_TEMPLATE(NUM_RETS, NUM_ARGS) \
+	EN2S_BEGIN_STATIC_TEMPLATE_ARGS \
+	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
+	EN2S_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
+	EN2S_STATIC(NUM_RETS, NUM_ARGS)
+
+// fill in the arguments in the run-time function call
+#define EN2S_GET_ARGS_0 ;
+#define EN2S_GET_ARGS_1 ARG_1 arg1 = to<ARG_1>(L, -1);
+#define EN2S_GET_ARGS_2 ARG_1 arg1 = to<ARG_1>(L, -2); ARG_2 arg2 = to<ARG_2>(L, -1);
+#define EN2S_GET_ARGS_3 ARG_1 arg1 = to<ARG_1>(L, -3); ARG_2 arg2 = to<ARG_2>(L, -2); ARG_3 arg3 = to<ARG_3>(L, -1);
+#define EN2S_GET_ARGS_4 ARG_1 arg1 = to<ARG_1>(L, -4); ARG_2 arg2 = to<ARG_2>(L, -3); ARG_3 arg3 = to<ARG_3>(L, -2); ARG_4 arg4 = to<ARG_4>(L, -1);
+#define EN2S_GET_ARGS_5 ARG_1 arg1 = to<ARG_1>(L, -5); ARG_2 arg2 = to<ARG_2>(L, -4); ARG_3 arg3 = to<ARG_3>(L, -3); ARG_4 arg4 = to<ARG_4>(L, -2); ARG_5 arg5 = to<ARG_5>(L, -1);
+
+// get the instance of the object of the 
+#define EN2S_GET_INSTANCE_ARGS_0 to<CLASS*>(L, -1)
+#define EN2S_GET_INSTANCE_ARGS_1 to<CLASS*>(L, -2)
+#define EN2S_GET_INSTANCE_ARGS_2 to<CLASS*>(L, -3)
+#define EN2S_GET_INSTANCE_ARGS_3 to<CLASS*>(L, -4)
+#define EN2S_GET_INSTANCE_ARGS_4 to<CLASS*>(L, -5)
+#define EN2S_GET_INSTANCE_ARGS_5 to<CLASS*>(L, -6)
+
+// push the appropriate number of values back to %Lua
+#define EN2S_PUSH_RETS_0 ;
+#define EN2S_PUSH_RETS_1 pushed += push(L, ret1); 
+#define EN2S_PUSH_RETS_2 pushed += push(L, ret1); pushed += push(L, ret2); 
+#define EN2S_PUSH_RETS_3 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3);
+#define EN2S_PUSH_RETS_4 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3); pushed += push(L, ret4);
+#define EN2S_PUSH_RETS_5 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3); pushed += push(L, ret4); pushed += push(L, ret5);
+
+// declare and implement the template non-member static function
+#define EN2S_STATIC(NUM_RETS, NUM_ARGS) \
+	inline LUA_FUNC(nativeStaticReturn##NUM_RETS##Param##NUM_ARGS) \
+	{ \
+		sint pushed(0); \
+		CW_DECLARE_RETS_##NUM_RETS \
+		EN2S_GET_ARGS_##NUM_ARGS \
+		CW_DECLARE_1_ASSIGN_RETS_##NUM_RETS (*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
+		EN2S_PUSH_RETS_##NUM_RETS \
+		return pushed; \
+	}
+
 namespace lua_extension
-{	
+{
 	template<void(* function)(void)> 
 	inline sint nativeStaticReturn0Param0(lua_State*)
 	{
@@ -195,120 +297,13 @@ namespace lua_extension
 		}
 		return 0;	
 	}
-} // namespace lua_extension
-
-
-/** function implementation */
-// fill in the arguments in the run-time function call
-#define EN2S_GET_ARGS_0 ;
-#define EN2S_GET_ARGS_1 ARG_1 arg1 = to<ARG_1>(L, -1);
-#define EN2S_GET_ARGS_2 ARG_1 arg1 = to<ARG_1>(L, -2); ARG_2 arg2 = to<ARG_2>(L, -1);
-#define EN2S_GET_ARGS_3 ARG_1 arg1 = to<ARG_1>(L, -3); ARG_2 arg2 = to<ARG_2>(L, -2); ARG_3 arg3 = to<ARG_3>(L, -1);
-#define EN2S_GET_ARGS_4 ARG_1 arg1 = to<ARG_1>(L, -4); ARG_2 arg2 = to<ARG_2>(L, -3); ARG_3 arg3 = to<ARG_3>(L, -2); ARG_4 arg4 = to<ARG_4>(L, -1);
-#define EN2S_GET_ARGS_5 ARG_1 arg1 = to<ARG_1>(L, -5); ARG_2 arg2 = to<ARG_2>(L, -4); ARG_3 arg3 = to<ARG_3>(L, -3); ARG_4 arg4 = to<ARG_4>(L, -2); ARG_5 arg5 = to<ARG_5>(L, -1);
-
-// push the appropriate number of values back to %Lua
-#define EN2S_PUSH_RETS_0 ;
-#define EN2S_PUSH_RETS_1 pushed += push(L, ret1); 
-#define EN2S_PUSH_RETS_2 pushed += push(L, ret1); pushed += push(L, ret2); 
-#define EN2S_PUSH_RETS_3 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3);
-#define EN2S_PUSH_RETS_4 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3); pushed += push(L, ret4);
-#define EN2S_PUSH_RETS_5 pushed += push(L, ret1); pushed += push(L, ret2); pushed += push(L, ret3); pushed += push(L, ret4); pushed += push(L, ret5);
-
-// get the instance of the object of the 
-#define EN2S_GET_INSTANCE_ARGS_0 to<CLASS*>(L, -1)
-#define EN2S_GET_INSTANCE_ARGS_1 to<CLASS*>(L, -2)
-#define EN2S_GET_INSTANCE_ARGS_2 to<CLASS*>(L, -3)
-#define EN2S_GET_INSTANCE_ARGS_3 to<CLASS*>(L, -4)
-#define EN2S_GET_INSTANCE_ARGS_4 to<CLASS*>(L, -5)
-#define EN2S_GET_INSTANCE_ARGS_5 to<CLASS*>(L, -6)
-
-// begin the static function template declaration
-#define EN2S_BEGIN_STATIC_TEMPLATE_ARGS \
-	template< 
-
-// begin the class function template declaration
-#define EN2S_BEGIN_CLASS_TEMPLATE_ARGS \
-	template<typename CLASS
-
-// end the static function template declaration
-#define EN2S_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
-
-// end the class member function template declaration
-#define EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) >
-
-// end the class const member function template declaration
-#define EN2S_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	CW_TEMPLATE_RETURN_SIGNATURE_RETS_##NUM_RETS (CLASS::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_##NUM_RETS##_ARGS_##NUM_ARGS) const>
-
-// and implement the class member function
-#define EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS) \
-	{ \
-		if (CLASS* object = EN2S_GET_INSTANCE_ARGS_##NUM_ARGS) \
-		{ \
-			sint pushed(0); \
-			CW_DECLARE_RETS_##NUM_RETS \
-			EN2S_GET_ARGS_##NUM_ARGS \
-			CW_DECLARE_1_ASSIGN_RETS_##NUM_RETS (object->*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
-			EN2S_PUSH_RETS_##NUM_RETS \
-			return pushed; \
-		} \
-		return 0; \
-	}
-
-// declare and implement the template non-member static function
-#define EN2S_STATIC(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(nativeStaticReturn##NUM_RETS##Param##NUM_ARGS) \
-	{ \
-		sint pushed(0); \
-		CW_DECLARE_RETS_##NUM_RETS \
-		EN2S_GET_ARGS_##NUM_ARGS \
-		CW_DECLARE_1_ASSIGN_RETS_##NUM_RETS (*function)(CW_CALL_RETS_##NUM_RETS##_ARGS_##NUM_ARGS); \
-		EN2S_PUSH_RETS_##NUM_RETS \
-		return pushed; \
-	}
-
-// declare and implement the class member function
-#define EN2S_CLASS(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(nativeMemberReturn##NUM_RETS##Param##NUM_ARGS) \
-	EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
-
-// declare and implement the class const member function
-#define EN2S_CONST_CLASS(NUM_RETS, NUM_ARGS) \
-	inline LUA_FUNC(nativeConstReturn##NUM_RETS##Param##NUM_ARGS) \
-	EN2S_CLASS_IMPLEMENTATION(NUM_RETS, NUM_ARGS)
-
-// define a static function with the specified number of arguments
-#define EN2S_GENERATE_STATIC_TEMPLATE(NUM_RETS, NUM_ARGS) \
-	EN2S_BEGIN_STATIC_TEMPLATE_ARGS \
-	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
-	EN2S_END_STATIC_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	EN2S_STATIC(NUM_RETS, NUM_ARGS)
-
-// define a class member function with the specified number of arguments
-#define EN2S_GENERATE_CLASS_TEMPLATE(NUM_RETS, NUM_ARGS) \
-	EN2S_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
-	EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	EN2S_CLASS(NUM_RETS, NUM_ARGS)
-
-// define a class const member function with the specified number of arguments
-#define EN2S_GENERATE_CLASS_CONST_TEMPLATE(NUM_RETS, NUM_ARGS) \
-	EN2S_BEGIN_CLASS_TEMPLATE_ARGS, \
-	CW_TEMPLATE_ARGS_RETS_##NUM_RETS##_ARGS_##NUM_ARGS, \
-	EN2S_END_CONST_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) \
-	EN2S_CONST_CLASS(NUM_RETS, NUM_ARGS)
-
-namespace lua_extension
-{
-/** static, non-member functions */
-CW_GENERATE_ALL(EN2S_GENERATE_STATIC_TEMPLATE)
-/** class member functions */
-CW_GENERATE_ALL(EN2S_GENERATE_CLASS_TEMPLATE)
-/** const class member functions */
-CW_GENERATE_ALL(EN2S_GENERATE_CLASS_CONST_TEMPLATE)
+		
+	/** static, non-member functions */
+	CW_GENERATE_ALL(EN2S_GENERATE_STATIC_TEMPLATE)
+	/** class member functions */
+	CW_GENERATE_ALL(EN2S_GENERATE_CLASS_TEMPLATE)
+	/** const class member functions */
+	CW_GENERATE_ALL(EN2S_GENERATE_CLASS_CONST_TEMPLATE)
 } // namespace lua_extension
 
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H
