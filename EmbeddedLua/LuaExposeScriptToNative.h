@@ -136,7 +136,7 @@ Tested in the field	:	NO
 			lua_pushvalue(L, -2);			/*s: object scriptFunction object */ \
 			ES2N_PUSH_ARGS_##NUM_ARGS		/*s: object scriptFunction object (arguments) */ \
 			if (!Lua::callProtected(L, ES2N_CLASS_CALL_ARGS_##NUM_ARGS, NUM_RETS )); \
-			{ \								/*s: object (return values) */ \
+			{ 								/*s: object (return values) */ \
 				ES2N_ASSIGN_RETURN_VALUES_##NUM_RETS \
 				lua_pop(L, 2);				/*s: */ \
 				return lua_extension::functionSuccess; \
@@ -165,240 +165,7 @@ namespace lua_extension
 		functionError,
 		moduleNotFound
 	}; // ScriptToNativeCallResult
-
-	// phybridConst, hybridConst, hybridMember, phybridMember
-	// CW_GENERATE_ALL(ES2N_GENERATE_HYBRID_CALLS)
-	ES2N_GENERATE_HYBRID_CALL(1, 0, CONST) 
-	ES2N_GENERATE_HYBRID_CALL(1, 0, MEMBER)
-	ES2N_GENERATE_HYBRID_CALL(0, 1, CONST) 
-	ES2N_GENERATE_HYBRID_CALL(0, 1, MEMBER)
 	
-	
-	ES2N_GENERATE_HYBRID_PCALL(1, 0, CONST)
-	ES2N_GENERATE_HYBRID_PCALL(1, 0, MEMBER)
-	ES2N_GENERATE_HYBRID_PCALL(0, 1, CONST)
-	ES2N_GENERATE_HYBRID_PCALL(0, 1, MEMBER)
-	
-
-// 	ES2N_GENERATE_HYBRID_CALLS(0, 1)
-// 	ES2N_GENERATE_HYBRID_CALLS(1, 0)
-// 	ES2N_GENERATE_HYBRID_CALLS(1, 1)
-
-	// callStatic
-	// hybridStatic
-
-	// pcallStatic
-	// phybridStatic
-#if 0
-	
-	template<typename CLASS, typename RET_1, RET_1(CLASS::* nativeFunction)(void)>
-	inline ScriptToNativeCallResult 
-		hybridMemberReturn1Param0(lua_State* L, const char* scriptFunction, CLASS& object, RET_1& ret_1)
-	{
-		push(L, object);					/*s: object */
-		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-		if (lua_isfunction(L, -1))
-		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-			lua_call(L, 1, 1);				/*s: object ret_1 */
-			ret_1 = to<RET_1>(L, -1);		
-			lua_pop(L, 2);					/*s: */
-			return lua_extension::functionSuccess;
-		}
-		else
-		{									/*s: module nil */
-			lua_pop(L, 2);					/*s: */
-			ret_1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound;
-		}
-	}
-
-	template<typename CLASS, typename RET_1, RET_1(CLASS::* nativeFunction)(void) const>
-	inline ScriptToNativeCallResult 
-		phybridConstReturn1Param0(lua_State* L, const char* scriptFunction, const CLASS& object, RET_1& ret_1)
-	{
-		push(L, object);					/*s: object */
-		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-		if (lua_isfunction(L, -1))
-		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-			if (!Lua::callProtected(L, 1, 1))
-			{								/*s: object ret_1 */
-				ret_1 = to<RET_1>(L, -1);		
-				lua_pop(L, 2);				/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
-			}				
-		}
-		else
-		{									/*s: object nil */
-			lua_pop(L, 2);					/*s: */
-			ret_1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound;
-		}
-	}
-	template<typename CLASS, typename RET_1, RET_1(CLASS::* nativeFunction)(void)>
-	inline ScriptToNativeCallResult 
-		phybridMemberReturn1Param0(lua_State* L, const char* scriptFunction, CLASS& object, RET_1& ret_1)
-	{
-		push(L, object);					/*s: object */
-		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-		if (lua_isfunction(L, -1))
-		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-			if (!Lua::callProtected(L, 1, 1))
-			{								/*s: object ret_1 */
-				ret_1 = to<RET_1>(L, -1);		
-				lua_pop(L, 2);				/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
-			}				
-		}
-		else
-		{									/*s: object nil */
-			lua_pop(L, 2);					/*s: */
-			ret_1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound;
-		}
-	}
-
-	template<typename RET_1>
-	inline ScriptToNativeCallResult 
-		callStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
-	{
-		lua_getglobal(L, module);				/*s: ? */
-		if (lua_istable(L, -1))					
-		{
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */
-			if (lua_isfunction(L, -1))
-			{									/*s: module scriptFunction */
-				lua_call(L, 0, 1);				/*s: module ret_1 */
-				ret_1 = to<RET_1>(L, -1);		
-				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{									/*s: module nil */
-				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionNotFound;
-			}
-		}
-		else
-		{										/*s: !table */
-			lua_pop(L, 1);
-			return lua_extension::moduleNotFound;
-		}
-	}
-	template<typename RET_1, RET_1(* nativeFunction)(void)>
-	inline ScriptToNativeCallResult 
-		hybridStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
-	{	
-		lua_getglobal(L, module);				/*s: ? */
-		if (lua_istable(L, -1))					
-		{
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */
-			if (lua_isfunction(L, -1))
-			{									/*s: module scriptFunction */
-				lua_call(L, 0, 1);				/*s: module ret_1 */
-				ret_1 = to<RET_1>(L, -1);		
-				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{									/*s: module nil */
-				lua_pop(L, 2);					/*s: */
-				ret_1 = (*nativeFunction)();
-				return lua_extension::functionNotFound;
-			}
-		}
-		else
-		{										/*s: !table */
-			lua_pop(L, 1);
-			ret_1 = (*nativeFunction)();
-			return lua_extension::moduleNotFound;
-		}
-	}
-
-	template<typename RET_1>
-	inline ScriptToNativeCallResult 
-		pcallStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
-	{
-		lua_getglobal(L, module);				/*s: ? */
-		if (lua_istable(L, -1))					
-		{
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */
-			if (lua_isfunction(L, -1))
-			{									/*s: module scriptFunction */
-				if (!Lua::callProtected(L, 0, 1))
-				{								/*s: module ret_1 */
-					ret_1 = to<RET_1>(L, -1);
-					lua_pop(L, 2);				/*s: */
-					return lua_extension::functionSuccess;
-				}
-				else
-				{								/*s: module */
-					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionError;
-				}
-			}
-			else
-			{									/*s: module nil */
-				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionNotFound;
-			}
-		}
-		else
-		{										/*s: !table */
-			lua_pop(L, 1);						/*s: */
-			return lua_extension::moduleNotFound;
-		}						
-	}
-	template<typename RET_1, RET_1(* nativeFunction)(void)>
-	inline ScriptToNativeCallResult 
-		phybridStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
-	{	
-		lua_getglobal(L, module);				/*s: ? */
-		if (lua_istable(L, -1))					
-		{
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */
-			if (lua_isfunction(L, -1))
-			{									/*s: module scriptFunction */
-				if (!Lua::callProtected(L, 0, 1))
-				{								/*s: module ret_1 */
-					ret_1 = to<RET_1>(L, -1);
-					lua_pop(L, 2);				/*s: */
-					return lua_extension::functionSuccess;
-				}
-				else
-				{								/*s: module */
-					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionError;
-				}
-			}
-			else
-			{									/*s: module nil */
-				lua_pop(L, 2);					/*s: */
-				ret_1 = (*nativeFunction)();
-				return lua_extension::functionNotFound;
-			}
-		}
-		else
-		{										/*s: !table */
-			lua_pop(L, 1);
-			ret_1 = (*nativeFunction)();
-			return lua_extension::moduleNotFound;
-		}
-	}
-
-
 	template<typename CLASS, void(CLASS::* nativeFunction)(void) const>
 	inline ScriptToNativeCallResult 
 		hybridConstReturn0Param0(lua_State* L, const char* scriptFunction, const CLASS& object)
@@ -617,109 +384,20 @@ namespace lua_extension
 		}
 	}
 
-	// 	template<typename CLASS, typename ARG_1, void(CLASS::* nativeFunction)(ARG_1) const>
-	// 	inline ScriptToNativeCallResult 
-	// 		hybridConstReturn0Param1(lua_State* L, const char* scriptFunction, const CLASS& object, ARG_1 arg_1)
-	// 	{
-	// 		push(L, object);					/*s: object */
-	// 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-	// 		if (lua_isfunction(L, -1))
-	// 		{									/*s: object scriptFunction */
-	// 			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-	// 			push(L, arg_1);					/*s: object scriptFunction object arg_1 */
-	// 			lua_call(L, 2, 0);				/*s: object */
-	// 			lua_pop(L, 1);					/*s: */
-	// 			return lua_extension::functionSuccess;
-	// 		}
-	// 		else
-	// 		{									/*s: module nil */
-	// 			lua_pop(L, 2);					/*s: */
-	// 			(object.*nativeFunction)(arg_1);
-	// 			return lua_extension::functionNotFound;
-	// 		}
-	// 	}
-	template<typename CLASS, typename ARG_1, void(CLASS::* nativeFunction)(ARG_1) const>
-	inline ScriptToNativeCallResult 
-		phybridConstReturn0Param1(lua_State* L, const char* scriptFunction, const CLASS& object, ARG_1 arg_1)
-	{
-		push(L, object);					/*s: object */
-		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-		if (lua_isfunction(L, -1))
-		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-			push(L, arg_1);					/*s: object scriptFunction object arg_1 */
-			if (!Lua::callProtected(L, 2, 0))
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
-			}				
-		}
-		else
-		{									/*s: object nil */
-			lua_pop(L, 2);					/*s: */
-			(object.*nativeFunction)(arg_1);
-			return lua_extension::functionNotFound;
-		}
-	}
 
-	// 	template<typename CLASS, typename ARG_1, void(CLASS::* nativeFunction)(ARG_1)>
-	// 	inline ScriptToNativeCallResult 
-	// 		hybridMemberReturn0Param1(lua_State* L, const char* scriptFunction, CLASS& object, ARG_1 arg_1)
-	// 	{
-	// 		push(L, object);					/*s: object */
-	// 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-	// 		if (lua_isfunction(L, -1))
-	// 		{									/*s: object scriptFunction */
-	// 			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-	// 			push(L, arg_1);					/*s: object scriptFunction object arg_1 */
-	// 			lua_call(L, 2, 0);				/*s: object */
-	// 			lua_pop(L, 1);					/*s: */
-	// 			return lua_extension::functionSuccess;
-	// 		}
-	// 		else
-	// 		{									/*s: module nil */
-	// 			lua_pop(L, 2);					/*s: */
-	// 			(object.*nativeFunction)(arg_1);
-	// 			return lua_extension::functionNotFound;
-	// 		}
-	// 	}
-	template<typename CLASS, typename ARG_1, void(CLASS::* nativeFunction)(ARG_1)>
-	inline ScriptToNativeCallResult 
-		phybridMemberReturn0Param1(lua_State* L, const char* scriptFunction, CLASS& object, ARG_1 arg_1)
-	{
-		push(L, object);					/*s: object */
-		lua_getfield(L, -1, scriptFunction);/*s: object ? */
-		if (lua_isfunction(L, -1))
-		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
-			push(L, arg_1);					/*s: object scriptFunction object arg_1 */
-			if (!Lua::callProtected(L, 2, 0))
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{								/*s: object */
-				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
-			}				
-		}
-		else
-		{									/*s: object nil */
-			lua_pop(L, 2);					/*s: */
-			(object.*nativeFunction)(arg_1);
-			return lua_extension::functionNotFound;
-		}
-	}
+	// phybridConst, hybridConst, hybridMember, phybridMember
+	CW_GENERATE_ALL(ES2N_GENERATE_HYBRID_CALLS)
 
-	template<typename ARG_1>
+	// callStatic
+	// hybridStatic
+
+	// pcallStatic
+	// phybridStatic
+#if 0
+	
+	template<typename RET_1>
 	inline ScriptToNativeCallResult 
-		callStaticReturn0Param1(lua_State* L, const char* scriptFunction, ARG_1 arg_1, const char* module="_G")
+		callStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
 	{
 		lua_getglobal(L, module);				/*s: ? */
 		if (lua_istable(L, -1))					
@@ -727,9 +405,9 @@ namespace lua_extension
 			lua_getfield(L, -1, scriptFunction);/*s: module ? */
 			if (lua_isfunction(L, -1))
 			{									/*s: module scriptFunction */
-				push(L, arg_1);					/*s: module scriptFunction arg_1 */
-				lua_call(L, 1, 0);				/*s: module */
-				lua_pop(L, 1);					/*s: */
+				lua_call(L, 0, 1);				/*s: module ret_1 */
+				ret_1 = to<RET_1>(L, -1);		
+				lua_pop(L, 2);					/*s: */
 				return lua_extension::functionSuccess;
 			}
 			else
@@ -744,9 +422,39 @@ namespace lua_extension
 			return lua_extension::moduleNotFound;
 		}
 	}
-	template<typename ARG_1>
+	template<typename RET_1, RET_1(* nativeFunction)(void)>
 	inline ScriptToNativeCallResult 
-		pcallStaticReturn0Param1(lua_State* L, const char* scriptFunction, ARG_1 arg_1, const char* module="_G")
+		hybridStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
+	{	
+		lua_getglobal(L, module);				/*s: ? */
+		if (lua_istable(L, -1))					
+		{
+			lua_getfield(L, -1, scriptFunction);/*s: module ? */
+			if (lua_isfunction(L, -1))
+			{									/*s: module scriptFunction */
+				lua_call(L, 0, 1);				/*s: module ret_1 */
+				ret_1 = to<RET_1>(L, -1);		
+				lua_pop(L, 2);					/*s: */
+				return lua_extension::functionSuccess;
+			}
+			else
+			{									/*s: module nil */
+				lua_pop(L, 2);					/*s: */
+				ret_1 = (*nativeFunction)();
+				return lua_extension::functionNotFound;
+			}
+		}
+		else
+		{										/*s: !table */
+			lua_pop(L, 1);
+			ret_1 = (*nativeFunction)();
+			return lua_extension::moduleNotFound;
+		}
+	}
+
+	template<typename RET_1>
+	inline ScriptToNativeCallResult 
+		pcallStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
 	{
 		lua_getglobal(L, module);				/*s: ? */
 		if (lua_istable(L, -1))					
@@ -754,10 +462,10 @@ namespace lua_extension
 			lua_getfield(L, -1, scriptFunction);/*s: module ? */
 			if (lua_isfunction(L, -1))
 			{									/*s: module scriptFunction */
-				push(L, arg_1);					/*s: module scriptFunction arg_1 */
-				if (!Lua::callProtected(L, 1, 0))
-				{								/*s: module */
-					lua_pop(L, 1);				/*s: */
+				if (!Lua::callProtected(L, 0, 1))
+				{								/*s: module ret_1 */
+					ret_1 = to<RET_1>(L, -1);
+					lua_pop(L, 2);				/*s: */
 					return lua_extension::functionSuccess;
 				}
 				else
@@ -778,10 +486,9 @@ namespace lua_extension
 			return lua_extension::moduleNotFound;
 		}						
 	}
-
-	template<typename ARG_1, void(* nativeFunction)(ARG_1)>
+	template<typename RET_1, RET_1(* nativeFunction)(void)>
 	inline ScriptToNativeCallResult 
-		hybridStaticReturn0Param1(lua_State* L, const char* scriptFunction, ARG_1 arg_1, const char* module="_G")
+		phybridStaticReturn1Param0(lua_State* L, const char* scriptFunction, RET_1& ret_1, const char* module="_G")
 	{	
 		lua_getglobal(L, module);				/*s: ? */
 		if (lua_istable(L, -1))					
@@ -789,39 +496,10 @@ namespace lua_extension
 			lua_getfield(L, -1, scriptFunction);/*s: module ? */
 			if (lua_isfunction(L, -1))
 			{									/*s: module scriptFunction */
-				push(L, arg_1);					/*s: module scriptFunction arg_1 */
-				lua_call(L, 1, 0);				/*s: module */
-				lua_pop(L, 1);					/*s: */
-				return lua_extension::functionSuccess;
-			}
-			else
-			{									/*s: module nil */
-				lua_pop(L, 2);					/*s: */
-				(*nativeFunction)(arg_1);
-				return lua_extension::functionNotFound;
-			}
-		}
-		else
-		{										/*s: !table */
-			lua_pop(L, 1);
-			(*nativeFunction)(arg_1);
-			return lua_extension::moduleNotFound;
-		}
-	}
-	template<typename ARG_1, void(* nativeFunction)(ARG_1)>
-	inline ScriptToNativeCallResult 
-		phybridStaticReturn0Param1(lua_State* L, const char* scriptFunction, ARG_1 arg_1, const char* module="_G")
-	{	
-		lua_getglobal(L, module);				/*s: ? */
-		if (lua_istable(L, -1))					
-		{
-			lua_getfield(L, -1, scriptFunction);/*s: module ? */
-			if (lua_isfunction(L, -1))
-			{									/*s: module scriptFunction */
-				push(L, arg_1);					/*s: module scriptFunction arg_1 */
-				if (!Lua::callProtected(L, 1, 0))
-				{								/*s: module */
-					lua_pop(L, 1);				/*s: */
+				if (!Lua::callProtected(L, 0, 1))
+				{								/*s: module ret_1 */
+					ret_1 = to<RET_1>(L, -1);
+					lua_pop(L, 2);				/*s: */
 					return lua_extension::functionSuccess;
 				}
 				else
@@ -833,32 +511,18 @@ namespace lua_extension
 			else
 			{									/*s: module nil */
 				lua_pop(L, 2);					/*s: */
-				(*nativeFunction)(arg_1);
+				ret_1 = (*nativeFunction)();
 				return lua_extension::functionNotFound;
 			}
 		}
 		else
 		{										/*s: !table */
 			lua_pop(L, 1);
-			(*nativeFunction)(arg_1);
+			ret_1 = (*nativeFunction)();
 			return lua_extension::moduleNotFound;
 		}
 	}
-
-
-
-
-
-
-
-
-
 #endif// 0
-
-// CW_GENERATE_ALL(ES2N_MEMBER_TEMPLATE)
-// CW_GENERATE_ALL(ES2N_STATIC_TEMPLATE)
 } // namespace lua_extension
-
-
 
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H
