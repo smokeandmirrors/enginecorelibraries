@@ -56,8 +56,12 @@ public:
 	sreal 
 		three;
 
-	void method0(void) { printf("native method0"); }
-	void method0C(void) const { printf("native method0"); }
+	void method0(void) { printf("native method0\n"); }
+	void method0C(void) const { printf("const native method0\n"); }
+	void method1(int value) { printf("native method1 %d\n", value); }
+	void method1C(int value) const { printf("const native method1 %d\n", value); }
+	sint methodr1(void) { return 4; }
+	sint methodr1C(void) const { return 5; }
 	sint method(void) const { return 17; }
 	sint method2(void) const { return 3; }
 };
@@ -258,10 +262,9 @@ DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 	__newindex_MEMBER(three, sreal)
 END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublic, AllPublic)
 
-DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublic, AllPublic)
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NODTOR(CLASS, AllPublic, AllPublic)
 	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<AllPublic, sint, &AllPublic::method>))
 END_LUA_CLASS(AllPublic, AllPublic)
-
 
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(AllPublicChild);
@@ -345,6 +348,16 @@ void returnZeroParamZero(void)
 	printf("native zero zero\n");
 }
 
+void returnZeroParamOne(int value)
+{
+	printf("native zero one: %d\n", value);
+}
+
+sint returnOneParamZero(void)
+{
+	return 7;
+}
+
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
 	real_time::initialize();
@@ -380,31 +393,73 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua_State* L = lua.getState();
 		sreal return2(4);
 		bool return1(false);
+			
+		AllPublic ap;
+				
+		hybridMemberReturn0Param0<AllPublic, &AllPublic::method0>(L, "method0", ap);
+		hybridConstReturn0Param0<AllPublic, &AllPublic::method0C>(L, "method0C", ap);
+		phybridMemberReturn0Param0<AllPublic, &AllPublic::method0>(L, "method0", ap);
+		phybridConstReturn0Param0<AllPublic, &AllPublic::method0C>(L, "method0C", ap);
 		
-		return2 = nativeLuaCall<sreal, bool, sreal, bool>(L, "callable", return1, return2, return1);
-		sreal ret1 = nativeLuaCall<sreal, sreal, sreal>(L, "callable2", 3.0f, 4.0f);
-		
-		AllPublic* ap = new AllPublic();
-		
-		sint value = nativeLuaCall2<AllPublic, sint, &AllPublic::method>(L, "method", ap, "AllPublic");
-		sint value2 = nativeLuaCall2<AllPublic, sint, &AllPublic::method2>(L, "method2", ap, "AllPublic");
-
-		phybridConstReturn0Param0<AllPublic, &AllPublic::method0C>(L, "method0C", *ap);
-		phybridMemberReturn0Param0<AllPublic, &AllPublic::method0>(L, "method0", *ap);
-
 		returnZeroParamZero();
 		phybridStaticReturn0Param0<returnZeroParamZero>(L, "returnZeroParamZero");
 
-		pscriptStaticReturn0Param0(L, "returnZeroParamZero");
-		pscriptStaticReturn0Param0(L, "returnZeroParamZero1");
-		pscriptStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
-		pscriptStaticReturn0Param0(L, "throwError");
+		pcallStaticReturn0Param0(L, "returnZeroParamZero");
+		pcallStaticReturn0Param0(L, "returnZeroParamZero1");
+		pcallStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
+		pcallStaticReturn0Param0(L, "throwError");
 
-		scriptStaticReturn0Param0(L, "returnZeroParamZero");
-		scriptStaticReturn0Param0(L, "returnZeroParamZero1");
-		scriptStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
-		// scriptStaticReturn0Param0(L, "throwError");
+		callStaticReturn0Param0(L, "returnZeroParamZero");
+		callStaticReturn0Param0(L, "returnZeroParamZero1");
+		callStaticReturn0Param0(L, "returnZeroParamZero", "moochy");
+		// callStaticReturn0Param0(L, "throwError");
+	
+		printf("\n\nNEXT\n\n");
 
+		int value(4);
+		hybridMemberReturn0Param1<AllPublic, int, &AllPublic::method1>(L, "method1", ap, value);
+		hybridConstReturn0Param1<AllPublic, int, &AllPublic::method1C>(L, "method1C", ap, value);
+		phybridMemberReturn0Param1<AllPublic, int, &AllPublic::method1>(L, "method1", ap, value);
+		phybridConstReturn0Param1<AllPublic, int, &AllPublic::method1C>(L, "method1C", ap, value);
+		
+		returnZeroParamOne(value);
+				
+		phybridStaticReturn0Param1<int, returnZeroParamOne>(L, "returnZeroParamOne", value);
+		hybridStaticReturn0Param1<int, returnZeroParamOne>(L, "returnZeroParamOne", value);
+
+		pcallStaticReturn0Param1(L, "returnZeroParamOne", value);
+		pcallStaticReturn0Param1(L, "returnZeroParamOne1", value);
+		pcallStaticReturn0Param1(L, "returnZeroParamOne", value, "moochy");
+		pcallStaticReturn0Param1(L, "throwError", value);
+
+		callStaticReturn0Param1(L, "returnZeroParamOne", value);
+		callStaticReturn0Param1(L, "returnZeroParamOne1", value);
+		callStaticReturn0Param1(L, "returnZeroParamOne", value, "moochy");
+		// callStaticReturn0Param0(L, "throwError");
+		
+		printf("\n\nNEXT\n\n");
+		/*
+		value = -888;
+		hybridMemberReturn1Param0<AllPublic, int, &AllPublic::methodr1>(L, "methodr1", ap, value);
+		hybridConstReturn1Param0<AllPublic, int, &AllPublic::methodr1C>(L, "methodr1C", ap, value);
+		phybridMemberReturn1Param0<AllPublic, int, &AllPublic::methodr1>(L, "methodr1", ap, value);
+		phybridConstReturn1Param0<AllPublic, int, &AllPublic::methodr1C>(L, "methodr1C", ap, value);
+
+		value = returnOneParamZero();
+
+		phybridStaticReturn1Param0<int, returnOneParamZero>(L, "returnOneParamZero", value);
+		hybridStaticReturn1Param0<int, returnOneParamZero>(L, "returnOneParamZero", value);
+
+		pcallStaticReturn1Param0(L, "returnOneParamZero", value);
+		pcallStaticReturn1Param0(L, "returnOneParamZero1", value);
+		pcallStaticReturn1Param0(L, "returnOneParamZero", value, "moochy");
+		pcallStaticReturn1Param0(L, "throwError", value);
+
+		callStaticReturn1Param0(L, "returnOneParamZero", value);
+		callStaticReturn1Param0(L, "returnOneParamZero1", value);
+		callStaticReturn1Param0(L, "returnOneParamZero", value, "moochy");
+		// callStaticReturn0Param0(L, "throwError");
+		*/
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA

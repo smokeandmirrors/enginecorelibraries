@@ -10,10 +10,24 @@ _G.u = function()
 end
 
 ---[[
+function _G.returnOneParamZero()
+	return 17
+end	
+--]]
+
+---[[
 function _G.returnZeroParamZero()
 	printf'script zero zero'
 end
 --]]
+
+--[[
+function _G.returnZeroParamOne(value)
+	printf('script zero one '..value)
+end
+--]]
+
+
 
 function _G.throwError()
 	error'FAIL!'

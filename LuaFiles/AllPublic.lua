@@ -25,4 +25,19 @@ end
 function AllPublic:method0C()
 	printf("script method0C")
 end
-	
+function AllPublic:method1(value)
+	printf("script method1 "..value)
+end
+
+function AllPublic:method1C(value)
+	printf("script method1C "..value)
+end
+--[[		
+function AllPublic:methodr1()
+	return 18
+end
+
+function AllPublic:methodr1C()
+	return 36
+end
+--]]

@@ -631,7 +631,7 @@ private:
 			{ \
 				return m_object; \
 			} \
-			virtual void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+			virtual void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 			{ \
 				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 			} \
@@ -664,7 +664,7 @@ private:
 			{ \
 				return m_object; \
 			} \
-			virtual void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+			virtual void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 			{ \
 				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 			} \
@@ -757,7 +757,7 @@ private:
 				++iter; \
 			} \
 		} \
-		void send(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 		{ \
 			SYNC(m_mutex); \
 			connections_list copy(m_receivers); \
@@ -769,7 +769,7 @@ private:
 				++iter; \
 			} \
 		} \
-		inline void operator()(CW_DECLARE_FUNCTION_ARGS_##NUM_ARGS) const \
+		inline void operator()(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 		{ \
 			send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 		} \
