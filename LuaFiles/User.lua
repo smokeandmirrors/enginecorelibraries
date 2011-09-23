@@ -13,11 +13,9 @@ function _G.testFile()
 	CW = rerequire'CodeWriting'
 	EN2S = rerequire'LuaExposeNativeToScript'
 	myFile = io.open('MyFile.h', 'w+')
-	local output
-		
+	local output		
 	--  EN2S.generateStaticTemplate
 	output = ""
-		
 	for i = 0, 10 do
 		for j = 0, 10 do
 			if i ~= 0 or j ~= 0 then
@@ -27,9 +25,6 @@ function _G.testFile()
 			end
 		end
 	end
-	
-	
-	myFile:write(output)
 	
 	myFile:flush()
 end

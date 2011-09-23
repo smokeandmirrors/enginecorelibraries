@@ -2058,30 +2058,3 @@ inline LUA_FUNC(nativeStaticReturn10Param10)
 	pushed += push(L, ret10);
 	return pushed;
 } // nativeStaticReturn10Param10
-
-//test generateStaticTemplate
-template< typename RET_1, typename RET_2, typename RET_3, typename RET_4, typename RET_5, typename RET_6, typename RET_7, typename RET_8, typename RET_9, typename RET_10, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, typename ARG_10, RET_1 (* function)(RET_2&, RET_3&, RET_4&, RET_5&, RET_6&, RET_7&, RET_8&, RET_9&, RET_10&, ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10) >
-inline LUA_FUNC(nativeStaticReturn10Param10)
-{
-	RET_2 ret2;
-	RET_3 ret3;
-	RET_4 ret4;
-	RET_5 ret5;
-	RET_6 ret6;
-	RET_7 ret7;
-	RET_8 ret8;
-	RET_9 ret9;
-	RET_10 ret10;
-	RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
-	sint pushed(push(L, ret1));
-	pushed += push(L, ret2);
-	pushed += push(L, ret3);
-	pushed += push(L, ret4);
-	pushed += push(L, ret5);
-	pushed += push(L, ret6);
-	pushed += push(L, ret7);
-	pushed += push(L, ret8);
-	pushed += push(L, ret9);
-	pushed += push(L, ret10);
-	return pushed;
-} // nativeStaticReturn10Param10
