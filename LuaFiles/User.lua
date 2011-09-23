@@ -17,18 +17,14 @@ function _G.testFile()
 		
 	--  EN2S.generateStaticTemplate
 	output = ""
-	output = output..'\n'
-	output = output..'\n//test generateStaticTemplate\n'
-	output = output..EN2S.generateStaticTemplate(0, 1)
-	output = output..'\n//test generateStaticTemplate\n'
-	output = output..EN2S.generateStaticTemplate(1, 0)
-	myFile:write(output)
-	
-	for i = 1, 10 do
-		for j = 1, 10 do
-			output = '\n//test generateStaticTemplate\n'
-			output = output..EN2S.generateStaticTemplate(i, j)
-			myFile:write(output)
+		
+	for i = 0, 10 do
+		for j = 0, 10 do
+			if i ~= 0 or j ~= 0 then
+				output = '\n//test generateStaticTemplate\n'
+				output = output..EN2S.generateStaticTemplate(i, j)
+				myFile:write(output)
+			end
 		end
 	end
 	

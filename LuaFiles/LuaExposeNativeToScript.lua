@@ -1,9 +1,34 @@
 module(..., package.seeall)
 
-U = require'Utilities'
-CW = require'CodeWriting'
-
+local U = require'Utilities'
+local CW = require'CodeWriting'
 local getTabs = U.getTabs
+
+function callArguments(nrets, nargs)
+	tassert(nrets, 'number')
+	tassert(nargs, 'number')
+	local output = ''
+	if nrets < 2 and nargs == 0 then
+		return output
+	end
+	if nrets > 1 then
+		output = output..('ret2') 
+	end
+	for i = 3, nrets do
+		output = output..(', ret'..i)
+	end	
+	if nargs > 0 then
+		if nrets > 1 then
+			output = output..(', '..'to<ARG_1>(L, -'..(nargs - 1 + 1)..')')
+		else
+			output = output..('to<ARG_1>(L, -'..(nargs - 1 + 1)..')')
+		end
+	end
+	for i = 2, nargs do
+		output = output..', to<ARG_'..i..'>(L, -'..(nargs - i + 1)..')'
+	end
+	return output
+end
 
 -- replaces EN2S_GET_ARGS_N
 function getArguments(nargs, tabs)
@@ -13,7 +38,6 @@ function getArguments(nargs, tabs)
 	for i = 1, nargs do
 		output = output..tabs..'ARG_'..i..' arg'..i..' = to<ARG_'..i..'>(L, -'..(nargs - i + 1)..');\n'
 	end
-	-- output: ARG_1 arg1 = to<ARG_1>(L, -n); ..., ARG_N argN = to<ARG_N>(L, -1);
 	return output
 end
 
@@ -28,10 +52,12 @@ function pushRets(nrets, tabs)
 	tassert(nrets, 'number', tabs)
 	local output = ''
 	local tabs = getTabs(tabs)
-	for i = 1, nrets do
+	if nrets > 0 then
+		output = output..tabs..'sint pushed(push(L, ret1));\n'
+	end	
+	for i = 2, nrets do
 		output = output..tabs..'pushed += push(L, ret'..i..');\n'
 	end
-	-- output: pushed += push(L, ret1); ..., pushed += push(L, retN);
 	return output
 end
 
@@ -40,7 +66,7 @@ end
 function endStaticTemplateArgs(nrets, nargs)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	return CW.templateReturnSignature(nargs)..'(* function)('..CW.templateArgumentsSignature(nrets, nargs)..') >\n'
+	return CW.templateReturnSignature(nrets)..'(* function)('..CW.templateArgumentsSignature(nrets, nargs)..') >\n'
 end
 
 -- replaces EN2S_GENERATE_STATIC_TEMPLATE
@@ -50,20 +76,22 @@ function generateStaticTemplate(nrets, nargs)
 	local tabs = getTabs(1)
 	local output = ''
 	output = output..'template< '..CW.templateArguments(nrets, nargs)..', '..endStaticTemplateArgs(nrets, nargs)
-	output = output..'inline LUA_FUNC(nativeStaticReturn'..nargs..'Param'..nrets..')\n'
+	output = output..'inline LUA_FUNC(nativeStaticReturn'..nrets..'Param'..nargs..')\n'
 	output = output..'{\n'
-	output = output..tabs..'sint pushed(0);\n'
 	output = output..CW.templateDeclareReturnValues(nrets, 1)
-	output = output..getArguments(nargs, 1)
-	output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
-	output = output..pushRets(nrets, 1)..'\n'
-	output = output..tabs..'return pushed;\n'
+	--[[ begin slightly more debuggable ]]--
+	-- output = output..getArguments(nargs, 1)
+	-- output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
+	--[[ end slightly more debuggable ]]--
+	--[[ begin slightly less debuggable ]]--
+	output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..callArguments(nrets, nargs)..');\n'
+	--[[ end slightly less debuggable ]]--
+	output = output..pushRets(nrets, 1)
+	if nrets > 0 then
+		output = output..tabs..'return pushed;\n'
+	else
+		output = output..tabs..'return 0;\n'
+	end
 	output = output..'} // nativeStaticReturn'..nrets..'Param'..nargs..'\n'
-	
 	return output
-	--[[
-	template<
-		typename ARG_1, typename
-	--]]
 end
-

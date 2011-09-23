@@ -41,7 +41,7 @@ end
 function templateReturnSignature(nrets)
 	tassert(nrets, 'number')
 	local output = ''
-	output = output..(nrets > 0 and 'void ' or 'RET_1 ') 
+	output = output..(nrets == 0 and 'void ' or 'RET_1 ') 
 	return output
 end
 
