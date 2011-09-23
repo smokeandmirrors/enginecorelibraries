@@ -10,23 +10,10 @@ _G.u = function()
 end
 
 function _G.testFile()
-	CW = rerequire'CodeWriting'
-	EN2S = rerequire'LuaExposeNativeToScript'
-	myFile = io.open('MyFile.h', 'w+')
-	local output		
-	--  EN2S.generateStaticTemplate
-	output = ""
-	for i = 0, 10 do
-		for j = 0, 10 do
-			if i ~= 0 or j ~= 0 then
-				output = '\n//test generateStaticTemplate\n'
-				output = output..EN2S.generateStaticTemplate(i, j)
-				myFile:write(output)
-			end
-		end
-	end
-	
-	myFile:flush()
+	local CW = rerequire'CodeWriting'
+	local EN2S = rerequire'LuaExposeNativeToScript'
+	local myFile = io.open('MyFile.h', 'w+')
+	EN2S.generateHeader(myFile, 10, 10)
 end
 
 function _G.cwtest()
