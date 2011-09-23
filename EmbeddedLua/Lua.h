@@ -107,7 +107,7 @@ public:
 	Opens %Lua library using the lua_function provided
 	\warning if you loaded a library and altered it, this will reload that library
 	*/
-	void				openLibrary(lua_function key) const;
+	bool				openLibrary(lua_function key) const;
 	/**
 	require() shortcut
 	*/
@@ -122,6 +122,9 @@ public:
 	void				setPackagePath(const char* luaPath);
 	
 protected:
+	/**
+	*/
+	void				conditionallyOpen(lua_function key, const schar* name);
 	/**
 	pushes a default implementation for __gc && __tostring for
 	LuaExtendable classes.
@@ -140,7 +143,7 @@ protected:
 	opens base, package, string, table, and math libraries in %Lua.  
 	in DEBUG builds only, opens the debug library
 	*/
-	void				openStandardLibraries(void) const;	
+	void				openStandardLibraries(void);	
 	
 private:
 	/** open standard libraries and such */

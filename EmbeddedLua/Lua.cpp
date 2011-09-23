@@ -8,19 +8,6 @@
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
-#define CONDITIONAL_STANDARD_LIB_OPEN(L, libname) \
-	{ \
-		lua_getglobal(L, #libname); \
-		if (!lua_istable(L, -1)) \
-		{ \
-			openLibrary(luaopen_##libname); \
-		} \
-		else \
-		{ \
-			lua_pop(L, 1); \
-		} \
-	}
-
 namespace lua_extension 
 {
 #if !GOLDMASTER
@@ -91,6 +78,19 @@ sint Lua::callProtected(lua_State* L, sint num_args, sint num_return_values)
 	}
 	
 	return report(L, error_code);
+}
+
+void Lua::conditionallyOpen(lua_function key, const schar* name)
+{
+	lua_getglobal(L, name); 
+	if (lua_isnil(L, -1)) 
+	{ 
+		openLibrary(key); 
+	} 
+	else 
+	{ 
+		lua_pop(L, 1); 
+	}
 }
 
 bool Lua::doString(const schar* chunk, const schar*)
@@ -200,27 +200,35 @@ void Lua::nilLoadedStatus(const schar* module) const
 	nilLoadedStatus(L, module);
 }
 
-void Lua::openLibrary(lua_function opener) const
+bool Lua::openLibrary(lua_function opener) const
 {
 	if (opener)
 	{
+		
 		lua_pushcfunction(L, opener);
-		callProtected(L);
+		sint status = callProtected(L);
 		lua_pop(L, 1);
+		return status == 0;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-void Lua::openStandardLibraries(void) const
+void Lua::openStandardLibraries(void) 
 {
-	CONDITIONAL_STANDARD_LIB_OPEN(L, base);
-	CONDITIONAL_STANDARD_LIB_OPEN(L, math);
-	CONDITIONAL_STANDARD_LIB_OPEN(L, package);
-	CONDITIONAL_STANDARD_LIB_OPEN(L, string);
-	CONDITIONAL_STANDARD_LIB_OPEN(L, table);
-	CONDITIONAL_STANDARD_LIB_OPEN(L, os);
 #if	DEBUG 
-	CONDITIONAL_STANDARD_LIB_OPEN(L, base);
+	conditionallyOpen(luaopen_debug, "debug");
 #endif // DEBUG 
+	conditionallyOpen(luaopen_io, "io");
+	conditionallyOpen(luaopen_math, "math");
+	conditionallyOpen(luaopen_os, "os");
+	conditionallyOpen(luaopen_package, "package");
+	conditionallyOpen(luaopen_string, "string");
+	conditionallyOpen(luaopen_table, "table");
+	// for some reason, I have to do this last for now
+	conditionallyOpen(luaopen_base, "base");
 }
 
 // \note taken and modified from from lua.c 
@@ -287,7 +295,7 @@ void Lua::runConsole(void) const
 
 void Lua::setPackagePath(const char* luaPath)
 {
-	CONDITIONAL_STANDARD_LIB_OPEN(L, package);
+	conditionallyOpen(luaopen_package, "package");
 	lua_getglobal(L, "package");	//s: package
 	push(L, luaPath);				//s: package, LUA_PATH,2B
 	lua_setfield(L, -2, "path");	//s: package

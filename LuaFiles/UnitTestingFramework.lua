@@ -171,7 +171,7 @@ end
 
 ----------------------------------------------------------------------
 errorHandler = function(error_object)
-	return debug.traceback(error_object,1)
+	return debug.traceback(error_object,4)
 end
 
 ----------------------------------------------------------------------

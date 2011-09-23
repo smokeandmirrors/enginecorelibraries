@@ -463,7 +463,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		callStaticReturn1Param0(L, "returnOneParamZero", value2);
 		 value2 = 3.14f;
 		callStaticReturn0Param1(L, "returnZeroParamOne", value2);
-
+		
 		// callStaticReturn0Param0(L, "throwError");
 		lua.runConsole();
 	}

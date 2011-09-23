@@ -16,7 +16,6 @@ function class(object, prefix, suffix)
 	if not object then
 		object = new((prefix or '')..'TC'..(suffix or ''))
 	end
-	
 	UT.checkEqual(object.one, 1)
 	object.one = 2
 	UT.checkEqual(object.one, 2)

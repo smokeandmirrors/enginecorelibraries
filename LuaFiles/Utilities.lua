@@ -48,6 +48,13 @@ function _G.togset(toggle, bool)
 	end		
 end
 
+---------------------------------------------------------------------
+-- shorcut for assert(type(object) == 'sometype')
+function _G.tassert(object, type_name)
+	assert(type(object) == type_name, 'type: '..type_name..' expected, but '..type(object)..' found instead!')
+end
+
+
 --[[ debug extensions ]]--
 if debug then
 ---------------------------------------------------------------------
@@ -237,6 +244,7 @@ end
 if table then
 function getTabs(number)
 	local indent = ''
+	number = number or 0
 	for i = 1, number do
 		indent = indent..'\t'
 	end

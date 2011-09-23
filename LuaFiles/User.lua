@@ -9,6 +9,40 @@ _G.u = function()
 	rerequire'User'
 end
 
+function _G.testFile()
+	CW = rerequire'CodeWriting'
+	EN2S = rerequire'LuaExposeNativeToScript'
+	myFile = io.open('MyFile.h', 'w+')
+	local output
+		
+	--  EN2S.generateStaticTemplate
+	output = ""
+	output = output..'\n'
+	output = output..'\n//test generateStaticTemplate\n'
+	output = output..EN2S.generateStaticTemplate(0, 1)
+	output = output..'\n//test generateStaticTemplate\n'
+	output = output..EN2S.generateStaticTemplate(1, 0)
+	myFile:write(output)
+	
+	for i = 1, 10 do
+		for j = 1, 10 do
+			output = '\n//test generateStaticTemplate\n'
+			output = output..EN2S.generateStaticTemplate(i, j)
+			myFile:write(output)
+		end
+	end
+	
+	
+	myFile:write(output)
+	
+	myFile:flush()
+end
+
+function _G.cwtest()
+	u()
+	testFile()
+end
+
 ---[[
 function _G.returnOneParamZero()
 	return 17
