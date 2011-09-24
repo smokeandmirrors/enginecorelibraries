@@ -68,17 +68,19 @@ end
 
 -- replaces EN2S_END_STATIC_TEMPLATE_ARGS
 -- end the static function template declaration
-function endStaticTemplateArgs(nrets, nargs)
+function endStaticTemplateArgs(nrets, nargs, fname)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	return CW.templateReturnSignature(nrets)..'(* function)('..CW.templateArgumentsSignature(nrets, nargs)..') >\n'
+	fname = fname or 'function'
+	return CW.templateReturnSignature(nrets)..'(* '..fname..')('..CW.templateArgumentsSignature(nrets, nargs)..') >\n'
 end
 
 -- replaces EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) 
-function endClassTemplateArgs(nrets, nargs, const)
+function endClassTemplateArgs(nrets, nargs, const, fname)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	return CW.templateReturnSignature(nrets)..'(CLASS::* function)('..CW.templateArgumentsSignature(nrets, nargs)..') ' ..(const and 'const' or '')..'>\n'
+	fname = fname or 'function'
+	return CW.templateReturnSignature(nrets)..'(CLASS::* '..fname..')('..CW.templateArgumentsSignature(nrets, nargs)..') ' ..(const and 'const' or '')..'>\n'
 end
 
 -- replaces EN2S_GENERATE_CLASS_TEMPLATE and EN2S_GENERATE_CLASS_CONST_TEMPLATE
@@ -178,6 +180,6 @@ function generateHeader(file, nrets, nargs)
 			end
 		end
 	end
-	file:write("}")
+	file:write("} // namespace lua_extension")
 	file:flush()
 end

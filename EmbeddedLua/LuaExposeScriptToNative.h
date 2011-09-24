@@ -534,4 +534,6 @@ namespace lua_extension
 
 } // namespace lua_extension
 
+
+
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H

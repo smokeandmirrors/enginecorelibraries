@@ -12,6 +12,14 @@ table.insert(tabs, '\t\t')
 table.insert(tabs, '\t\t\t')
 table.insert(tabs, '\t\t\t\t')
 
+function callNotFound(nrets, nargs, hybrid, ntabs)
+	if hybrid then
+		return tabs[ntabs]..CW.templateAssignReturnValues(nrets)..'(*nativeFunction)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
+	else
+		return ''
+	end
+end
+
 function assignReturnValues(nrets, nargs, ntabs)
 	tassert(nrets, 'number')
 	local output = ''
@@ -42,13 +50,17 @@ function hybridConst(nrets, nargs)
 	return 'Member'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
 end
 
+function static(nrets, nargs)
+	return 'Static'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, '..CW.templateCallSignature(nrets, nargs)..', const char* module=\"_G\")\n'
+end
+
 function generateClassHybridCall(nrets, nargs, const)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
 	local name = 'hybrid'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '.. name..' */\n'
-	output = output..'template<typename CLASS, '..CW.templateArguments(nrets, nargs)..', '..EN2S.endClassTemplateArgs(nrets, nargs, const) 
+	output = output..'template<typename CLASS, '..CW.templateArguments(nrets, nargs)..', '..EN2S.endClassTemplateArgs(nrets, nargs, const, 'nativeFunction') 
 	output = output..'inline ScriptToNativeCallResult\n'
 	output = output..'hybrid'..(const and hybridConst(nrets, nargs) or hybridMember(nrets, nargs))
 	output = output..'{\t/*s: */\n'
@@ -87,7 +99,7 @@ function generateClassHybridPCall(nrets, nargs, const)
 	local name = 'phybrid'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '..name..' */\n'
-	output = output..'template<typename CLASS, '..CW.templateArguments(nrets, nargs)..', '..EN2S.endClassTemplateArgs(nrets, nargs, const) 
+	output = output..'template<typename CLASS, '..CW.templateArguments(nrets, nargs)..', '..EN2S.endClassTemplateArgs(nrets, nargs, const, 'nativeFunction') 
 	output = output..'inline ScriptToNativeCallResult\n'
 	output = output..'phybrid'..(const and hybridConst(nrets, nargs) or hybridMember(nrets, nargs))
 	output = output..'{\t/*s: */\n'
@@ -114,6 +126,7 @@ function generateClassHybridPCall(nrets, nargs, const)
 	output = output..tabs[3]..			'/*s: */\n'
 	output = output..tabs[3]..			'return lua_extension::functionError;\n'
 	output = output..tabs[2]..		'} \n'
+	output = output..tabs[1]..'}\n'
 	output = output..tabs[1]..'else \n'
 	output = output..tabs[1]..'{\t/*s: module nil */\n'
 	output = output..tabs[2]..	'lua_pop(L, 2);\n'
@@ -126,13 +139,111 @@ function generateClassHybridPCall(nrets, nargs, const)
 	return output
 end
 
+function generateStaticCall(nrets, nargs, hybrid)
+	tassert(nrets, 'number')
+	tassert(nargs, 'number')
+	local name = (hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
+	local output = ''
+	output = output..'/** '.. name..' */\n'
+	output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	output = output..'inline ScriptToNativeCallResult\n'
+	output = output..(hybrid and 'hybrid' or 'call')..static(nrets, nargs)
+	output = output..'{\t/*s: */\n'
+	output = output..tabs[1]..'lua_getglobal(L, module);\n'
+	output = output..tabs[1]..'/*s: ? */\n'
+	output = output..tabs[1]..'if (lua_istable(L, -1))\n'
+	output = output..tabs[1]..'{	/*s: module */\n'
+	output = output..tabs[2]..		'lua_getfield(L, -1, scriptFunction);\n'
+	output = output..tabs[2]..		'/*s: module ? */\n'
+	output = output..tabs[2]..		'if (lua_isfunction(L, -1))\n'
+	output = output..tabs[2]..		'{	/*s: module scriptFunction */\n'
+	output = output..					pushArguments(nrets, nargs, 3)
+	output = output..tabs[3]..			'/*s: module scriptFunction (arguments) */\n'
+	output = output..tabs[3]..			'lua_call(L, '..(nargs)..');\n'
+	output = output..tabs[3]..			'/*s: module (return values) */\n'
+	output = output..					assignReturnValues(nrets, nargs, 3)
+	output = output..tabs[3]..			'lua_pop(L, '..(nrets+1)..');\n'
+	output = output..tabs[3]..			'/*s: */\n'
+	output = output..tabs[3]..			'return lua_extension::functionSuccess;\n'
+	output = output..tabs[2]..		'}\n'
+	output = output..tabs[2]..		'else\n'
+	output = output..tabs[2]..		'{\t/*s: module nil */\n'
+	output = output..tabs[3]..			'lua_pop(L, 2)\n'
+	output = output..tabs[3]..			'/*s: */\n'
+	output = output..					callNotFound(nrets, nargs, hybrid, 3)
+	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
+	output = output..tabs[2]..		'}\n'
+	output = output..tabs[1]..'}\n'
+	output = output..tabs[1]..'else\n'
+	output = output..tabs[1]..'{\t/*s: !table */ \n'
+	output = output..tabs[2]..	'lua_pop(L, 1);\n'
+	output = output..tabs[2]..	'/*s: */ \n'
+	output = output..			callNotFound(nrets, nargs, hybrid, 2)
+	output = output..tabs[2]..	'return lua_extension::moduleNotFound; \n'
+	output = output..tabs[1]..'} \n'
+	output = output..'} // '..name..'\n\n'
+	return output
+end
+
+function generateStaticPCall(nrets, nargs, hybrid)
+	tassert(nrets, 'number')
+	tassert(nargs, 'number') 
+	local name = 'p'..(hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
+	local output = ''
+	output = output..'/** '..name..' */\n'
+	output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	output = output..'inline ScriptToNativeCallResult\n'
+	output = output..'p'..(hybrid and 'hybrid' or 'call')..static(nrets, nargs)
+	output = output..'{\t/*s: */\n'
+	output = output..tabs[1]..'lua_getglobal(L, module);\n'
+	output = output..tabs[1]..'/*s: ? */\n'
+	output = output..tabs[1]..'if (lua_istable(L, -1))\n'
+	output = output..tabs[1]..'{	/*s: module */\n'
+	output = output..tabs[2]..		'lua_getfield(L, -1, scriptFunction);\n'
+	output = output..tabs[2]..		'/*s: module ? */\n'
+	output = output..tabs[2]..		'if (lua_isfunction(L, -1))\n'
+	output = output..tabs[2]..		'{	/*s: module scriptFunction */\n'
+	output = output..					pushArguments(nrets, nargs, 3)
+	output = output..tabs[3]..			'/*s: module scriptFunction (arguments) */\n'
+	output = output..tabs[3]..			'if (!Lua::callProtected((L, '..(nargs)..'))\n'
+	output = output..tabs[3]..			'{\t/*s: module (return values) */ \n'
+	output = output..						assignReturnValues(nrets, nargs, 4)
+	output = output..tabs[4]..				'lua_pop(L, '..(nrets+1)..'); \n'
+	output = output..tabs[4]..				'/*s: */ \n'
+	output = output..tabs[4]..				'return lua_extension::functionSuccess;\n'
+	output = output..tabs[3]..			'} \n'
+	output = output..tabs[3]..			'else\n'
+	output = output..tabs[3]..			'{\t/*s: module */\n'
+	output = output..tabs[4]..				'lua_pop(L, 1);\n'
+	output = output..tabs[4]..				'/*s: */\n'
+	output = output..tabs[4]..				'return lua_extension::functionError;\n'
+	output = output..tabs[3]..			'} \n'
+	output = output..tabs[2]..		'else\n'
+	output = output..tabs[2]..		'{\t/*s: module nil */\n'
+	output = output..tabs[3]..			'lua_pop(L, 2)\n'
+	output = output..tabs[3]..			'/*s: */\n'
+	output = output..					callNotFound(nrets, nargs, hybrid, 3)
+	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
+	output = output..tabs[2]..		'}\n'
+	output = output..tabs[1]..'}\n'
+	output = output..tabs[1]..'else\n'
+	output = output..tabs[1]..'{\t/*s: !table */ \n'
+	output = output..tabs[2]..	'lua_pop(L, 1);\n'
+	output = output..tabs[2]..	'/*s: */ \n'
+	output = output..			callNotFound(nrets, nargs, hybrid, 2)
+	output = output..tabs[2]..	'return lua_extension::moduleNotFound; \n'
+	output = output..tabs[1]..'} \n'
+	output = output..'} // '..name..'\n\n'
+	return output
+end
+
 function generateHeader(file, nrets, nargs)
 	tassert(file, 'userdata')
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	local output 
-	--[[
-	output = "typedef enum ScriptToNativeCallResult\n"..
+	local output = "namespace lua_extension\n{\n" 
+	---[[
+	output = output.."typedef enum ScriptToNativeCallResult\n"..
 	"{\n"..
 	"	functionSuccess=0,\n"..
 	"	functionNotFound,\n"..
@@ -361,26 +472,33 @@ function generateHeader(file, nrets, nargs)
 	"		(*nativeFunction)();\n"..
 	"		return lua_extension::moduleNotFound;\n"..
 	"	}\n"..
-	"}"
-	file:write(output)
+	"} "
 	--]]
-	---[[
+	file:write(output)
 	for i = 0, nrets do
 		for j = 0, nargs do
 			if i ~= 0 or j ~= 0 then
 				local output = ''
+				--[[
 				-- generateClassHybridPCall
 				output = output..generateClassHybridPCall(i, j)
 				output = output..generateClassHybridPCall(i, j, true)
 				-- generateClassHybridCall
 				output = output..generateClassHybridCall(i, j)
 				output = output..generateClassHybridCall(i, j, true)
+				--]]
+				-- generateStaticCall
+				output = output..generateStaticCall(i, j, hybrid)
+				output = output..generateStaticCall(i, j, true)
+				-- generateStaticPCall
+				output = output..generateStaticPCall(i, j, hybrid)
+				output = output..generateStaticPCall(i, j, true)
 				-- write the current functions to file
 				file:write(output)
 			end
 		end
 	end
-	--]]
-	-- save the file
+	
+	file:write("} // namespace lua_extension")
 	file:flush()
 end

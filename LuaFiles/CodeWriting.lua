@@ -12,10 +12,10 @@ function templateCallSignature(nrets, nargs, prefixIfAny)
 	prefixIfAny = prefixIfAny or ''
 	local output = prefixIfAny
 	if nrets > 0 then
-		output = output..'RET_1& ret'
+		output = output..'RET_1& ret1'
 	end
 	for i = 2, nrets do
-		output = output..', RET_'..i..'& ret'
+		output = output..', RET_'..i..'& ret'..i
 	end
 	if nargs > 0 then
 		if nrets > 0 then
@@ -25,7 +25,7 @@ function templateCallSignature(nrets, nargs, prefixIfAny)
 		end		
 	end
 	for i = 2, nargs do
-		output = output..', ARG_'..i
+		output = output..', ARG_'..i..' arg'..i
 	end
 	return output
 end
@@ -209,7 +209,6 @@ function templateFunctionCallArguments(nrets, nargs)
 	for i = 3, nrets do
 		output = output..(', ret'..i)
 	end	
-	-- output: 'ret2, ... , retN'
 	
 	if nrets > 1 and nargs > 0 then
 		output = output..(', ')
@@ -222,7 +221,6 @@ function templateFunctionCallArguments(nrets, nargs)
 	for i = 2, nargs do
 		output = output..(', arg'..i)
 	end
-	-- output: 'ARG_1, ..., ARG_N'
 	return output
 end
 
