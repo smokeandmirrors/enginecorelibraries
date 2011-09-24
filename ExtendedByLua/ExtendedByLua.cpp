@@ -391,7 +391,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		
-		/*
+		
 		lua_State* L = lua.getState();
 		sreal return2(4);
 		return2 = 4;
@@ -430,14 +430,14 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		phybridStaticReturn0Param1<int, returnZeroParamOne>(L, "returnZeroParamOne", value);
 		hybridStaticReturn0Param1<int, returnZeroParamOne>(L, "returnZeroParamOne", value);
 
-		pcallStaticReturn0Param1(L, "returnZeroParamOne", value);
-		pcallStaticReturn0Param1(L, "returnZeroParamOne1", value);
-		pcallStaticReturn0Param1(L, "returnZeroParamOne", value, "moochy");
-		pcallStaticReturn0Param1(L, "throwError", value);
+		pcallStaticReturn0Param1<sint>(L, "returnZeroParamOne", value);
+		pcallStaticReturn0Param1<sint>(L, "returnZeroParamOne1", value);
+		pcallStaticReturn0Param1<sint>(L, "returnZeroParamOne", value, "moochy");
+		pcallStaticReturn0Param1<sint>(L, "throwError", value);
 
-		callStaticReturn0Param1(L, "returnZeroParamOne", value);
-		callStaticReturn0Param1(L, "returnZeroParamOne1", value);
-		callStaticReturn0Param1(L, "returnZeroParamOne", value, "moochy");
+		callStaticReturn0Param1<sint>(L, "returnZeroParamOne", value);
+		callStaticReturn0Param1<sint>(L, "returnZeroParamOne1", value);
+		callStaticReturn0Param1<sint>(L, "returnZeroParamOne", value, "moochy");
 		// callStaticReturn0Param0(L, "throwError");
 		
 		printf("\n\nNEXT\n\n");
@@ -452,22 +452,22 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		phybridStaticReturn1Param0<int, returnOneParamZero>(L, "returnOneParamZero", value);
 		hybridStaticReturn1Param0<int, returnOneParamZero>(L, "returnOneParamZero", value);
 
-		pcallStaticReturn1Param0(L, "returnOneParamZero", value);
-		pcallStaticReturn1Param0(L, "returnOneParamZero1", value);
-		pcallStaticReturn1Param0(L, "returnOneParamZero", value, "moochy");
-		pcallStaticReturn1Param0(L, "throwError", value);
+		pcallStaticReturn1Param0<sint>(L, "returnOneParamZero", value);
+		pcallStaticReturn1Param0<sint>(L, "returnOneParamZero1", value);
+		pcallStaticReturn1Param0<sint>(L, "returnOneParamZero", value, "moochy");
+		pcallStaticReturn1Param0<sint>(L, "throwError", value);
 
-		callStaticReturn1Param0(L, "returnOneParamZero", value);
-		callStaticReturn1Param0(L, "returnOneParamZero1", value);
-		callStaticReturn1Param0(L, "returnOneParamZero", value, "moochy");
+		callStaticReturn1Param0<sint>(L, "returnOneParamZero", value);
+		callStaticReturn1Param0<sint>(L, "returnOneParamZero1", value);
+		callStaticReturn1Param0<sint>(L, "returnOneParamZero", value, "moochy");
 
 		float value2 = 3.0f;
-		callStaticReturn1Param0(L, "returnOneParamZero", value2);
+		callStaticReturn1Param0<float>(L, "returnOneParamZero", value2);
 		 value2 = 3.14f;
-		callStaticReturn0Param1(L, "returnZeroParamOne", value2);
+		callStaticReturn0Param1<float>(L, "returnZeroParamOne", value2);
 		
 		// callStaticReturn0Param0(L, "throwError");
-		*/
+		
 
 		lua.runConsole();
 	}

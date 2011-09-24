@@ -41,17 +41,17 @@ end
 function hybridMember(nrets, nargs)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	return 'ConstReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, const CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
+	return 'MemberReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
 end
 
 function hybridConst(nrets, nargs)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
-	return 'Member'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
+	return 'ConstReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, const CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
 end
 
 function static(nrets, nargs)
-	return 'Static'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, '..CW.templateCallSignature(nrets, nargs)..', const char* module=\"_G\")\n'
+	return 'StaticReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, '..CW.templateCallSignature(nrets, nargs)..', const char* module=\"_G\")\n'
 end
 
 function generateClassHybridCall(nrets, nargs, const)
@@ -74,7 +74,7 @@ function generateClassHybridCall(nrets, nargs, const)
 	output = output..tabs[2]..		'/*s: object scriptFunction object */ \n'
 	output = output..				pushArguments(nrets, nargs, 2)
 	output = output..tabs[2]..		'/*s: object scriptFunction object (arguments) */ \n'
-	output = output..tabs[2]..		'lua_call(L, '..(nargs+1)..'); \n'
+	output = output..tabs[2]..		'lua_call(L, '..(nargs+1)..', '..nrets..'); \n'
 	output = output..tabs[2]..		'/*s: object (return values) */ \n'
 	output = output..				assignReturnValues(nrets, nargs, 2)
 	output = output..tabs[2]..		'lua_pop(L, '..(nrets+1)..'); \n'
@@ -88,8 +88,8 @@ function generateClassHybridCall(nrets, nargs, const)
 	output = output..tabs[2]..	CW.templateAssignReturnValues(nrets)..'(object.*nativeFunction)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
 	output = output..tabs[2]..	'return lua_extension::functionNotFound; \n'
 	output = output..tabs[1]..'} \n'
-	output = output..'}\n'
-	output = output..'\n'
+	output = output..'} //'..name
+	output = output..'\n\n'
 	return output
 end
 
@@ -113,7 +113,7 @@ function generateClassHybridPCall(nrets, nargs, const)
 	output = output..tabs[2]..		'/*s: object scriptFunction object */ \n'
 	output = output..				pushArguments(nrets, nargs, 2)
 	output = output..tabs[2]..		'/*s: object scriptFunction object (arguments) */ \n'
-	output = output..tabs[2]..		'if (!Lua::callProtected((L, '..(nargs+1)..'))\n'
+	output = output..tabs[2]..		'if (!Lua::callProtected(L, '..(nargs+1)..', '..nrets..'))\n'
 	output = output..tabs[2]..		'{\t/*s: object (return values) */ \n'
 	output = output..					assignReturnValues(nrets, nargs, 3)
 	output = output..tabs[3]..			'lua_pop(L, '..(nrets+1)..'); \n'
@@ -145,7 +145,11 @@ function generateStaticCall(nrets, nargs, hybrid)
 	local name = (hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '.. name..' */\n'
-	output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	if hybrid then
+		output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	else
+		output = output..'template<'..CW.templateArguments(nrets, nargs)..'>'
+	end
 	output = output..'inline ScriptToNativeCallResult\n'
 	output = output..(hybrid and 'hybrid' or 'call')..static(nrets, nargs)
 	output = output..'{\t/*s: */\n'
@@ -159,7 +163,7 @@ function generateStaticCall(nrets, nargs, hybrid)
 	output = output..tabs[2]..		'{	/*s: module scriptFunction */\n'
 	output = output..					pushArguments(nrets, nargs, 3)
 	output = output..tabs[3]..			'/*s: module scriptFunction (arguments) */\n'
-	output = output..tabs[3]..			'lua_call(L, '..(nargs)..');\n'
+	output = output..tabs[3]..			'lua_call(L, '..nargs..', '..nrets..');\n'
 	output = output..tabs[3]..			'/*s: module (return values) */\n'
 	output = output..					assignReturnValues(nrets, nargs, 3)
 	output = output..tabs[3]..			'lua_pop(L, '..(nrets+1)..');\n'
@@ -168,7 +172,7 @@ function generateStaticCall(nrets, nargs, hybrid)
 	output = output..tabs[2]..		'}\n'
 	output = output..tabs[2]..		'else\n'
 	output = output..tabs[2]..		'{\t/*s: module nil */\n'
-	output = output..tabs[3]..			'lua_pop(L, 2)\n'
+	output = output..tabs[3]..			'lua_pop(L, 2);\n'
 	output = output..tabs[3]..			'/*s: */\n'
 	output = output..					callNotFound(nrets, nargs, hybrid, 3)
 	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
@@ -191,7 +195,11 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	local name = 'p'..(hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '..name..' */\n'
-	output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	if hybrid then
+		output = output..'template<'..CW.templateArguments(nrets, nargs)..', '..EN2S.endStaticTemplateArgs(nrets, nargs, 'nativeFunction')
+	else
+		output = output..'template<'..CW.templateArguments(nrets, nargs)..'>'
+	end
 	output = output..'inline ScriptToNativeCallResult\n'
 	output = output..'p'..(hybrid and 'hybrid' or 'call')..static(nrets, nargs)
 	output = output..'{\t/*s: */\n'
@@ -205,7 +213,7 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	output = output..tabs[2]..		'{	/*s: module scriptFunction */\n'
 	output = output..					pushArguments(nrets, nargs, 3)
 	output = output..tabs[3]..			'/*s: module scriptFunction (arguments) */\n'
-	output = output..tabs[3]..			'if (!Lua::callProtected((L, '..(nargs)..'))\n'
+	output = output..tabs[3]..			'if (!Lua::callProtected(L, '..nargs..', '..nrets..'))\n'
 	output = output..tabs[3]..			'{\t/*s: module (return values) */ \n'
 	output = output..						assignReturnValues(nrets, nargs, 4)
 	output = output..tabs[4]..				'lua_pop(L, '..(nrets+1)..'); \n'
@@ -218,9 +226,10 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	output = output..tabs[4]..				'/*s: */\n'
 	output = output..tabs[4]..				'return lua_extension::functionError;\n'
 	output = output..tabs[3]..			'} \n'
+	output = output..tabs[2]..		'}\n'
 	output = output..tabs[2]..		'else\n'
 	output = output..tabs[2]..		'{\t/*s: module nil */\n'
-	output = output..tabs[3]..			'lua_pop(L, 2)\n'
+	output = output..tabs[3]..			'lua_pop(L, 2);\n'
 	output = output..tabs[3]..			'/*s: */\n'
 	output = output..					callNotFound(nrets, nargs, hybrid, 3)
 	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
@@ -242,116 +251,18 @@ function generateHeader(file, nrets, nargs)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
 	local output = "namespace lua_extension\n{\n" 
-	---[[
+	
 	output = output.."typedef enum ScriptToNativeCallResult\n"..
 	"{\n"..
 	"	functionSuccess=0,\n"..
 	"	functionNotFound,\n"..
 	"	functionError,\n"..
 	"	moduleNotFound\n"..
-	"}; // ScriptToNativeCallResult\n"
+	"}; // ScriptToNativeCallResult\n\n"
 	file:write(output)
-	output = "template<typename CLASS, void(CLASS::* nativeFunction)(void) const>\n"..
-	"inline ScriptToNativeCallResult \n"..
-	"	hybridConstReturn0Param0(lua_State* L, const char* scriptFunction, const CLASS& object)\n"..
-	"{\n"..
-	"	push(L, object);					/*s: object */\n"..
-	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
-	"	if (lua_isfunction(L, -1))\n"..
-	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
-	"		lua_call(L, 1, 0);				/*s: object */\n"..
-	"		lua_pop(L, 1);					/*s: */\n"..
-	"		return lua_extension::functionSuccess;\n"..
-	"	}\n"..
-	"	else\n"..
-	"	{									/*s: module nil */\n"..
-	"		lua_pop(L, 2);					/*s: */\n"..
-	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
-	"	}\n"..
-	"}\n"
-	file:write(output)
-	output = "template<typename CLASS, void(CLASS::* nativeFunction)(void) const>\n"..
-	"inline ScriptToNativeCallResult \n"..
-	"	phybridConstReturn0Param0(lua_State* L, const char* scriptFunction, const CLASS& object)\n"..
-	"{\n"..
-	"	push(L, object);					/*s: object */\n"..
-	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
-	"	if (lua_isfunction(L, -1))\n"..
-	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
-	"		if (!Lua::callProtected(L, 1, 0))\n"..
-	"		{								/*s: object */\n"..
-	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
-	"		}\n"..
-	"		else\n"..
-	"		{								/*s: object */\n"..
-	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionError;\n"..
-	"		}				\n"..
-	"	}\n"..
-	"	else\n"..
-	"	{									/*s: object nil */\n"..
-	"		lua_pop(L, 2);					/*s: */\n"..
-	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
-	"	}\n"..
-	"}\n"..
-	"\n"
-	file:write(output)
-	output = "template<typename CLASS, void(CLASS::* nativeFunction)(void)>\n"..
-	"inline ScriptToNativeCallResult \n"..
-	"	hybridMemberReturn0Param0(lua_State* L, const char* scriptFunction, CLASS& object)\n"..
-	"{\n"..
-	"	push(L, object);					/*s: object */\n"..
-	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
-	"	if (lua_isfunction(L, -1))\n"..
-	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
-	"		lua_call(L, 1, 0);				/*s: object */\n"..
-	"		lua_pop(L, 1);					/*s: */\n"..
-	"		return lua_extension::functionSuccess;\n"..
-	"	}\n"..
-	"	else\n"..
-	"	{									/*s: module nil */\n"..
-	"		lua_pop(L, 2);					/*s: */\n"..
-	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
-	"	}\n"..
-	"}\n"
-	file:write(output)
-	output = "template<typename CLASS, void(CLASS::* nativeFunction)(void)>\n"..
-	"inline ScriptToNativeCallResult \n"..
-	"	phybridMemberReturn0Param0(lua_State* L, const char* scriptFunction, CLASS& object)\n"..
-	"{\n"..
-	"	push(L, object);					/*s: object */\n"..
-	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
-	"	if (lua_isfunction(L, -1))\n"..
-	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
-	"		if (!Lua::callProtected(L, 1, 0))\n"..
-	"		{								/*s: object */\n"..
-	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
-	"		}\n"..
-	"		else\n"..
-	"		{								/*s: object */\n"..
-	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionError;\n"..
-	"		}				\n"..
-	"	}\n"..
-	"	else\n"..
-	"	{									/*s: object nil */\n"..
-	"		lua_pop(L, 2);					/*s: */\n"..
-	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
-	"	}\n"..
-	"}\n"
-	file:write(output)
-	output = "inline ScriptToNativeCallResult \n"..
-	"	callStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
+	
+	output = "/** callStaticReturn0Param0 */\ninline ScriptToNativeCallResult \n"..
+	"callStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
 	"{\n"..
 	"	lua_getglobal(L, module);				/*s: ? */\n"..
 	"	if (lua_istable(L, -1))					\n"..
@@ -374,11 +285,56 @@ function generateHeader(file, nrets, nargs)
 	"		lua_pop(L, 1);\n"..
 	"		return lua_extension::moduleNotFound;\n"..
 	"	}\n"..
-	"}\n"
+	"} // callStaticReturn0Param0\n\n"
 	file:write(output)
-	output = "template<void(* nativeFunction)(void)>\n"..
+	
+	output = "/** hybridConstReturn0Param0 */\ntemplate<typename CLASS, void(CLASS::* nativeFunction)(void) const>\n"..
 	"inline ScriptToNativeCallResult \n"..
-	"	hybridStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
+	"hybridConstReturn0Param0(lua_State* L, const char* scriptFunction, const CLASS& object)\n"..
+	"{\n"..
+	"	push(L, object);					/*s: object */\n"..
+	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
+	"	if (lua_isfunction(L, -1))\n"..
+	"	{									/*s: object scriptFunction */\n"..
+	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		lua_call(L, 1, 0);				/*s: object */\n"..
+	"		lua_pop(L, 1);					/*s: */\n"..
+	"		return lua_extension::functionSuccess;\n"..
+	"	}\n"..
+	"	else\n"..
+	"	{									/*s: module nil */\n"..
+	"		lua_pop(L, 2);					/*s: */\n"..
+	"		(object.*nativeFunction)();\n"..
+	"		return lua_extension::functionNotFound;\n"..
+	"	}\n"..
+	"} // hybridConstReturn0Param0\n\n"
+	file:write(output)
+	
+	output = "/** hybridMemberReturn0Param0 */\ntemplate<typename CLASS, void(CLASS::* nativeFunction)(void)>\n"..
+	"inline ScriptToNativeCallResult \n"..
+	"hybridMemberReturn0Param0(lua_State* L, const char* scriptFunction, CLASS& object)\n"..
+	"{\n"..
+	"	push(L, object);					/*s: object */\n"..
+	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
+	"	if (lua_isfunction(L, -1))\n"..
+	"	{									/*s: object scriptFunction */\n"..
+	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		lua_call(L, 1, 0);				/*s: object */\n"..
+	"		lua_pop(L, 1);					/*s: */\n"..
+	"		return lua_extension::functionSuccess;\n"..
+	"	}\n"..
+	"	else\n"..
+	"	{									/*s: module nil */\n"..
+	"		lua_pop(L, 2);					/*s: */\n"..
+	"		(object.*nativeFunction)();\n"..
+	"		return lua_extension::functionNotFound;\n"..
+	"	}\n"..
+	"} // hybridMemberReturn0Param0\n\n"
+	file:write(output)
+		
+	output = "/** hybridStaticReturn0Param0 */\ntemplate<void(* nativeFunction)(void)>\n"..
+	"inline ScriptToNativeCallResult \n"..
+	"hybridStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
 	"{	\n"..
 	"	lua_getglobal(L, module);				/*s: ? */\n"..
 	"	if (lua_istable(L, -1))					\n"..
@@ -403,10 +359,11 @@ function generateHeader(file, nrets, nargs)
 	"		(*nativeFunction)();\n"..
 	"		return lua_extension::moduleNotFound;\n"..
 	"	}\n"..
-	"}\n"
+	"} // hybridStaticReturn0Param0\n\n"
 	file:write(output)
-	output = "inline ScriptToNativeCallResult \n"..
-	"	pcallStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
+	
+	output = "/** pcallStaticReturn0Param0 */\ninline ScriptToNativeCallResult \n"..
+	"pcallStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
 	"{\n"..
 	"	lua_getglobal(L, module);				/*s: ? */\n"..
 	"	if (lua_istable(L, -1))					\n"..
@@ -436,11 +393,70 @@ function generateHeader(file, nrets, nargs)
 	"		lua_pop(L, 1);						/*s: */\n"..
 	"		return lua_extension::moduleNotFound;\n"..
 	"	}						\n"..
-	"}\n"
+	"} // pcallStaticReturn0Param0\n\n"
 	file:write(output)
-	output = "template<void(* nativeFunction)(void)>\n"..
+	
+	output = "/** phybridConstReturn0Param0 */\ntemplate<typename CLASS, void(CLASS::* nativeFunction)(void) const>\n"..
 	"inline ScriptToNativeCallResult \n"..
-	"	phybridStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
+	"phybridConstReturn0Param0(lua_State* L, const char* scriptFunction, const CLASS& object)\n"..
+	"{\n"..
+	"	push(L, object);					/*s: object */\n"..
+	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
+	"	if (lua_isfunction(L, -1))\n"..
+	"	{									/*s: object scriptFunction */\n"..
+	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		if (!Lua::callProtected(L, 1, 0))\n"..
+	"		{								/*s: object */\n"..
+	"			lua_pop(L, 1);				/*s: */\n"..
+	"			return lua_extension::functionSuccess;\n"..
+	"		}\n"..
+	"		else\n"..
+	"		{								/*s: object */\n"..
+	"			lua_pop(L, 1);				/*s: */\n"..
+	"			return lua_extension::functionError;\n"..
+	"		}				\n"..
+	"	}\n"..
+	"	else\n"..
+	"	{									/*s: object nil */\n"..
+	"		lua_pop(L, 2);					/*s: */\n"..
+	"		(object.*nativeFunction)();\n"..
+	"		return lua_extension::functionNotFound;\n"..
+	"	}\n"..
+	"} // phybridConstReturn0Param0\n\n"
+	file:write(output)
+	
+	output = "/** phybridMemberReturn0Param0 */\ntemplate<typename CLASS, void(CLASS::* nativeFunction)(void)>\n"..
+	"inline ScriptToNativeCallResult \n"..
+	"phybridMemberReturn0Param0(lua_State* L, const char* scriptFunction, CLASS& object)\n"..
+	"{\n"..
+	"	push(L, object);					/*s: object */\n"..
+	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
+	"	if (lua_isfunction(L, -1))\n"..
+	"	{									/*s: object scriptFunction */\n"..
+	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		if (!Lua::callProtected(L, 1, 0))\n"..
+	"		{								/*s: object */\n"..
+	"			lua_pop(L, 1);				/*s: */\n"..
+	"			return lua_extension::functionSuccess;\n"..
+	"		}\n"..
+	"		else\n"..
+	"		{								/*s: object */\n"..
+	"			lua_pop(L, 1);				/*s: */\n"..
+	"			return lua_extension::functionError;\n"..
+	"		}				\n"..
+	"	}\n"..
+	"	else\n"..
+	"	{									/*s: object nil */\n"..
+	"		lua_pop(L, 2);					/*s: */\n"..
+	"		(object.*nativeFunction)();\n"..
+	"		return lua_extension::functionNotFound;\n"..
+	"	}\n"..
+	"} // phybridMemberReturn0Param0\n\n"
+	file:write(output)
+	
+	output = "/** phybridStaticReturn0Param0 */\ntemplate<void(* nativeFunction)(void)>\n"..
+	"inline ScriptToNativeCallResult \n"..
+	"phybridStaticReturn0Param0(lua_State* L, const char* scriptFunction, const char* module=\"_G\")\n"..
 	"{	\n"..
 	"	lua_getglobal(L, module);				/*s: ? */\n"..
 	"	if (lua_istable(L, -1))					\n"..
@@ -472,26 +488,28 @@ function generateHeader(file, nrets, nargs)
 	"		(*nativeFunction)();\n"..
 	"		return lua_extension::moduleNotFound;\n"..
 	"	}\n"..
-	"} "
-	--]]
+	"} // phybridStaticReturn0Param0\n\n "
 	file:write(output)
+	
 	for i = 0, nrets do
 		for j = 0, nargs do
 			if i ~= 0 or j ~= 0 then
 				local output = ''
-				--[[
-				-- generateClassHybridPCall
-				output = output..generateClassHybridPCall(i, j)
-				output = output..generateClassHybridPCall(i, j, true)
-				-- generateClassHybridCall
-				output = output..generateClassHybridCall(i, j)
+				-- callStatic
+				output = output..generateStaticCall(i, j)
+				-- hybridConst
 				output = output..generateClassHybridCall(i, j, true)
-				--]]
-				-- generateStaticCall
-				output = output..generateStaticCall(i, j, hybrid)
+				-- hybridMember
+				output = output..generateClassHybridCall(i, j)
+				-- hybridStatic
 				output = output..generateStaticCall(i, j, true)
-				-- generateStaticPCall
-				output = output..generateStaticPCall(i, j, hybrid)
+				-- pcallStatic
+				output = output..generateStaticPCall(i, j)
+				-- phybridConst
+				output = output..generateClassHybridPCall(i, j, true)
+				-- phybridMember
+				output = output..generateClassHybridPCall(i, j)
+				-- phybridStatic
 				output = output..generateStaticPCall(i, j, true)
 				-- write the current functions to file
 				file:write(output)

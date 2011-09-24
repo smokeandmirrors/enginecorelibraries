@@ -9,14 +9,14 @@ _G.u = function()
 	rerequire'User'
 end
 
-function _G.testFile()
+function cn2s()
 	local CW = rerequire'CodeWriting'
 	local EN2S = rerequire'LuaExposeNativeToScript'
 	local myFile = io.open('MyFile.h', 'w+')
 	EN2S.generateHeader(myFile, 10, 10)
 end
 
-function _G.testFile2()
+function cs2n()
 	local CW = rerequire'CodeWriting'
 	rerequire'LuaExposeNativeToScript'
 	local ES2N = rerequire'LuaExposeScriptToNative'
@@ -24,10 +24,16 @@ function _G.testFile2()
 	ES2N.generateHeader(myFile, 10, 10)
 end
 
-function _G.cwtest()
+function _G.n2s()
 	u()
-	testFile2()
+	_G.User.cn2s()
 end
+
+function _G.s2n()
+	u()
+	_G.User.cs2n()
+end
+
 
 ---[[
 function _G.returnOneParamZero()
