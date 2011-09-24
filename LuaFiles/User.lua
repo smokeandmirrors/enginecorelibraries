@@ -16,9 +16,17 @@ function _G.testFile()
 	EN2S.generateHeader(myFile, 10, 10)
 end
 
+function _G.testFile2()
+	local CW = rerequire'CodeWriting'
+	rerequire'LuaExposeNativeToScript'
+	local ES2N = rerequire'LuaExposeScriptToNative'
+	local myFile = io.open('MyFile.h', 'w+')
+	ES2N.generateHeader(myFile, 10, 10)
+end
+
 function _G.cwtest()
 	u()
-	testFile()
+	testFile2()
 end
 
 ---[[
@@ -38,8 +46,6 @@ function _G.returnZeroParamOne(value)
 	printf('script zero one '..value)
 end
 --]]
-
-
 
 function _G.throwError()
 	error'FAIL!'

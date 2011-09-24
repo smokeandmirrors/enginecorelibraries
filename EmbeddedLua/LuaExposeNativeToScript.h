@@ -20,7 +20,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \warning THIS FUNCTIONALITY IS NOT THREAD SAFE.
 
 <DEVELOPMENT STATUS>
-Current Draft		:	1.0
+Current Draft		:	1.1
 Current Phase		:   FIELD TESTING
 Purpose				:	DEPLOYMENT
 Unit Tested			:	YES
@@ -70,9 +70,7 @@ is the return value of the function.  The 2nd return value is the first
 argument by reference, and the Nth return value is the (N - 1)th argument
 by reference, etc.  All arguments after the last argument to be returned to
 %Lua will not be returned to %Lua, no matter how they are passed to the 
-C function
-
-\todo optional arguments (should be nearly trivial, but annoying to write)
+C function.
 
 */
 
@@ -148,7 +146,8 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
-			(object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			(object->*function)(to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param2
@@ -159,7 +158,8 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
-			(object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			(object->*function)(to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param2
@@ -168,7 +168,8 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, void (* function)(ARG_1, ARG_2) >
 	inline LUA_FUNC(nativeStaticReturn0Param2)
 	{
-		(*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		(*function)(to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param2
 
@@ -178,7 +179,9 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
-			(object->*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			(object->*function)(to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param3
@@ -189,7 +192,9 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
-			(object->*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			(object->*function)(to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param3
@@ -198,7 +203,9 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, void (* function)(ARG_1, ARG_2, ARG_3) >
 	inline LUA_FUNC(nativeStaticReturn0Param3)
 	{
-		(*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		(*function)(to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param3
 
@@ -208,7 +215,10 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
-			(object->*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			(object->*function)(to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param4
@@ -219,7 +229,10 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
-			(object->*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			(object->*function)(to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param4
@@ -228,7 +241,10 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4) >
 	inline LUA_FUNC(nativeStaticReturn0Param4)
 	{
-		(*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		(*function)(to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param4
 
@@ -238,7 +254,11 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
-			(object->*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			(object->*function)(to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param5
@@ -249,7 +269,11 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
-			(object->*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			(object->*function)(to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param5
@@ -258,7 +282,11 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) >
 	inline LUA_FUNC(nativeStaticReturn0Param5)
 	{
-		(*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		(*function)(to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param5
 
@@ -268,7 +296,12 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
-			(object->*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			(object->*function)(to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param6
@@ -279,7 +312,12 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
-			(object->*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			(object->*function)(to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param6
@@ -288,7 +326,12 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6) >
 	inline LUA_FUNC(nativeStaticReturn0Param6)
 	{
-		(*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		(*function)(to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param6
 
@@ -298,7 +341,13 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
-			(object->*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			(object->*function)(to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param7
@@ -309,7 +358,13 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
-			(object->*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			(object->*function)(to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param7
@@ -318,7 +373,13 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7) >
 	inline LUA_FUNC(nativeStaticReturn0Param7)
 	{
-		(*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		(*function)(to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param7
 
@@ -328,7 +389,14 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
-			(object->*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			(object->*function)(to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param8
@@ -339,7 +407,14 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
-			(object->*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			(object->*function)(to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param8
@@ -348,7 +423,14 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8) >
 	inline LUA_FUNC(nativeStaticReturn0Param8)
 	{
-		(*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		(*function)(to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param8
 
@@ -358,7 +440,15 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
-			(object->*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			(object->*function)(to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param9
@@ -369,7 +459,15 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
-			(object->*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			(object->*function)(to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param9
@@ -378,7 +476,15 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9) >
 	inline LUA_FUNC(nativeStaticReturn0Param9)
 	{
-		(*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		(*function)(to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param9
 
@@ -388,7 +494,16 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
-			(object->*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			(object->*function)(to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 		}
 		return 0;
 	} // nativeConstReturn0Param10
@@ -399,7 +514,16 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
-			(object->*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			(object->*function)(to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 		}
 		return 0;
 	} // nativeMemberReturn0Param10
@@ -408,7 +532,16 @@ namespace lua_extension
 	template< typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, typename ARG_10, void (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10) >
 	inline LUA_FUNC(nativeStaticReturn0Param10)
 	{
-		(*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		(*function)(to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		return 0;
 	} // nativeStaticReturn0Param10
 
@@ -488,7 +621,8 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -501,7 +635,8 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -512,7 +647,8 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, RET_1 (* function)(ARG_1, ARG_2) >
 	inline LUA_FUNC(nativeStaticReturn1Param2)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param2
@@ -523,7 +659,9 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -536,7 +674,9 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -547,7 +687,9 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, RET_1 (* function)(ARG_1, ARG_2, ARG_3) >
 	inline LUA_FUNC(nativeStaticReturn1Param3)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param3
@@ -558,7 +700,10 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -571,7 +716,10 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -582,7 +730,10 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4) >
 	inline LUA_FUNC(nativeStaticReturn1Param4)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param4
@@ -593,7 +744,11 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -606,7 +761,11 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -617,7 +776,11 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) >
 	inline LUA_FUNC(nativeStaticReturn1Param5)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param5
@@ -628,7 +791,12 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -641,7 +809,12 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -652,7 +825,12 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6) >
 	inline LUA_FUNC(nativeStaticReturn1Param6)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param6
@@ -663,7 +841,13 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -676,7 +860,13 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -687,7 +877,13 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7) >
 	inline LUA_FUNC(nativeStaticReturn1Param7)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param7
@@ -698,7 +894,14 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -711,7 +914,14 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -722,7 +932,14 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8) >
 	inline LUA_FUNC(nativeStaticReturn1Param8)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param8
@@ -733,7 +950,15 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -746,7 +971,15 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -757,7 +990,15 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9) >
 	inline LUA_FUNC(nativeStaticReturn1Param9)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param9
@@ -768,7 +1009,16 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -781,7 +1031,16 @@ namespace lua_extension
 	{
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
-			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			return pushed;
 		}
@@ -792,7 +1051,16 @@ namespace lua_extension
 	template< typename RET_1, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, typename ARG_10, RET_1 (* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10) >
 	inline LUA_FUNC(nativeStaticReturn1Param10)
 	{
-		RET_1 ret1 = (*function)(to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		return pushed;
 	} // nativeStaticReturn1Param10
@@ -845,7 +1113,8 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -2))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -860,7 +1129,8 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -2))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -873,7 +1143,8 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param1)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -886,7 +1157,9 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -901,7 +1174,9 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -3))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -914,7 +1189,9 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param2)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -927,7 +1204,10 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -942,7 +1222,10 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -4))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -955,7 +1238,10 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param3)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -968,7 +1254,11 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -983,7 +1273,11 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -5))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -996,7 +1290,11 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param4)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1009,7 +1307,12 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1024,7 +1327,12 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -6))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1037,7 +1345,12 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param5)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1050,7 +1363,13 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1065,7 +1384,13 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -7))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1078,7 +1403,13 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param6)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1091,7 +1422,14 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1106,7 +1444,14 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -8))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1119,7 +1464,14 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param7)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1132,7 +1484,15 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1147,7 +1507,15 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -9))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1160,7 +1528,15 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param8)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1173,7 +1549,16 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1188,7 +1573,16 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -10))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1201,7 +1595,16 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param9)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1214,7 +1617,17 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1229,7 +1642,17 @@ namespace lua_extension
 		if (CLASS* object = to<CLASS*>(L, -11))
 		{
 			RET_2 ret2;
-			RET_1 ret1 = (object->*function)(ret2, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			return pushed;
@@ -1242,7 +1665,17 @@ namespace lua_extension
 	inline LUA_FUNC(nativeStaticReturn2Param10)
 	{
 		RET_2 ret2;
-		RET_1 ret1 = (*function)(ret2, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		return pushed;
@@ -1303,7 +1736,8 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1320,7 +1754,8 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1335,7 +1770,8 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1350,7 +1786,9 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1367,7 +1805,9 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1382,7 +1822,9 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1397,7 +1839,10 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1414,7 +1859,10 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1429,7 +1877,10 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1444,7 +1895,11 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1461,7 +1916,11 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1476,7 +1935,11 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1491,7 +1954,12 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1508,7 +1976,12 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1523,7 +1996,12 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1538,7 +2016,13 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1555,7 +2039,13 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1570,7 +2060,13 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1585,7 +2081,14 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1602,7 +2105,14 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1617,7 +2127,14 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1632,7 +2149,15 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1649,7 +2174,15 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1664,7 +2197,15 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1679,7 +2220,16 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1696,7 +2246,16 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1711,7 +2270,16 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1726,7 +2294,17 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1743,7 +2321,17 @@ namespace lua_extension
 		{
 			RET_2 ret2;
 			RET_3 ret3;
-			RET_1 ret1 = (object->*function)(ret2, ret3, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1758,7 +2346,17 @@ namespace lua_extension
 	{
 		RET_2 ret2;
 		RET_3 ret3;
-		RET_1 ret1 = (*function)(ret2, ret3, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1827,7 +2425,8 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1846,7 +2445,8 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1863,7 +2463,8 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1880,7 +2481,9 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1899,7 +2502,9 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1916,7 +2521,9 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1933,7 +2540,10 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1952,7 +2562,10 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -1969,7 +2582,10 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -1986,7 +2602,11 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2005,7 +2625,11 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2022,7 +2646,11 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2039,7 +2667,12 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2058,7 +2691,12 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2075,7 +2713,12 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2092,7 +2735,13 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2111,7 +2760,13 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2128,7 +2783,13 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2145,7 +2806,14 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2164,7 +2832,14 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2181,7 +2856,14 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2198,7 +2880,15 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2217,7 +2907,15 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2234,7 +2932,15 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2251,7 +2957,16 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2270,7 +2985,16 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2287,7 +3011,16 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2304,7 +3037,17 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2323,7 +3066,17 @@ namespace lua_extension
 			RET_2 ret2;
 			RET_3 ret3;
 			RET_4 ret4;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2340,7 +3093,17 @@ namespace lua_extension
 		RET_2 ret2;
 		RET_3 ret3;
 		RET_4 ret4;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2417,7 +3180,8 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2438,7 +3202,8 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2457,7 +3222,8 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2476,7 +3242,9 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2497,7 +3265,9 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2516,7 +3286,9 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2535,7 +3307,10 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2556,7 +3331,10 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2575,7 +3353,10 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2594,7 +3375,11 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2615,7 +3400,11 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2634,7 +3423,11 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2653,7 +3446,12 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2674,7 +3472,12 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2693,7 +3496,12 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2712,7 +3520,13 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2733,7 +3547,13 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2752,7 +3572,13 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2771,7 +3597,14 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2792,7 +3625,14 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2811,7 +3651,14 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2830,7 +3677,15 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2851,7 +3706,15 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2870,7 +3733,15 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2889,7 +3760,16 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2910,7 +3790,16 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2929,7 +3818,16 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -2948,7 +3846,17 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2969,7 +3877,17 @@ namespace lua_extension
 			RET_3 ret3;
 			RET_4 ret4;
 			RET_5 ret5;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -2988,7 +3906,17 @@ namespace lua_extension
 		RET_3 ret3;
 		RET_4 ret4;
 		RET_5 ret5;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3073,7 +4001,8 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3096,7 +4025,8 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3117,7 +4047,8 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3138,7 +4069,9 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3161,7 +4094,9 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3182,7 +4117,9 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3203,7 +4140,10 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3226,7 +4166,10 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3247,7 +4190,10 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3268,7 +4214,11 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3291,7 +4241,11 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3312,7 +4266,11 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3333,7 +4291,12 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3356,7 +4319,12 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3377,7 +4345,12 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3398,7 +4371,13 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3421,7 +4400,13 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3442,7 +4427,13 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3463,7 +4454,14 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3486,7 +4484,14 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3507,7 +4512,14 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3528,7 +4540,15 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3551,7 +4571,15 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3572,7 +4600,15 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3593,7 +4629,16 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3616,7 +4661,16 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3637,7 +4691,16 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3658,7 +4721,17 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3681,7 +4754,17 @@ namespace lua_extension
 			RET_4 ret4;
 			RET_5 ret5;
 			RET_6 ret6;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3702,7 +4785,17 @@ namespace lua_extension
 		RET_4 ret4;
 		RET_5 ret5;
 		RET_6 ret6;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3795,7 +4888,8 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3820,7 +4914,8 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3843,7 +4938,8 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3866,7 +4962,9 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3891,7 +4989,9 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3914,7 +5014,9 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -3937,7 +5039,10 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3962,7 +5067,10 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -3985,7 +5093,10 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4008,7 +5119,11 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4033,7 +5148,11 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4056,7 +5175,11 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4079,7 +5202,12 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4104,7 +5232,12 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4127,7 +5260,12 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4150,7 +5288,13 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4175,7 +5319,13 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4198,7 +5348,13 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4221,7 +5377,14 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4246,7 +5409,14 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4269,7 +5439,14 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4292,7 +5469,15 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4317,7 +5502,15 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4340,7 +5533,15 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4363,7 +5564,16 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4388,7 +5598,16 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4411,7 +5630,16 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4434,7 +5662,17 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4459,7 +5697,17 @@ namespace lua_extension
 			RET_5 ret5;
 			RET_6 ret6;
 			RET_7 ret7;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4482,7 +5730,17 @@ namespace lua_extension
 		RET_5 ret5;
 		RET_6 ret6;
 		RET_7 ret7;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4583,7 +5841,8 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4610,7 +5869,8 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4635,7 +5895,8 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4660,7 +5921,9 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4687,7 +5950,9 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4712,7 +5977,9 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4737,7 +6004,10 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4764,7 +6034,10 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4789,7 +6062,10 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4814,7 +6090,11 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4841,7 +6121,11 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4866,7 +6150,11 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4891,7 +6179,12 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4918,7 +6211,12 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4943,7 +6241,12 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -4968,7 +6271,13 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -4995,7 +6304,13 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5020,7 +6335,13 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5045,7 +6366,14 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5072,7 +6400,14 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5097,7 +6432,14 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5122,7 +6464,15 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5149,7 +6499,15 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5174,7 +6532,15 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5199,7 +6565,16 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5226,7 +6601,16 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5251,7 +6635,16 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5276,7 +6669,17 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5303,7 +6706,17 @@ namespace lua_extension
 			RET_6 ret6;
 			RET_7 ret7;
 			RET_8 ret8;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5328,7 +6741,17 @@ namespace lua_extension
 		RET_6 ret6;
 		RET_7 ret7;
 		RET_8 ret8;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5437,7 +6860,8 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5466,7 +6890,8 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5493,7 +6918,8 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5520,7 +6946,9 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5549,7 +6977,9 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5576,7 +7006,9 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5603,7 +7035,10 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5632,7 +7067,10 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5659,7 +7097,10 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5686,7 +7127,11 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5715,7 +7160,11 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5742,7 +7191,11 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5769,7 +7222,12 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5798,7 +7256,12 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5825,7 +7288,12 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5852,7 +7320,13 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5881,7 +7355,13 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5908,7 +7388,13 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -5935,7 +7421,14 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5964,7 +7457,14 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -5991,7 +7491,14 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6018,7 +7525,15 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6047,7 +7562,15 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6074,7 +7597,15 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6101,7 +7632,16 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6130,7 +7670,16 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6157,7 +7706,16 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6184,7 +7742,17 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6213,7 +7781,17 @@ namespace lua_extension
 			RET_7 ret7;
 			RET_8 ret8;
 			RET_9 ret9;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6240,7 +7818,17 @@ namespace lua_extension
 		RET_7 ret7;
 		RET_8 ret8;
 		RET_9 ret9;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6357,7 +7945,8 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6388,7 +7977,8 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6417,7 +8007,8 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6446,7 +8037,9 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6477,7 +8070,9 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -2),
+				to<ARG_2>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6506,7 +8101,9 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -2), to<ARG_2>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6535,7 +8132,10 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6566,7 +8166,10 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -3),
+				to<ARG_2>(L, -2),
+				to<ARG_3>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6595,7 +8198,10 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -3), to<ARG_2>(L, -2), to<ARG_3>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6624,7 +8230,11 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6655,7 +8265,11 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -4),
+				to<ARG_2>(L, -3),
+				to<ARG_3>(L, -2),
+				to<ARG_4>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6684,7 +8298,11 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -4), to<ARG_2>(L, -3), to<ARG_3>(L, -2), to<ARG_4>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6713,7 +8331,12 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6744,7 +8367,12 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -5),
+				to<ARG_2>(L, -4),
+				to<ARG_3>(L, -3),
+				to<ARG_4>(L, -2),
+				to<ARG_5>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6773,7 +8401,12 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -5), to<ARG_2>(L, -4), to<ARG_3>(L, -3), to<ARG_4>(L, -2), to<ARG_5>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6802,7 +8435,13 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6833,7 +8472,13 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -6),
+				to<ARG_2>(L, -5),
+				to<ARG_3>(L, -4),
+				to<ARG_4>(L, -3),
+				to<ARG_5>(L, -2),
+				to<ARG_6>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6862,7 +8507,13 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -6), to<ARG_2>(L, -5), to<ARG_3>(L, -4), to<ARG_4>(L, -3), to<ARG_5>(L, -2), to<ARG_6>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6891,7 +8542,14 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6922,7 +8580,14 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -7),
+				to<ARG_2>(L, -6),
+				to<ARG_3>(L, -5),
+				to<ARG_4>(L, -4),
+				to<ARG_5>(L, -3),
+				to<ARG_6>(L, -2),
+				to<ARG_7>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -6951,7 +8616,14 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -7), to<ARG_2>(L, -6), to<ARG_3>(L, -5), to<ARG_4>(L, -4), to<ARG_5>(L, -3), to<ARG_6>(L, -2), to<ARG_7>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -6980,7 +8652,15 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7011,7 +8691,15 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -8),
+				to<ARG_2>(L, -7),
+				to<ARG_3>(L, -6),
+				to<ARG_4>(L, -5),
+				to<ARG_5>(L, -4),
+				to<ARG_6>(L, -3),
+				to<ARG_7>(L, -2),
+				to<ARG_8>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7040,7 +8728,15 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -8), to<ARG_2>(L, -7), to<ARG_3>(L, -6), to<ARG_4>(L, -5), to<ARG_5>(L, -4), to<ARG_6>(L, -3), to<ARG_7>(L, -2), to<ARG_8>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -7069,7 +8765,16 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7100,7 +8805,16 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -9),
+				to<ARG_2>(L, -8),
+				to<ARG_3>(L, -7),
+				to<ARG_4>(L, -6),
+				to<ARG_5>(L, -5),
+				to<ARG_6>(L, -4),
+				to<ARG_7>(L, -3),
+				to<ARG_8>(L, -2),
+				to<ARG_9>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7129,7 +8843,16 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -9), to<ARG_2>(L, -8), to<ARG_3>(L, -7), to<ARG_4>(L, -6), to<ARG_5>(L, -5), to<ARG_6>(L, -4), to<ARG_7>(L, -3), to<ARG_8>(L, -2), to<ARG_9>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -7158,7 +8881,17 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7189,7 +8922,17 @@ namespace lua_extension
 			RET_8 ret8;
 			RET_9 ret9;
 			RET_10 ret10;
-			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+			RET_1 ret1 = (object->*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+				to<ARG_1>(L, -10),
+				to<ARG_2>(L, -9),
+				to<ARG_3>(L, -8),
+				to<ARG_4>(L, -7),
+				to<ARG_5>(L, -6),
+				to<ARG_6>(L, -5),
+				to<ARG_7>(L, -4),
+				to<ARG_8>(L, -3),
+				to<ARG_9>(L, -2),
+				to<ARG_10>(L, -1));
 			sint pushed(push(L, ret1));
 			pushed += push(L, ret2);
 			pushed += push(L, ret3);
@@ -7218,7 +8961,17 @@ namespace lua_extension
 		RET_8 ret8;
 		RET_9 ret9;
 		RET_10 ret10;
-		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, to<ARG_1>(L, -10), to<ARG_2>(L, -9), to<ARG_3>(L, -8), to<ARG_4>(L, -7), to<ARG_5>(L, -6), to<ARG_6>(L, -5), to<ARG_7>(L, -4), to<ARG_8>(L, -3), to<ARG_9>(L, -2), to<ARG_10>(L, -1));
+		RET_1 ret1 = (*function)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10,
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1));
 		sint pushed(push(L, ret1));
 		pushed += push(L, ret2);
 		pushed += push(L, ret3);
@@ -7231,8 +8984,7 @@ namespace lua_extension
 		pushed += push(L, ret10);
 		return pushed;
 	} // nativeStaticReturn10Param10
+
 }
-
-
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H
 

@@ -2,6 +2,34 @@ module(..., package.seeall)
 
 require'Utilities'
 
+-- replaces CW_DECLARE_FUNCTION_REF
+function templateCallSignature(nrets, nargs, prefixIfAny)
+	tassert(nrets, 'number')
+	tassert(nargs, 'number')
+	if nrets == 0 and nargs == 0 then
+		return ''
+	end
+	prefixIfAny = prefixIfAny or ''
+	local output = prefixIfAny
+	if nrets > 0 then
+		output = output..'RET_1& ret'
+	end
+	for i = 2, nrets do
+		output = output..', RET_'..i..'& ret'
+	end
+	if nargs > 0 then
+		if nrets > 0 then
+			output = output..', ARG_1 arg1'
+		else
+			output = output..'ARG_1 arg1'
+		end		
+	end
+	for i = 2, nargs do
+		output = output..', ARG_'..i
+	end
+	return output
+end
+
 -- replaces CW_TEMPLATE_ARGS_RETS_N_ARGS_N
 function templateArguments(nrets, nargs)
 	tassert(nrets, 'number')

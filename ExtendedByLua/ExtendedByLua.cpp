@@ -390,6 +390,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 
 		// get the user file for easier rapid iteration
 		lua.require("User");
+		
+		/*
 		lua_State* L = lua.getState();
 		sreal return2(4);
 		return2 = 4;
@@ -465,6 +467,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		callStaticReturn0Param1(L, "returnZeroParamOne", value2);
 		
 		// callStaticReturn0Param0(L, "throwError");
+		*/
+
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA

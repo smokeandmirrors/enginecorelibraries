@@ -3,14 +3,13 @@ module(..., package.seeall)
 local U = require'Utilities'
 local CW = require'CodeWriting'
 local getTabs = U.getTabs
-local useMoreDebuggable = false
 
 -- replaces EN2S_BEGIN_CLASS_TEMPLATE_ARGS
 function beginClassTemplateArgs()
 
 end
 
-function callArguments(nrets, nargs)
+function callArguments(nrets, nargs, tabs)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
 	local output = ''
@@ -25,13 +24,13 @@ function callArguments(nrets, nargs)
 	end	
 	if nargs > 0 then
 		if nrets > 1 then
-			output = output..(', '..'to<ARG_1>(L, -'..(nargs - 1 + 1)..')')
+			output = output..(',\n'..getTabs(tabs)..'to<ARG_1>(L, -'..(nargs - 1 + 1)..')')
 		else
 			output = output..('to<ARG_1>(L, -'..(nargs - 1 + 1)..')')
 		end
 	end
 	for i = 2, nargs do
-		output = output..', to<ARG_'..i..'>(L, -'..(nargs - i + 1)..')'
+		output = output..',\n'..getTabs(tabs)..'to<ARG_'..i..'>(L, -'..(nargs - i + 1)..')'
 	end
 	return output
 end
@@ -95,12 +94,7 @@ function generateMemberTemplate(nrets, nargs, const)
 	output = output..tabs1..'if (CLASS* object = '..getInstance(nargs)..')\n'
 	output = output..tabs1..'{\n'
 	output = output..			CW.templateDeclareReturnValues(nrets, 2)
-	if useMoreDebuggable then
-		output = output..		getArguments(nargs, 2)
-		output = output..		CW.templateDeclareOneAssignReturnValues(nrets, 2)..'(object->*function)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
-	else
-		output = output..		CW.templateDeclareOneAssignReturnValues(nrets, 2)..'(object->*function)('..callArguments(nrets, nargs)..');\n'
-	end
+	output = output..			CW.templateDeclareOneAssignReturnValues(nrets, 2)..'(object->*function)('..callArguments(nrets, nargs, 3)..');\n'
 	output = output..pushRets(nrets, 2)
 	if nrets > 0 then
 		output = output..tabs2..'return pushed;\n'
@@ -113,6 +107,7 @@ end
 
 -- replaces EN2S_GENERATE_STATIC_TEMPLATE
 function generateStaticTemplate(nrets, nargs)
+	assert(type(file) ~= nil)
 	tassert(nrets, 'number')
 	tassert(nargs, 'number')
 	local tabs = getTabs(1)
@@ -122,12 +117,7 @@ function generateStaticTemplate(nrets, nargs)
 	output = output..'inline LUA_FUNC(nativeStaticReturn'..nrets..'Param'..nargs..')\n'
 	output = output..'{\n'
 	output = output..CW.templateDeclareReturnValues(nrets, 1)
-	if useMoreDebuggable then
-		output = output..getArguments(nargs, 1)
-		output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
-	else
-		output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..callArguments(nrets, nargs)..');\n'
-	end
+	output = output..CW.templateDeclareOneAssignReturnValues(nrets, 1)..'(*function)('..callArguments(nrets, nargs, 2)..');\n'
 	output = output..pushRets(nrets, 1)
 	if nrets > 0 then
 		output = output..tabs..'return pushed;\n'
@@ -139,7 +129,10 @@ function generateStaticTemplate(nrets, nargs)
 end
 
 function generateHeader(file, nrets, nargs)
-	local output = "" ..
+	tassert(file, 'userdata')
+	tassert(nrets, 'number')
+	tassert(nargs, 'number')
+	local output = "namespace lua_extension\n{\n" ..
 	"/** nativeConstReturn0Param0 */\n"..
 	"template<typename CLASS, void(CLASS::* function)(void) const>\n"..
 	"inline sint nativeConstReturn0Param0(lua_State* L)\n"..
@@ -185,6 +178,6 @@ function generateHeader(file, nrets, nargs)
 			end
 		end
 	end
-	
+	file:write("}")
 	file:flush()
 end
