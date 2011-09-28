@@ -82,7 +82,7 @@ namespace lua_extension
 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
 		if (lua_isfunction(L, -1))
 		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
+			push(L, object);				/*s: object scriptFunction object */
 			lua_call(L, 1, 0);				/*s: object */
 			lua_pop(L, 1);					/*s: */
 			return lua_extension::functionSuccess;
@@ -104,7 +104,7 @@ namespace lua_extension
 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
 		if (lua_isfunction(L, -1))
 		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
+			push(L, object);				/*s: object scriptFunction object */
 			lua_call(L, 1, 0);				/*s: object */
 			lua_pop(L, 1);					/*s: */
 			return lua_extension::functionSuccess;
@@ -190,7 +190,7 @@ namespace lua_extension
 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
 		if (lua_isfunction(L, -1))
 		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
+			push(L, object);				/*s: object scriptFunction object */
 			if (!Lua::callProtected(L, 1, 0))
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
@@ -219,7 +219,7 @@ namespace lua_extension
 		lua_getfield(L, -1, scriptFunction);/*s: object ? */
 		if (lua_isfunction(L, -1))
 		{									/*s: object scriptFunction */
-			lua_pushvalue(L, -2);			/*s: object scriptFunction object */
+			push(L, object);				/*s: object scriptFunction object */
 			if (!Lua::callProtected(L, 1, 0))
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
@@ -322,7 +322,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -352,7 +352,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -462,7 +462,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -499,7 +499,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -617,7 +617,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -648,7 +648,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -761,7 +761,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -799,7 +799,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -920,7 +920,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -952,7 +952,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1068,7 +1068,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1107,7 +1107,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1231,7 +1231,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1264,7 +1264,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1383,7 +1383,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1423,7 +1423,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1550,7 +1550,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1584,7 +1584,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1706,7 +1706,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1747,7 +1747,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1877,7 +1877,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -1912,7 +1912,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2037,7 +2037,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2079,7 +2079,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2212,7 +2212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2248,7 +2248,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2376,7 +2376,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2419,7 +2419,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2555,7 +2555,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2592,7 +2592,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2723,7 +2723,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2767,7 +2767,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2906,7 +2906,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -2944,7 +2944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3078,7 +3078,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3123,7 +3123,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3265,7 +3265,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3304,7 +3304,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3441,7 +3441,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3487,7 +3487,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -3622,7 +3622,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 1); 
@@ -3652,7 +3652,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 1); 
@@ -3762,7 +3762,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 1))
@@ -3799,7 +3799,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 1))
@@ -3917,7 +3917,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -3948,7 +3948,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -4061,7 +4061,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -4099,7 +4099,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -4220,7 +4220,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4252,7 +4252,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4368,7 +4368,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4407,7 +4407,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4531,7 +4531,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4564,7 +4564,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4683,7 +4683,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4723,7 +4723,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4850,7 +4850,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -4884,7 +4884,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5006,7 +5006,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5047,7 +5047,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5177,7 +5177,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5212,7 +5212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5337,7 +5337,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5379,7 +5379,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5512,7 +5512,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5548,7 +5548,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5676,7 +5676,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5719,7 +5719,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5855,7 +5855,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -5892,7 +5892,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6023,7 +6023,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6067,7 +6067,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6206,7 +6206,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6244,7 +6244,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6378,7 +6378,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6423,7 +6423,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6565,7 +6565,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6604,7 +6604,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6741,7 +6741,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6787,7 +6787,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6932,7 +6932,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -6972,7 +6972,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -7112,7 +7112,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -7159,7 +7159,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -7297,7 +7297,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 2); 
@@ -7328,7 +7328,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 2); 
@@ -7441,7 +7441,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 2))
@@ -7479,7 +7479,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 2))
@@ -7600,7 +7600,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -7632,7 +7632,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -7748,7 +7748,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -7787,7 +7787,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -7911,7 +7911,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -7944,7 +7944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8063,7 +8063,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8103,7 +8103,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8230,7 +8230,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8264,7 +8264,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8386,7 +8386,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8427,7 +8427,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8557,7 +8557,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8592,7 +8592,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8717,7 +8717,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8759,7 +8759,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8892,7 +8892,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -8928,7 +8928,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9056,7 +9056,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9099,7 +9099,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9235,7 +9235,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9272,7 +9272,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9403,7 +9403,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9447,7 +9447,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9586,7 +9586,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9624,7 +9624,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9758,7 +9758,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9803,7 +9803,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9945,7 +9945,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -9984,7 +9984,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10121,7 +10121,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10167,7 +10167,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10312,7 +10312,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10352,7 +10352,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10492,7 +10492,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10539,7 +10539,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10687,7 +10687,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10728,7 +10728,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10871,7 +10871,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -10919,7 +10919,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -11060,7 +11060,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 3); 
@@ -11092,7 +11092,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 3); 
@@ -11208,7 +11208,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 3))
@@ -11247,7 +11247,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 3))
@@ -11371,7 +11371,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -11404,7 +11404,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -11523,7 +11523,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -11563,7 +11563,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -11690,7 +11690,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -11724,7 +11724,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -11846,7 +11846,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -11887,7 +11887,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12017,7 +12017,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12052,7 +12052,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12177,7 +12177,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12219,7 +12219,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12352,7 +12352,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12388,7 +12388,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12516,7 +12516,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12559,7 +12559,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12695,7 +12695,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12732,7 +12732,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12863,7 +12863,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -12907,7 +12907,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13046,7 +13046,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13084,7 +13084,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13218,7 +13218,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13263,7 +13263,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13405,7 +13405,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13444,7 +13444,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13581,7 +13581,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13627,7 +13627,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13772,7 +13772,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13812,7 +13812,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13952,7 +13952,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -13999,7 +13999,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14147,7 +14147,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14188,7 +14188,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14331,7 +14331,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14379,7 +14379,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14530,7 +14530,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14572,7 +14572,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14718,7 +14718,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14767,7 +14767,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -14911,7 +14911,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 4); 
@@ -14944,7 +14944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 4); 
@@ -15063,7 +15063,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 4))
@@ -15103,7 +15103,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 4))
@@ -15230,7 +15230,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -15264,7 +15264,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -15386,7 +15386,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -15427,7 +15427,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -15557,7 +15557,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -15592,7 +15592,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -15717,7 +15717,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -15759,7 +15759,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -15892,7 +15892,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -15928,7 +15928,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16056,7 +16056,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16099,7 +16099,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16235,7 +16235,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16272,7 +16272,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16403,7 +16403,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16447,7 +16447,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16586,7 +16586,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16624,7 +16624,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16758,7 +16758,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16803,7 +16803,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16945,7 +16945,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -16984,7 +16984,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17121,7 +17121,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17167,7 +17167,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17312,7 +17312,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17352,7 +17352,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17492,7 +17492,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17539,7 +17539,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17687,7 +17687,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17728,7 +17728,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17871,7 +17871,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -17919,7 +17919,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18070,7 +18070,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18112,7 +18112,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18258,7 +18258,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18307,7 +18307,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18461,7 +18461,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18504,7 +18504,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18653,7 +18653,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18703,7 +18703,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -18850,7 +18850,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 5); 
@@ -18884,7 +18884,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 5); 
@@ -19006,7 +19006,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 5))
@@ -19047,7 +19047,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 5))
@@ -19177,7 +19177,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -19212,7 +19212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -19337,7 +19337,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -19379,7 +19379,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -19512,7 +19512,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -19548,7 +19548,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -19676,7 +19676,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -19719,7 +19719,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -19855,7 +19855,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -19892,7 +19892,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20023,7 +20023,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20067,7 +20067,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20206,7 +20206,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20244,7 +20244,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20378,7 +20378,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20423,7 +20423,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20565,7 +20565,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20604,7 +20604,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20741,7 +20741,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20787,7 +20787,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20932,7 +20932,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -20972,7 +20972,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21112,7 +21112,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21159,7 +21159,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21307,7 +21307,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21348,7 +21348,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21491,7 +21491,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21539,7 +21539,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21690,7 +21690,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21732,7 +21732,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21878,7 +21878,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -21927,7 +21927,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22081,7 +22081,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22124,7 +22124,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22273,7 +22273,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22323,7 +22323,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22480,7 +22480,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22524,7 +22524,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22676,7 +22676,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22727,7 +22727,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -22877,7 +22877,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 6); 
@@ -22912,7 +22912,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 6); 
@@ -23037,7 +23037,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 6))
@@ -23079,7 +23079,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 6))
@@ -23212,7 +23212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -23248,7 +23248,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -23376,7 +23376,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -23419,7 +23419,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -23555,7 +23555,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -23592,7 +23592,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -23723,7 +23723,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -23767,7 +23767,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -23906,7 +23906,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -23944,7 +23944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24078,7 +24078,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24123,7 +24123,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24265,7 +24265,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24304,7 +24304,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24441,7 +24441,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24487,7 +24487,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24632,7 +24632,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24672,7 +24672,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24812,7 +24812,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -24859,7 +24859,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25007,7 +25007,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25048,7 +25048,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25191,7 +25191,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25239,7 +25239,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25390,7 +25390,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25432,7 +25432,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25578,7 +25578,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25627,7 +25627,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25781,7 +25781,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25824,7 +25824,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -25973,7 +25973,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26023,7 +26023,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26180,7 +26180,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26224,7 +26224,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26376,7 +26376,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26427,7 +26427,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26587,7 +26587,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26632,7 +26632,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26787,7 +26787,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26839,7 +26839,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -26992,7 +26992,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 7); 
@@ -27028,7 +27028,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 7); 
@@ -27156,7 +27156,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 7))
@@ -27199,7 +27199,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 7))
@@ -27335,7 +27335,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -27372,7 +27372,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -27503,7 +27503,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -27547,7 +27547,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -27686,7 +27686,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -27724,7 +27724,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -27858,7 +27858,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -27903,7 +27903,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28045,7 +28045,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28084,7 +28084,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28221,7 +28221,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28267,7 +28267,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28412,7 +28412,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28452,7 +28452,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28592,7 +28592,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28639,7 +28639,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28787,7 +28787,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28828,7 +28828,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -28971,7 +28971,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29019,7 +29019,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29170,7 +29170,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29212,7 +29212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29358,7 +29358,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29407,7 +29407,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29561,7 +29561,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29604,7 +29604,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29753,7 +29753,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29803,7 +29803,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -29960,7 +29960,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30004,7 +30004,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30156,7 +30156,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30207,7 +30207,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30367,7 +30367,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30412,7 +30412,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30567,7 +30567,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30619,7 +30619,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30782,7 +30782,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30828,7 +30828,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -30986,7 +30986,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -31039,7 +31039,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -31195,7 +31195,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 8); 
@@ -31232,7 +31232,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 8); 
@@ -31363,7 +31363,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 8))
@@ -31407,7 +31407,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 8))
@@ -31546,7 +31546,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -31584,7 +31584,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -31718,7 +31718,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -31763,7 +31763,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -31905,7 +31905,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -31944,7 +31944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32081,7 +32081,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32127,7 +32127,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32272,7 +32272,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32312,7 +32312,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32452,7 +32452,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32499,7 +32499,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32647,7 +32647,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32688,7 +32688,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32831,7 +32831,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -32879,7 +32879,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33030,7 +33030,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33072,7 +33072,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33218,7 +33218,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33267,7 +33267,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33421,7 +33421,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33464,7 +33464,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33613,7 +33613,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33663,7 +33663,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33820,7 +33820,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -33864,7 +33864,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34016,7 +34016,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34067,7 +34067,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34227,7 +34227,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34272,7 +34272,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34427,7 +34427,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34479,7 +34479,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34642,7 +34642,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34688,7 +34688,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34846,7 +34846,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -34899,7 +34899,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -35065,7 +35065,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -35112,7 +35112,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -35273,7 +35273,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -35327,7 +35327,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -35486,7 +35486,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 9); 
@@ -35524,7 +35524,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 9); 
@@ -35658,7 +35658,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 9))
@@ -35703,7 +35703,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 9))
@@ -35845,7 +35845,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -35884,7 +35884,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -36021,7 +36021,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -36067,7 +36067,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -36212,7 +36212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36252,7 +36252,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36392,7 +36392,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36439,7 +36439,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36587,7 +36587,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36628,7 +36628,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36771,7 +36771,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36819,7 +36819,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -36970,7 +36970,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37012,7 +37012,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37158,7 +37158,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37207,7 +37207,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37361,7 +37361,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37404,7 +37404,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37553,7 +37553,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37603,7 +37603,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37760,7 +37760,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37804,7 +37804,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -37956,7 +37956,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38007,7 +38007,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38167,7 +38167,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38212,7 +38212,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38367,7 +38367,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38419,7 +38419,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38582,7 +38582,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38628,7 +38628,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38786,7 +38786,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -38839,7 +38839,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39005,7 +39005,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39052,7 +39052,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39213,7 +39213,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39267,7 +39267,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39436,7 +39436,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39484,7 +39484,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39648,7 +39648,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39703,7 +39703,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -39865,7 +39865,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 10); 
@@ -39904,7 +39904,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			lua_call(L, 1, 10); 
@@ -40041,7 +40041,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 10))
@@ -40087,7 +40087,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			/*s: object scriptFunction object (arguments) */ 
 			if (!Lua::callProtected(L, 1, 10))
@@ -40232,7 +40232,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -40272,7 +40272,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -40412,7 +40412,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -40459,7 +40459,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			/*s: object scriptFunction object (arguments) */ 
@@ -40607,7 +40607,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -40648,7 +40648,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -40791,7 +40791,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -40839,7 +40839,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -40990,7 +40990,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41032,7 +41032,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41178,7 +41178,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41227,7 +41227,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41381,7 +41381,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41424,7 +41424,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41573,7 +41573,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41623,7 +41623,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41780,7 +41780,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41824,7 +41824,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -41976,7 +41976,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42027,7 +42027,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42187,7 +42187,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42232,7 +42232,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42387,7 +42387,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42439,7 +42439,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42602,7 +42602,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42648,7 +42648,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42806,7 +42806,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -42859,7 +42859,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43025,7 +43025,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43072,7 +43072,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43233,7 +43233,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43287,7 +43287,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43456,7 +43456,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43504,7 +43504,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43668,7 +43668,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43723,7 +43723,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43895,7 +43895,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -43944,7 +43944,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -44111,7 +44111,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -44167,7 +44167,7 @@ namespace lua_extension
 		/*s: object ? */
 		if (lua_isfunction(L, -1)) 
 		{	/*s: object scriptFunction */ 
-			lua_pushvalue(L, -2);
+			push(L, object);
 			/*s: object scriptFunction object */ 
 			push(L, arg1);
 			push(L, arg2);
@@ -44277,4 +44277,6 @@ namespace lua_extension
 	} // phybridStaticReturn10Param10
 
 } // namespace lua_extension
+
+
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H

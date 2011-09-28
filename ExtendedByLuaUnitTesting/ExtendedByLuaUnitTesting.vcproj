@@ -362,6 +362,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UTExposeNativeToScript.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UTExposeScriptToNative.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UTLibraryExtension.cpp"
 				>
 			</File>

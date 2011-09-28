@@ -48,11 +48,6 @@ end
 -- @param instance the runtime object
 -- @param class_name the class type in question
 function _G.IS_A(instance, class_name)
-	if class_name == 'Derived' then
-		print('Derived, IS_A:')
-		print(instance.getClass, classes_PRIVATE[class_name], introspect_PRIVATE(instance:getClass(), classes_PRIVATE[class_name]))
-	end
-	
 	local tupos = type(instance)
 	return (tupos == 'table' or (tupos == 'userdata' and getmetatable(instance) and getmetatable(instance).__index)) 
 		and instance.getClass 

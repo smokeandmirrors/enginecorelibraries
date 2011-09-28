@@ -70,7 +70,7 @@ function generateClassHybridCall(nrets, nargs, const)
 	output = output..tabs[1]..'/*s: object ? */\n'
 	output = output..tabs[1]..'if (lua_isfunction(L, -1)) \n'
 	output = output..tabs[1]..'{	/*s: object scriptFunction */ \n'
-	output = output..tabs[2]..		'lua_pushvalue(L, -2);\n'
+	output = output..tabs[2]..		'push(L, object);\n'
 	output = output..tabs[2]..		'/*s: object scriptFunction object */ \n'
 	output = output..				pushArguments(nrets, nargs, 2)
 	output = output..tabs[2]..		'/*s: object scriptFunction object (arguments) */ \n'
@@ -109,7 +109,7 @@ function generateClassHybridPCall(nrets, nargs, const)
 	output = output..tabs[1]..'/*s: object ? */\n'
 	output = output..tabs[1]..'if (lua_isfunction(L, -1)) \n'
 	output = output..tabs[1]..'{	/*s: object scriptFunction */ \n'
-	output = output..tabs[2]..		'lua_pushvalue(L, -2);\n'
+	output = output..tabs[2]..		'push(L, object);\n'
 	output = output..tabs[2]..		'/*s: object scriptFunction object */ \n'
 	output = output..				pushArguments(nrets, nargs, 2)
 	output = output..tabs[2]..		'/*s: object scriptFunction object (arguments) */ \n'
@@ -296,7 +296,7 @@ function generateHeader(file, nrets, nargs)
 	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
 	"	if (lua_isfunction(L, -1))\n"..
 	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		lua_call(L, 1, 0);				/*s: object */\n"..
 	"		lua_pop(L, 1);					/*s: */\n"..
 	"		return lua_extension::functionSuccess;\n"..
@@ -318,7 +318,7 @@ function generateHeader(file, nrets, nargs)
 	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
 	"	if (lua_isfunction(L, -1))\n"..
 	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		lua_call(L, 1, 0);				/*s: object */\n"..
 	"		lua_pop(L, 1);					/*s: */\n"..
 	"		return lua_extension::functionSuccess;\n"..
@@ -404,7 +404,7 @@ function generateHeader(file, nrets, nargs)
 	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
 	"	if (lua_isfunction(L, -1))\n"..
 	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		if (!Lua::callProtected(L, 1, 0))\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..
@@ -433,7 +433,7 @@ function generateHeader(file, nrets, nargs)
 	"	lua_getfield(L, -1, scriptFunction);/*s: object ? */\n"..
 	"	if (lua_isfunction(L, -1))\n"..
 	"	{									/*s: object scriptFunction */\n"..
-	"		lua_pushvalue(L, -2);			/*s: object scriptFunction object */\n"..
+	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		if (!Lua::callProtected(L, 1, 0))\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..

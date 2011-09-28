@@ -18,117 +18,117 @@ public:
 	void test_define_lua_LuaExtendable_by_proxy(void);
 };
 
-class One
+class Single
 {
 public:
-	typedef One super;
+	typedef Single super;
 	sint getValue(void) const		{ return 1; }
 	sint increment(sint i) const	{ return i + getValue(); }
 }; // Basic
 
-DECLARE_LUA_LIBRARY(One)
+DECLARE_LUA_LIBRARY(Single)
 
-LUA_FUNC(newOne)
+LUA_FUNC(newSingle)
 {
-	pushRegisteredClass(L, new One());		//s: ud
+	pushRegisteredClass(L, new Single());		//s: ud
 	lua_newtable(L);						//s: ud, ud_mt
-	lua_getglobal(L, "One");				//s: ud, ud_mt, Basic
+	lua_getglobal(L, "Single");				//s: ud, ud_mt, Basic
 	lua_setfield(L, -2, "__index");			//s: ud, ud_mt
 	lua_setmetatable(L, -2);				//s: ud/mt
 	return 1;
 }
 
-LUA_FUNC(getOne)
+LUA_FUNC(getSingle)
 {
-	static One* singleOne(NULL);
+	static Single* singleSingle(NULL);
 
-	if (!singleOne)
+	if (!singleSingle)
 	{
-		singleOne = new One();
-		pushRegisteredClass(L,singleOne);		//s: ud
+		singleSingle = new Single();
+		pushRegisteredClass(L,singleSingle);		//s: ud
 		lua_newtable(L);						//s: ud, ud_mt
-		lua_getglobal(L, "One");				//s: ud, ud_mt, Basic
+		lua_getglobal(L, "Single");				//s: ud, ud_mt, Basic
 		lua_setfield(L, -2, "__index");			//s: ud, ud_mt
 		lua_setmetatable(L, -2);				//s: ud/mt
 	}
 	else
 	{
-		pushRegisteredClass(L,singleOne);		//s: ud
+		pushRegisteredClass(L,singleSingle);		//s: ud
 	}
 
 	return 1;
 }
 
-LUA_FUNC(getValueOne)
+LUA_FUNC(getValueSingle)
 {
-	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->getValue());						//s: ud, value
+	Single* single = static_cast<Single*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, single->getValue());						//s: ud, value
 }
 
-LUA_FUNC(incrementOne)
+LUA_FUNC(incrementSingle)
 {
 	sint argument = to<sint>(L, -1);						//s: ud, arg
 	lua_pop(L, 1);											//s: ud
-	One* one = static_cast<One*>(lua_touserdata(L, -1));	//s: ud
-	return push(L, one->increment(argument));				//s: ud, valuereturn 1;
+	Single* single = static_cast<Single*>(lua_touserdata(L, -1));	//s: ud
+	return push(L, single->increment(argument));				//s: ud, valuereturn 1;
 }
 
-DEFINE_LUA_LIBRARY(One)
-	LUA_ENTRY_NAMED("new", newOne)
-	LUA_ENTRY_NAMED("get", getOne)
-	LUA_ENTRY_NAMED("getValue", getValueOne)
-	LUA_ENTRY_NAMED("increment", incrementOne)
-END_LUA_LIBRARY(One)
+DEFINE_LUA_LIBRARY(Single)
+	LUA_ENTRY_NAMED("new", newSingle)
+	LUA_ENTRY_NAMED("get", getSingle)
+	LUA_ENTRY_NAMED("getValue", getValueSingle)
+	LUA_ENTRY_NAMED("increment", incrementSingle)
+END_LUA_LIBRARY(Single)
 
 void Classes::test_define_lua_class()
 {
 	DECLARE_UNIT_TESTING_LUA_OBJECT
-	REGISTER_LUA_LIBRARY((&lua), One);
-	CFIX_ASSERT(lua.doString("_G.one = One.new()"));
+	REGISTER_LUA_LIBRARY((&lua), Single);
+	CFIX_ASSERT(lua.doString("_G.single = Single.new()"));
 	lua_State* L = lua.getState();
-	lua_getglobal(L, "one");
-	//s: one
+	lua_getglobal(L, "single");
+	//s: single
 	CFIX_ASSERT(lua_isuserdata(L, -1));
 	void* ud = lua_touserdata(L, -1);
 	CFIX_ASSERT(ud);
-	One* one = static_cast<One*>(lua_touserdata(L, -1));
-	CFIX_ASSERT(one);
+	Single* single = static_cast<Single*>(lua_touserdata(L, -1));
+	CFIX_ASSERT(single);
 	lua_getfield(L, -1, "getValue");
-	//s: one getValue
+	//s: single getValue
 	CFIX_ASSERT(lua_iscfunction(L, -1));
 	lua_pushvalue(L, -2);
-	//s: one getValue one
+	//s: single getValue single
 	CFIX_ASSERT(lua_isuserdata(L, -1));
 	lua_call(L, 1, 1);
-	//s: one 1
+	//s: single 1
 	CFIX_ASSERT(lua_isnumber(L, -1));
-	sint one_value = to<sint>(L, -1);
-	//s: one 1
-	CFIX_ASSERT(one_value == 1);
+	sint single_value = to<sint>(L, -1);
+	//s: single 1
+	CFIX_ASSERT(single_value == 1);
 	lua_pop(L, 1);
-	//s: one
+	//s: single
 	lua_getfield(L, -1, "increment");
-	//s: one increment
+	//s: single increment
 	CFIX_ASSERT(lua_iscfunction(L, -1));
 	lua_pushvalue(L, -2);
-	//s: one increment one
+	//s: single increment single
 	CFIX_ASSERT(lua_isuserdata(L, -1));
 	push(L, 2);
-	//s: one increment one 2
+	//s: single increment single 2
 	lua_call(L, 2, 1);
-	//s: one 3
+	//s: single 3
 	sint three_value = to<sint>(L, -1);
-	//s: one 1
+	//s: single 1
 	CFIX_ASSERT(three_value == 3);
 	lua_pop(L, 2);
-	CFIX_ASSERT(lua.require("UTOne"));
-	CFIX_ASSERT(lua.doString("_G.one2 = One.new()"));
-	CFIX_ASSERT(lua.doString("_G.there = type(one2.decrement) == 'function'"));
+	CFIX_ASSERT(lua.require("UTSingle"));
+	CFIX_ASSERT(lua.doString("_G.single2 = Single.new()"));
+	CFIX_ASSERT(lua.doString("_G.there = type(single2.decrement) == 'function'"));
 	lua_getglobal(L, "there");
 	bool there = to<bool>(L, -1);
 	//s: _G.there
 	CFIX_ASSERT(there);
-	CFIX_ASSERT(lua.doString("_G.zero = one2.decrement(one2:getValue())"));
+	CFIX_ASSERT(lua.doString("_G.zero = single2.decrement(single2:getValue())"));
 	lua_getglobal(L, "zero");
 	//s: _G.there _G.zero
 	CFIX_ASSERT(lua_isnumber(L, -1));
