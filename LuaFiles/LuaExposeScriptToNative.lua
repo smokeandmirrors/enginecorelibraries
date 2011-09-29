@@ -21,7 +21,7 @@ function callNotFound(nrets, nargs, hybrid, ntabs)
 end
 
 function assignReturnValues(nrets, nargs, ntabs)
-	tassert(nrets, 'number')
+	tassert('number', nrets)
 	local output = ''
 	for i = 1, nrets do
 		output = output..tabs[ntabs]..'ret'..i..' = to<RET_'..i..'>(L, -'..(nrets-i+1)..');\n' -- ret1 = to<RET_1>(L, -1);
@@ -30,7 +30,7 @@ function assignReturnValues(nrets, nargs, ntabs)
 end
 
 function pushArguments(nrets, nargs, ntabs)
-	tassert(nargs, 'number')
+	tassert('number', nargs)
 	local output = ''
 	for i = 1, nargs do
 		output = output..tabs[ntabs]..'push(L, arg'..i..');\n'
@@ -39,15 +39,13 @@ function pushArguments(nrets, nargs, ntabs)
 end
 
 function hybridMember(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
-	return 'MemberReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
+	tassert('number', nrets, nargs)
+    return 'MemberReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
 end
 
 function hybridConst(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
-	return 'ConstReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, const CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
+	tassert('number', nrets, nargs)
+    return 'ConstReturn'..nrets..'Param'..nargs..'(lua_State* L, const char* scriptFunction, const CLASS& object'..CW.templateCallSignature(nrets, nargs, ', ')..')\n'
 end
 
 function static(nrets, nargs)
@@ -55,9 +53,8 @@ function static(nrets, nargs)
 end
 
 function generateClassHybridCall(nrets, nargs, const)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
-	local name = 'hybrid'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs
+	tassert('number', nrets, nargs)
+    local name = 'hybrid'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '.. name..' */\n'
 	output = output..'template<typename CLASS, '..CW.templateArguments(nrets, nargs)..', '..EN2S.endClassTemplateArgs(nrets, nargs, const, 'nativeFunction') 
@@ -94,8 +91,8 @@ function generateClassHybridCall(nrets, nargs, const)
 end
 
 function generateClassHybridPCall(nrets, nargs, const)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number') 
+	tassert('number', nrets)
+	tassert('number', nargs) 
 	local name = 'phybrid'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '..name..' */\n'
@@ -140,9 +137,8 @@ function generateClassHybridPCall(nrets, nargs, const)
 end
 
 function generateStaticCall(nrets, nargs, hybrid)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
-	local name = (hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
+	tassert('number', nrets, nargs)
+    local name = (hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '.. name..' */\n'
 	if hybrid then
@@ -190,8 +186,8 @@ function generateStaticCall(nrets, nargs, hybrid)
 end
 
 function generateStaticPCall(nrets, nargs, hybrid)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number') 
+	tassert('number', nrets)
+	tassert('number', nargs) 
 	local name = 'p'..(hybrid and 'hybrid' or 'call')..'StaticReturn'..nrets..'Param'..nargs
 	local output = ''
 	output = output..'/** '..name..' */\n'
@@ -247,11 +243,9 @@ function generateStaticPCall(nrets, nargs, hybrid)
 end
 
 function generateHeader(file, nrets, nargs)
-	tassert(file, 'userdata')
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
-	local output = "namespace lua_extension\n{\n" 
-	
+	tassert('userdata', file)
+	tassert('number', nrets, nargs)
+    local output = "namespace lua_extension\n{\n" 
 	output = output.."typedef enum ScriptToNativeCallResult\n"..
 	"{\n"..
 	"	functionSuccess=0,\n"..

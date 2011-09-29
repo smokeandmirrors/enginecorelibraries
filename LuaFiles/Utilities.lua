@@ -49,9 +49,12 @@ function _G.togset(toggle, bool)
 end
 
 ---------------------------------------------------------------------
--- shorcut for assert(type(object) == 'sometype')
-function _G.tassert(object, type_name)
-	assert(type(object) == type_name, 'type: '..type_name..' expected, but '..type(object)..' found instead!')
+-- 
+-- \todo look up the fast? varargs interator select function
+function _G.tassert(tupos, ...)
+	for key, value in pairs{...} do
+        assert(type(value) == tupos, 'type: '..tupos..' expected, but '..type(value)..' found instead at key: '..tostring(key)..'!')
+    end
 end
 
 
@@ -183,13 +186,7 @@ end
 -- @param t modifiable table
 -- @return a read-only version of t
 function table.getreadonly(t)
-	local proxy = {}
-	local mt = {
-		__index = t,
-		__newindex = readOnlySupport
-	}
-	setmetatable(proxy, mt)
-	return proxy
+    return setmetatable({}, {__index = t, __newindex = readOnlySupport})
 end
 
 ---------------------------------------------------------------------

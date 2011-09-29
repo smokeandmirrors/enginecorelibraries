@@ -10,8 +10,7 @@ function beginClassTemplateArgs()
 end
 
 function callArguments(nrets, nargs, tabs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	local output = ''
 	if nrets < 2 and nargs == 0 then
 		return output
@@ -37,7 +36,7 @@ end
 
 -- replaces EN2S_GET_ARGS_N
 function getArguments(nargs, tabs)
-	tassert(nargs, 'number')
+	tassert('number', nargs)
 	local output = ''
 	local tabs = getTabs(tabs)
 	for i = 1, nargs do
@@ -48,13 +47,13 @@ end
 
 -- replaces EN2S_GET_INSTANCE_ARGS_N
 function getInstance(nargs)
-	tassert(nargs, 'number')
+	tassert('number', nargs)
 	return 'to<CLASS*>(L, -'..(nargs + 1)..')'
 end
 
 -- replaces EN2S_PUSH_RETS_N
 function pushRets(nrets, tabs)
-	tassert(nrets, 'number', tabs)
+	tassert('number', nrets, tabs)
 	local output = ''
 	local tabs = getTabs(tabs)
 	if nrets > 0 then
@@ -69,24 +68,21 @@ end
 -- replaces EN2S_END_STATIC_TEMPLATE_ARGS
 -- end the static function template declaration
 function endStaticTemplateArgs(nrets, nargs, fname)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	fname = fname or 'function'
 	return CW.templateReturnSignature(nrets)..'(* '..fname..')('..CW.templateArgumentsSignature(nrets, nargs)..') >\n'
 end
 
 -- replaces EN2S_END_CLASS_TEMPLATE_ARGS(NUM_RETS, NUM_ARGS) 
 function endClassTemplateArgs(nrets, nargs, const, fname)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	fname = fname or 'function'
 	return CW.templateReturnSignature(nrets)..'(CLASS::* '..fname..')('..CW.templateArgumentsSignature(nrets, nargs)..') ' ..(const and 'const' or '')..'>\n'
 end
 
 -- replaces EN2S_GENERATE_CLASS_TEMPLATE and EN2S_GENERATE_CLASS_CONST_TEMPLATE
 function generateMemberTemplate(nrets, nargs, const)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	local tabs1 = getTabs(1)
 	local tabs2 = getTabs(2)
 	local output = '/** native'..(const and 'Const' or 'Member')..'Return'..nrets..'Param'..nargs..' */\n'
@@ -110,8 +106,7 @@ end
 -- replaces EN2S_GENERATE_STATIC_TEMPLATE
 function generateStaticTemplate(nrets, nargs)
 	assert(type(file) ~= nil)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	local tabs = getTabs(1)
 	local output = ''
 	output = output..'/** nativeStaticReturn'..nrets..'Param'..nargs..' */\n'
@@ -131,9 +126,8 @@ function generateStaticTemplate(nrets, nargs)
 end
 
 function generateHeader(file, nrets, nargs)
-	tassert(file, 'userdata')
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('userdata', file)
+	tassert('number', nrets, nargs)
 	local output = "namespace lua_extension\n{\n" ..
 	"/** nativeConstReturn0Param0 */\n"..
 	"template<typename CLASS, void(CLASS::* function)(void) const>\n"..

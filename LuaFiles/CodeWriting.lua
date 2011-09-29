@@ -4,8 +4,7 @@ require'Utilities'
 
 -- replaces CW_DECLARE_FUNCTION_REF
 function templateCallSignature(nrets, nargs, prefixIfAny)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	if nrets == 0 and nargs == 0 then
 		return ''
 	end
@@ -32,8 +31,7 @@ end
 
 -- replaces CW_TEMPLATE_ARGS_RETS_N_ARGS_N
 function templateArguments(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	assert(nrets > 0 or nargs > 0, '0, 0 is handled manually (for now)')
 	local output = ''
 	
@@ -67,7 +65,7 @@ end
 -- replaces CW_TEMPLATE_RETURN_SIGNATURE_RETS_N
 -- end the static function template declaration
 function templateReturnSignature(nrets)
-	tassert(nrets, 'number')
+	tassert('number', nrets)
 	local output = ''
 	output = output..(nrets == 0 and 'void ' or 'RET_1 ') 
 	return output
@@ -75,8 +73,7 @@ end
 
 -- replaces CW_TEMPLATE_ARGS_SIGNATURE_RETS_N_ARGS_N
 function templateArgumentsSignature(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	assert(nrets > 0 or nargs > 0, '0, 0 is handled manually (for now)')
 	local output = ''
 	
@@ -116,8 +113,7 @@ end
 
 -- replaces CW_DECLARE_FUNCTION_RETS_N_ARGS_N
 function templateDeclareFunctionSignature(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	local output = ''
 	if nrets < 2 and nargs == 0 then
 		output = output..('void')
@@ -150,7 +146,7 @@ end
 
 -- replaces CW_DECLARE_RETS_N
 function templateDeclareReturnValues(nrets, tabs)
-	tassert(nrets, 'number')
+	tassert('number', nrets)
 	tabs = Utilities.getTabs(tabs)
 	local output = ''
 	
@@ -167,7 +163,7 @@ end
 
 -- replaces CW_DECLARE_1_ASSIGN_RETS_N
 function templateDeclareOneAssignReturnValues(nrets, tabs)
-	tassert(nrets, 'number')
+	tassert('number', nrets)
 	tabs = Utilities.getTabs(tabs)
 	local output = ''
 	
@@ -182,7 +178,7 @@ end
 
 -- replaces CW_ASSIGN_RETS_N
 function templateAssignReturnValues(nrets)
-	tassert(nrets, 'number')
+	tassert('number', nrets)
 	local output = ''
 	
 	if nrets > 0 then
@@ -194,8 +190,7 @@ end
 
 -- replaces CW_CALL_RETS_N_ARGS_N
 function templateFunctionCallArguments(nrets, nargs)
-	tassert(nrets, 'number')
-	tassert(nargs, 'number')
+	tassert('number', nrets, nargs)
 	local output = ''
 	
 	if nrets < 2 and nargs == 0 then
