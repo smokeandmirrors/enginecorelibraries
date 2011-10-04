@@ -45,10 +45,6 @@ millisecond milliseconds(void);
 /** real time in seconds since program initialization */
 second seconds(void);
 
-/** \todo split these up by constructor, if they are constructed with with a clock, all of the time is based on that clock calling tick(),
-othwerwise, they will operate on the realTime calls directly. */
-/** \todo minimize all of the arithmetic here, and remove the divides */
-/** \todo make sure all of these values can handle slow motion, reversal of time */
 // frame clock, game play/engine clock
 class Clock 
 {
@@ -75,24 +71,74 @@ public:
 		tick(void)=0;
 }; // Clock
 
+
 class ClockReal : public Clock 
 {
 public:
 	ClockReal(void)
+		: m_rate(1.0)
+	{ /* empty */ }
+
+	ClockReal(const ClockReal& clone)
+		: m_rate(clone.getRate())
+	{ /* empty */ }
+
+	dreal getRate(void) const 
+	{ 
+		return m_rate; 
+	}
+
+	cycle getTick(void) const 
+	{ 
+		return 0; 
+	}
+
+	millisecond milliseconds(void) const	
+	{ 
+		return realTime::milliseconds() * m_rate; 
+	}
+
+	second seconds(void) const
+	{
+		return realTime::seconds() * m_rate;
+	}
+
+	void setRate(dreal rate)
+	{
+		m_rate = rate;
+	}
+
+	void tick(void)
+	{
+		assert(false); // no need to tick this clock
+	}
+
+private:
+	ClockReal operator=(const ClockReal &);
+
+	millisecond	m_currentMilliseconds;
+	second		m_currentSeconds;
+	dreal		m_rate;
+}; // class ClockReal
+
+class ClockFrame : public Clock 
+{
+public:
+	ClockFrame(void)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
 	, m_tick(realTime::cycles())
 	{ /* empty */ }
 	
-	ClockReal(cycle initialTime)
+	ClockFrame(cycle initialTime)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
 	, m_tick(initialTime)
 	{ /* empty */ }
 	
-	ClockReal(const ClockReal& clone)
+	ClockFrame(const ClockFrame& clone)
 	: m_currentMilliseconds(clone.milliseconds())
 	, m_currentSeconds(clone.seconds())
 	, m_rate(clone.getRate())
@@ -134,15 +180,15 @@ public:
 	}
 
 private:
-	ClockReal operator=(const ClockReal &);
+	ClockFrame operator=(const ClockFrame &);
 
 	millisecond	m_currentMilliseconds;
 	second		m_currentSeconds;
 	dreal		m_rate;
 	cycle		m_tick;
-}; // class ClockReal
+}; // class ClockFrame
 
-class ClockRelative : public Clock 
+class ClockRelative : public ClockFrame 
 {
 public:
 	ClockRelative(const Clock& parent)
@@ -164,26 +210,6 @@ public:
 	dreal getRate(void) const 
 	{ 
 		return m_parent->getRate() * m_rate; 
-	}
-
-	cycle getTick(void) const 
-	{ 
-		return m_tick; 
-	}
-
-	millisecond milliseconds(void) const	
-	{ 
-		return m_currentMilliseconds; 
-	}
-
-	second seconds(void) const
-	{
-		return m_currentSeconds;
-	}
-
-	void setRate(dreal rate)
-	{
-		m_rate = rate;
 	}
 
 	void tick(void)
@@ -231,17 +257,17 @@ public:
 	millisecond milliseconds(void) const	
 	{ 
 		if (m_active)
-			return static_cast<millisecond>(/* fabs (m_reference.getRate()) * */(m_reference.milliseconds() - m_start)); 
+			return static_cast<millisecond>(m_reference.milliseconds() - m_start); 
 		else
-			return static_cast<millisecond>(/* fabs (m_reference.getRate()) * */(m_stop - m_start));
+			return static_cast<millisecond>(m_stop - m_start);
 	}
 
 	second seconds(void) const
 	{
 		if (m_active)
-			return static_cast<second>(0.001 * /* fabs (m_reference.getRate()) * */(m_reference.milliseconds() - m_start)); 
+			return static_cast<second>(0.001 * (m_reference.milliseconds() - m_start)); 
 		else
-			return static_cast<second>(0.001 * /* fabs (m_reference.getRate()) * */(m_stop - m_start));	
+			return static_cast<second>(0.001 * (m_stop - m_start));	
 	}
 
 	void start(void)

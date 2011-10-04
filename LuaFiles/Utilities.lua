@@ -52,11 +52,11 @@ end
 -- 
 -- \todo look up the fast? varargs interator select function
 function _G.tassert(tupos, ...)
-	for key, value in pairs{...} do
-        assert(type(value) == tupos, 'type: '..tupos..' expected, but '..type(value)..' found instead at key: '..tostring(key)..'!')
+	local nargs = select('#', ...)
+	for i = 1, nargs do
+        assert(type(select(i, ...)) == tupos, 'type: '..tupos..' expected, but '..type(select(i, ...))..' found instead at key: '..tostring(key)..'!')
     end
 end
-
 
 --[[ debug extensions ]]--
 if debug then

@@ -10,8 +10,14 @@ function _G.timeTest()
 	_G.clock = new'ClockReal'
 	_G.timer = new('Timer', clock)
 	_G.stopwatch = new('Stopwatch', clock)
+	
 	timer:set(10000, 10000, BoolEnum.BoolEnum_False)
-	-- timer:start()
+	timer:start()
+	
+	while timer:isTimeRemaining() do
+		print(timer:seconds())
+	end
+	
 	_G.relclock = new('ClockRelative', clock)
 	relclock:setRate(10);
 	_G.relstopwatch = new('Stopwatch', relclock)

@@ -54,10 +54,6 @@ sint __newindexProxy(lua_State* L)
 
 sint __newindexProxyPublicMembers(lua_State* L)
 {												//s: ud k v
-// 	sint stack_size;
-// 	stack_size = lua_gettop(L);
-// 	const char* type;
-// 	type = 
 	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k v __newindexSupport
 	lua_pushvalue(L, -4);						//s: ud k v __newindexSupport ud
 	lua_pushvalue(L, -4);						//s: ud k v __newindexSupport ud k 
@@ -308,8 +304,7 @@ sint setProxyMetatablePublicMembers(lua_State* L)
 	*/
 												//s: userdata class_mt
 	if (isInstanceBeingRefreshed(L))			//s: userdata class_mt
-	{	/* \todo THIS WON'T WORK */ 
-		// the class is being redefined			//s: userdata class_mt
+	{	// the class is being redefined			//s: userdata class_mt
 		lua_pushvalue(L, -1);					//s: userdata class_mt class_mt
 		lua_getmetatable(L, -3);				//s: userdata class_mt class_mt userdata_mt
 		lua_pushvalue(L, lua_upvalueindex(1));	//s: userdata class_mt class_mt userdata_mt proxy

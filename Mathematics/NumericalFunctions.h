@@ -13,8 +13,8 @@
 This file is intended to allow for easier cross platorm, cross compiler
 development.
 
-\todo C99 functions:
-http://en.wikipedia.org/wiki/Math.h
+\todo make this a templated class:  Math<T>
+with all static functions
 
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0

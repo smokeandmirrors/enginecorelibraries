@@ -1263,8 +1263,8 @@ __gcmetamethod(lua_State* L)
 
 template<typename CLASS> sint
 __new(lua_State* L)
-{
-	return push(L, new CLASS());
+{	/** \note do NOT replace the line below with push(L, new CLASS()); */
+	return pushRegisteredClass(L, new CLASS());
 }
 
 /**

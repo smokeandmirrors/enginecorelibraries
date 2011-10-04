@@ -69,8 +69,6 @@ across platforms/networks/compilers/implementations
 
 in ANY other situation, do NOT use the sized types, use the unsized types
 
-\todo investigate this more
-
 @{
 */
 
@@ -87,7 +85,7 @@ typedef float 				sreal;
 typedef double				dreal;
 
 /** sized types 
-\todo fill these in with compiler/OS specific types when a proven reason for it comes up:
+\todo investigate sized vs unsized types more, fill these in with compiler/OS specific types when a proven reason for it comes up:
 probably going to be something over network/serialization/platform requirements
 
 typedef char				schar;
