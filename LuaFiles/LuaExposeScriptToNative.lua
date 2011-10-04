@@ -76,14 +76,14 @@ function generateClassHybridCall(nrets, nargs, const)
 	output = output..				assignReturnValues(nrets, nargs, 2)
 	output = output..tabs[2]..		'lua_pop(L, '..(nrets+1)..'); \n'
 	output = output..tabs[2]..		'/*s: */ \n'
-	output = output..tabs[2]..		'return lua_extension::functionSuccess; \n'
+	output = output..tabs[2]..		'return embeddedLua::functionSuccess; \n'
 	output = output..tabs[1]..'} \n'
 	output = output..tabs[1]..'else \n'
 	output = output..tabs[1]..'{\t/*s: module nil */ \n'
 	output = output..tabs[2]..	'lua_pop(L, 2);\n'
 	output = output..tabs[2]..	'/*s: */ \n'
 	output = output..tabs[2]..	CW.templateAssignReturnValues(nrets)..'(object.*nativeFunction)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
-	output = output..tabs[2]..	'return lua_extension::functionNotFound; \n'
+	output = output..tabs[2]..	'return embeddedLua::functionNotFound; \n'
 	output = output..tabs[1]..'} \n'
 	output = output..'} //'..name
 	output = output..'\n\n'
@@ -115,13 +115,13 @@ function generateClassHybridPCall(nrets, nargs, const)
 	output = output..					assignReturnValues(nrets, nargs, 3)
 	output = output..tabs[3]..			'lua_pop(L, '..(nrets+1)..'); \n'
 	output = output..tabs[3]..			'/*s: */ \n'
-	output = output..tabs[3]..			'return lua_extension::functionSuccess; \n'
+	output = output..tabs[3]..			'return embeddedLua::functionSuccess; \n'
 	output = output..tabs[2]..		'} \n'
 	output = output..tabs[2]..		'else\n'
 	output = output..tabs[2]..		'{\t/*s: object */\n'
 	output = output..tabs[3]..			'lua_pop(L, 1);\n'
 	output = output..tabs[3]..			'/*s: */\n'
-	output = output..tabs[3]..			'return lua_extension::functionError;\n'
+	output = output..tabs[3]..			'return embeddedLua::functionError;\n'
 	output = output..tabs[2]..		'} \n'
 	output = output..tabs[1]..'}\n'
 	output = output..tabs[1]..'else \n'
@@ -129,7 +129,7 @@ function generateClassHybridPCall(nrets, nargs, const)
 	output = output..tabs[2]..	'lua_pop(L, 2);\n'
 	output = output..tabs[2]..	'/*s: */ \n'
 	output = output..tabs[2]..	CW.templateAssignReturnValues(nrets)..'(object.*nativeFunction)('..CW.templateFunctionCallArguments(nrets, nargs)..');\n'
-	output = output..tabs[2]..	'return lua_extension::functionNotFound; \n'
+	output = output..tabs[2]..	'return embeddedLua::functionNotFound; \n'
 	output = output..tabs[1]..'} \n'
 	output = output..'} // '..name..'\n'
 	output = output..'\n'
@@ -164,14 +164,14 @@ function generateStaticCall(nrets, nargs, hybrid)
 	output = output..					assignReturnValues(nrets, nargs, 3)
 	output = output..tabs[3]..			'lua_pop(L, '..(nrets+1)..');\n'
 	output = output..tabs[3]..			'/*s: */\n'
-	output = output..tabs[3]..			'return lua_extension::functionSuccess;\n'
+	output = output..tabs[3]..			'return embeddedLua::functionSuccess;\n'
 	output = output..tabs[2]..		'}\n'
 	output = output..tabs[2]..		'else\n'
 	output = output..tabs[2]..		'{\t/*s: module nil */\n'
 	output = output..tabs[3]..			'lua_pop(L, 2);\n'
 	output = output..tabs[3]..			'/*s: */\n'
 	output = output..					callNotFound(nrets, nargs, hybrid, 3)
-	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
+	output = output..tabs[3]..			'return embeddedLua::functionNotFound;\n'
 	output = output..tabs[2]..		'}\n'
 	output = output..tabs[1]..'}\n'
 	output = output..tabs[1]..'else\n'
@@ -179,7 +179,7 @@ function generateStaticCall(nrets, nargs, hybrid)
 	output = output..tabs[2]..	'lua_pop(L, 1);\n'
 	output = output..tabs[2]..	'/*s: */ \n'
 	output = output..			callNotFound(nrets, nargs, hybrid, 2)
-	output = output..tabs[2]..	'return lua_extension::moduleNotFound; \n'
+	output = output..tabs[2]..	'return embeddedLua::moduleNotFound; \n'
 	output = output..tabs[1]..'} \n'
 	output = output..'} // '..name..'\n\n'
 	return output
@@ -214,13 +214,13 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	output = output..						assignReturnValues(nrets, nargs, 4)
 	output = output..tabs[4]..				'lua_pop(L, '..(nrets+1)..'); \n'
 	output = output..tabs[4]..				'/*s: */ \n'
-	output = output..tabs[4]..				'return lua_extension::functionSuccess;\n'
+	output = output..tabs[4]..				'return embeddedLua::functionSuccess;\n'
 	output = output..tabs[3]..			'} \n'
 	output = output..tabs[3]..			'else\n'
 	output = output..tabs[3]..			'{\t/*s: module */\n'
 	output = output..tabs[4]..				'lua_pop(L, 1);\n'
 	output = output..tabs[4]..				'/*s: */\n'
-	output = output..tabs[4]..				'return lua_extension::functionError;\n'
+	output = output..tabs[4]..				'return embeddedLua::functionError;\n'
 	output = output..tabs[3]..			'} \n'
 	output = output..tabs[2]..		'}\n'
 	output = output..tabs[2]..		'else\n'
@@ -228,7 +228,7 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	output = output..tabs[3]..			'lua_pop(L, 2);\n'
 	output = output..tabs[3]..			'/*s: */\n'
 	output = output..					callNotFound(nrets, nargs, hybrid, 3)
-	output = output..tabs[3]..			'return lua_extension::functionNotFound;\n'
+	output = output..tabs[3]..			'return embeddedLua::functionNotFound;\n'
 	output = output..tabs[2]..		'}\n'
 	output = output..tabs[1]..'}\n'
 	output = output..tabs[1]..'else\n'
@@ -236,7 +236,7 @@ function generateStaticPCall(nrets, nargs, hybrid)
 	output = output..tabs[2]..	'lua_pop(L, 1);\n'
 	output = output..tabs[2]..	'/*s: */ \n'
 	output = output..			callNotFound(nrets, nargs, hybrid, 2)
-	output = output..tabs[2]..	'return lua_extension::moduleNotFound; \n'
+	output = output..tabs[2]..	'return embeddedLua::moduleNotFound; \n'
 	output = output..tabs[1]..'} \n'
 	output = output..'} // '..name..'\n\n'
 	return output
@@ -245,7 +245,7 @@ end
 function generateHeader(file, nrets, nargs)
 	tassert('userdata', file)
 	tassert('number', nrets, nargs)
-    local output = "namespace lua_extension\n{\n" 
+    local output = "namespace embeddedLua\n{\n" 
 	output = output.."typedef enum ScriptToNativeCallResult\n"..
 	"{\n"..
 	"	functionSuccess=0,\n"..
@@ -266,18 +266,18 @@ function generateHeader(file, nrets, nargs)
 	"		{									/*s: module scriptFunction */\n"..
 	"			lua_call(L, 0, 0);				/*s: module */\n"..
 	"			lua_pop(L, 1);					/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
+	"			return embeddedLua::functionSuccess;\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{									/*s: module nil */\n"..
 	"			lua_pop(L, 2);					/*s: */\n"..
-	"			return lua_extension::functionNotFound;\n"..
+	"			return embeddedLua::functionNotFound;\n"..
 	"		}\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{										/*s: !table */\n"..
 	"		lua_pop(L, 1);\n"..
-	"		return lua_extension::moduleNotFound;\n"..
+	"		return embeddedLua::moduleNotFound;\n"..
 	"	}\n"..
 	"} // callStaticReturn0Param0\n\n"
 	file:write(output)
@@ -293,13 +293,13 @@ function generateHeader(file, nrets, nargs)
 	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		lua_call(L, 1, 0);				/*s: object */\n"..
 	"		lua_pop(L, 1);					/*s: */\n"..
-	"		return lua_extension::functionSuccess;\n"..
+	"		return embeddedLua::functionSuccess;\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{									/*s: module nil */\n"..
 	"		lua_pop(L, 2);					/*s: */\n"..
 	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
+	"		return embeddedLua::functionNotFound;\n"..
 	"	}\n"..
 	"} // hybridConstReturn0Param0\n\n"
 	file:write(output)
@@ -315,13 +315,13 @@ function generateHeader(file, nrets, nargs)
 	"		push(L, object);				/*s: object scriptFunction object */\n"..
 	"		lua_call(L, 1, 0);				/*s: object */\n"..
 	"		lua_pop(L, 1);					/*s: */\n"..
-	"		return lua_extension::functionSuccess;\n"..
+	"		return embeddedLua::functionSuccess;\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{									/*s: module nil */\n"..
 	"		lua_pop(L, 2);					/*s: */\n"..
 	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
+	"		return embeddedLua::functionNotFound;\n"..
 	"	}\n"..
 	"} // hybridMemberReturn0Param0\n\n"
 	file:write(output)
@@ -338,20 +338,20 @@ function generateHeader(file, nrets, nargs)
 	"		{									/*s: module scriptFunction */\n"..
 	"			lua_call(L, 0, 0);				/*s: module */\n"..
 	"			lua_pop(L, 1);					/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
+	"			return embeddedLua::functionSuccess;\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{									/*s: module nil */\n"..
 	"			lua_pop(L, 2);					/*s: */\n"..
 	"			(*nativeFunction)();\n"..
-	"			return lua_extension::functionNotFound;\n"..
+	"			return embeddedLua::functionNotFound;\n"..
 	"		}\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{										/*s: !table */\n"..
 	"		lua_pop(L, 1);\n"..
 	"		(*nativeFunction)();\n"..
-	"		return lua_extension::moduleNotFound;\n"..
+	"		return embeddedLua::moduleNotFound;\n"..
 	"	}\n"..
 	"} // hybridStaticReturn0Param0\n\n"
 	file:write(output)
@@ -368,24 +368,24 @@ function generateHeader(file, nrets, nargs)
 	"			if (!Lua::callProtected(L, 0, 0))\n"..
 	"			{								/*s: module */\n"..
 	"				lua_pop(L, 1);				/*s: */\n"..
-	"				return lua_extension::functionSuccess;\n"..
+	"				return embeddedLua::functionSuccess;\n"..
 	"			}\n"..
 	"			else\n"..
 	"			{								/*s: module */\n"..
 	"				lua_pop(L, 1);				/*s: */\n"..
-	"				return lua_extension::functionError;\n"..
+	"				return embeddedLua::functionError;\n"..
 	"			}\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{									/*s: module nil */\n"..
 	"			lua_pop(L, 2);					/*s: */\n"..
-	"			return lua_extension::functionNotFound;\n"..
+	"			return embeddedLua::functionNotFound;\n"..
 	"		}\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{										/*s: !table */\n"..
 	"		lua_pop(L, 1);						/*s: */\n"..
-	"		return lua_extension::moduleNotFound;\n"..
+	"		return embeddedLua::moduleNotFound;\n"..
 	"	}						\n"..
 	"} // pcallStaticReturn0Param0\n\n"
 	file:write(output)
@@ -402,19 +402,19 @@ function generateHeader(file, nrets, nargs)
 	"		if (!Lua::callProtected(L, 1, 0))\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
+	"			return embeddedLua::functionSuccess;\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionError;\n"..
+	"			return embeddedLua::functionError;\n"..
 	"		}				\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{									/*s: object nil */\n"..
 	"		lua_pop(L, 2);					/*s: */\n"..
 	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
+	"		return embeddedLua::functionNotFound;\n"..
 	"	}\n"..
 	"} // phybridConstReturn0Param0\n\n"
 	file:write(output)
@@ -431,19 +431,19 @@ function generateHeader(file, nrets, nargs)
 	"		if (!Lua::callProtected(L, 1, 0))\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionSuccess;\n"..
+	"			return embeddedLua::functionSuccess;\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{								/*s: object */\n"..
 	"			lua_pop(L, 1);				/*s: */\n"..
-	"			return lua_extension::functionError;\n"..
+	"			return embeddedLua::functionError;\n"..
 	"		}				\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{									/*s: object nil */\n"..
 	"		lua_pop(L, 2);					/*s: */\n"..
 	"		(object.*nativeFunction)();\n"..
-	"		return lua_extension::functionNotFound;\n"..
+	"		return embeddedLua::functionNotFound;\n"..
 	"	}\n"..
 	"} // phybridMemberReturn0Param0\n\n"
 	file:write(output)
@@ -461,26 +461,26 @@ function generateHeader(file, nrets, nargs)
 	"			if (!Lua::callProtected(L, 0, 0))\n"..
 	"			{								/*s: module */\n"..
 	"				lua_pop(L, 1);				/*s: */\n"..
-	"				return lua_extension::functionSuccess;\n"..
+	"				return embeddedLua::functionSuccess;\n"..
 	"			}\n"..
 	"			else\n"..
 	"			{								/*s: module */\n"..
 	"				lua_pop(L, 1);				/*s: */\n"..
-	"				return lua_extension::functionError;\n"..
+	"				return embeddedLua::functionError;\n"..
 	"			}\n"..
 	"		}\n"..
 	"		else\n"..
 	"		{									/*s: module nil */\n"..
 	"			lua_pop(L, 2);					/*s: */\n"..
 	"			(*nativeFunction)();\n"..
-	"			return lua_extension::functionNotFound;\n"..
+	"			return embeddedLua::functionNotFound;\n"..
 	"		}\n"..
 	"	}\n"..
 	"	else\n"..
 	"	{										/*s: !table */\n"..
 	"		lua_pop(L, 1);\n"..
 	"		(*nativeFunction)();\n"..
-	"		return lua_extension::moduleNotFound;\n"..
+	"		return embeddedLua::moduleNotFound;\n"..
 	"	}\n"..
 	"} // phybridStaticReturn0Param0\n\n "
 	file:write(output)
@@ -511,6 +511,6 @@ function generateHeader(file, nrets, nargs)
 		end
 	end
 	
-	file:write("} // namespace lua_extension")
+	file:write("} // namespace embeddedLua")
 	file:flush()
 end

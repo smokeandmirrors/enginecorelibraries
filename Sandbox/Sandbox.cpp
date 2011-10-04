@@ -22,17 +22,18 @@
 #include "Time.h"
 #include "Vector.h"
 
-using namespace design_patterns;
+using namespace designPatterns;
+using namespace realTime;
 
 void onPlay(void);
 
 void sandbox::play()
 {
 	
-	int int_version = compiler_checks::Math<int>::ZERO_TOLERANCE;
-	float float_version = compiler_checks::Math<float>::ZERO_TOLERANCE;
+	int int_version = compilerChecks::Math<int>::ZERO_TOLERANCE;
+	float float_version = compilerChecks::Math<float>::ZERO_TOLERANCE;
 
-	compiler_checks::check();
+	compilerChecks::check();
 
 	printf("Playing in the sandbox!\n");
 	onPlay();
@@ -53,14 +54,14 @@ inline void doWork(millisecond milliseconds)
 		*i++ = number;
 	}
 
-	millisecond start = real_time::milliseconds();
+	millisecond start = realTime::milliseconds();
 		
 	do 
 	{
 		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	while (real_time::milliseconds() - start < milliseconds);
+	while (realTime::milliseconds() - start < milliseconds);
 
 	// delete[] numbers;
 }
@@ -678,4 +679,8 @@ void onPlay(void)
 // 	}	
 // 
 // 	multithreading::Scheduler::single().destroy();
+
+	ClockReal realSingle;
+	ClockReal realDouble;
+	ClockRelative relative(realSingle);
 }

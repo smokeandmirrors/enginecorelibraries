@@ -10,7 +10,7 @@
 #include "LuaExtensionInclusions.h"
 #include "LuaExposeNativeToScript.h"
 #include "LuaMathExtensions.h"
-using namespace lua_extension;
+using namespace embeddedLua;
 #endif//EXTENDED_BY_LUA
 using namespace math;
 

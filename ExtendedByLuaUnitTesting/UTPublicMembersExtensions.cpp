@@ -7,7 +7,7 @@
 #include "UTTools.h"
 #include "LuaExtensionInclusions.h"
 
-using namespace lua_extension;
+using namespace embeddedLua;
 
 class TC
 {

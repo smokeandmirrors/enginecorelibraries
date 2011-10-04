@@ -11,7 +11,7 @@ Defines the entry point for the console application.
 #if EXTENDED_BY_LUA
 #pragma message("This executable is compiling with embedded lua.")
 #include "LuaExtensionInclusions.h"
-using namespace lua_extension;
+using namespace embeddedLua;
 /** 
 make sure all folders containing desired .lua files
 relative to the working directory)
@@ -168,7 +168,7 @@ DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, AllPublicChildLE, AllPublic
 END_LUA_CLASS(AllPublicChildLE, AllPublicLE)
 
 //////////////////////////////////////////////////////////////////////////
-DECLARE_LUA_CLASS(AllPublicGrandChildLE);
+DECLARE_LUA_LUAEXTENDABLE(AllPublicGrandChildLE)
 
 DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(AllPublicGrandChildLE, AllPublicChildLE)
 	__index_PROXY_MEMBER(six)
@@ -358,34 +358,109 @@ sint returnOneParamZero(void)
 	return 7;
 }
 
+using namespace realTime;
+
+DEFINE_LUA_ENUM(BoolEnum)
+	LUA_ENUM(BoolEnum_False)
+	LUA_ENUM(BoolEnum_True)
+	LUA_ENUM(BoolEnum_Unset)
+END_LUA_ENUM(BoolEnum)
+
+DECLARE_LUA_LIBRARY(realTime)
+DEFINE_LUA_LIBRARY(realTime)
+	LUA_ENTRY_NAMED("cycles", (nativeStaticReturn1Param0<cycle, &cycles>))
+	LUA_ENTRY_NAMED("milliseconds", (nativeStaticReturn1Param0<millisecond, &milliseconds>))
+	LUA_ENTRY_NAMED("seconds", (nativeStaticReturn1Param0<second, &seconds>))
+END_LUA_LIBRARY(realTime)
+
+DECLARE_LUA_CLASS(Clock)
+DEFINE_LUA_CLASS_NO_CTOR(CLASS, Clock, Clock)
+	LUA_ENTRY_NAMED("getRate", (nativeConstReturn1Param0<Clock, dreal, &Clock::getRate>))
+	LUA_ENTRY_NAMED("getTick", (nativeConstReturn1Param0<Clock, cycle, &Clock::getTick>))
+	LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Clock, millisecond, &Clock::milliseconds>))
+	LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Clock, second, &Clock::seconds>))
+	LUA_ENTRY_NAMED("setRate", (nativeMemberReturn0Param1<Clock, dreal, &Clock::setRate>))
+	LUA_ENTRY_NAMED("tick", (nativeMemberReturn0Param0<Clock, &Clock::tick>))
+END_LUA_CLASS(Clock, Clock)
+
+DECLARE_LUA_CLASS(ClockReal)
+DEFINE_LUA_CLASS(CLASS, ClockReal, Clock)
+END_LUA_CLASS(ClockReal, Clock)
+
+DECLARE_LUA_CLASS(ClockRelative)
+LUA_FUNC(newClockRelative)
+{
+	return push(L, new ClockRelative(to<const Clock&>(L, -1)));
+}
+DEFINE_LUA_CLASS_NO_CTOR(CLASS, ClockRelative, Clock)
+LUA_ENTRY_NAMED("__new", newClockRelative)
+END_LUA_CLASS(ClockRelative, Clock)
+
+DECLARE_LUA_CLASS(Stopwatch)
+LUA_FUNC(newStopwatch)
+{
+	return push(L, new Stopwatch(to<const Clock&>(L, -1)));
+}
+DEFINE_LUA_CLASS_NO_CTOR(CLASS, Stopwatch, Stopwatch)
+LUA_ENTRY_NAMED("__new", newStopwatch)
+LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::start>))
+LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::stop>))
+LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::reset>))
+LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Stopwatch, millisecond, &Stopwatch::milliseconds>))
+LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Stopwatch, second, &Stopwatch::seconds>))
+END_LUA_CLASS(Stopwatch, Stopwatch)
+
+DECLARE_LUA_CLASS(Timer)
+LUA_FUNC(newTimer)
+{
+	return push(L, new Timer(to<const Clock&>(L, -1)));
+}
+DEFINE_LUA_CLASS_NO_CTOR(CLASS, Timer, Timer)
+LUA_ENTRY_NAMED("__new", newTimer)
+LUA_ENTRY_NAMED("isTimeRemaining", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeRemaining>))
+LUA_ENTRY_NAMED("isTimeUp", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeUp>))
+LUA_ENTRY_NAMED("set", (nativeMemberReturn0Param3<Timer, second, second, BoolEnum, &Timer::set>))
+LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Timer, &Timer::start>))
+LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Timer, &Timer::stop>))
+LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Timer, &Timer::reset>))
+LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Timer, millisecond, &Timer::milliseconds>))
+LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Timer, second, &Timer::seconds>))
+END_LUA_CLASS(Timer, Timer)
+
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
-	real_time::initialize();
-
 #if EXTENDED_BY_LUA 
 	{
-		lua_extension::Lua lua;
+		embeddedLua::Lua lua;
 		lua.setPackagePath(LUA_PACKAGE_PATH_RUN_FROM_SOLUTION_DIR);
 		registerGlobalLibrary(lua.getState());
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
+		REGISTER_LUA_ENUM((&lua), BoolEnum)
 		REGISTER_LUA_ENUM((&lua), eDirections)
 		REGISTER_LUA_ENUM((&lua), eNumbers)
 		REGISTER_LUA_ENUM((&lua), ReadOnly)
 
-		REGISTER_LUA_LIBRARY((&lua), AllPublic);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicChild);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChild);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicLE);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE);
-		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChildLE);
-		REGISTER_LUA_LIBRARY((&lua), Vector2);
-		REGISTER_LUA_LIBRARY((&lua), Vector3);
-		
+		REGISTER_LUA_LIBRARY((&lua), AllPublic)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicChild)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChild)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicLE)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChildLE)
+		REGISTER_LUA_LIBRARY((&lua), Vector2)
+		REGISTER_LUA_LIBRARY((&lua), Vector3)
+
+		REGISTER_LUA_LIBRARY((&lua), realTime)
+		REGISTER_LUA_LIBRARY((&lua), Clock)
+		REGISTER_LUA_LIBRARY((&lua), ClockReal)
+		REGISTER_LUA_LIBRARY((&lua), ClockRelative)
+		REGISTER_LUA_LIBRARY((&lua), Timer) 
+		REGISTER_LUA_LIBRARY((&lua), Stopwatch) 
+
 #if UNIT_TEST_VERIFICATION
-		REGISTER_LUA_LIBRARY((&lua), Grandparent2);
-		REGISTER_LUA_LIBRARY((&lua), Parent2);
-		REGISTER_LUA_LIBRARY((&lua), Child2);
+		REGISTER_LUA_LIBRARY((&lua), Grandparent2)
+		REGISTER_LUA_LIBRARY((&lua), Parent2)
+		REGISTER_LUA_LIBRARY((&lua), Child2)
 #endif // UNIT_TEST_VERIFICATION
 
 		// get the user file for easier rapid iteration

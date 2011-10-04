@@ -33,7 +33,9 @@ Tested in the field	:	YES
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 
-namespace lua_extension 
+#include "Time.h"
+
+namespace embeddedLua 
 { 
 #if ARGUMENT_ERRORS 
 #pragma message("Compiling with Lua stack argument type checking.")
@@ -213,6 +215,30 @@ inline sint push(lua_State* L, bool value)
 	return 1;
 }
 
+inline sint push(lua_State* L, schar value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, uchar value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, sshort value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, ushort value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
 inline sint push(lua_State* L, sint value)
 {
 	lua_pushinteger(L, static_cast<lua_Integer>(value));
@@ -220,6 +246,18 @@ inline sint push(lua_State* L, sint value)
 }
 
 inline sint push(lua_State* L, uint value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, ulong value)
+{
+	lua_pushinteger(L, static_cast<lua_Integer>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, slong value)
 {
 	lua_pushinteger(L, static_cast<lua_Integer>(value));
 	return 1;
@@ -242,6 +280,26 @@ inline sint push(lua_State* L, const schar* value)
 	lua_pushstring(L, value);
 	return 1;
 }
+
+/*
+inline sint push(lua_State* L, millicycle value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, millisecond value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+
+inline sint push(lua_State* L, second value)
+{
+	lua_pushnumber(L, static_cast<lua_Number>(value));
+	return 1;
+}
+*/
 
 /**
 \note when pushing a LueExtendable into %Lua, it might not be because the 
@@ -270,6 +328,6 @@ inline sint pushTrue(lua_State* L)
 
 /** @} */
 
-} // namespace lua_extension
+} // namespace embeddedLua
 
 #endif//LUASTATEINTERACTION_H

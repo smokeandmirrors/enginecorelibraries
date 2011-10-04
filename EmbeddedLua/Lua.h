@@ -32,7 +32,7 @@ of application and library code for %Lua.
 */
 #include "LuaBuild.h"
 
-namespace lua_extension 
+namespace embeddedLua 
 {
 
 /**
@@ -167,6 +167,6 @@ private:
 	char*				m_name;
 };
 
-} // namespace lua_extension 
+} // namespace embeddedLua 
 
 #endif//LUA_H

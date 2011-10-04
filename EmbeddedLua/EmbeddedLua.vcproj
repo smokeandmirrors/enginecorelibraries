@@ -449,7 +449,15 @@
 				>
 			</File>
 			<File
+				RelativePath="..\LuaFiles\LuaExposeNativeToScript.lua"
+				>
+			</File>
+			<File
 				RelativePath=".\LuaExposeScriptToNative.h"
+				>
+			</File>
+			<File
+				RelativePath="..\LuaFiles\LuaExposeScriptToNative.lua"
 				>
 			</File>
 			<File

@@ -30,7 +30,7 @@ Tested in the field	:	NO
 #include "Build.h"
 #include "Synchronization.h"
 
-namespace design_patterns
+namespace designPatterns
 {
 
 template<typename T>
@@ -109,6 +109,6 @@ template<typename T> T& (*					Singleton<T>::getter)(void) (Singleton<T>::getUni
 template<typename T> multithreading::Mutex	Singleton<T>::mutex; 
 template<typename T> T*						Singleton<T>::singleton(NULL);
 
-} // namespace design_patterns
+} // namespace designPatterns
 
 #endif//SINGLETON_H

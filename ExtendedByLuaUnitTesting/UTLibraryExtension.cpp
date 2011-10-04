@@ -7,7 +7,7 @@
 
 #if EXTENDED_BY_LUA
 #include "LuaExtensionInclusions.h"
-using namespace lua_extension;
+using namespace embeddedLua;
 
 static sint getOne(void)
 {

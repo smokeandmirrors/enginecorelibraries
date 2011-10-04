@@ -6,10 +6,10 @@
 #include "Singleton.h"
 #include "UTTools.h"
 
-using namespace lua_extension; 
+using namespace embeddedLua; 
 
 class Zero
-	: public design_patterns::Singleton<Zero>
+	: public designPatterns::Singleton<Zero>
 {
 public:
 	const sint m_0;
@@ -39,7 +39,7 @@ DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, Zero, Zero)
 END_LUA_CLASS(Zero, Zero)
 
 class One
-: public design_patterns::Singleton<One>
+: public designPatterns::Singleton<One>
 {
 public:
 	static One* staticReturn1Param1(const One* param1) 
@@ -107,7 +107,7 @@ DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, One, One)
 END_LUA_CLASS(One, One)
 
 class Two 
-	: public design_patterns::Singleton<Two>
+	: public designPatterns::Singleton<Two>
 {
 public:	
 	static One* staticReturn2Param2(Two*& return2, const One* param1, const Two* param2) 

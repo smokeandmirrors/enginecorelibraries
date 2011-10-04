@@ -11,7 +11,7 @@ Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	NO
 */
-namespace compiler_checks 
+namespace compilerChecks 
 {
 
 	template <typename REAL>
@@ -28,7 +28,7 @@ namespace compiler_checks
 
 	void check(void);
 
-} // namespace compiler_checks
+} // namespace compilerChecks
 
 
 

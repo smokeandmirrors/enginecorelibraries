@@ -26,7 +26,7 @@ Tested in the field	:	NO
 #include "Build.h"
 #include "Synchronization.h"
 
-namespace design_patterns
+namespace designPatterns
 {
 
 typedef uint Component_GUID;
@@ -177,7 +177,7 @@ private:
 		m_components;
 }; // Composite
 
-} // namespace design_patterns
+} // namespace designPatterns
 
 
 #endif//COMPOSITION_H

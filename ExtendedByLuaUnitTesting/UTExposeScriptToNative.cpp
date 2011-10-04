@@ -4,8 +4,8 @@
 #include "UTTools.h"
 
 #if EXTENDED_BY_LUA 
-using namespace lua_extension; 
-#endif// lua_extension
+using namespace embeddedLua; 
+#endif// embeddedLua
 
 class UTExposeScriptToNative : public cfixcc::TestFixture
 {
@@ -16,7 +16,7 @@ public:
 	{
 #if EXTENDED_BY_LUA 
 		CFIX_INCONCLUSIVE(__TEXT("Not implemented"));
-#endif// lua_extension
+#endif// embeddedLua
 	}
 };
 

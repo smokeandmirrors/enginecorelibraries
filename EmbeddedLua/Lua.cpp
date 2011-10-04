@@ -8,7 +8,7 @@
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 
-namespace lua_extension 
+namespace embeddedLua 
 {
 #if !GOLDMASTER
 // \note taken straight from lua.c
@@ -272,12 +272,12 @@ void Lua::runConsole(void) const
 	{
 		char* d = &quit[0]; 
 		char* s = &buff[0];
-		
+
 		for (sint i=0; i < 8; i++)
 		{
 			*d++ = *s++;
 		}
-		
+
 		if (strcmp(quit, "lua_quit"))
 		{
 			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || callProtected(L))
@@ -288,7 +288,7 @@ void Lua::runConsole(void) const
 		}
 		else
 		{
-			break;
+			return;
 		}
 	}	
 }
@@ -302,4 +302,4 @@ void Lua::setPackagePath(const char* luaPath)
 	lua_pop(L, 1);					//s: 
 }
 
-} // namespace lua_extension
+} // namespace embeddedLua

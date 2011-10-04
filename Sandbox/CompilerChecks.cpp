@@ -42,7 +42,7 @@ public:
 	int thingTwo;
 };
 
-namespace compiler_checks 
+namespace compilerChecks 
 {
 	void check(void)
 	{
@@ -51,4 +51,4 @@ namespace compiler_checks
 		size_t sizeofv2t = sizeof(vThings2);
 		size_t sum = sizeof2TI + sizeof2T + sizeofv2t;
 	}
-} // namespace compiler_checks 
+} // namespace compilerChecks 

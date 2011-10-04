@@ -12,7 +12,7 @@
 #include "UTTools.h"
 #include "Vector.h"
 
-using namespace lua_extension;
+using namespace embeddedLua;
 using namespace math;
 using namespace unit_testing_tools;
 

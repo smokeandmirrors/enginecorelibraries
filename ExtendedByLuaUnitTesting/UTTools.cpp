@@ -28,7 +28,7 @@ void checkNearEqual(dreal lhs, dreal rhs, dreal tolerance)
 }
 
 #if EXTENDED_BY_LUA 
-using namespace lua_extension;
+using namespace embeddedLua;
 
 void executeLuaUnitTest(char* module, Lua* lua)
 {

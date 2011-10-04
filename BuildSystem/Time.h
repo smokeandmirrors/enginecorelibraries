@@ -12,235 +12,384 @@ Used in experiments :	YES
 Tested in the field	:	NO
 
 */
+#include <stdio.h>
+
 #include "Build.h"
+
+#include "math.h"
 
 typedef ulong cycle;
 typedef dreal millicycle;
 typedef dreal millisecond;
 typedef dreal second;
 
-namespace real_time
+namespace realTime
 {
-/** cycles since initialize() was called */
-cycle			cycles(void);
-void			initialize(void);
 /** cycles per second */
-cycle			hertz(void); 
+extern const cycle	
+	hertz; 
+/** seconds per cycle */
+extern const second	
+	hertzInverse;
 /** cycles per millisecond */
-millicycle		millihertz(void);
-millisecond		milliseconds(void);
-second			seconds(void);
+extern const millicycle 
+	milliHz;
+/** millisecond per cycle*/
+extern const millisecond 
+	milliHzInverse;
+	
+/** real time in cycles since program initialization */
+cycle cycles(void);
+/** real time in milliseconds since program initialization */
+millisecond milliseconds(void);
+/** real time in seconds since program initialization */
+second seconds(void);
 
 /** \todo split these up by constructor, if they are constructed with with a clock, all of the time is based on that clock calling tick(),
-othwerwise, they will operate on the real_time calls directly. */
+othwerwise, they will operate on the realTime calls directly. */
 /** \todo minimize all of the arithmetic here, and remove the divides */
-/** \todo make sure all of these values can handle slomotion, reversal of time */
-
-// frame clock, gameplay/engine clock
+/** \todo make sure all of these values can handle slow motion, reversal of time */
+// frame clock, game play/engine clock
 class Clock 
 {
 public:
-	Clock(void)
+	virtual ~Clock(void)=0{/*empty*/}
+	
+	virtual dreal 
+		getRate(void) const=0;
+	
+	/** return the last cycle when this object processed real time */
+	virtual cycle
+		getTick(void) const=0;
+
+	virtual millisecond 
+		milliseconds(void) const=0;
+	
+	virtual second 
+		seconds(void) const=0;
+	
+	virtual void 
+		setRate(dreal rate)=0;
+
+	virtual void	
+		tick(void)=0;
+}; // Clock
+
+class ClockReal : public Clock 
+{
+public:
+	ClockReal(void)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
-	, m_tick(real_time::cycles())
+	, m_tick(realTime::cycles())
 	{ /* empty */ }
 	
-	Clock(cycle start)
+	ClockReal(cycle initialTime)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
-	, m_tick(start)
+	, m_tick(initialTime)
 	{ /* empty */ }
 	
-	Clock(const Clock& relative_parent)
-	: m_currentMilliseconds(relative_parent.milliseconds())
-	, m_currentSeconds(relative_parent.seconds())
-	, m_rate(relative_parent.getRate())
-	, m_tick(relative_parent.getTick())
+	ClockReal(const ClockReal& clone)
+	: m_currentMilliseconds(clone.milliseconds())
+	, m_currentSeconds(clone.seconds())
+	, m_rate(clone.getRate())
+	, m_tick(clone.getTick())
 	{ /* empty */ }
 	
-	inline dreal getRate(void) const 
+	dreal getRate(void) const 
 	{ 
 		return m_rate; 
 	}
 
-	inline millisecond milliseconds(void) const	
-	{ 
-		return m_currentMilliseconds; 
-	}
-
-	inline second seconds(void) const
-	{
-		return m_currentSeconds;
-	}
-	
-	inline void setRate(dreal rate)
-	{
-		m_rate = rate;
-	}
-
-	inline void	tick(void)
-	{
-		cycle tick = real_time::cycles();
-		dreal delta = m_rate * (tick - m_tick);
-		m_currentMilliseconds += static_cast<millisecond>(delta / real_time::millihertz()); 
-		m_currentSeconds += static_cast<second>(delta / real_time::hertz());
-		m_tick = tick;
-	}
-
-protected:
-	inline cycle getTick(void) const 
+	cycle getTick(void) const 
 	{ 
 		return m_tick; 
 	}
 
+	millisecond milliseconds(void) const	
+	{ 
+		return m_currentMilliseconds; 
+	}
+
+	second seconds(void) const
+	{
+		return m_currentSeconds;
+	}
+	
+	void setRate(dreal rate)
+	{
+		m_rate = rate;
+	}
+
+	void tick(void)
+	{
+		cycle tick = realTime::cycles();
+		dreal delta = m_rate * (tick - m_tick);
+		m_currentMilliseconds += static_cast<millisecond>(delta * realTime::milliHzInverse); 
+		m_currentSeconds += static_cast<second>(delta * realTime::hertzInverse);
+		m_tick = tick;
+	}
+
 private:
-	Clock operator=(const Clock &);
+	ClockReal operator=(const ClockReal &);
 
 	millisecond	m_currentMilliseconds;
 	second		m_currentSeconds;
 	dreal		m_rate;
 	cycle		m_tick;
-}; // class Clock
+}; // class ClockReal
 
-class StopWatch 
+class ClockRelative : public Clock 
 {
 public:
-	StopWatch(dreal rate=1.0)
-	: m_active(true)
-	, m_start(real_time::cycles())
-	, m_stop(m_start)
-	, m_rate(rate)
+	ClockRelative(const Clock& parent)
+		: m_currentMilliseconds(0)
+		, m_currentSeconds(0)
+		, m_rate(parent.getRate())
+		, m_tick(parent.getTick())
+		, m_parent(&parent)
 	{ /* empty */ }
-	
-	StopWatch(const Clock& reference_frame)
-	: m_active(true)
-	, m_start(real_time::cycles())
-	, m_stop(m_start)
-	, m_rate(reference_frame.getRate())
+
+	ClockRelative(const ClockRelative& clone)
+		: m_currentMilliseconds(clone.milliseconds())
+		, m_currentSeconds(clone.seconds())
+		, m_rate(clone.getRate())
+		, m_tick(clone.getTick())
+		, m_parent(clone.getParent())
 	{ /* empty */ }
-	
-	inline dreal getRate(void) const 
+
+	dreal getRate(void) const 
 	{ 
-		return m_rate; 
+		return m_parent->getRate() * m_rate; 
 	}
 
-	inline millisecond milliseconds(void) const	
+	cycle getTick(void) const 
+	{ 
+		return m_tick; 
+	}
+
+	millisecond milliseconds(void) const	
+	{ 
+		return m_currentMilliseconds; 
+	}
+
+	second seconds(void) const
+	{
+		return m_currentSeconds;
+	}
+
+	void setRate(dreal rate)
+	{
+		m_rate = rate;
+	}
+
+	void tick(void)
+	{
+		cycle tick = m_parent->getTick();
+		millisecond delta = getRate() * (tick - m_tick);
+		m_currentMilliseconds += static_cast<millisecond>(delta * realTime::milliHzInverse); 
+		m_currentSeconds += static_cast<second>(delta * realTime::hertzInverse);
+		m_tick = tick;
+	}
+	
+protected:
+	inline const Clock* getParent(void) const
+	{
+		return m_parent;
+	}
+
+private:
+	ClockRelative operator=(const ClockRelative &);
+
+	millisecond	m_currentMilliseconds;
+	second		m_currentSeconds;
+	dreal		m_rate;
+	cycle		m_tick;
+	const Clock* m_parent;
+}; // class ClockRelative
+
+class Stopwatch
+{
+public:
+	Stopwatch(const Clock& reference)
+	: m_reference(reference) 
+	, m_start(0)
+	, m_stop(0)
+	, m_active(false)
+	{ 
+		/* empty */ 
+	}
+	
+	bool isActive(void) const 
+	{
+		return m_active;
+	}
+
+	millisecond milliseconds(void) const	
 	{ 
 		if (m_active)
-			return static_cast<millisecond>((m_rate * (real_time::cycles() - m_start)) / real_time::millihertz()); 
+			return static_cast<millisecond>(/* fabs (m_reference.getRate()) * */(m_reference.milliseconds() - m_start)); 
 		else
-			return static_cast<millisecond>((m_rate * (m_stop - m_start)) / real_time::millihertz());
+			return static_cast<millisecond>(/* fabs (m_reference.getRate()) * */(m_stop - m_start));
 	}
 
-	inline second seconds(void) const
+	second seconds(void) const
 	{
 		if (m_active)
-			return static_cast<second>((m_rate * (real_time::cycles() - m_start)) / real_time::hertz());	
+			return static_cast<second>(0.001 * /* fabs (m_reference.getRate()) * */(m_reference.milliseconds() - m_start)); 
 		else
-			return static_cast<second>((m_rate * (m_stop - m_start)) / real_time::hertz());	
+			return static_cast<second>(0.001 * /* fabs (m_reference.getRate()) * */(m_stop - m_start));	
 	}
 
-	inline void start(void)
+	void start(void)
 	{
-		m_active = true;
+		if (!m_active)
+		{
+			m_start = m_reference.milliseconds();
+			m_active = true;
+		}
 	}
 
-	inline void stop(void)
+	void stop(void)
 	{
-		m_stop = real_time::cycles();
-		m_active = false;
+		if (m_active)
+		{
+			m_stop = m_reference.milliseconds();
+			m_active = false;
+		}
 	}
 
-	inline void reset(void)
+	void reset(void)
 	{
-		m_start = real_time::cycles();
+		m_start = m_reference.milliseconds();
 		m_stop = m_start;
 	}
 	
 private:
-	StopWatch(const StopWatch& relative_parent);
-	StopWatch operator=(const StopWatch&);
+	Stopwatch(void);
+	Stopwatch(const Stopwatch&);
+	Stopwatch operator=(const Stopwatch&);
 	
-	bool		m_active;
-	const dreal	m_rate;
-	cycle		m_start;
-	cycle		m_stop;
-}; // class StopWatch
+	const Clock& m_reference;
+	millisecond m_start;
+	millisecond m_stop;
+	bool m_active;
+}; // class Stopwatch
 
 class Timer 
 {
 public:
-	Timer(const dreal rate=1.0, second max_time=0.0, second min_time=-1.0, bool auto_reset=false)
-	: m_autoReset(auto_reset)
-	, m_maxTime(max_time)
-	, m_minTime(min_time == -1.0 ? max_time : min_time)
-	, m_rate(rate)
+	Timer(const Clock& reference, millisecond maxTime=0.0, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_False)
+	: m_stopwatch(reference)
+	, m_autoReset(autoReset == BoolEnum_Unset ? autoReset == BoolEnum_True : false)
+	, m_maxTime(maxTime)
+	, m_minTime(minTime == -1.0 ? maxTime : minTime)
 	{
 		reset();
 	}
 
-	inline void reset(void)
+	bool isActive(void) const
+	{	
+		return m_stopwatch.isActive();
+	}	
+
+	bool isTimeRemaining(void)
 	{
-		m_startTime = real_time::seconds();
-		m_resetTime = m_maxTime; /** \todo: randomize me */
-	}
-	
-	inline void set(second max_time, second min_time=-1.0, bool auto_reset=false)
-	{
-		m_maxTime = max_time;
-		m_minTime = min_time == -1.0 ? max_time : min_time;
-		m_autoReset = auto_reset;
-	}
-	
-	inline bool timeIsUp(void) 
-	{
-		bool time_passed = getTimePassed() >= m_resetTime;
-		
-		if (m_autoReset)
+		if (isActive())
 		{
-			reset();
+			bool timeRemains = _getMillisecondsPassed() < m_resetTime;
+
+			if (m_autoReset == BoolEnum_True)
+			{
+				reset();
+			}
+
+			return timeRemains;
 		}
 		
-		return time_passed;
+		return false;
 	}
 
-	inline bool timeRemains(void)
+	bool isTimeUp(void) 
 	{
-		bool time_passed = getTimePassed() < m_resetTime;
-		
-		if (m_autoReset)
+		if (isActive())
 		{
-			reset();
+			bool timeIsUp = _getMillisecondsPassed() >= m_resetTime;
+			
+			if (m_autoReset)
+			{
+				reset();
+			}
+			
+			return timeIsUp;
 		}
 		
-		return time_passed;
+		return false;
+	}
+
+	millisecond milliseconds(void) const
+	{
+		return m_resetTime - _getMillisecondsPassed();
+	}
+
+	void reset(void)
+	{
+		m_stopwatch.reset();
+		m_resetTime = m_maxTime; /** \todo randomize me */
+	}
+
+	second seconds(void) const
+	{
+		return milliseconds() * 0.001;
+	}
+
+	void set(second maxTime, second minTime=-1.0, BoolEnum autoReset=BoolEnum_Unset)
+	{
+		m_maxTime = maxTime;
+		m_minTime = minTime == -1.0 ? maxTime : minTime;
+		reset();
+
+		if (autoReset != BoolEnum_Unset)
+			m_autoReset = autoReset == BoolEnum_True;
+	}
+
+	void start(void)
+	{
+		if (!isActive())
+		{
+			m_stopwatch.start();
+		}
+	}
+
+	void stop(void)
+	{
+		if (isActive())
+		{
+			m_stopwatch.stop();
+		}
 	}
 
 protected:
-	inline second getTimePassed(void) const
+	inline millisecond _getMillisecondsPassed(void) const
 	{
-		return m_rate * (real_time::seconds() - m_startTime); 
+		return m_stopwatch.milliseconds(); 
 	}
 
 private:
+	Timer(void);
 	Timer(const Timer& relative_parent);
 	Timer operator=(const Timer&);
-
+	
+	Stopwatch	m_stopwatch;
 	bool		m_autoReset;
-	second		m_maxTime;
-	second		m_minTime;
-	const dreal	m_rate;
-	second		m_resetTime;
-	second		m_startTime;
+	millisecond	m_maxTime;
+	millisecond	m_minTime;
+	millisecond	m_resetTime;
 }; // class Timer
 
-} // namespace real_time
-
-// namespace frame_time ? engine_time
-// namespace game_time ?
-// OR, time objects created by the real_time ns?
+} // namespace realTime
 
 #endif//TIME_H

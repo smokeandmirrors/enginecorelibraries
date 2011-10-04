@@ -22,7 +22,7 @@ this path will have to be set on a per machine basis
 */
 
 #define DECLARE_UNIT_TESTING_LUA_OBJECT \
-	lua_extension::Lua lua; \
+	embeddedLua::Lua lua; \
 	lua.setPackagePath(UNIT_TESTING_LUA_PACKAGE_PATH);
 
 namespace unit_testing_tools
@@ -30,7 +30,7 @@ namespace unit_testing_tools
 	void checkNearEqual(sreal lhs, sreal rhs, sreal tolerance=0.0f);
 	void checkNearEqual(dreal lhs, dreal rhs, dreal tolerance=0.0f);
 #if EXTENDED_BY_LUA 
-	void executeLuaUnitTest(char* module, lua_extension::Lua* lua=NULL);
+	void executeLuaUnitTest(char* module, embeddedLua::Lua* lua=NULL);
 #endif
 } // namespace unit_testing_tools
 

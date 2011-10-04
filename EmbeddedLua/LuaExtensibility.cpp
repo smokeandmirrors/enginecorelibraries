@@ -6,7 +6,7 @@
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
-namespace lua_extension
+namespace embeddedLua
 {
 inline bool 
 	isInstanceBeingRefreshed(lua_State* L);
@@ -405,4 +405,4 @@ sint LuaExtendable::__tostring(lua_State* L)
 	return 1;
 }
 
-} // namespace lua_extension
+} // namespace embeddedLua

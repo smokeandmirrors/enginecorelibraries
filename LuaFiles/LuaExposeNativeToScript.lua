@@ -128,7 +128,7 @@ end
 function generateHeader(file, nrets, nargs)
 	tassert('userdata', file)
 	tassert('number', nrets, nargs)
-	local output = "namespace lua_extension\n{\n" ..
+	local output = "namespace embeddedLua\n{\n" ..
 	"/** nativeConstReturn0Param0 */\n"..
 	"template<typename CLASS, void(CLASS::* function)(void) const>\n"..
 	"inline sint nativeConstReturn0Param0(lua_State* L)\n"..
@@ -174,6 +174,6 @@ function generateHeader(file, nrets, nargs)
 			end
 		end
 	end
-	file:write("} // namespace lua_extension")
+	file:write("} // namespace embeddedLua")
 	file:flush()
 end

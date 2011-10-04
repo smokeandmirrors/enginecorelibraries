@@ -51,7 +51,7 @@ a Quaternion class
 */
 class Quaternion
 #if EXTENDED_BY_LUA
-	: public lua_extension::LuaExtendable
+	: public embeddedLua::LuaExtendable
 #endif
 {
 public:

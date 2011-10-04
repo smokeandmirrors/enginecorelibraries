@@ -11,7 +11,7 @@ time the object is pushed into %Lua
 BE PASSED IN TO THE FUNCTION
 */
 
-sint lua_extension::push(lua_State* L, LuaExtendable* value)
+sint embeddedLua::push(lua_State* L, LuaExtendable* value)
 {
 	if (value)
 	{

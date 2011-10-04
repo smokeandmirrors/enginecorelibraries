@@ -11,7 +11,7 @@
 #include "LuaStateInteraction.h"
 #include "UTTools.h"
 
-using namespace lua_extension;
+using namespace embeddedLua;
 
 class LuaClass : public cfixcc::TestFixture
 {

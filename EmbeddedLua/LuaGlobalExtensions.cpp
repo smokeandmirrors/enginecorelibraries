@@ -2,7 +2,7 @@
 
 #include "Vector.h"
 
-namespace lua_extension
+namespace embeddedLua
 {
 
 /**
@@ -20,4 +20,4 @@ void registerGlobalLibrary(lua_State* L)
 	luaL_register(L, NULL, lua_library_Global);
 }
 
-} // namespace lua_extension
+} // namespace embeddedLua

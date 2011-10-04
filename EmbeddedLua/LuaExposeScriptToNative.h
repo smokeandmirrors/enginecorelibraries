@@ -36,7 +36,7 @@ Tested in the field	:	NO
 #include "LuaStateInteraction.h"
 #include "TemplateArguments.h"
 
-namespace lua_extension
+namespace embeddedLua
 {
 	typedef enum ScriptToNativeCallResult
 	{
@@ -58,18 +58,18 @@ namespace lua_extension
 			{									/*s: module scriptFunction */
 				lua_call(L, 0, 0);				/*s: module */
 				lua_pop(L, 1);					/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{									/*s: module nil */
 				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{										/*s: !table */
 			lua_pop(L, 1);
-			return lua_extension::moduleNotFound;
+			return embeddedLua::moduleNotFound;
 		}
 	} // callStaticReturn0Param0
 
@@ -85,13 +85,13 @@ namespace lua_extension
 			push(L, object);				/*s: object scriptFunction object */
 			lua_call(L, 1, 0);				/*s: object */
 			lua_pop(L, 1);					/*s: */
-			return lua_extension::functionSuccess;
+			return embeddedLua::functionSuccess;
 		}
 		else
 		{									/*s: module nil */
 			lua_pop(L, 2);					/*s: */
 			(object.*nativeFunction)();
-			return lua_extension::functionNotFound;
+			return embeddedLua::functionNotFound;
 		}
 	} // hybridConstReturn0Param0
 
@@ -107,13 +107,13 @@ namespace lua_extension
 			push(L, object);				/*s: object scriptFunction object */
 			lua_call(L, 1, 0);				/*s: object */
 			lua_pop(L, 1);					/*s: */
-			return lua_extension::functionSuccess;
+			return embeddedLua::functionSuccess;
 		}
 		else
 		{									/*s: module nil */
 			lua_pop(L, 2);					/*s: */
 			(object.*nativeFunction)();
-			return lua_extension::functionNotFound;
+			return embeddedLua::functionNotFound;
 		}
 	} // hybridMemberReturn0Param0
 
@@ -130,20 +130,20 @@ namespace lua_extension
 			{									/*s: module scriptFunction */
 				lua_call(L, 0, 0);				/*s: module */
 				lua_pop(L, 1);					/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{									/*s: module nil */
 				lua_pop(L, 2);					/*s: */
 				(*nativeFunction)();
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{										/*s: !table */
 			lua_pop(L, 1);
 			(*nativeFunction)();
-			return lua_extension::moduleNotFound;
+			return embeddedLua::moduleNotFound;
 		}
 	} // hybridStaticReturn0Param0
 
@@ -160,24 +160,24 @@ namespace lua_extension
 				if (!Lua::callProtected(L, 0, 0))
 				{								/*s: module */
 					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				}
 				else
 				{								/*s: module */
 					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				}
 			}
 			else
 			{									/*s: module nil */
 				lua_pop(L, 2);					/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{										/*s: !table */
 			lua_pop(L, 1);						/*s: */
-			return lua_extension::moduleNotFound;
+			return embeddedLua::moduleNotFound;
 		}						
 	} // pcallStaticReturn0Param0
 
@@ -194,19 +194,19 @@ namespace lua_extension
 			if (!Lua::callProtected(L, 1, 0))
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			}				
 		}
 		else
 		{									/*s: object nil */
 			lua_pop(L, 2);					/*s: */
 			(object.*nativeFunction)();
-			return lua_extension::functionNotFound;
+			return embeddedLua::functionNotFound;
 		}
 	} // phybridConstReturn0Param0
 
@@ -223,19 +223,19 @@ namespace lua_extension
 			if (!Lua::callProtected(L, 1, 0))
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{								/*s: object */
 				lua_pop(L, 1);				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			}				
 		}
 		else
 		{									/*s: object nil */
 			lua_pop(L, 2);					/*s: */
 			(object.*nativeFunction)();
-			return lua_extension::functionNotFound;
+			return embeddedLua::functionNotFound;
 		}
 	} // phybridMemberReturn0Param0
 
@@ -253,26 +253,26 @@ namespace lua_extension
 				if (!Lua::callProtected(L, 0, 0))
 				{								/*s: module */
 					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				}
 				else
 				{								/*s: module */
 					lua_pop(L, 1);				/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				}
 			}
 			else
 			{									/*s: module nil */
 				lua_pop(L, 2);					/*s: */
 				(*nativeFunction)();
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{										/*s: !table */
 			lua_pop(L, 1);
 			(*nativeFunction)();
-			return lua_extension::moduleNotFound;
+			return embeddedLua::moduleNotFound;
 		}
 	} // phybridStaticReturn0Param0
 
@@ -294,20 +294,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param1
 
@@ -330,14 +330,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param1
 
@@ -360,14 +360,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param1
 
@@ -390,14 +390,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -405,7 +405,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param1
 
@@ -427,27 +427,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param1
 
@@ -470,13 +470,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -484,7 +484,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param1
 
@@ -507,13 +507,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -521,7 +521,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param1
 
@@ -544,13 +544,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -558,7 +558,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -566,7 +566,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param1
 
@@ -589,20 +589,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param2
 
@@ -626,14 +626,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param2
 
@@ -657,14 +657,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param2
 
@@ -688,14 +688,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -703,7 +703,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param2
 
@@ -726,27 +726,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param2
 
@@ -770,13 +770,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -784,7 +784,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param2
 
@@ -808,13 +808,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -822,7 +822,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param2
 
@@ -846,13 +846,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -860,7 +860,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -868,7 +868,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param2
 
@@ -892,20 +892,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param3
 
@@ -930,14 +930,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param3
 
@@ -962,14 +962,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param3
 
@@ -994,14 +994,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1009,7 +1009,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param3
 
@@ -1033,27 +1033,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param3
 
@@ -1078,13 +1078,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1092,7 +1092,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param3
 
@@ -1117,13 +1117,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1131,7 +1131,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param3
 
@@ -1156,13 +1156,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -1170,7 +1170,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1178,7 +1178,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param3
 
@@ -1203,20 +1203,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param4
 
@@ -1242,14 +1242,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param4
 
@@ -1275,14 +1275,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param4
 
@@ -1308,14 +1308,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1323,7 +1323,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param4
 
@@ -1348,27 +1348,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param4
 
@@ -1394,13 +1394,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1408,7 +1408,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param4
 
@@ -1434,13 +1434,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1448,7 +1448,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param4
 
@@ -1474,13 +1474,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -1488,7 +1488,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1496,7 +1496,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param4
 
@@ -1522,20 +1522,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param5
 
@@ -1562,14 +1562,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param5
 
@@ -1596,14 +1596,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param5
 
@@ -1630,14 +1630,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1645,7 +1645,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param5
 
@@ -1671,27 +1671,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param5
 
@@ -1718,13 +1718,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1732,7 +1732,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param5
 
@@ -1759,13 +1759,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -1773,7 +1773,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param5
 
@@ -1800,13 +1800,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -1814,7 +1814,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1822,7 +1822,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param5
 
@@ -1849,20 +1849,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param6
 
@@ -1890,14 +1890,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param6
 
@@ -1925,14 +1925,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param6
 
@@ -1960,14 +1960,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -1975,7 +1975,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param6
 
@@ -2002,27 +2002,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param6
 
@@ -2050,13 +2050,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2064,7 +2064,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param6
 
@@ -2092,13 +2092,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2106,7 +2106,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param6
 
@@ -2134,13 +2134,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -2148,7 +2148,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -2156,7 +2156,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param6
 
@@ -2184,20 +2184,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param7
 
@@ -2226,14 +2226,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param7
 
@@ -2262,14 +2262,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param7
 
@@ -2298,14 +2298,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -2313,7 +2313,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param7
 
@@ -2341,27 +2341,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param7
 
@@ -2390,13 +2390,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2404,7 +2404,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param7
 
@@ -2433,13 +2433,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2447,7 +2447,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param7
 
@@ -2476,13 +2476,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -2490,7 +2490,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -2498,7 +2498,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param7
 
@@ -2527,20 +2527,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param8
 
@@ -2570,14 +2570,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param8
 
@@ -2607,14 +2607,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param8
 
@@ -2644,14 +2644,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -2659,7 +2659,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param8
 
@@ -2688,27 +2688,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param8
 
@@ -2738,13 +2738,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2752,7 +2752,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param8
 
@@ -2782,13 +2782,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -2796,7 +2796,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param8
 
@@ -2826,13 +2826,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -2840,7 +2840,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -2848,7 +2848,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param8
 
@@ -2878,20 +2878,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param9
 
@@ -2922,14 +2922,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param9
 
@@ -2960,14 +2960,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param9
 
@@ -2998,14 +2998,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3013,7 +3013,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param9
 
@@ -3043,27 +3043,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param9
 
@@ -3094,13 +3094,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3108,7 +3108,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param9
 
@@ -3139,13 +3139,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3153,7 +3153,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param9
 
@@ -3184,13 +3184,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -3198,7 +3198,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3206,7 +3206,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param9
 
@@ -3237,20 +3237,20 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn0Param10
 
@@ -3282,14 +3282,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn0Param10
 
@@ -3321,14 +3321,14 @@ namespace lua_extension
 			/*s: object (return values) */ 
 			lua_pop(L, 1); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn0Param10
 
@@ -3360,14 +3360,14 @@ namespace lua_extension
 				/*s: module (return values) */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3375,7 +3375,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn0Param10
 
@@ -3406,27 +3406,27 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn0Param10
 
@@ -3458,13 +3458,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3472,7 +3472,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn0Param10
 
@@ -3504,13 +3504,13 @@ namespace lua_extension
 			{	/*s: object (return values) */ 
 				lua_pop(L, 1); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3518,7 +3518,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			(object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn0Param10
 
@@ -3550,13 +3550,13 @@ namespace lua_extension
 				{	/*s: module (return values) */ 
 					lua_pop(L, 1); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -3564,7 +3564,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3572,7 +3572,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			(*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn0Param10
 
@@ -3594,20 +3594,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param0
 
@@ -3630,14 +3630,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param0
 
@@ -3660,14 +3660,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param0
 
@@ -3690,14 +3690,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)();
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3705,7 +3705,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)();
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param0
 
@@ -3727,27 +3727,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param0
 
@@ -3770,13 +3770,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3784,7 +3784,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param0
 
@@ -3807,13 +3807,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -3821,7 +3821,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)();
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param0
 
@@ -3844,13 +3844,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -3858,7 +3858,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)();
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -3866,7 +3866,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)();
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param0
 
@@ -3889,20 +3889,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param1
 
@@ -3926,14 +3926,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param1
 
@@ -3957,14 +3957,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param1
 
@@ -3988,14 +3988,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4003,7 +4003,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param1
 
@@ -4026,27 +4026,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param1
 
@@ -4070,13 +4070,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4084,7 +4084,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param1
 
@@ -4108,13 +4108,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4122,7 +4122,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param1
 
@@ -4146,13 +4146,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -4160,7 +4160,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4168,7 +4168,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param1
 
@@ -4192,20 +4192,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param2
 
@@ -4230,14 +4230,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param2
 
@@ -4262,14 +4262,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param2
 
@@ -4294,14 +4294,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4309,7 +4309,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param2
 
@@ -4333,27 +4333,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param2
 
@@ -4378,13 +4378,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4392,7 +4392,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param2
 
@@ -4417,13 +4417,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4431,7 +4431,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param2
 
@@ -4456,13 +4456,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -4470,7 +4470,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4478,7 +4478,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param2
 
@@ -4503,20 +4503,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param3
 
@@ -4542,14 +4542,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param3
 
@@ -4575,14 +4575,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param3
 
@@ -4608,14 +4608,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4623,7 +4623,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param3
 
@@ -4648,27 +4648,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param3
 
@@ -4694,13 +4694,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4708,7 +4708,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param3
 
@@ -4734,13 +4734,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -4748,7 +4748,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param3
 
@@ -4774,13 +4774,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -4788,7 +4788,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4796,7 +4796,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param3
 
@@ -4822,20 +4822,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param4
 
@@ -4862,14 +4862,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param4
 
@@ -4896,14 +4896,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param4
 
@@ -4930,14 +4930,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -4945,7 +4945,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param4
 
@@ -4971,27 +4971,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param4
 
@@ -5018,13 +5018,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5032,7 +5032,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param4
 
@@ -5059,13 +5059,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5073,7 +5073,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param4
 
@@ -5100,13 +5100,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -5114,7 +5114,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5122,7 +5122,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param4
 
@@ -5149,20 +5149,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param5
 
@@ -5190,14 +5190,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param5
 
@@ -5225,14 +5225,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param5
 
@@ -5260,14 +5260,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5275,7 +5275,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param5
 
@@ -5302,27 +5302,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param5
 
@@ -5350,13 +5350,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5364,7 +5364,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param5
 
@@ -5392,13 +5392,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5406,7 +5406,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param5
 
@@ -5434,13 +5434,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -5448,7 +5448,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5456,7 +5456,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param5
 
@@ -5484,20 +5484,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param6
 
@@ -5526,14 +5526,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param6
 
@@ -5562,14 +5562,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param6
 
@@ -5598,14 +5598,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5613,7 +5613,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param6
 
@@ -5641,27 +5641,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param6
 
@@ -5690,13 +5690,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5704,7 +5704,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param6
 
@@ -5733,13 +5733,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -5747,7 +5747,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param6
 
@@ -5776,13 +5776,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -5790,7 +5790,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5798,7 +5798,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param6
 
@@ -5827,20 +5827,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param7
 
@@ -5870,14 +5870,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param7
 
@@ -5907,14 +5907,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param7
 
@@ -5944,14 +5944,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -5959,7 +5959,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param7
 
@@ -5988,27 +5988,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param7
 
@@ -6038,13 +6038,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6052,7 +6052,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param7
 
@@ -6082,13 +6082,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6096,7 +6096,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param7
 
@@ -6126,13 +6126,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -6140,7 +6140,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -6148,7 +6148,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param7
 
@@ -6178,20 +6178,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param8
 
@@ -6222,14 +6222,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param8
 
@@ -6260,14 +6260,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param8
 
@@ -6298,14 +6298,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -6313,7 +6313,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param8
 
@@ -6343,27 +6343,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param8
 
@@ -6394,13 +6394,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6408,7 +6408,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param8
 
@@ -6439,13 +6439,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6453,7 +6453,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param8
 
@@ -6484,13 +6484,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -6498,7 +6498,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -6506,7 +6506,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param8
 
@@ -6537,20 +6537,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param9
 
@@ -6582,14 +6582,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param9
 
@@ -6621,14 +6621,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param9
 
@@ -6660,14 +6660,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -6675,7 +6675,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param9
 
@@ -6706,27 +6706,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param9
 
@@ -6758,13 +6758,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6772,7 +6772,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param9
 
@@ -6804,13 +6804,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -6818,7 +6818,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param9
 
@@ -6850,13 +6850,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -6864,7 +6864,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -6872,7 +6872,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param9
 
@@ -6904,20 +6904,20 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn1Param10
 
@@ -6950,14 +6950,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn1Param10
 
@@ -6990,14 +6990,14 @@ namespace lua_extension
 			ret1 = to<RET_1>(L, -1);
 			lua_pop(L, 2); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn1Param10
 
@@ -7030,14 +7030,14 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7045,7 +7045,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn1Param10
 
@@ -7077,27 +7077,27 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn1Param10
 
@@ -7130,13 +7130,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7144,7 +7144,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn1Param10
 
@@ -7177,13 +7177,13 @@ namespace lua_extension
 				ret1 = to<RET_1>(L, -1);
 				lua_pop(L, 2); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7191,7 +7191,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn1Param10
 
@@ -7224,13 +7224,13 @@ namespace lua_extension
 					ret1 = to<RET_1>(L, -1);
 					lua_pop(L, 2); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -7238,7 +7238,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7246,7 +7246,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn1Param10
 
@@ -7269,20 +7269,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param0
 
@@ -7306,14 +7306,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param0
 
@@ -7337,14 +7337,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param0
 
@@ -7368,14 +7368,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7383,7 +7383,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param0
 
@@ -7406,27 +7406,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param0
 
@@ -7450,13 +7450,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7464,7 +7464,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param0
 
@@ -7488,13 +7488,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7502,7 +7502,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param0
 
@@ -7526,13 +7526,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -7540,7 +7540,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7548,7 +7548,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param0
 
@@ -7572,20 +7572,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param1
 
@@ -7610,14 +7610,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param1
 
@@ -7642,14 +7642,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param1
 
@@ -7674,14 +7674,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7689,7 +7689,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param1
 
@@ -7713,27 +7713,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param1
 
@@ -7758,13 +7758,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7772,7 +7772,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param1
 
@@ -7797,13 +7797,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -7811,7 +7811,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param1
 
@@ -7836,13 +7836,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -7850,7 +7850,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -7858,7 +7858,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param1
 
@@ -7883,20 +7883,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param2
 
@@ -7922,14 +7922,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param2
 
@@ -7955,14 +7955,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param2
 
@@ -7988,14 +7988,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8003,7 +8003,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param2
 
@@ -8028,27 +8028,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param2
 
@@ -8074,13 +8074,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8088,7 +8088,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param2
 
@@ -8114,13 +8114,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8128,7 +8128,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param2
 
@@ -8154,13 +8154,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -8168,7 +8168,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8176,7 +8176,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param2
 
@@ -8202,20 +8202,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param3
 
@@ -8242,14 +8242,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param3
 
@@ -8276,14 +8276,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param3
 
@@ -8310,14 +8310,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8325,7 +8325,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param3
 
@@ -8351,27 +8351,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param3
 
@@ -8398,13 +8398,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8412,7 +8412,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param3
 
@@ -8439,13 +8439,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8453,7 +8453,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param3
 
@@ -8480,13 +8480,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -8494,7 +8494,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8502,7 +8502,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param3
 
@@ -8529,20 +8529,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param4
 
@@ -8570,14 +8570,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param4
 
@@ -8605,14 +8605,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param4
 
@@ -8640,14 +8640,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8655,7 +8655,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param4
 
@@ -8682,27 +8682,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param4
 
@@ -8730,13 +8730,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8744,7 +8744,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param4
 
@@ -8772,13 +8772,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -8786,7 +8786,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param4
 
@@ -8814,13 +8814,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -8828,7 +8828,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8836,7 +8836,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param4
 
@@ -8864,20 +8864,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param5
 
@@ -8906,14 +8906,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param5
 
@@ -8942,14 +8942,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param5
 
@@ -8978,14 +8978,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -8993,7 +8993,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param5
 
@@ -9021,27 +9021,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param5
 
@@ -9070,13 +9070,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9084,7 +9084,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param5
 
@@ -9113,13 +9113,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9127,7 +9127,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param5
 
@@ -9156,13 +9156,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -9170,7 +9170,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -9178,7 +9178,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param5
 
@@ -9207,20 +9207,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param6
 
@@ -9250,14 +9250,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param6
 
@@ -9287,14 +9287,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param6
 
@@ -9324,14 +9324,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -9339,7 +9339,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param6
 
@@ -9368,27 +9368,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param6
 
@@ -9418,13 +9418,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9432,7 +9432,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param6
 
@@ -9462,13 +9462,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9476,7 +9476,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param6
 
@@ -9506,13 +9506,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -9520,7 +9520,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -9528,7 +9528,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param6
 
@@ -9558,20 +9558,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param7
 
@@ -9602,14 +9602,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param7
 
@@ -9640,14 +9640,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param7
 
@@ -9678,14 +9678,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -9693,7 +9693,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param7
 
@@ -9723,27 +9723,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param7
 
@@ -9774,13 +9774,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9788,7 +9788,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param7
 
@@ -9819,13 +9819,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -9833,7 +9833,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param7
 
@@ -9864,13 +9864,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -9878,7 +9878,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -9886,7 +9886,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param7
 
@@ -9917,20 +9917,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param8
 
@@ -9962,14 +9962,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param8
 
@@ -10001,14 +10001,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param8
 
@@ -10040,14 +10040,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -10055,7 +10055,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param8
 
@@ -10086,27 +10086,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param8
 
@@ -10138,13 +10138,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10152,7 +10152,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param8
 
@@ -10184,13 +10184,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10198,7 +10198,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param8
 
@@ -10230,13 +10230,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -10244,7 +10244,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -10252,7 +10252,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param8
 
@@ -10284,20 +10284,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param9
 
@@ -10330,14 +10330,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param9
 
@@ -10370,14 +10370,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param9
 
@@ -10410,14 +10410,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -10425,7 +10425,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param9
 
@@ -10457,27 +10457,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param9
 
@@ -10510,13 +10510,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10524,7 +10524,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param9
 
@@ -10557,13 +10557,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10571,7 +10571,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param9
 
@@ -10604,13 +10604,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -10618,7 +10618,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -10626,7 +10626,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param9
 
@@ -10659,20 +10659,20 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn2Param10
 
@@ -10706,14 +10706,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn2Param10
 
@@ -10747,14 +10747,14 @@ namespace lua_extension
 			ret2 = to<RET_2>(L, -1);
 			lua_pop(L, 3); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn2Param10
 
@@ -10788,14 +10788,14 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -10803,7 +10803,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn2Param10
 
@@ -10836,27 +10836,27 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn2Param10
 
@@ -10890,13 +10890,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10904,7 +10904,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn2Param10
 
@@ -10938,13 +10938,13 @@ namespace lua_extension
 				ret2 = to<RET_2>(L, -1);
 				lua_pop(L, 3); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -10952,7 +10952,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn2Param10
 
@@ -10986,13 +10986,13 @@ namespace lua_extension
 					ret2 = to<RET_2>(L, -1);
 					lua_pop(L, 3); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -11000,7 +11000,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11008,7 +11008,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn2Param10
 
@@ -11032,20 +11032,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param0
 
@@ -11070,14 +11070,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param0
 
@@ -11102,14 +11102,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param0
 
@@ -11134,14 +11134,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11149,7 +11149,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param0
 
@@ -11173,27 +11173,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param0
 
@@ -11218,13 +11218,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11232,7 +11232,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param0
 
@@ -11257,13 +11257,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11271,7 +11271,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param0
 
@@ -11296,13 +11296,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -11310,7 +11310,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11318,7 +11318,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param0
 
@@ -11343,20 +11343,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param1
 
@@ -11382,14 +11382,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param1
 
@@ -11415,14 +11415,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param1
 
@@ -11448,14 +11448,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11463,7 +11463,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param1
 
@@ -11488,27 +11488,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param1
 
@@ -11534,13 +11534,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11548,7 +11548,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param1
 
@@ -11574,13 +11574,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11588,7 +11588,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param1
 
@@ -11614,13 +11614,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -11628,7 +11628,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11636,7 +11636,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param1
 
@@ -11662,20 +11662,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param2
 
@@ -11702,14 +11702,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param2
 
@@ -11736,14 +11736,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param2
 
@@ -11770,14 +11770,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11785,7 +11785,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param2
 
@@ -11811,27 +11811,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param2
 
@@ -11858,13 +11858,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11872,7 +11872,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param2
 
@@ -11899,13 +11899,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -11913,7 +11913,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param2
 
@@ -11940,13 +11940,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -11954,7 +11954,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -11962,7 +11962,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param2
 
@@ -11989,20 +11989,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param3
 
@@ -12030,14 +12030,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param3
 
@@ -12065,14 +12065,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param3
 
@@ -12100,14 +12100,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12115,7 +12115,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param3
 
@@ -12142,27 +12142,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param3
 
@@ -12190,13 +12190,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12204,7 +12204,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param3
 
@@ -12232,13 +12232,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12246,7 +12246,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param3
 
@@ -12274,13 +12274,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -12288,7 +12288,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12296,7 +12296,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param3
 
@@ -12324,20 +12324,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param4
 
@@ -12366,14 +12366,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param4
 
@@ -12402,14 +12402,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param4
 
@@ -12438,14 +12438,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12453,7 +12453,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param4
 
@@ -12481,27 +12481,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param4
 
@@ -12530,13 +12530,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12544,7 +12544,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param4
 
@@ -12573,13 +12573,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12587,7 +12587,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param4
 
@@ -12616,13 +12616,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -12630,7 +12630,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12638,7 +12638,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param4
 
@@ -12667,20 +12667,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param5
 
@@ -12710,14 +12710,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param5
 
@@ -12747,14 +12747,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param5
 
@@ -12784,14 +12784,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12799,7 +12799,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param5
 
@@ -12828,27 +12828,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param5
 
@@ -12878,13 +12878,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12892,7 +12892,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param5
 
@@ -12922,13 +12922,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -12936,7 +12936,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param5
 
@@ -12966,13 +12966,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -12980,7 +12980,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -12988,7 +12988,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param5
 
@@ -13018,20 +13018,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param6
 
@@ -13062,14 +13062,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param6
 
@@ -13100,14 +13100,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param6
 
@@ -13138,14 +13138,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -13153,7 +13153,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param6
 
@@ -13183,27 +13183,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param6
 
@@ -13234,13 +13234,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -13248,7 +13248,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param6
 
@@ -13279,13 +13279,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -13293,7 +13293,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param6
 
@@ -13324,13 +13324,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -13338,7 +13338,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -13346,7 +13346,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param6
 
@@ -13377,20 +13377,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param7
 
@@ -13422,14 +13422,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param7
 
@@ -13461,14 +13461,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param7
 
@@ -13500,14 +13500,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -13515,7 +13515,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param7
 
@@ -13546,27 +13546,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param7
 
@@ -13598,13 +13598,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -13612,7 +13612,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param7
 
@@ -13644,13 +13644,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -13658,7 +13658,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param7
 
@@ -13690,13 +13690,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -13704,7 +13704,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -13712,7 +13712,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param7
 
@@ -13744,20 +13744,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param8
 
@@ -13790,14 +13790,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param8
 
@@ -13830,14 +13830,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param8
 
@@ -13870,14 +13870,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -13885,7 +13885,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param8
 
@@ -13917,27 +13917,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param8
 
@@ -13970,13 +13970,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -13984,7 +13984,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param8
 
@@ -14017,13 +14017,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -14031,7 +14031,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param8
 
@@ -14064,13 +14064,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -14078,7 +14078,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -14086,7 +14086,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param8
 
@@ -14119,20 +14119,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param9
 
@@ -14166,14 +14166,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param9
 
@@ -14207,14 +14207,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param9
 
@@ -14248,14 +14248,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -14263,7 +14263,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param9
 
@@ -14296,27 +14296,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param9
 
@@ -14350,13 +14350,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -14364,7 +14364,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param9
 
@@ -14398,13 +14398,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -14412,7 +14412,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param9
 
@@ -14446,13 +14446,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -14460,7 +14460,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -14468,7 +14468,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param9
 
@@ -14502,20 +14502,20 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn3Param10
 
@@ -14550,14 +14550,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn3Param10
 
@@ -14592,14 +14592,14 @@ namespace lua_extension
 			ret3 = to<RET_3>(L, -1);
 			lua_pop(L, 4); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn3Param10
 
@@ -14634,14 +14634,14 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -14649,7 +14649,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn3Param10
 
@@ -14683,27 +14683,27 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn3Param10
 
@@ -14738,13 +14738,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -14752,7 +14752,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn3Param10
 
@@ -14787,13 +14787,13 @@ namespace lua_extension
 				ret3 = to<RET_3>(L, -1);
 				lua_pop(L, 4); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -14801,7 +14801,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn3Param10
 
@@ -14836,13 +14836,13 @@ namespace lua_extension
 					ret3 = to<RET_3>(L, -1);
 					lua_pop(L, 4); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -14850,7 +14850,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -14858,7 +14858,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn3Param10
 
@@ -14883,20 +14883,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param0
 
@@ -14922,14 +14922,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param0
 
@@ -14955,14 +14955,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param0
 
@@ -14988,14 +14988,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15003,7 +15003,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param0
 
@@ -15028,27 +15028,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param0
 
@@ -15074,13 +15074,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15088,7 +15088,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param0
 
@@ -15114,13 +15114,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15128,7 +15128,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param0
 
@@ -15154,13 +15154,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -15168,7 +15168,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15176,7 +15176,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param0
 
@@ -15202,20 +15202,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param1
 
@@ -15242,14 +15242,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param1
 
@@ -15276,14 +15276,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param1
 
@@ -15310,14 +15310,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15325,7 +15325,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param1
 
@@ -15351,27 +15351,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param1
 
@@ -15398,13 +15398,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15412,7 +15412,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param1
 
@@ -15439,13 +15439,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15453,7 +15453,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param1
 
@@ -15480,13 +15480,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -15494,7 +15494,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15502,7 +15502,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param1
 
@@ -15529,20 +15529,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param2
 
@@ -15570,14 +15570,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param2
 
@@ -15605,14 +15605,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param2
 
@@ -15640,14 +15640,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15655,7 +15655,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param2
 
@@ -15682,27 +15682,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param2
 
@@ -15730,13 +15730,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15744,7 +15744,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param2
 
@@ -15772,13 +15772,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -15786,7 +15786,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param2
 
@@ -15814,13 +15814,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -15828,7 +15828,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15836,7 +15836,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param2
 
@@ -15864,20 +15864,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param3
 
@@ -15906,14 +15906,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param3
 
@@ -15942,14 +15942,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param3
 
@@ -15978,14 +15978,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -15993,7 +15993,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param3
 
@@ -16021,27 +16021,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param3
 
@@ -16070,13 +16070,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16084,7 +16084,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param3
 
@@ -16113,13 +16113,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16127,7 +16127,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param3
 
@@ -16156,13 +16156,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -16170,7 +16170,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -16178,7 +16178,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param3
 
@@ -16207,20 +16207,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param4
 
@@ -16250,14 +16250,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param4
 
@@ -16287,14 +16287,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param4
 
@@ -16324,14 +16324,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -16339,7 +16339,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param4
 
@@ -16368,27 +16368,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param4
 
@@ -16418,13 +16418,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16432,7 +16432,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param4
 
@@ -16462,13 +16462,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16476,7 +16476,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param4
 
@@ -16506,13 +16506,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -16520,7 +16520,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -16528,7 +16528,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param4
 
@@ -16558,20 +16558,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param5
 
@@ -16602,14 +16602,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param5
 
@@ -16640,14 +16640,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param5
 
@@ -16678,14 +16678,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -16693,7 +16693,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param5
 
@@ -16723,27 +16723,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param5
 
@@ -16774,13 +16774,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16788,7 +16788,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param5
 
@@ -16819,13 +16819,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -16833,7 +16833,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param5
 
@@ -16864,13 +16864,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -16878,7 +16878,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -16886,7 +16886,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param5
 
@@ -16917,20 +16917,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param6
 
@@ -16962,14 +16962,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param6
 
@@ -17001,14 +17001,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param6
 
@@ -17040,14 +17040,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -17055,7 +17055,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param6
 
@@ -17086,27 +17086,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param6
 
@@ -17138,13 +17138,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17152,7 +17152,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param6
 
@@ -17184,13 +17184,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17198,7 +17198,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param6
 
@@ -17230,13 +17230,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -17244,7 +17244,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -17252,7 +17252,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param6
 
@@ -17284,20 +17284,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param7
 
@@ -17330,14 +17330,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param7
 
@@ -17370,14 +17370,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param7
 
@@ -17410,14 +17410,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -17425,7 +17425,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param7
 
@@ -17457,27 +17457,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param7
 
@@ -17510,13 +17510,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17524,7 +17524,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param7
 
@@ -17557,13 +17557,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17571,7 +17571,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param7
 
@@ -17604,13 +17604,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -17618,7 +17618,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -17626,7 +17626,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param7
 
@@ -17659,20 +17659,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param8
 
@@ -17706,14 +17706,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param8
 
@@ -17747,14 +17747,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param8
 
@@ -17788,14 +17788,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -17803,7 +17803,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param8
 
@@ -17836,27 +17836,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param8
 
@@ -17890,13 +17890,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17904,7 +17904,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param8
 
@@ -17938,13 +17938,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -17952,7 +17952,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param8
 
@@ -17986,13 +17986,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -18000,7 +18000,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18008,7 +18008,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param8
 
@@ -18042,20 +18042,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param9
 
@@ -18090,14 +18090,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param9
 
@@ -18132,14 +18132,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param9
 
@@ -18174,14 +18174,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18189,7 +18189,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param9
 
@@ -18223,27 +18223,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param9
 
@@ -18278,13 +18278,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -18292,7 +18292,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param9
 
@@ -18327,13 +18327,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -18341,7 +18341,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param9
 
@@ -18376,13 +18376,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -18390,7 +18390,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18398,7 +18398,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param9
 
@@ -18433,20 +18433,20 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn4Param10
 
@@ -18482,14 +18482,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn4Param10
 
@@ -18525,14 +18525,14 @@ namespace lua_extension
 			ret4 = to<RET_4>(L, -1);
 			lua_pop(L, 5); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn4Param10
 
@@ -18568,14 +18568,14 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18583,7 +18583,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn4Param10
 
@@ -18618,27 +18618,27 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn4Param10
 
@@ -18674,13 +18674,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -18688,7 +18688,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn4Param10
 
@@ -18724,13 +18724,13 @@ namespace lua_extension
 				ret4 = to<RET_4>(L, -1);
 				lua_pop(L, 5); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -18738,7 +18738,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn4Param10
 
@@ -18774,13 +18774,13 @@ namespace lua_extension
 					ret4 = to<RET_4>(L, -1);
 					lua_pop(L, 5); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -18788,7 +18788,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18796,7 +18796,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn4Param10
 
@@ -18822,20 +18822,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param0
 
@@ -18862,14 +18862,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param0
 
@@ -18896,14 +18896,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param0
 
@@ -18930,14 +18930,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -18945,7 +18945,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param0
 
@@ -18971,27 +18971,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param0
 
@@ -19018,13 +19018,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19032,7 +19032,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param0
 
@@ -19059,13 +19059,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19073,7 +19073,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param0
 
@@ -19100,13 +19100,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -19114,7 +19114,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19122,7 +19122,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param0
 
@@ -19149,20 +19149,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param1
 
@@ -19190,14 +19190,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param1
 
@@ -19225,14 +19225,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param1
 
@@ -19260,14 +19260,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19275,7 +19275,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param1
 
@@ -19302,27 +19302,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param1
 
@@ -19350,13 +19350,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19364,7 +19364,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param1
 
@@ -19392,13 +19392,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19406,7 +19406,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param1
 
@@ -19434,13 +19434,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -19448,7 +19448,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19456,7 +19456,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param1
 
@@ -19484,20 +19484,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param2
 
@@ -19526,14 +19526,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param2
 
@@ -19562,14 +19562,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param2
 
@@ -19598,14 +19598,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19613,7 +19613,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param2
 
@@ -19641,27 +19641,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param2
 
@@ -19690,13 +19690,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19704,7 +19704,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param2
 
@@ -19733,13 +19733,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -19747,7 +19747,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param2
 
@@ -19776,13 +19776,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -19790,7 +19790,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19798,7 +19798,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param2
 
@@ -19827,20 +19827,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param3
 
@@ -19870,14 +19870,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param3
 
@@ -19907,14 +19907,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param3
 
@@ -19944,14 +19944,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -19959,7 +19959,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param3
 
@@ -19988,27 +19988,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param3
 
@@ -20038,13 +20038,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20052,7 +20052,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param3
 
@@ -20082,13 +20082,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20096,7 +20096,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param3
 
@@ -20126,13 +20126,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -20140,7 +20140,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -20148,7 +20148,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param3
 
@@ -20178,20 +20178,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param4
 
@@ -20222,14 +20222,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param4
 
@@ -20260,14 +20260,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param4
 
@@ -20298,14 +20298,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -20313,7 +20313,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param4
 
@@ -20343,27 +20343,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param4
 
@@ -20394,13 +20394,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20408,7 +20408,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param4
 
@@ -20439,13 +20439,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20453,7 +20453,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param4
 
@@ -20484,13 +20484,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -20498,7 +20498,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -20506,7 +20506,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param4
 
@@ -20537,20 +20537,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param5
 
@@ -20582,14 +20582,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param5
 
@@ -20621,14 +20621,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param5
 
@@ -20660,14 +20660,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -20675,7 +20675,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param5
 
@@ -20706,27 +20706,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param5
 
@@ -20758,13 +20758,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20772,7 +20772,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param5
 
@@ -20804,13 +20804,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -20818,7 +20818,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param5
 
@@ -20850,13 +20850,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -20864,7 +20864,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -20872,7 +20872,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param5
 
@@ -20904,20 +20904,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param6
 
@@ -20950,14 +20950,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param6
 
@@ -20990,14 +20990,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param6
 
@@ -21030,14 +21030,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -21045,7 +21045,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param6
 
@@ -21077,27 +21077,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param6
 
@@ -21130,13 +21130,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21144,7 +21144,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param6
 
@@ -21177,13 +21177,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21191,7 +21191,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param6
 
@@ -21224,13 +21224,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -21238,7 +21238,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -21246,7 +21246,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param6
 
@@ -21279,20 +21279,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param7
 
@@ -21326,14 +21326,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param7
 
@@ -21367,14 +21367,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param7
 
@@ -21408,14 +21408,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -21423,7 +21423,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param7
 
@@ -21456,27 +21456,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param7
 
@@ -21510,13 +21510,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21524,7 +21524,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param7
 
@@ -21558,13 +21558,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21572,7 +21572,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param7
 
@@ -21606,13 +21606,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -21620,7 +21620,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -21628,7 +21628,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param7
 
@@ -21662,20 +21662,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param8
 
@@ -21710,14 +21710,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param8
 
@@ -21752,14 +21752,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param8
 
@@ -21794,14 +21794,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -21809,7 +21809,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param8
 
@@ -21843,27 +21843,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param8
 
@@ -21898,13 +21898,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21912,7 +21912,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param8
 
@@ -21947,13 +21947,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -21961,7 +21961,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param8
 
@@ -21996,13 +21996,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -22010,7 +22010,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22018,7 +22018,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param8
 
@@ -22053,20 +22053,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param9
 
@@ -22102,14 +22102,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param9
 
@@ -22145,14 +22145,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param9
 
@@ -22188,14 +22188,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22203,7 +22203,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param9
 
@@ -22238,27 +22238,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param9
 
@@ -22294,13 +22294,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -22308,7 +22308,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param9
 
@@ -22344,13 +22344,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -22358,7 +22358,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param9
 
@@ -22394,13 +22394,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -22408,7 +22408,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22416,7 +22416,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param9
 
@@ -22452,20 +22452,20 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn5Param10
 
@@ -22502,14 +22502,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn5Param10
 
@@ -22546,14 +22546,14 @@ namespace lua_extension
 			ret5 = to<RET_5>(L, -1);
 			lua_pop(L, 6); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn5Param10
 
@@ -22590,14 +22590,14 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22605,7 +22605,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn5Param10
 
@@ -22641,27 +22641,27 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn5Param10
 
@@ -22698,13 +22698,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -22712,7 +22712,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn5Param10
 
@@ -22749,13 +22749,13 @@ namespace lua_extension
 				ret5 = to<RET_5>(L, -1);
 				lua_pop(L, 6); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -22763,7 +22763,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn5Param10
 
@@ -22800,13 +22800,13 @@ namespace lua_extension
 					ret5 = to<RET_5>(L, -1);
 					lua_pop(L, 6); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -22814,7 +22814,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22822,7 +22822,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn5Param10
 
@@ -22849,20 +22849,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param0
 
@@ -22890,14 +22890,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param0
 
@@ -22925,14 +22925,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param0
 
@@ -22960,14 +22960,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -22975,7 +22975,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param0
 
@@ -23002,27 +23002,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param0
 
@@ -23050,13 +23050,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23064,7 +23064,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param0
 
@@ -23092,13 +23092,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23106,7 +23106,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param0
 
@@ -23134,13 +23134,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -23148,7 +23148,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -23156,7 +23156,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param0
 
@@ -23184,20 +23184,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param1
 
@@ -23226,14 +23226,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param1
 
@@ -23262,14 +23262,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param1
 
@@ -23298,14 +23298,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -23313,7 +23313,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param1
 
@@ -23341,27 +23341,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param1
 
@@ -23390,13 +23390,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23404,7 +23404,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param1
 
@@ -23433,13 +23433,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23447,7 +23447,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param1
 
@@ -23476,13 +23476,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -23490,7 +23490,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -23498,7 +23498,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param1
 
@@ -23527,20 +23527,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param2
 
@@ -23570,14 +23570,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param2
 
@@ -23607,14 +23607,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param2
 
@@ -23644,14 +23644,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -23659,7 +23659,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param2
 
@@ -23688,27 +23688,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param2
 
@@ -23738,13 +23738,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23752,7 +23752,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param2
 
@@ -23782,13 +23782,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -23796,7 +23796,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param2
 
@@ -23826,13 +23826,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -23840,7 +23840,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -23848,7 +23848,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param2
 
@@ -23878,20 +23878,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param3
 
@@ -23922,14 +23922,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param3
 
@@ -23960,14 +23960,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param3
 
@@ -23998,14 +23998,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24013,7 +24013,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param3
 
@@ -24043,27 +24043,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param3
 
@@ -24094,13 +24094,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24108,7 +24108,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param3
 
@@ -24139,13 +24139,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24153,7 +24153,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param3
 
@@ -24184,13 +24184,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -24198,7 +24198,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24206,7 +24206,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param3
 
@@ -24237,20 +24237,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param4
 
@@ -24282,14 +24282,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param4
 
@@ -24321,14 +24321,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param4
 
@@ -24360,14 +24360,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24375,7 +24375,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param4
 
@@ -24406,27 +24406,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param4
 
@@ -24458,13 +24458,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24472,7 +24472,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param4
 
@@ -24504,13 +24504,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24518,7 +24518,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param4
 
@@ -24550,13 +24550,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -24564,7 +24564,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24572,7 +24572,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param4
 
@@ -24604,20 +24604,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param5
 
@@ -24650,14 +24650,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param5
 
@@ -24690,14 +24690,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param5
 
@@ -24730,14 +24730,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24745,7 +24745,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param5
 
@@ -24777,27 +24777,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param5
 
@@ -24830,13 +24830,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24844,7 +24844,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param5
 
@@ -24877,13 +24877,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -24891,7 +24891,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param5
 
@@ -24924,13 +24924,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -24938,7 +24938,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -24946,7 +24946,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param5
 
@@ -24979,20 +24979,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param6
 
@@ -25026,14 +25026,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param6
 
@@ -25067,14 +25067,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param6
 
@@ -25108,14 +25108,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -25123,7 +25123,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param6
 
@@ -25156,27 +25156,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param6
 
@@ -25210,13 +25210,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -25224,7 +25224,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param6
 
@@ -25258,13 +25258,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -25272,7 +25272,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param6
 
@@ -25306,13 +25306,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -25320,7 +25320,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -25328,7 +25328,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param6
 
@@ -25362,20 +25362,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param7
 
@@ -25410,14 +25410,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param7
 
@@ -25452,14 +25452,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param7
 
@@ -25494,14 +25494,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -25509,7 +25509,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param7
 
@@ -25543,27 +25543,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param7
 
@@ -25598,13 +25598,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -25612,7 +25612,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param7
 
@@ -25647,13 +25647,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -25661,7 +25661,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param7
 
@@ -25696,13 +25696,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -25710,7 +25710,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -25718,7 +25718,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param7
 
@@ -25753,20 +25753,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param8
 
@@ -25802,14 +25802,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param8
 
@@ -25845,14 +25845,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param8
 
@@ -25888,14 +25888,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -25903,7 +25903,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param8
 
@@ -25938,27 +25938,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param8
 
@@ -25994,13 +25994,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26008,7 +26008,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param8
 
@@ -26044,13 +26044,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26058,7 +26058,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param8
 
@@ -26094,13 +26094,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -26108,7 +26108,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -26116,7 +26116,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param8
 
@@ -26152,20 +26152,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param9
 
@@ -26202,14 +26202,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param9
 
@@ -26246,14 +26246,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param9
 
@@ -26290,14 +26290,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -26305,7 +26305,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param9
 
@@ -26341,27 +26341,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param9
 
@@ -26398,13 +26398,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26412,7 +26412,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param9
 
@@ -26449,13 +26449,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26463,7 +26463,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param9
 
@@ -26500,13 +26500,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -26514,7 +26514,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -26522,7 +26522,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param9
 
@@ -26559,20 +26559,20 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn6Param10
 
@@ -26610,14 +26610,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn6Param10
 
@@ -26655,14 +26655,14 @@ namespace lua_extension
 			ret6 = to<RET_6>(L, -1);
 			lua_pop(L, 7); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn6Param10
 
@@ -26700,14 +26700,14 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -26715,7 +26715,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn6Param10
 
@@ -26752,27 +26752,27 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn6Param10
 
@@ -26810,13 +26810,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26824,7 +26824,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn6Param10
 
@@ -26862,13 +26862,13 @@ namespace lua_extension
 				ret6 = to<RET_6>(L, -1);
 				lua_pop(L, 7); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -26876,7 +26876,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn6Param10
 
@@ -26914,13 +26914,13 @@ namespace lua_extension
 					ret6 = to<RET_6>(L, -1);
 					lua_pop(L, 7); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -26928,7 +26928,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -26936,7 +26936,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn6Param10
 
@@ -26964,20 +26964,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param0
 
@@ -27006,14 +27006,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param0
 
@@ -27042,14 +27042,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param0
 
@@ -27078,14 +27078,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27093,7 +27093,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param0
 
@@ -27121,27 +27121,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param0
 
@@ -27170,13 +27170,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27184,7 +27184,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param0
 
@@ -27213,13 +27213,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27227,7 +27227,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param0
 
@@ -27256,13 +27256,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -27270,7 +27270,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27278,7 +27278,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param0
 
@@ -27307,20 +27307,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param1
 
@@ -27350,14 +27350,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param1
 
@@ -27387,14 +27387,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param1
 
@@ -27424,14 +27424,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27439,7 +27439,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param1
 
@@ -27468,27 +27468,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param1
 
@@ -27518,13 +27518,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27532,7 +27532,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param1
 
@@ -27562,13 +27562,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27576,7 +27576,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param1
 
@@ -27606,13 +27606,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -27620,7 +27620,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27628,7 +27628,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param1
 
@@ -27658,20 +27658,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param2
 
@@ -27702,14 +27702,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param2
 
@@ -27740,14 +27740,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param2
 
@@ -27778,14 +27778,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27793,7 +27793,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param2
 
@@ -27823,27 +27823,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param2
 
@@ -27874,13 +27874,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27888,7 +27888,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param2
 
@@ -27919,13 +27919,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -27933,7 +27933,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param2
 
@@ -27964,13 +27964,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -27978,7 +27978,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -27986,7 +27986,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param2
 
@@ -28017,20 +28017,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param3
 
@@ -28062,14 +28062,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param3
 
@@ -28101,14 +28101,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param3
 
@@ -28140,14 +28140,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -28155,7 +28155,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param3
 
@@ -28186,27 +28186,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param3
 
@@ -28238,13 +28238,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -28252,7 +28252,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param3
 
@@ -28284,13 +28284,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -28298,7 +28298,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param3
 
@@ -28330,13 +28330,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -28344,7 +28344,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -28352,7 +28352,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param3
 
@@ -28384,20 +28384,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param4
 
@@ -28430,14 +28430,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param4
 
@@ -28470,14 +28470,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param4
 
@@ -28510,14 +28510,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -28525,7 +28525,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param4
 
@@ -28557,27 +28557,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param4
 
@@ -28610,13 +28610,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -28624,7 +28624,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param4
 
@@ -28657,13 +28657,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -28671,7 +28671,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param4
 
@@ -28704,13 +28704,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -28718,7 +28718,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -28726,7 +28726,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param4
 
@@ -28759,20 +28759,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param5
 
@@ -28806,14 +28806,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param5
 
@@ -28847,14 +28847,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param5
 
@@ -28888,14 +28888,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -28903,7 +28903,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param5
 
@@ -28936,27 +28936,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param5
 
@@ -28990,13 +28990,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29004,7 +29004,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param5
 
@@ -29038,13 +29038,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29052,7 +29052,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param5
 
@@ -29086,13 +29086,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -29100,7 +29100,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -29108,7 +29108,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param5
 
@@ -29142,20 +29142,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param6
 
@@ -29190,14 +29190,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param6
 
@@ -29232,14 +29232,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param6
 
@@ -29274,14 +29274,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -29289,7 +29289,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param6
 
@@ -29323,27 +29323,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param6
 
@@ -29378,13 +29378,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29392,7 +29392,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param6
 
@@ -29427,13 +29427,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29441,7 +29441,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param6
 
@@ -29476,13 +29476,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -29490,7 +29490,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -29498,7 +29498,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param6
 
@@ -29533,20 +29533,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param7
 
@@ -29582,14 +29582,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param7
 
@@ -29625,14 +29625,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param7
 
@@ -29668,14 +29668,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -29683,7 +29683,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param7
 
@@ -29718,27 +29718,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param7
 
@@ -29774,13 +29774,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29788,7 +29788,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param7
 
@@ -29824,13 +29824,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -29838,7 +29838,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param7
 
@@ -29874,13 +29874,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -29888,7 +29888,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -29896,7 +29896,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param7
 
@@ -29932,20 +29932,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param8
 
@@ -29982,14 +29982,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param8
 
@@ -30026,14 +30026,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param8
 
@@ -30070,14 +30070,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -30085,7 +30085,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param8
 
@@ -30121,27 +30121,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param8
 
@@ -30178,13 +30178,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -30192,7 +30192,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param8
 
@@ -30229,13 +30229,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -30243,7 +30243,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param8
 
@@ -30280,13 +30280,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -30294,7 +30294,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -30302,7 +30302,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param8
 
@@ -30339,20 +30339,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param9
 
@@ -30390,14 +30390,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param9
 
@@ -30435,14 +30435,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param9
 
@@ -30480,14 +30480,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -30495,7 +30495,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param9
 
@@ -30532,27 +30532,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param9
 
@@ -30590,13 +30590,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -30604,7 +30604,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param9
 
@@ -30642,13 +30642,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -30656,7 +30656,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param9
 
@@ -30694,13 +30694,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -30708,7 +30708,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -30716,7 +30716,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param9
 
@@ -30754,20 +30754,20 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn7Param10
 
@@ -30806,14 +30806,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn7Param10
 
@@ -30852,14 +30852,14 @@ namespace lua_extension
 			ret7 = to<RET_7>(L, -1);
 			lua_pop(L, 8); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn7Param10
 
@@ -30898,14 +30898,14 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -30913,7 +30913,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn7Param10
 
@@ -30951,27 +30951,27 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn7Param10
 
@@ -31010,13 +31010,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31024,7 +31024,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn7Param10
 
@@ -31063,13 +31063,13 @@ namespace lua_extension
 				ret7 = to<RET_7>(L, -1);
 				lua_pop(L, 8); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31077,7 +31077,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn7Param10
 
@@ -31116,13 +31116,13 @@ namespace lua_extension
 					ret7 = to<RET_7>(L, -1);
 					lua_pop(L, 8); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -31130,7 +31130,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -31138,7 +31138,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn7Param10
 
@@ -31167,20 +31167,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param0
 
@@ -31210,14 +31210,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param0
 
@@ -31247,14 +31247,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param0
 
@@ -31284,14 +31284,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -31299,7 +31299,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param0
 
@@ -31328,27 +31328,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param0
 
@@ -31378,13 +31378,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31392,7 +31392,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param0
 
@@ -31422,13 +31422,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31436,7 +31436,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param0
 
@@ -31466,13 +31466,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -31480,7 +31480,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -31488,7 +31488,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param0
 
@@ -31518,20 +31518,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param1
 
@@ -31562,14 +31562,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param1
 
@@ -31600,14 +31600,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param1
 
@@ -31638,14 +31638,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -31653,7 +31653,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param1
 
@@ -31683,27 +31683,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param1
 
@@ -31734,13 +31734,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31748,7 +31748,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param1
 
@@ -31779,13 +31779,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -31793,7 +31793,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param1
 
@@ -31824,13 +31824,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -31838,7 +31838,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -31846,7 +31846,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param1
 
@@ -31877,20 +31877,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param2
 
@@ -31922,14 +31922,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param2
 
@@ -31961,14 +31961,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param2
 
@@ -32000,14 +32000,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32015,7 +32015,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param2
 
@@ -32046,27 +32046,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param2
 
@@ -32098,13 +32098,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32112,7 +32112,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param2
 
@@ -32144,13 +32144,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32158,7 +32158,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param2
 
@@ -32190,13 +32190,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -32204,7 +32204,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32212,7 +32212,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param2
 
@@ -32244,20 +32244,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param3
 
@@ -32290,14 +32290,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param3
 
@@ -32330,14 +32330,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param3
 
@@ -32370,14 +32370,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32385,7 +32385,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param3
 
@@ -32417,27 +32417,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param3
 
@@ -32470,13 +32470,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32484,7 +32484,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param3
 
@@ -32517,13 +32517,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32531,7 +32531,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param3
 
@@ -32564,13 +32564,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -32578,7 +32578,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32586,7 +32586,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param3
 
@@ -32619,20 +32619,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param4
 
@@ -32666,14 +32666,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param4
 
@@ -32707,14 +32707,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param4
 
@@ -32748,14 +32748,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32763,7 +32763,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param4
 
@@ -32796,27 +32796,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param4
 
@@ -32850,13 +32850,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32864,7 +32864,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param4
 
@@ -32898,13 +32898,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -32912,7 +32912,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param4
 
@@ -32946,13 +32946,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -32960,7 +32960,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -32968,7 +32968,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param4
 
@@ -33002,20 +33002,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param5
 
@@ -33050,14 +33050,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param5
 
@@ -33092,14 +33092,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param5
 
@@ -33134,14 +33134,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -33149,7 +33149,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param5
 
@@ -33183,27 +33183,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param5
 
@@ -33238,13 +33238,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -33252,7 +33252,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param5
 
@@ -33287,13 +33287,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -33301,7 +33301,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param5
 
@@ -33336,13 +33336,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -33350,7 +33350,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -33358,7 +33358,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param5
 
@@ -33393,20 +33393,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param6
 
@@ -33442,14 +33442,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param6
 
@@ -33485,14 +33485,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param6
 
@@ -33528,14 +33528,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -33543,7 +33543,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param6
 
@@ -33578,27 +33578,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param6
 
@@ -33634,13 +33634,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -33648,7 +33648,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param6
 
@@ -33684,13 +33684,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -33698,7 +33698,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param6
 
@@ -33734,13 +33734,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -33748,7 +33748,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -33756,7 +33756,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param6
 
@@ -33792,20 +33792,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param7
 
@@ -33842,14 +33842,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param7
 
@@ -33886,14 +33886,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param7
 
@@ -33930,14 +33930,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -33945,7 +33945,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param7
 
@@ -33981,27 +33981,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param7
 
@@ -34038,13 +34038,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34052,7 +34052,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param7
 
@@ -34089,13 +34089,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34103,7 +34103,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param7
 
@@ -34140,13 +34140,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -34154,7 +34154,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -34162,7 +34162,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param7
 
@@ -34199,20 +34199,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param8
 
@@ -34250,14 +34250,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param8
 
@@ -34295,14 +34295,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param8
 
@@ -34340,14 +34340,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -34355,7 +34355,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param8
 
@@ -34392,27 +34392,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param8
 
@@ -34450,13 +34450,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34464,7 +34464,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param8
 
@@ -34502,13 +34502,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34516,7 +34516,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param8
 
@@ -34554,13 +34554,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -34568,7 +34568,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -34576,7 +34576,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param8
 
@@ -34614,20 +34614,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param9
 
@@ -34666,14 +34666,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param9
 
@@ -34712,14 +34712,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param9
 
@@ -34758,14 +34758,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -34773,7 +34773,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param9
 
@@ -34811,27 +34811,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param9
 
@@ -34870,13 +34870,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34884,7 +34884,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param9
 
@@ -34923,13 +34923,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -34937,7 +34937,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param9
 
@@ -34976,13 +34976,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -34990,7 +34990,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -34998,7 +34998,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param9
 
@@ -35037,20 +35037,20 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn8Param10
 
@@ -35090,14 +35090,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn8Param10
 
@@ -35137,14 +35137,14 @@ namespace lua_extension
 			ret8 = to<RET_8>(L, -1);
 			lua_pop(L, 9); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn8Param10
 
@@ -35184,14 +35184,14 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -35199,7 +35199,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn8Param10
 
@@ -35238,27 +35238,27 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn8Param10
 
@@ -35298,13 +35298,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -35312,7 +35312,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn8Param10
 
@@ -35352,13 +35352,13 @@ namespace lua_extension
 				ret8 = to<RET_8>(L, -1);
 				lua_pop(L, 9); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -35366,7 +35366,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn8Param10
 
@@ -35406,13 +35406,13 @@ namespace lua_extension
 					ret8 = to<RET_8>(L, -1);
 					lua_pop(L, 9); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -35420,7 +35420,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -35428,7 +35428,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn8Param10
 
@@ -35458,20 +35458,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param0
 
@@ -35502,14 +35502,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param0
 
@@ -35540,14 +35540,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param0
 
@@ -35578,14 +35578,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -35593,7 +35593,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param0
 
@@ -35623,27 +35623,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param0
 
@@ -35674,13 +35674,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -35688,7 +35688,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param0
 
@@ -35719,13 +35719,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -35733,7 +35733,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param0
 
@@ -35764,13 +35764,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -35778,7 +35778,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -35786,7 +35786,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param0
 
@@ -35817,20 +35817,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param1
 
@@ -35862,14 +35862,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param1
 
@@ -35901,14 +35901,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param1
 
@@ -35940,14 +35940,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -35955,7 +35955,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param1
 
@@ -35986,27 +35986,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param1
 
@@ -36038,13 +36038,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36052,7 +36052,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param1
 
@@ -36084,13 +36084,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36098,7 +36098,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param1
 
@@ -36130,13 +36130,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -36144,7 +36144,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -36152,7 +36152,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param1
 
@@ -36184,20 +36184,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param2
 
@@ -36230,14 +36230,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param2
 
@@ -36270,14 +36270,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param2
 
@@ -36310,14 +36310,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -36325,7 +36325,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param2
 
@@ -36357,27 +36357,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param2
 
@@ -36410,13 +36410,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36424,7 +36424,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param2
 
@@ -36457,13 +36457,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36471,7 +36471,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param2
 
@@ -36504,13 +36504,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -36518,7 +36518,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -36526,7 +36526,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param2
 
@@ -36559,20 +36559,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param3
 
@@ -36606,14 +36606,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param3
 
@@ -36647,14 +36647,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param3
 
@@ -36688,14 +36688,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -36703,7 +36703,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param3
 
@@ -36736,27 +36736,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param3
 
@@ -36790,13 +36790,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36804,7 +36804,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param3
 
@@ -36838,13 +36838,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -36852,7 +36852,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param3
 
@@ -36886,13 +36886,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -36900,7 +36900,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -36908,7 +36908,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param3
 
@@ -36942,20 +36942,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param4
 
@@ -36990,14 +36990,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param4
 
@@ -37032,14 +37032,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param4
 
@@ -37074,14 +37074,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -37089,7 +37089,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param4
 
@@ -37123,27 +37123,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param4
 
@@ -37178,13 +37178,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -37192,7 +37192,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param4
 
@@ -37227,13 +37227,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -37241,7 +37241,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param4
 
@@ -37276,13 +37276,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -37290,7 +37290,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -37298,7 +37298,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param4
 
@@ -37333,20 +37333,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param5
 
@@ -37382,14 +37382,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param5
 
@@ -37425,14 +37425,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param5
 
@@ -37468,14 +37468,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -37483,7 +37483,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param5
 
@@ -37518,27 +37518,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param5
 
@@ -37574,13 +37574,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -37588,7 +37588,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param5
 
@@ -37624,13 +37624,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -37638,7 +37638,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param5
 
@@ -37674,13 +37674,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -37688,7 +37688,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -37696,7 +37696,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param5
 
@@ -37732,20 +37732,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param6
 
@@ -37782,14 +37782,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param6
 
@@ -37826,14 +37826,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param6
 
@@ -37870,14 +37870,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -37885,7 +37885,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param6
 
@@ -37921,27 +37921,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param6
 
@@ -37978,13 +37978,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -37992,7 +37992,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param6
 
@@ -38029,13 +38029,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -38043,7 +38043,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param6
 
@@ -38080,13 +38080,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -38094,7 +38094,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -38102,7 +38102,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param6
 
@@ -38139,20 +38139,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param7
 
@@ -38190,14 +38190,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param7
 
@@ -38235,14 +38235,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param7
 
@@ -38280,14 +38280,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -38295,7 +38295,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param7
 
@@ -38332,27 +38332,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param7
 
@@ -38390,13 +38390,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -38404,7 +38404,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param7
 
@@ -38442,13 +38442,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -38456,7 +38456,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param7
 
@@ -38494,13 +38494,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -38508,7 +38508,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -38516,7 +38516,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param7
 
@@ -38554,20 +38554,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param8
 
@@ -38606,14 +38606,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param8
 
@@ -38652,14 +38652,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param8
 
@@ -38698,14 +38698,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -38713,7 +38713,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param8
 
@@ -38751,27 +38751,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param8
 
@@ -38810,13 +38810,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -38824,7 +38824,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param8
 
@@ -38863,13 +38863,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -38877,7 +38877,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param8
 
@@ -38916,13 +38916,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -38930,7 +38930,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -38938,7 +38938,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param8
 
@@ -38977,20 +38977,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param9
 
@@ -39030,14 +39030,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param9
 
@@ -39077,14 +39077,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param9
 
@@ -39124,14 +39124,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -39139,7 +39139,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param9
 
@@ -39178,27 +39178,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param9
 
@@ -39238,13 +39238,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -39252,7 +39252,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param9
 
@@ -39292,13 +39292,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -39306,7 +39306,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param9
 
@@ -39346,13 +39346,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -39360,7 +39360,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -39368,7 +39368,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param9
 
@@ -39408,20 +39408,20 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn9Param10
 
@@ -39462,14 +39462,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn9Param10
 
@@ -39510,14 +39510,14 @@ namespace lua_extension
 			ret9 = to<RET_9>(L, -1);
 			lua_pop(L, 10); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn9Param10
 
@@ -39558,14 +39558,14 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -39573,7 +39573,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn9Param10
 
@@ -39613,27 +39613,27 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn9Param10
 
@@ -39674,13 +39674,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -39688,7 +39688,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn9Param10
 
@@ -39729,13 +39729,13 @@ namespace lua_extension
 				ret9 = to<RET_9>(L, -1);
 				lua_pop(L, 10); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -39743,7 +39743,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn9Param10
 
@@ -39784,13 +39784,13 @@ namespace lua_extension
 					ret9 = to<RET_9>(L, -1);
 					lua_pop(L, 10); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -39798,7 +39798,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -39806,7 +39806,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn9Param10
 
@@ -39837,20 +39837,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param0
 
@@ -39882,14 +39882,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param0
 
@@ -39921,14 +39921,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param0
 
@@ -39960,14 +39960,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -39975,7 +39975,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param0
 
@@ -40006,27 +40006,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param0
 
@@ -40058,13 +40058,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40072,7 +40072,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param0
 
@@ -40104,13 +40104,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40118,7 +40118,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param0
 
@@ -40150,13 +40150,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -40164,7 +40164,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -40172,7 +40172,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param0
 
@@ -40204,20 +40204,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param1
 
@@ -40250,14 +40250,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param1
 
@@ -40290,14 +40290,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param1
 
@@ -40330,14 +40330,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -40345,7 +40345,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param1
 
@@ -40377,27 +40377,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param1
 
@@ -40430,13 +40430,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40444,7 +40444,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param1
 
@@ -40477,13 +40477,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40491,7 +40491,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param1
 
@@ -40524,13 +40524,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -40538,7 +40538,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -40546,7 +40546,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param1
 
@@ -40579,20 +40579,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param2
 
@@ -40626,14 +40626,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param2
 
@@ -40667,14 +40667,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param2
 
@@ -40708,14 +40708,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -40723,7 +40723,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param2
 
@@ -40756,27 +40756,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param2
 
@@ -40810,13 +40810,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40824,7 +40824,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param2
 
@@ -40858,13 +40858,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -40872,7 +40872,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param2
 
@@ -40906,13 +40906,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -40920,7 +40920,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -40928,7 +40928,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param2
 
@@ -40962,20 +40962,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param3
 
@@ -41010,14 +41010,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param3
 
@@ -41052,14 +41052,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param3
 
@@ -41094,14 +41094,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -41109,7 +41109,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param3
 
@@ -41143,27 +41143,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param3
 
@@ -41198,13 +41198,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -41212,7 +41212,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param3
 
@@ -41247,13 +41247,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -41261,7 +41261,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param3
 
@@ -41296,13 +41296,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -41310,7 +41310,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -41318,7 +41318,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param3
 
@@ -41353,20 +41353,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param4
 
@@ -41402,14 +41402,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param4
 
@@ -41445,14 +41445,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param4
 
@@ -41488,14 +41488,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -41503,7 +41503,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param4
 
@@ -41538,27 +41538,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param4
 
@@ -41594,13 +41594,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -41608,7 +41608,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param4
 
@@ -41644,13 +41644,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -41658,7 +41658,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param4
 
@@ -41694,13 +41694,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -41708,7 +41708,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -41716,7 +41716,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param4
 
@@ -41752,20 +41752,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param5
 
@@ -41802,14 +41802,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param5
 
@@ -41846,14 +41846,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param5
 
@@ -41890,14 +41890,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -41905,7 +41905,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param5
 
@@ -41941,27 +41941,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param5
 
@@ -41998,13 +41998,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42012,7 +42012,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param5
 
@@ -42049,13 +42049,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42063,7 +42063,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param5
 
@@ -42100,13 +42100,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -42114,7 +42114,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -42122,7 +42122,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param5
 
@@ -42159,20 +42159,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param6
 
@@ -42210,14 +42210,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param6
 
@@ -42255,14 +42255,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param6
 
@@ -42300,14 +42300,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -42315,7 +42315,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param6
 
@@ -42352,27 +42352,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param6
 
@@ -42410,13 +42410,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42424,7 +42424,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param6
 
@@ -42462,13 +42462,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42476,7 +42476,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param6
 
@@ -42514,13 +42514,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -42528,7 +42528,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -42536,7 +42536,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param6
 
@@ -42574,20 +42574,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param7
 
@@ -42626,14 +42626,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param7
 
@@ -42672,14 +42672,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param7
 
@@ -42718,14 +42718,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -42733,7 +42733,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param7
 
@@ -42771,27 +42771,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param7
 
@@ -42830,13 +42830,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42844,7 +42844,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param7
 
@@ -42883,13 +42883,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -42897,7 +42897,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param7
 
@@ -42936,13 +42936,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -42950,7 +42950,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -42958,7 +42958,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param7
 
@@ -42997,20 +42997,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param8
 
@@ -43050,14 +43050,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param8
 
@@ -43097,14 +43097,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param8
 
@@ -43144,14 +43144,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -43159,7 +43159,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param8
 
@@ -43198,27 +43198,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param8
 
@@ -43258,13 +43258,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -43272,7 +43272,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param8
 
@@ -43312,13 +43312,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -43326,7 +43326,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param8
 
@@ -43366,13 +43366,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -43380,7 +43380,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -43388,7 +43388,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param8
 
@@ -43428,20 +43428,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param9
 
@@ -43482,14 +43482,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param9
 
@@ -43530,14 +43530,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param9
 
@@ -43578,14 +43578,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -43593,7 +43593,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param9
 
@@ -43633,27 +43633,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param9
 
@@ -43694,13 +43694,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -43708,7 +43708,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param9
 
@@ -43749,13 +43749,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -43763,7 +43763,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param9
 
@@ -43804,13 +43804,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -43818,7 +43818,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -43826,7 +43826,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param9
 
@@ -43867,20 +43867,20 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // callStaticReturn10Param10
 
@@ -43922,14 +43922,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridConstReturn10Param10
 
@@ -43971,14 +43971,14 @@ namespace lua_extension
 			ret10 = to<RET_10>(L, -1);
 			lua_pop(L, 11); 
 			/*s: */ 
-			return lua_extension::functionSuccess; 
+			return embeddedLua::functionSuccess; 
 		} 
 		else 
 		{	/*s: module nil */ 
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} //hybridMemberReturn10Param10
 
@@ -44020,14 +44020,14 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11);
 				/*s: */
-				return lua_extension::functionSuccess;
+				return embeddedLua::functionSuccess;
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -44035,7 +44035,7 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // hybridStaticReturn10Param10
 
@@ -44076,27 +44076,27 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
 			{	/*s: module nil */
 				lua_pop(L, 2);
 				/*s: */
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
 		{	/*s: !table */ 
 			lua_pop(L, 1);
 			/*s: */ 
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // pcallStaticReturn10Param10
 
@@ -44138,13 +44138,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -44152,7 +44152,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridConstReturn10Param10
 
@@ -44194,13 +44194,13 @@ namespace lua_extension
 				ret10 = to<RET_10>(L, -1);
 				lua_pop(L, 11); 
 				/*s: */ 
-				return lua_extension::functionSuccess; 
+				return embeddedLua::functionSuccess; 
 			} 
 			else
 			{	/*s: object */
 				lua_pop(L, 1);
 				/*s: */
-				return lua_extension::functionError;
+				return embeddedLua::functionError;
 			} 
 		}
 		else 
@@ -44208,7 +44208,7 @@ namespace lua_extension
 			lua_pop(L, 2);
 			/*s: */ 
 			ret1 = (object.*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::functionNotFound; 
+			return embeddedLua::functionNotFound; 
 		} 
 	} // phybridMemberReturn10Param10
 
@@ -44250,13 +44250,13 @@ namespace lua_extension
 					ret10 = to<RET_10>(L, -1);
 					lua_pop(L, 11); 
 					/*s: */ 
-					return lua_extension::functionSuccess;
+					return embeddedLua::functionSuccess;
 				} 
 				else
 				{	/*s: module */
 					lua_pop(L, 1);
 					/*s: */
-					return lua_extension::functionError;
+					return embeddedLua::functionError;
 				} 
 			}
 			else
@@ -44264,7 +44264,7 @@ namespace lua_extension
 				lua_pop(L, 2);
 				/*s: */
 				ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				return lua_extension::functionNotFound;
+				return embeddedLua::functionNotFound;
 			}
 		}
 		else
@@ -44272,11 +44272,11 @@ namespace lua_extension
 			lua_pop(L, 1);
 			/*s: */ 
 			ret1 = (*nativeFunction)(ret2, ret3, ret4, ret5, ret6, ret7, ret8, ret9, ret10, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-			return lua_extension::moduleNotFound; 
+			return embeddedLua::moduleNotFound; 
 		} 
 	} // phybridStaticReturn10Param10
 
-} // namespace lua_extension
+} // namespace embeddedLua
 
 
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H

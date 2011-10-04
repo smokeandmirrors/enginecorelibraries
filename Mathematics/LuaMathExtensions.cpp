@@ -12,11 +12,14 @@
 #include "LuaExtensionInclusions.h"
 #include "LuaExposeNativeToScript.h"
 #include "LuaMathExtensions.h"
-using namespace lua_extension;
+using namespace embeddedLua;
 #endif//EXTENDED_BY_LUA
 using namespace math;
 
 #if EXTENDED_BY_LUA
+
+DEFINE_LUA_CLASS_PUSH_FUNCTION(Vector2)
+DEFINE_LUA_CLASS_PUSH_FUNCTION(Vector3)
 
 namespace lua_library_Vector2 
 {
@@ -58,10 +61,10 @@ namespace lua_library_Vector2
 	}
 
 	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector2)
-
+	
 	static const luaL_reg Vector2_library[] = 
 	{
-		LUA_ENTRY_NAMED("__gc", lua_extension::__gcmetamethod<Vector2>)
+		LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethod<Vector2>)
 		LUA_ENTRY_CLASS__isnewindexable_FALSE
 		LUA_ENTRY_CLASS__new_AUTO(Vector2)
 		LUA_ENTRY_CLASS__setmetatable_USERDATA
@@ -285,10 +288,10 @@ namespace lua_library_Vector3
 	}
 
 	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector3)
-
+		
 	static const luaL_reg Vector3_library[] = 
 	{
-		LUA_ENTRY_NAMED("__gc", lua_extension::__gcmetamethod<Vector3>)
+		LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethod<Vector3>)
 		LUA_ENTRY_CLASS__isnewindexable_FALSE
 		LUA_ENTRY_CLASS__new_AUTO(Vector3)
 		LUA_ENTRY_CLASS__setmetatable_USERDATA

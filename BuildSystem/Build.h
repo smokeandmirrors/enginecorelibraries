@@ -52,6 +52,13 @@ Tested in the field	:	NO
 /** preprocessor control for unit testing compilation */
 #define WITH_UNIT_TESTING 1
 
+enum BoolEnum
+{
+	BoolEnum_False=0,
+	BoolEnum_True,
+	BoolEnum_Unset
+}; // BoolEnum
+
 /**
 \defgroup Global typedefs 
 Adhere to these to enable easier cross-platform development

@@ -79,7 +79,9 @@ C function.
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
 
-namespace lua_extension
+/* (optional)(args)constructor writing */
+
+namespace embeddedLua
 {
 	/** nativeConstReturn0Param0 */
 	template<typename CLASS, void(CLASS::* function)(void) const>

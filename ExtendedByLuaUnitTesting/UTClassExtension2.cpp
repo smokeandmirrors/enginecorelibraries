@@ -10,7 +10,7 @@
 
 #include "LuaExtensionInclusions.h"
 
-using namespace lua_extension;
+using namespace embeddedLua;
 
 class UTClassExtension2 : public cfixcc::TestFixture
 {
@@ -84,7 +84,7 @@ END_LUA_LIBRARY(One2)
 
 void UTClassExtension2::test_define_lua_class()
 {
-	lua_extension::Lua lua; 
+	embeddedLua::Lua lua; 
 	lua.setPackagePath(UNIT_TESTING_LUA_PACKAGE_PATH);
 	REGISTER_LUA_LIBRARY((&lua), One2);
 	CFIX_ASSERT(lua.doString("_G.one = One2.new()"));

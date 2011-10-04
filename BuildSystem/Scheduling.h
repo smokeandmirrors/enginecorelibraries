@@ -24,10 +24,10 @@ class Thread;
 class PendingJobQueue;
 
 class Scheduler 
-: public design_patterns::Singleton<Scheduler>
+: public designPatterns::Singleton<Scheduler>
 , public signals::Receiver
 {
-	friend class design_patterns::Singleton<Scheduler>;
+	friend class designPatterns::Singleton<Scheduler>;
 	friend class signals::Transmitter1<Thread*>;
 
 public:

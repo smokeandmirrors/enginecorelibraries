@@ -9,81 +9,60 @@
 // static CLOCKS_PER_SEC
 namespace 
 {
-
-bool		system_is_initialized(false);
-cycle		systemCycleStart;
-cycle		systemHertz;
-millicycle	systemMillihertz;
-
-inline cycle getCycles(void)
+inline cycle _getCurrentCycle(void)
 {
-	assert(system_is_initialized);
 #if WIN32
 	LARGE_INTEGER perf_query;
-#if DEBUG
 	int success = QueryPerformanceCounter(&perf_query);
 	assert(success);
-#else
-	QueryPerformanceCounter(&perf_query);
-#endif//DEBUG
-	return perf_query.QuadPart - systemCycleStart;
+	return perf_query.QuadPart;
 #else
 	PREVENT_COMPILE
 #endif//WIN32	
-} // inline cycle getCycles(void)
+} // inline cycle _getCurrentCycle(void)
 
+cycle cycleZero(_getCurrentCycle());
+
+inline cycle _getCycles(void)
+{
+	return _getCurrentCycle() - cycleZero;
+} // inline cycle _getCycles(void)
+
+inline cycle _getSystemHertz(void)
+{
+#if WIN32
+	LARGE_INTEGER perf_query;
+	int success = QueryPerformanceFrequency(&perf_query);
+	assert(success);
+	return static_cast<cycle>(perf_query.QuadPart);
+#else
+	PREVENT_COMPILE
+#endif//WIN32	
+} // inline cycle _getSystemHertz(void)
 } // namespace 
 
-namespace real_time
+namespace realTime
 {
+const cycle hertz(_getSystemHertz()); 
+const second hertzInverse(1.0 / _getSystemHertz());
+const millicycle milliHz(_getSystemHertz() / 1000.0);
+const millisecond milliHzInverse(1.0 / (_getSystemHertz() / 1000.0));
+
+void initalizeInternal(cycle& hz, second& inverseHz, millicycle& milliHertz, millisecond& inverseMillihz);
 
 cycle cycles(void)
 {
-	assert(system_is_initialized);
-	return getCycles();
-}
-
-cycle hertz(void)
-{
-	assert(system_is_initialized);
-	return systemHertz;
-}
-
-void initialize(void)
-{
-	if (system_is_initialized)
-		return;
-#if WIN32
-	LARGE_INTEGER perf_query;
-	int success = QueryPerformanceCounter(&perf_query);
-	assert(success);
-	systemCycleStart = perf_query.QuadPart;
-	success = QueryPerformanceFrequency(&perf_query);
-	assert(success);
-	systemHertz = static_cast<cycle>(perf_query.QuadPart);
-	systemMillihertz = static_cast<millicycle>(systemHertz) / static_cast<millicycle>(1000);
-#else
-	PREVENT_COMPILE
-#endif//WIN32	
-	system_is_initialized = true;
-}
-
-millicycle millihertz(void)
-{
-	assert(system_is_initialized);
-	return systemMillihertz;
+	return _getCycles();
 }
 
 millisecond milliseconds(void)
 {
-	assert(system_is_initialized);
-	return static_cast<millisecond>(getCycles()) / static_cast<millisecond>(systemMillihertz);	
+	return static_cast<millisecond>(_getCycles()) * milliHzInverse;	
 }
 
 second seconds(void)
 {
-	assert(system_is_initialized);
-	return static_cast<second>(getCycles()) / static_cast<second>(systemHertz);
+	return static_cast<second>(_getCycles()) * hertzInverse;
 }
 
 } // namespace time

@@ -192,7 +192,7 @@ the LuaExtendable interface.
 /** 
 */
 #define DECLARE_LUA_PUSH_FUNCTION(CLASS) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		sint push(lua_State* L, CLASS * value); \
 		sint push(lua_State* L, const CLASS * value); \
@@ -203,7 +203,7 @@ the LuaExtendable interface.
 /** 
 */
 #define DECLARE_LUA_PUSH_FUNCTION_NS(NAMESPACE, CLASS) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		sint push(lua_State* L, NAMESPACE##::##CLASS * value); \
 		sint push(lua_State* L, const NAMESPACE##::##CLASS * value); \
@@ -436,7 +436,7 @@ time the object is pushed into %Lua
 BE PASSED IN TO THE FUNCTION
 */
 #define DEFINE_LUA_CLASS_PUSH_FUNCTION(CLASS) \
-	sint lua_extension::push(lua_State* L, CLASS * value) \
+	sint embeddedLua::push(lua_State* L, CLASS * value) \
 	{ \
 		if (value) \
 		{ \
@@ -466,15 +466,15 @@ BE PASSED IN TO THE FUNCTION
 		} \
 		return 1; \
 	} \
-	sint lua_extension::push(lua_State* L, CLASS & value) \
+	sint embeddedLua::push(lua_State* L, CLASS & value) \
 	{ \
 		return push(L, &value); \
 	} \
-	sint lua_extension::push(lua_State* L, const CLASS & value) \
+	sint embeddedLua::push(lua_State* L, const CLASS & value) \
 	{ \
 		return push(L, const_cast<CLASS &>(value)); \
 	} \
-	sint lua_extension::push(lua_State* L, const CLASS * value) \
+	sint embeddedLua::push(lua_State* L, const CLASS * value) \
 	{ \
 		return push(L, const_cast<CLASS*>(value)); \
 	}
@@ -483,7 +483,7 @@ BE PASSED IN TO THE FUNCTION
 */
 #define DEFINE_LUA_ENUM(ENUM_NAME) \
 	DEFINE_TO_ENUM(ENUM_NAME) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		LUA_FUNC(register_##ENUM_NAME) \
 		{ \
@@ -493,7 +493,7 @@ BE PASSED IN TO THE FUNCTION
 */
 #define DEFINE_LUA_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
 	DEFINE_TO_ENUM_BOUND(ENUM, MIN_VALUE, MAX_VALUE) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		LUA_FUNC(register_##ENUM) \
 		{ \
@@ -504,7 +504,7 @@ BE PASSED IN TO THE FUNCTION
 */
 #define DEFINE_LUA_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN_VALUE, MAX_VALUE) \
 	DEFINE_TO_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN_VALUE, MAX_VALUE) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		inline sint register_##ENUM(struct lua_State* L) /* LUA_FUNC(register_##ENUM)*/ \
 		{ \
@@ -579,7 +579,7 @@ This method is ideal for static classes or libraries.
 	sint key(lua_State* L) \
 	{ \
 		luaL_register(L, #CLASS, CLASS##_library); \
-		lua_extension::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
+		embeddedLua::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
 		return 1; \
 	} 
 
@@ -634,7 +634,7 @@ This method is ideal for static classes or libraries.
 */
 #if ARGUMENT_ERRORS
 	#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
-		namespace lua_extension \
+		namespace embeddedLua \
 		{ \
 			template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
 			{ \
@@ -684,10 +684,10 @@ This method is ideal for static classes or libraries.
 				} \
 				return **static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
-		} // namespace lua_extension 
+		} // namespace embeddedLua 
 #else // #if ARGUMENT_ERRORS
 	#define DEFINE_TO_CLASS_FUNCTIONS(CLASS) \
-		namespace lua_extension \
+		namespace embeddedLua \
 		{ \
 			template<> inline const CLASS* to< const CLASS* >(lua_State* L, int index) \
 			{ \
@@ -713,12 +713,12 @@ This method is ideal for static classes or libraries.
 			{ \
 				return **static_cast<CLASS**>(lua_touserdata(L, index)); \
 			} \
-		} // namespace lua_extension 
+		} // namespace embeddedLua 
 #endif
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM(ENUM) \
-	template<> inline ENUM lua_extension::to<##ENUM##>(lua_State* L, sint index) \
+	template<> inline ENUM embeddedLua::to<##ENUM##>(lua_State* L, sint index) \
 	{ \
 		return static_cast<##ENUM##>(to<sint>(L, index)); \
 	}
@@ -727,7 +727,7 @@ This method is ideal for static classes or libraries.
 /** helps compilers with enums as paramenters in template wrapped functions */
 #if ARGUMENT_ERRORS	
 	#define DEFINE_TO_ENUM_BOUND(ENUM, MIN, MAX) \
-		template<> inline ENUM lua_extension::to< ##ENUM## >(lua_State* L, sint index) \
+		template<> inline ENUM embeddedLua::to< ##ENUM## >(lua_State* L, sint index) \
 		{ \
 			ENUM value = static_cast< ##ENUM## >(to<sint>(L, index)); \
 			if (value > MAX || value < MIN) \
@@ -745,7 +745,7 @@ This method is ideal for static classes or libraries.
 /** helps compilers with enums as paramenters in template wrapped functions */
 #if ARGUMENT_ERRORS
 	#define DEFINE_TO_ENUM_BOUND_NS(NAMESPACE, ENUM, MIN, MAX) \
-		template<> inline NAMESPACE##::##ENUM lua_extension::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
+		template<> inline NAMESPACE##::##ENUM embeddedLua::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
 		{ \
 			NAMESPACE##::##ENUM value = static_cast< NAMESPACE##::##ENUM >(to<sint>(L, index)); \
 			if (value >NAMESPACE##::##MAX || value < NAMESPACE##::##MIN) \
@@ -762,7 +762,7 @@ This method is ideal for static classes or libraries.
 
 /** helps compilers with enums as paramenters in template wrapped functions */
 #define DEFINE_TO_ENUM_NS(NAMESPACE, ENUM)\
-	template<> inline NAMESPACE##::##ENUM lua_extension::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
+	template<> inline NAMESPACE##::##ENUM embeddedLua::to< NAMESPACE##::##ENUM >(lua_State* L, sint index) \
 	{ \
 		return static_cast< NAMESPACE##::##ENUM >(to<sint>(L, index));\
 	}
@@ -775,7 +775,7 @@ back out of %Lua.
 */
 #if ARGUMENT_ERRORS
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
 		{ \
@@ -803,7 +803,7 @@ back out of %Lua.
 	}
 #else
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \
-	namespace lua_extension \
+	namespace embeddedLua \
 	{ \
 		template<> inline CLASS* to< CLASS* >(lua_State* L, sint index) \
 		{ \
@@ -857,14 +857,14 @@ calls nilLoadedStatus() in declareLuaClass
 			lua_newtable(L);						/*s: ReadOnly proxy mt */ \
 			lua_pushvalue(L, -3);					/*s: ReadOnly proxy mt ReadOnly */ \
 			lua_setfield(L, -2, "__index");			/*s: ReadOnly proxy mt */ \
-			lua_pushcfunction(L, lua_extension::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
+			lua_pushcfunction(L, embeddedLua::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
 			lua_setfield(L, -2, "__newindex");		/*s: ReadOnly proxy mt */ \
 			lua_setmetatable(L, -2);				/*s: ReadOnly proxy */ \
 			lua_replace(L, -2);						/*s: proxy */ \
 			lua_setglobal(L, #ENUM );				/*s: */ \
 			return 0; \
 		} \
-	} // end namespace lua_extension
+	} // end namespace embeddedLua
 
 /** 
 */
@@ -885,14 +885,14 @@ calls nilLoadedStatus() in declareLuaClass
 			lua_newtable(L);						/*s: ReadOnly proxy mt */ \
 			lua_pushvalue(L, -3);					/*s: ReadOnly proxy mt ReadOnly */ \
 			lua_setfield(L, -2, "__index");			/*s: ReadOnly proxy mt */ \
-			lua_pushcfunction(L, lua_extension::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
+			lua_pushcfunction(L, embeddedLua::__newindexEnum); /*s: ReadOnly proxy mt UpdateEnumError */ \
 			lua_setfield(L, -2, "__newindex");		/*s: ReadOnly proxy mt */ \
 			lua_setmetatable(L, -2);				/*s: ReadOnly proxy */ \
 			lua_replace(L, -2);						/*s: proxy */ \
 			lua_setglobal(L, #ENUM );				/*s: */ \
 			return 0; \
 		} \
-	} // end namespace lua_extension
+	} // end namespace embeddedLua
 
 /** 
  
@@ -1028,27 +1028,27 @@ the require() function.
 /** 
 */
 #define LUA_ENTRY_CLASS__gc_DESTRUCTOR(CLASS) \
-	LUA_ENTRY_NAMED("__gc", lua_extension::__gcmetamethod<##CLASS##>) 
+	LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethod<##CLASS##>) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isExtendableByProxy \
-	LUA_ENTRY_NAMED("__isExtendableByProxy", lua_extension::pushTrue) 
+	LUA_ENTRY_NAMED("__isExtendableByProxy", embeddedLua::pushTrue) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isnewindexable_TRUE \
-	LUA_ENTRY_NAMED("__isnewindexable", lua_extension::pushTrue) 
+	LUA_ENTRY_NAMED("__isnewindexable", embeddedLua::pushTrue) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__isnewindexable_FALSE \
-	LUA_ENTRY_NAMED("__isnewindexable", lua_extension::pushFalse) 
+	LUA_ENTRY_NAMED("__isnewindexable", embeddedLua::pushFalse) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__new_AUTO(CLASS) \
-	LUA_ENTRY_NAMED("__new", lua_extension::__new<##CLASS##>) 
+	LUA_ENTRY_NAMED("__new", embeddedLua::__new<##CLASS##>) 
 
 /** 
 */
@@ -1058,17 +1058,17 @@ the require() function.
 /** 
 */
 #define LUA_ENTRY_CLASS__setmetatable_PROXY \
-	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setProxyMetatable) 
+	LUA_ENTRY_NAMED("__setmetatable", embeddedLua::setProxyMetatable) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__setmetatable_PROXY_PUBLIC_MEMBERS \
-	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setProxyMetatablePublicMembers) 
+	LUA_ENTRY_NAMED("__setmetatable", embeddedLua::setProxyMetatablePublicMembers) 
 
 /** 
 */
 #define LUA_ENTRY_CLASS__setmetatable_USERDATA \
-	LUA_ENTRY_NAMED("__setmetatable", lua_extension::setUserdataMetatable) 
+	LUA_ENTRY_NAMED("__setmetatable", embeddedLua::setUserdataMetatable) 
 
 /** 
 */
@@ -1151,7 +1151,7 @@ add a lua method to a definition by a different name
 /** 
 */
 #define REGISTER_LUA_ENUM(LUA_OBJECT_PTR, ENUM_NAME) \
-	lua_extension::register_##ENUM_NAME##(LUA_OBJECT_PTR->getState());
+	embeddedLua::register_##ENUM_NAME##(LUA_OBJECT_PTR->getState());
 
 /** 
 register a library with a lua state 
@@ -1168,7 +1168,7 @@ behavior is undefined
 
 /** @} */
 
-namespace lua_extension 
+namespace embeddedLua 
 {
 
 /**
@@ -1264,7 +1264,7 @@ __gcmetamethod(lua_State* L)
 template<typename CLASS> sint
 __new(lua_State* L)
 {
-	return pushRegisteredClass(L, new CLASS());
+	return push(L, new CLASS());
 }
 
 /**
@@ -1346,7 +1346,7 @@ since you can't call setmetatable on a userdata value in %Lua.
 */
 sint
 	setUserdataMetatable(lua_State* L);
-} // namespace lua_extension 
+} // namespace embeddedLua 
 
 /** @} */
 

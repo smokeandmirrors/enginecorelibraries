@@ -5,6 +5,142 @@ require'ObjectOrientedParadigm'
 require'Vector3PureLua'
 UT = require'UnitTestingFramework'
 
+needCall = false
+function _G.timeTest()
+	_G.clock = new'ClockReal'
+	_G.timer = new('Timer', clock)
+	_G.stopwatch = new('Stopwatch', clock)
+	timer:set(10000, 10000, BoolEnum.BoolEnum_False)
+	-- timer:start()
+	_G.relclock = new('ClockRelative', clock)
+	relclock:setRate(10);
+	_G.relstopwatch = new('Stopwatch', relclock)
+end	
+
+function _G.tickAll()
+	clock:tick()
+	relclock:tick()
+	print(clock:seconds(), relclock:seconds(), relstopwatch:seconds())
+end
+
+function _G.timeTick()
+	if needCall then
+		timeTest()
+		needCall = false
+	end
+	print'Time tick!'
+end
+
+function iterateIPairs(...)
+	local sum = 0
+	-- the table creation does cost some memory
+	for _, v in ipairs{...} do
+		sum = sum + v
+	end
+	return sum
+end
+
+function iteratePairs(...)
+	local sum = 0
+	-- the table creation does cost some memory
+	for _, v in pairs{...} do
+		sum = sum + v
+	end
+	return sum
+end
+
+function iterateSelect(...)
+	local select = select
+	local sentinel = select('#', ...)
+	local sum = 0
+	-- at millions of iterations, this is slighly slower than 
+	-- pairs/ipairs, but has consumes less/no memory
+	for i = 1, sentinel do
+		sum = sum + select(i, ...)
+	end
+	return sum
+end
+
+function makeBigTable(size)
+	size = type(size) == 'number' and size or 10000
+	t = {}
+	local sum = 0
+	for i=1,size do
+		table.insert(t, i)
+		sum = sum + i
+	end
+	table.shuffle(t)
+	return t, sum
+end	
+
+
+function _G.testIPairs(iterations, size, t, sum)
+	local iterations = type(iterations) == 'number' and size or 10
+	if (not t) then
+		t, sum = makeBigTable(size)
+		sum = sum * iterations
+	end
+	
+	local pairsSum = 0
+	local pairsStart = os.clock()
+	for i=1, iterations do
+		pairsSum = pairsSum + iterateIPairs(unpack(t))
+	end
+	local pairsEnd = os.clock()
+	local pairsTotal = os.difftime(pairsEnd, pairsStart)
+	print('Iterations: ', iterations, ' iPairs: ', pairsTotal)
+	assert(pairsSum == sum)
+end
+
+
+
+function _G.testPairs(iterations, size, t, sum)
+	local iterations = type(iterations) == 'number' and size or 10
+	if (not t) then
+		t, sum = makeBigTable(size)
+		sum = sum * iterations
+	end
+	
+	local pairsSum = 0
+	local pairsStart = os.clock()
+	for i=1, iterations do
+		pairsSum = pairsSum + iteratePairs(unpack(t))
+	end
+	local pairsEnd = os.clock()
+	local pairsTotal = os.difftime(pairsEnd, pairsStart)
+	print('Iterations: ', iterations, ' Pairs: ', pairsTotal)
+	assert(pairsSum == sum)
+end
+
+function _G.testSelect(iterations, size, t, sum)
+	local iterations = type(iterations) == 'number' and size or 10
+	if (not t) then
+		t, sum = makeBigTable(size)
+		sum = sum * iterations
+	end
+	local selectSum = 0
+	local selectStart = os.clock()
+	for i=1, iterations do
+		selectSum = selectSum + iterateSelect(unpack(t))
+	end
+	local selectEnd = os.clock()
+	local selectTotal = os.difftime(selectEnd, selectStart)
+	print('Iterations: ', iterations, ' select: ', selectTotal)
+	assert(selectSum == sum)
+end
+
+function _G.testIteration(iterations, size)
+	local iterations = type(iterations) == 'number' and size or 10
+	local t, sum = makeBigTable(size)
+	sum = sum * iterations
+	collectgarbage'collect'
+	testPairs(iterations, size, t, sum)
+	testIPairs(iterations, size, t, sum)
+	testSelect(iterations, size, t, sum)	
+end
+
+
+
 _G.u = function()
 	rerequire'User'
 end
