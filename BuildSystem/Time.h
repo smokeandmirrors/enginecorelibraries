@@ -372,7 +372,7 @@ public:
 		return milliseconds() * 0.001;
 	}
 
-	void set(second maxTime, second minTime=-1.0, BoolEnum autoReset=BoolEnum_Unset)
+	void set(millisecond maxTime, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_Unset)
 	{
 		m_maxTime = maxTime;
 		m_minTime = minTime == -1.0 ? maxTime : minTime;

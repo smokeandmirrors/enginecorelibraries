@@ -387,6 +387,10 @@ DECLARE_LUA_CLASS(ClockReal)
 DEFINE_LUA_CLASS(CLASS, ClockReal, Clock)
 END_LUA_CLASS(ClockReal, Clock)
 
+DECLARE_LUA_CLASS(ClockFrame)
+DEFINE_LUA_CLASS(CLASS, ClockFrame, Clock)
+END_LUA_CLASS(ClockFrame, Clock)
+
 DECLARE_LUA_CLASS(ClockRelative)
 LUA_FUNC(newClockRelative)
 {
@@ -454,6 +458,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		REGISTER_LUA_LIBRARY((&lua), Clock)
 		REGISTER_LUA_LIBRARY((&lua), ClockReal)
 		REGISTER_LUA_LIBRARY((&lua), ClockRelative)
+		REGISTER_LUA_LIBRARY((&lua), ClockFrame)
 		REGISTER_LUA_LIBRARY((&lua), Timer) 
 		REGISTER_LUA_LIBRARY((&lua), Stopwatch) 
 
@@ -466,7 +471,9 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		// get the user file for easier rapid iteration
 		lua.require("User");
 		
+#define POOR_MANS_TESTING 0
 #if POOR_MANS_TESTING		
+		
 		lua_State* L = lua.getState();
 		sreal return2(4);
 		return2 = 4;

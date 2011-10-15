@@ -31,6 +31,12 @@ function _G.falsef()
 	return false
 end
 
+function _G.isCallable(object)
+	return type(object) == 'function'
+	or (getmetatable(object) 
+		and type(getmetatable(object).__call) == 'function')
+end
+
 ---------------------------------------------------------------------
 -- defines a single, global function that returns true, comes in
 -- handy all over the place
@@ -49,9 +55,17 @@ function _G.togset(toggle, bool)
 end
 
 ---------------------------------------------------------------------
--- 
--- \todo look up the fast? varargs interator select function
 function _G.tassert(tupos, ...)
+	assert(type(tupos) == 'string' 
+	and (tupos == 'boolean'
+		or tupos == 'nil'
+		or tupos == 'function'
+		or tupos == 'number'
+		or tupos == 'table'
+		or tupos == 'userdata'
+		or tupos == 'thread'), 
+	'invalid type specified for argument one')
+	
 	local nargs = select('#', ...)
 	for i = 1, nargs do
         assert(type(select(i, ...)) == tupos, 'type: '..tupos..' expected, but '..type(select(i, ...))..' found instead at key: '..tostring(key)..'!')

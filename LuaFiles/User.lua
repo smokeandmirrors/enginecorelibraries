@@ -5,6 +5,12 @@ require'ObjectOrientedParadigm'
 require'Vector3PureLua'
 UT = require'UnitTestingFramework'
 
+function _G.enginetest()
+	rerequire'TestSequenceOne'
+	require'Engine'
+	Engine.run()
+end
+
 needCall = false
 function _G.timeTest()
 	_G.clock = new'ClockReal'
@@ -435,3 +441,34 @@ vectorPerformance = function(class_name, iterations)
 		v:perpendicular()
 	end
 end
+
+function _G.testLatent()
+	for _, thread in pairs(threads) do
+		local status = coroutine.status(thread)
+		if status == 'dead' then
+			table.remove(threads, thread)
+		--[[
+		elseif status == 'error' then
+			TheCorner.insert('coroutines', threads)
+		--]]		
+		else
+			coroutine.resume(thread)
+		end		
+	end
+end
+
+function _G.isTimeUp()
+	currentTime = currentTime + 1
+	return currentTime > timeLimit
+end
+
+function _G.createLatentFunction(f, condition)
+	return coroutine.create(
+		function(...)
+			f(...)
+			while not condition(...) do
+				coroutine.yield()
+			end
+		end)
+end
+
