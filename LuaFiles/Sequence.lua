@@ -2,7 +2,7 @@ module(..., package.seeall)
 ----------------------------------------------------------------------
 -- Sequence.lua
 --	
--- A suite of functionality to frame-to-frame agnostic code
+-- A suite of functionality for frame-to-frame agnostic or latent code
 -- \todo execute on this with co-routines
 --
 -- @author Smoke and Mirrors Development
@@ -13,7 +13,8 @@ require'Utilities'
 
 m_sequences = {}
 
-function noOnComplete()
+function clear()
+	table.emptyindexed(m_sequences)
 end
 
 function create(f, onComplete)
@@ -41,8 +42,7 @@ function execute(sequence)
 	end
 end
 
-function wait()
-	coroutine.yield()
+function noOnComplete()
 end
 
 function run()
@@ -51,4 +51,13 @@ function run()
 			table.remove(m_sequences, index)
 		end
 	end
+end
+
+function validate()
+	assert(coroutine.running() ~= nil, 
+		'Sequence code must be called from within a coroutine, use in a Sequence')
+end
+
+function wait()
+	coroutine.yield()
 end

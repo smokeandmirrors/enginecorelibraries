@@ -7,7 +7,10 @@ UT = require'UnitTestingFramework'
 
 function _G.enginetest()
 	rerequire'TestSequenceOne'
+	require'Sequence'
 	require'Engine'
+	Sequence.clear()
+	TestSequenceOne.test()
 	Engine.run()
 end
 

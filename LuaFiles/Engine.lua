@@ -3,7 +3,7 @@ module(..., package.seeall)
 require'ObjectOrientedParadigm'
 require'Utilities'
 
-maxMilliseconds = 15000 -- milliseconds
+maxMilliseconds = 21000 -- milliseconds
 frameClock = new'ClockFrame'
 frame = 0
 timer = new('Timer', frameClock)
@@ -15,6 +15,7 @@ function run()
 	
 	while timer:isTimeRemaining() do
 		frameClock:tick()
-		Sequence:run()
-	end	
+		Sequence:run()		
+	end
+	print'Engine finished running'
 end

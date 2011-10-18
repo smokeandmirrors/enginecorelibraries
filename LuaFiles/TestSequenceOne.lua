@@ -4,22 +4,20 @@ require'ObjectOrientedParadigm'
 require'Utilities'
 require'Sequence'
 
-
+-- latent function
 function doTime(timeOne)
-	assert(coroutine.running() ~= nil, 'Sequence code must be called from within a coroutine, use in a Sequence')
+	Sequence.validate()
 	local stopwatch = new('Stopwatch', Engine.frameClock)
 	stopwatch:start()
 	while stopwatch:seconds() < timeOne do
 		Sequence.wait()
 	end
-	print(stopwatch:seconds())
 end
 
--- sequence
-function doLotsOfTime(timeOne, timeTwo, timeThree)
-	
+-- sequence function that calls latent functions
+function doLotsOfTime(timeOne, timeTwo, timeThree)	
 	doTime(timeOne)
-	print('I finished time one after: '..timeOne)
+	print('I finished time one: '..timeOne)
 	doTime(timeTwo)
 	print('I finished time two: '..timeTwo)
 	doTime(timeThree)
@@ -27,11 +25,11 @@ function doLotsOfTime(timeOne, timeTwo, timeThree)
 end
 
 function myTimeSequence()
-	doLotsOfTime(1, 5, 10)
+	doLotsOfTime(1, 3, 5)
 end
 
 function myTimeSequence2()
-	doLotsOfTime(2, 6.67, 8.333)
+	doLotsOfTime(2, 4, 6)
 end
 
 function woot(sequence)
@@ -44,5 +42,7 @@ function woot(sequence)
 	end
 end
 
-Sequence.create(myTimeSequence, woot)
-Sequence.create(myTimeSequence2, woot)
+function test()
+	Sequence.create(myTimeSequence, woot)
+	Sequence.create(myTimeSequence2, woot)
+end
