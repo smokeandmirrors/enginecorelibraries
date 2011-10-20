@@ -4,11 +4,6 @@ local U = require'Utilities'
 local CW = require'CodeWriting'
 local getTabs = U.getTabs
 
--- replaces EN2S_BEGIN_CLASS_TEMPLATE_ARGS
-function beginClassTemplateArgs()
-
-end
-
 function callArguments(nrets, nargs, tabs)
 	tassert('number', nrets, nargs)
 	local output = ''
@@ -78,6 +73,23 @@ function endClassTemplateArgs(nrets, nargs, const, fname)
 	tassert('number', nrets, nargs)
 	fname = fname or 'function'
 	return CW.templateReturnSignature(nrets)..'(CLASS::* '..fname..')('..CW.templateArgumentsSignature(nrets, nargs)..') ' ..(const and 'const' or '')..'>\n'
+end
+
+function generateArgsConstructor(nargs)
+	tassert('number', nargs)
+	local tabs1 = getTabs(1)
+	local tabs2 = getTabs(2)
+	local tabs3 = getTabs(3)
+	local output = '/** '..nargs..' args constructor wrapper */\n'
+	output = output..'template< typename CLASS, '..CW.templateArguments(0, nargs)..'>\n'
+	output = output..'inline LUA_FUNC(__new)\n'
+	output = output..'{\n'
+	output = output..tabs1..'return pushRegisteredClass(L, \n'
+	output = output..tabs2..	'new CLASS(\n'
+	output = output..tabs3..		callArguments(0, nargs, 3)
+	output = output..'));\n'
+	output = output..'}\n\n'
+	return output
 end
 
 -- replaces EN2S_GENERATE_CLASS_TEMPLATE and EN2S_GENERATE_CLASS_CONST_TEMPLATE
@@ -164,16 +176,31 @@ function generateHeader(file, nrets, nargs)
 		for j = 0, nargs do
 			if i ~= 0 or j ~= 0 then
 				local output = ''
-				-- generateConstClassTemplate
+				-- generate constClassTemplate
 				output = output..generateMemberTemplate(i, j, true)
-				-- generateMemberClassTemplate
+				-- generate memberClassTemplate
 				output = output..generateMemberTemplate(i, j)
-				-- generateStaticTemplate
+				-- generate staticTemplate
 				output = output..generateStaticTemplate(i, j)
 				file:write(output)
 			end
 		end
 	end
+	
+	file:write(
+		'/** no args constructor wrapper */\n'..
+		'template<typename CLASS>\n'..
+		'inline LUA_FUNC(__new)\n'..
+		'{	/** \\note do NOT replace the line below with pushRegisteredClass() with push() */\n'..
+		'\t'..'return pushRegisteredClass(L, new CLASS());\n'..
+		'}\n\n'
+	)
+	
+	for j = 1, nargs do
+		-- generate args constructor
+		file:write(generateArgsConstructor(j))
+	end
+	
 	file:write("} // namespace embeddedLua")
 	file:flush()
 end

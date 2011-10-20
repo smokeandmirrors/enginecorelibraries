@@ -7,6 +7,7 @@ Defines the entry point for the console application.
 #include <tchar.h>
 
 #include "LuaMathExtensions.h"
+#include "Constructors.h"
 
 #if EXTENDED_BY_LUA
 #pragma message("This executable is compiling with embedded lua.")
@@ -392,43 +393,31 @@ DEFINE_LUA_CLASS(CLASS, ClockFrame, Clock)
 END_LUA_CLASS(ClockFrame, Clock)
 
 DECLARE_LUA_CLASS(ClockRelative)
-LUA_FUNC(newClockRelative)
-{
-	return push(L, new ClockRelative(to<const Clock&>(L, -1)));
-}
 DEFINE_LUA_CLASS_NO_CTOR(CLASS, ClockRelative, Clock)
-LUA_ENTRY_NAMED("__new", newClockRelative)
+	LUA_ENTRY_NAMED("__new", (&__new<ClockRelative, const Clock&>))
 END_LUA_CLASS(ClockRelative, Clock)
 
 DECLARE_LUA_CLASS(Stopwatch)
-LUA_FUNC(newStopwatch)
-{
-	return push(L, new Stopwatch(to<const Clock&>(L, -1)));
-}
 DEFINE_LUA_CLASS_NO_CTOR(CLASS, Stopwatch, Stopwatch)
-LUA_ENTRY_NAMED("__new", newStopwatch)
-LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::start>))
-LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::stop>))
-LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::reset>))
-LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Stopwatch, millisecond, &Stopwatch::milliseconds>))
-LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Stopwatch, second, &Stopwatch::seconds>))
+	LUA_ENTRY_NAMED("__new", (&__new<Stopwatch, const Clock&>))
+	LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::start>))
+	LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::stop>))
+	LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Stopwatch, &Stopwatch::reset>))
+	LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Stopwatch, millisecond, &Stopwatch::milliseconds>))
+	LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Stopwatch, second, &Stopwatch::seconds>))
 END_LUA_CLASS(Stopwatch, Stopwatch)
 
 DECLARE_LUA_CLASS(Timer)
-LUA_FUNC(newTimer)
-{
-	return push(L, new Timer(to<const Clock&>(L, -1)));
-}
 DEFINE_LUA_CLASS_NO_CTOR(CLASS, Timer, Timer)
-LUA_ENTRY_NAMED("__new", newTimer)
-LUA_ENTRY_NAMED("isTimeRemaining", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeRemaining>))
-LUA_ENTRY_NAMED("isTimeUp", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeUp>))
-LUA_ENTRY_NAMED("set", (nativeMemberReturn0Param3<Timer, second, second, BoolEnum, &Timer::set>))
-LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Timer, &Timer::start>))
-LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Timer, &Timer::stop>))
-LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Timer, &Timer::reset>))
-LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Timer, millisecond, &Timer::milliseconds>))
-LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Timer, second, &Timer::seconds>))
+	LUA_ENTRY_NAMED("__new", (&__new<Timer, const Clock&>))
+	LUA_ENTRY_NAMED("isTimeRemaining", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeRemaining>))
+	LUA_ENTRY_NAMED("isTimeUp", (nativeMemberReturn1Param0<Timer, bool, &Timer::isTimeUp>))
+	LUA_ENTRY_NAMED("set", (nativeMemberReturn0Param3<Timer, second, second, BoolEnum, &Timer::set>))
+	LUA_ENTRY_NAMED("start", (nativeMemberReturn0Param0<Timer, &Timer::start>))
+	LUA_ENTRY_NAMED("stop", (nativeMemberReturn0Param0<Timer, &Timer::stop>))
+	LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Timer, &Timer::reset>))
+	LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Timer, millisecond, &Timer::milliseconds>))
+	LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Timer, second, &Timer::seconds>))
 END_LUA_CLASS(Timer, Timer)
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
@@ -549,8 +538,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		callStaticReturn0Param1<float>(L, "returnZeroParamOne", value2);
 		
 		// callStaticReturn0Param0(L, "throwError");
-#endif//POOR_MANS_TESTING			
-
+#endif//POOR_MANS_TESTING
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA

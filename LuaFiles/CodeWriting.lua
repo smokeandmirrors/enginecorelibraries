@@ -32,7 +32,8 @@ end
 -- replaces CW_TEMPLATE_ARGS_RETS_N_ARGS_N
 function templateArguments(nrets, nargs)
 	tassert('number', nrets, nargs)
-	assert(nrets > 0 or nargs > 0, '0, 0 is handled manually (for now)')
+	assert(nrets > 0 or nargs > 0, 'nrets ==0 , nargs == 0 is handled manually (for now)\n'..
+							'current: nrets == '..nrets..', nargs == '..nargs)
 	local output = ''
 	
 	if nrets > 0 then

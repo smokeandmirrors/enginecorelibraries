@@ -462,6 +462,10 @@
 			Name="Code Writing"
 			>
 			<File
+				RelativePath=".\Constructors.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TemplateArguments.h"
 				>
 			</File>

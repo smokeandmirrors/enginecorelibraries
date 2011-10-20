@@ -702,9 +702,6 @@ function declareInterface_PRIVATE(definition)
 end
 
 ----------------------------------------------------------------------
--- \todo this should probably be removed as there is no guarantee that
--- ObjectOrientedParadigm won't be removed before all other objects
--- that might 'need' this to be called on them?
 function destructHierarchy_PRIVATE(instance)
 	local class = instance:getClass()
 	repeat

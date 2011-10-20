@@ -8987,6 +8987,149 @@ namespace embeddedLua
 		return pushed;
 	} // nativeStaticReturn10Param10
 
-}
+	/** no args constructor wrapper */
+	template<typename CLASS>
+	inline LUA_FUNC(__new)
+	{	/** \note do NOT replace the line below with pushRegisteredClass() with push() */
+		return pushRegisteredClass(L, new CLASS());
+	}
+
+	/** 1 args constructor wrapper */
+	template< typename CLASS, typename ARG_1>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -1)));
+	}
+
+	/** 2 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -2),
+			to<ARG_2>(L, -1)));
+	}
+
+	/** 3 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -3),
+			to<ARG_2>(L, -2),
+			to<ARG_3>(L, -1)));
+	}
+
+	/** 4 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -4),
+			to<ARG_2>(L, -3),
+			to<ARG_3>(L, -2),
+			to<ARG_4>(L, -1)));
+	}
+
+	/** 5 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -5),
+			to<ARG_2>(L, -4),
+			to<ARG_3>(L, -3),
+			to<ARG_4>(L, -2),
+			to<ARG_5>(L, -1)));
+	}
+
+	/** 6 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -6),
+			to<ARG_2>(L, -5),
+			to<ARG_3>(L, -4),
+			to<ARG_4>(L, -3),
+			to<ARG_5>(L, -2),
+			to<ARG_6>(L, -1)));
+	}
+
+	/** 7 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -7),
+			to<ARG_2>(L, -6),
+			to<ARG_3>(L, -5),
+			to<ARG_4>(L, -4),
+			to<ARG_5>(L, -3),
+			to<ARG_6>(L, -2),
+			to<ARG_7>(L, -1)));
+	}
+
+	/** 8 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -8),
+			to<ARG_2>(L, -7),
+			to<ARG_3>(L, -6),
+			to<ARG_4>(L, -5),
+			to<ARG_5>(L, -4),
+			to<ARG_6>(L, -3),
+			to<ARG_7>(L, -2),
+			to<ARG_8>(L, -1)));
+	}
+
+	/** 9 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -9),
+			to<ARG_2>(L, -8),
+			to<ARG_3>(L, -7),
+			to<ARG_4>(L, -6),
+			to<ARG_5>(L, -5),
+			to<ARG_6>(L, -4),
+			to<ARG_7>(L, -3),
+			to<ARG_8>(L, -2),
+			to<ARG_9>(L, -1)));
+	}
+
+	/** 10 args constructor wrapper */
+	template< typename CLASS, typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, typename ARG_10>
+	inline LUA_FUNC(__new)
+	{
+		return pushRegisteredClass(L, 
+			new CLASS(
+			to<ARG_1>(L, -10),
+			to<ARG_2>(L, -9),
+			to<ARG_3>(L, -8),
+			to<ARG_4>(L, -7),
+			to<ARG_5>(L, -6),
+			to<ARG_6>(L, -5),
+			to<ARG_7>(L, -4),
+			to<ARG_8>(L, -3),
+			to<ARG_9>(L, -2),
+			to<ARG_10>(L, -1)));
+	}
+
+} // namespace embeddedLua
+
 #endif//LUA_EXPOSE_NATIVE_TO_SCRIPT_H
 

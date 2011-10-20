@@ -1253,39 +1253,30 @@ public:
 metamethod for classes that do not implement
 LuaExtendable
 */
-template<typename CLASS> sint
-__gcmetamethod(lua_State* L)
+template<typename CLASS>
+LUA_FUNC(__gcmetamethod)
 {
 	CLASS* udata = to<CLASS*>(L, -1);
 	delete udata;
 	return 0;
 }
 
-template<typename CLASS> sint
-__new(lua_State* L)
-{	/** \note do NOT replace the line below with push(L, new CLASS()); */
-	return pushRegisteredClass(L, new CLASS());
-}
-
 /**
 */
-sint 
-	__newindexEnum(lua_State* L);
+LUA_FUNC(__newindexEnum);
 
 /**
 __newindex method for the metatable of a class exposed to %Lua 
 via the proxy method that will allow it to be assigned new fields
 */
-sint 
-	__newindexProxy(lua_State* L);
+LUA_FUNC(__newindexProxy);
 
 /**
 __newindex method for the metatable of a class exposed to %Lua 
 via the proxy method that will allow it to be assigned new fields
 but also has exposed public members
 */
-sint 
-	__newindexProxyPublicMembers(lua_State* L);
+LUA_FUNC(__newindexProxyPublicMembers);
 
 /**
 completes a %Lua class declaration in case no script accompanied
