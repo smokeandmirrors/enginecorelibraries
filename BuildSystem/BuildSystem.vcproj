@@ -470,6 +470,14 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Containers"
+			>
+			<File
+				RelativePath=".\RedBlackTree.h"
+				>
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

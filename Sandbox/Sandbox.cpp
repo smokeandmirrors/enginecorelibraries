@@ -14,6 +14,7 @@
 #include "Build.h"
 #include "CompilerChecks.h"
 #include "Composition.h"
+#include "RedBlackTree.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
 #include "Synchronization.h"
@@ -34,6 +35,19 @@ void sandbox::play()
 	float float_version = compilerChecks::Math<float>::ZERO_TOLERANCE;
 
 	compilerChecks::check();
+	
+	/*
+	RedBlackTree<sint> rbt;
+	assert(rbt.isEmpty());
+	rbt.insert(-1);
+	rbt.remove(-1);
+	rbt.getMax();
+	rbt.getMin();
+	rbt.getSize();
+	rbt.has(2);
+	rbt.removeMax();
+	rbt.removeMin();
+	*/
 
 	printf("Playing in the sandbox!\n");
 	onPlay();
