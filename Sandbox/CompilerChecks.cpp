@@ -50,5 +50,8 @@ namespace compilerChecks
 		size_t sizeof2T = sizeof(Things2);
 		size_t sizeofv2t = sizeof(vThings2);
 		size_t sum = sizeof2TI + sizeof2T + sizeofv2t;
+		
+		int int_version = Math<int>::ZERO_TOLERANCE;
+		float float_version = Math<float>::ZERO_TOLERANCE;
 	}
 } // namespace compilerChecks 

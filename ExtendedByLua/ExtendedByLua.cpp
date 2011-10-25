@@ -539,7 +539,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		
 		// callStaticReturn0Param0(L, "throwError");
 #endif//POOR_MANS_TESTING
-		lua.runConsole();
+		// lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 	

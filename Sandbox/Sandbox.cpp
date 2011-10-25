@@ -30,25 +30,7 @@ void onPlay(void);
 
 void sandbox::play()
 {
-	
-	int int_version = compilerChecks::Math<int>::ZERO_TOLERANCE;
-	float float_version = compilerChecks::Math<float>::ZERO_TOLERANCE;
-
 	compilerChecks::check();
-	
-	/*
-	RedBlackTree<sint> rbt;
-	assert(rbt.isEmpty());
-	rbt.insert(-1);
-	rbt.remove(-1);
-	rbt.getMax();
-	rbt.getMin();
-	rbt.getSize();
-	rbt.has(2);
-	rbt.removeMax();
-	rbt.removeMin();
-	*/
-
 	printf("Playing in the sandbox!\n");
 	onPlay();
 	printf("Stopped playing in the sandbox!\n");
@@ -606,8 +588,106 @@ class Shadows
 
 };
 
+template<typename NUMBER>
+NUMBER getRand(NUMBER min, NUMBER max) 
+{
+	PREVENT_COMPILE
+}
+
+template<>
+sint getRand(sint min, sint max) 
+{
+	return (rand() % (max - min)) + min;
+}
+
+template<>
+sreal getRand(sreal min, sreal max) 
+{
+	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
+	return v * (max - min) + min;
+}
+
+class WTF
+{
+private:
+	class WTF2
+	{
+		WTF2();
+	};
+};
+
+WTF::WTF2::WTF2()
+{
+
+}
+
 void onPlay(void)
 {
+	srand(static_cast<uint>(realTime::cycles()));
+	
+	for (int i = 0; i < 10; i++)
+		printf("%f\n", getRand<sreal>(-1.0f, 1.0f));
+
+	for (int i = 0; i < 10; i++)
+		printf("%d\n", getRand<sint>(-10, 10));
+
+	RedBlackTree<sint> rbt;
+	assert(rbt.isEmpty());
+	rbt.insert(-1);
+	rbt.remove(-1);
+	rbt.getMax();
+	rbt.getMin();
+	rbt.getSize();
+	assert(!rbt.has(2));
+	rbt.removeMax();
+	rbt.removeMin();
+
+	uint sum = 0;
+	
+	std::vector<sint> numbers;
+	sint randomNumber;
+	
+	for (sint i = 0; i < 10000; i++)
+	{
+		// randomNumber = getRand<sint>(-100, 100);
+		randomNumber = i;
+		numbers.push_back(randomNumber);
+		
+		assert(!rbt.has(randomNumber));
+		assert(rbt.getSize() == sum);
+		sum++;
+		rbt.insert(randomNumber);
+		assert(rbt.getSize() == sum);
+		assert(rbt.has(randomNumber));
+		
+		/*
+		assert(!rbt.has(-101));
+		assert(!rbt.has(101));
+		assert(rbt.getMax() <= 100);
+		assert(rbt.getMin() >= -100);		
+		*/
+	}
+	
+	for (int i = 0; i < 10000; i++)
+	{
+		randomNumber = numbers[i];
+		assert(rbt.getSize() == sum);
+		assert(rbt.has(randomNumber));
+		rbt.remove(randomNumber);
+		sum--;
+		assert(rbt.getSize() == sum);
+		/*
+		assert(!rbt.has(-101));
+		assert(!rbt.has(101));
+		assert(rbt.getMax() <= 100);
+		assert(rbt.getMin() >= -100);		
+		*/
+	}
+
+	assert(rbt.isEmpty());
+	
+}
+
 // 	Agent alpha;
 // 	Movement movement;
 // 	Attack attack;
@@ -693,8 +773,7 @@ void onPlay(void)
 // 	}	
 // 
 // 	multithreading::Scheduler::single().destroy();
-
-	ClockReal realSingle;
-	ClockReal realDouble;
-	ClockRelative relative(realSingle);
-}
+// 
+// 	ClockReal realSingle;
+// 	ClockReal realDouble;
+// 	ClockRelative relative(realSingle);
