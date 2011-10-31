@@ -508,7 +508,7 @@ public:
 		m_completedJobs = 0;
 		std::string name = frameReqName(m_reqID);
 		name += "(o)";
-		multithreading::Scheduler::single().enqueue(m_original, multithreading::noThreadPreference, name.c_str());
+		multithreading::Scheduler::single().enqueue(m_original, multithreading::noCPUpreference, name.c_str());
 	}
 
 private:
@@ -542,7 +542,7 @@ void TestJob::execute(void)
 		std::string name = frameReqName(m_requirement->getID());
 		name += "(c)";
 		TestJob* job = new TestJob(m_requirement);
-		multithreading::Scheduler::single().enqueue(job, multithreading::noThreadPreference, name.c_str());
+		multithreading::Scheduler::single().enqueue(job, multithreading::noCPUpreference, name.c_str());
 	}
 
 	if (delete_self)
@@ -607,22 +607,63 @@ sreal getRand(sreal min, sreal max)
 	return v * (max - min) + min;
 }
 
-class WTF
+#include "Table.h"
+
+void testEngineLoop(void)
 {
-private:
-	class WTF2
+	EngineLoop loop;	
+	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
+	loop.addFrameRequirement(&physics_sych);
+	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
+	loop.addFrameRequirement(&physics_asych);
+	TestRequirement rendering(6, eFR_Rendering, 4);
+	loop.addFrameRequirement(&rendering);
+	TestRequirement lighting(4, eFR_Lighting, 3);
+	loop.addFrameRequirement(&lighting);
+	TestRequirement animation(3, eFR_Animation, 2);
+	loop.addFrameRequirement(&animation);
+	TestRequirement audio(2, eFR_Audio, 4);
+	loop.addFrameRequirement(&audio);
+	TestRequirement events(1, eFR_Events, 0);
+	loop.addFrameRequirement(&events);
+	TestRequirement gameplay(1, eFR_Gameplay, 0);
+	loop.addFrameRequirement(&gameplay);
+	TestRequirement ai(1, eFR_AI, 30);
+	loop.addFrameRequirement(&ai);
+	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
+	loop.addFrameRequirement(&garbage_collection);
+	TestRequirement networking(2, eFR_Networking, 4);
+	loop.addFrameRequirement(&networking);
+	loop.start();
+
+	while (loop.getFrameNumber() < 2)
 	{
-		WTF2();
+		multithreading::sleep(3000);
 	};
-};
 
-WTF::WTF2::WTF2()
-{
+	loop.stop();
 
+	// \todo replace with: multithreading::Scheduler::single().waitForCompletion();
+	while (multithreading::Scheduler::single().hasAnyWork())
+	{
+		multithreading::sleep(3000);
+	}	
+
+	multithreading::Scheduler::single().destroy();
 }
 
 void onPlay(void)
 {
+	testEngineLoop();
+
+
+	Table< RedBlackTree<sint>* > table;
+
+	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
+
+	table.insert("make work", outstanding);
+	table.get("make work");
+	
 	srand(static_cast<uint>(realTime::cycles()));
 	
 	for (int i = 0; i < 10; i++)
@@ -631,7 +672,9 @@ void onPlay(void)
 	for (int i = 0; i < 10; i++)
 		printf("%d\n", getRand<sint>(-10, 10));
 
-	RedBlackTree<sint> rbt;
+	// RedBlackTree<sint> rbt;
+	RedBlackTree<sint>* pRbt = new RedBlackTree<sint>();
+	RedBlackTree<sint>& rbt = *pRbt;
 	assert(rbt.isEmpty());
 	rbt.insert(-1);
 	rbt.remove(-1);
@@ -668,24 +711,25 @@ void onPlay(void)
 		*/
 	}
 	
-	for (int i = 0; i < 10000; i++)
-	{
-		randomNumber = numbers[i];
-		assert(rbt.getSize() == sum);
-		assert(rbt.has(randomNumber));
-		rbt.remove(randomNumber);
-		sum--;
-		assert(rbt.getSize() == sum);
-		/*
-		assert(!rbt.has(-101));
-		assert(!rbt.has(101));
-		assert(rbt.getMax() <= 100);
-		assert(rbt.getMin() >= -100);		
-		*/
-	}
-
-	assert(rbt.isEmpty());
+	delete pRbt;
 	
+// 	for (int i = 0; i < 10000; i++)
+// 	{
+// 		randomNumber = numbers[i];
+// 		assert(rbt.getSize() == sum);
+// 		assert(rbt.has(randomNumber));
+// 		rbt.remove(randomNumber);
+// 		sum--;
+// 		assert(rbt.getSize() == sum);
+// 		/*
+// 		assert(!rbt.has(-101));
+// 		assert(!rbt.has(101));
+// 		assert(rbt.getMax() <= 100);
+// 		assert(rbt.getMin() >= -100);		
+// 		*/
+// 	}
+// 
+// 	assert(rbt.isEmpty());
 }
 
 // 	Agent alpha;
@@ -735,45 +779,7 @@ void onPlay(void)
 // 	assert(!alpha.has<Attack>());
 // 	assert(NULL == alpha.get<Attack>());
 // 
-// 	EngineLoop loop;	
-// 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
-// 	loop.addFrameRequirement(&physics_sych);
-// 	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
-// 	loop.addFrameRequirement(&physics_asych);
-// 	TestRequirement rendering(6, eFR_Rendering, 4);
-// 	loop.addFrameRequirement(&rendering);
-// 	TestRequirement lighting(4, eFR_Lighting, 3);
-// 	loop.addFrameRequirement(&lighting);
-// 	TestRequirement animation(3, eFR_Animation, 2);
-// 	loop.addFrameRequirement(&animation);
-// 	TestRequirement audio(2, eFR_Audio, 4);
-// 	loop.addFrameRequirement(&audio);
-// 	TestRequirement events(1, eFR_Events, 0);
-// 	loop.addFrameRequirement(&events);
-// 	TestRequirement gameplay(1, eFR_Gameplay, 0);
-// 	loop.addFrameRequirement(&gameplay);
-// 	TestRequirement ai(1, eFR_AI, 30);
-// 	loop.addFrameRequirement(&ai);
-// 	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
-// 	loop.addFrameRequirement(&garbage_collection);
-// 	TestRequirement networking(2, eFR_Networking, 4);
-// 	loop.addFrameRequirement(&networking);
-// 	loop.start();
-// 
-// 	while (loop.getFrameNumber() < 2)
-// 	{
-// 		multithreading::sleep(3000);
-// 	};
-// 
-// 	loop.stop();
-// 
-// 	while (multithreading::Scheduler::single().hasAnyWork())
-// 	{
-// 		multithreading::sleep(3000);
-// 	}	
-// 
-// 	multithreading::Scheduler::single().destroy();
-// 
+// 	
 // 	ClockReal realSingle;
 // 	ClockReal realDouble;
 // 	ClockRelative relative(realSingle);
