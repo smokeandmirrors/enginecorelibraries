@@ -26,6 +26,11 @@ Unit Tested			:	NO
 Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
+
+
+\todo get rid of the thread safety of this class and use a registration system instead that registers
+all singletons in the beginning of main()
+
 */
 #include "Build.h"
 #include "Synchronization.h"

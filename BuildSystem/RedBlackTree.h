@@ -22,8 +22,17 @@ public:
 	static const bool black;
 	static std::vector<uint> depths;
 	
-	RedBlackTree(void);
-	~RedBlackTree(void);
+	RedBlackTree(void)
+		: m_root(NULL)
+		, m_size(0)
+		, m_isBeingChecked(false)
+	{ /* empty */ }
+
+	~RedBlackTree(void)
+	{ 
+		Node::recycle(m_root);
+		assert(Node::numNodes == 0);
+	}
 
 	ELEMENT
 		getMax(void) const;
@@ -452,21 +461,6 @@ template<typename ELEMENT> const bool RedBlackTree<ELEMENT>::black(false);
 template<typename ELEMENT> std::vector<uint> RedBlackTree<ELEMENT>::depths;
 template<typename ELEMENT> uint RedBlackTree<ELEMENT>::Node::numNodes;
 
-
-template<typename ELEMENT> 
-RedBlackTree<ELEMENT>::RedBlackTree(void)
-: m_root(NULL)
-, m_size(0)
-, m_isBeingChecked(false)
-{ /* empty */ }
-
-
-template<typename ELEMENT> 
-RedBlackTree<ELEMENT>::~RedBlackTree(void)
-{ 
-	Node::recycle(m_root);
-}
-
 template<typename ELEMENT> 
 ELEMENT RedBlackTree<ELEMENT>::getMax(void) const
 {
@@ -588,20 +582,5 @@ void RedBlackTree<ELEMENT>::removeMin(void)
 	assert(Node::numNodes == getSize());
 	// check();
 }
-
-/*
-template<typename ELEMENT> 
-RedBlackTree<ELEMENT>
-::Node<ELEMENT>
-::Node<ELEMENT>(
-	   bool color, RedBlackTree<ELEMENT>::Node* left, RedBlackTree<ELEMENT>::Node* right, ELEMENT value)
-: m_color(color)
-, m_left(left)
-, m_right(right)
-, m_value(value)
-{ 
-	//empty  
-}
-*/
 
 #endif//REDBLACKTREE_H
