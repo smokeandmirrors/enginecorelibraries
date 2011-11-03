@@ -38,18 +38,111 @@ namespace multithreading
 		return 0; \
 	}
 
-typedef void(* executableFunction)(void);
+typedef sint cpuID;
 
-extern const sint noThreadPreference; 
+typedef void(*	executableFunction)(void);
+
+extern const cpuID noCPUpreference; 
 
 void sleep(millisecond milliseconds);
 
 class Executable 
 {
 public:
-	virtual	~Executable(void)=0 {/* empty */}
-	virtual void execute(void)=0;
+	virtual	
+		~Executable(void)=0 {/* empty */}
+	
+	virtual void 
+		execute(void)=0;
+
+	virtual const std::string&
+		toString(void) const=0;
 }; // class Executable
+
+class Executor
+{
+public:
+	Executor(executableFunction executable, 
+		const std::string& name="un-named")
+		: m_name(name)
+		, m_implementation(new FunctionImplementation(executable)) 
+	{ /* empty */ }
+	
+	Executor(Executable* executable, 
+		const std::string& name="un-named")
+		: m_name(name)
+		, m_implementation(new ObjectImplementation(executable)) 
+	{ /* empty */ }
+
+	~Executor(void) 
+	{ 
+		delete m_implementation; 
+	}
+
+	void 
+		execute(void) 
+	{ 
+		m_implementation->execute(); 
+	}
+
+	const std::string&
+		toString(void) const
+	{
+		return m_name;
+	}
+
+private:
+	class ExecutorImplementation
+	{
+	public:
+		virtual ~ExecutorImplementation() 
+		{ /* empty */ }
+		
+		virtual void execute(void)=0;
+	}; // ExecutorImplementation
+
+	class ObjectImplementation : public ExecutorImplementation
+	{
+	public:
+		ObjectImplementation(Executable* object) 
+			: m_object(object) 
+		{ /* empty */ }
+
+		void 
+			execute(void) 
+		{ 
+			m_object->execute(); 
+		}					
+
+	private:	
+		Executable*	m_object;
+	}; // class ExecutableExecutor : public Executor
+
+	class FunctionImplementation : public ExecutorImplementation
+	{
+	public:		
+		FunctionImplementation(executableFunction function) 
+			: m_function(function) 
+		{ /* empty */ }
+
+		void 
+			execute(void) 
+		{ 
+			(*m_function)(); 
+		}		
+
+	private:
+		executableFunction m_function;
+	}; // class FunctionExecutor : public Executor
+
+	std::string
+		m_name;
+
+	ExecutorImplementation* 
+		m_implementation;
+}; // class Executor
+
+
 
 }//namespace multithreading
 

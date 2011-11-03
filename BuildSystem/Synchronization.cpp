@@ -17,6 +17,7 @@ class PlatformMutex
 {
 public:
 #if WIN32
+	/** \todo inspect SetCriticalSectionSpinCount */
 	inline PlatformMutex(void)
 	{
 		InitializeCriticalSection(&m_criticalsection);

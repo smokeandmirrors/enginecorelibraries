@@ -474,7 +474,15 @@
 			Name="Containers"
 			>
 			<File
+				RelativePath=".\Array.h"
+				>
+			</File>
+			<File
 				RelativePath=".\RedBlackTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Table.h"
 				>
 			</File>
 		</Filter>

@@ -17,166 +17,102 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
+
 namespace multithreading
 {
 
 class Thread;
-class PendingJobQueue;
 
+/** 
+a class that handles processing concurrent execution
+of threads 
+ */
 class Scheduler 
 : public designPatterns::Singleton<Scheduler>
-, public signals::Receiver
 {
+	class Job;
+	class PendingJobQueue;
 	friend class designPatterns::Singleton<Scheduler>;
-	friend class signals::Transmitter1<Thread*>;
 
 public:
-	/** 
-	\todo expose an optional direct callback mechanism for when the job
-	is finished 
-	*/
-	void			enqueue(Executable* job, 
-						sint ideal_thread=noThreadPreference,
-						const schar* name="un-named");
-
-	/** 
-	\todo expose an optional direct callback mechanism for when the job
-	is finished 
-	*/
-	void			enqueue(executableFunction job, 
-						sint ideal_thread=noThreadPreference,
-						const schar* name="un-named");
-
-	uint getMaxThreads(void) const 
-	{ 
-		return m_maxThreads; 
-	}
+	void 
+		enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
+/*
+	void 
+		enqueue(std::vector<Job*>& job);
 	
-	uint getNumberActiveJobs(void) const
-	{
-		return m_numActiveJobs;
-	}
-	
-	uint getNumberPendingJobs(void) const;
-	
-	uint getNumberSystemThreads(void) const	
-	{ 
-		return m_numSystemThreads; 
-	}
-	
-	bool hasAnyWork(void) const
-	{
-		SYNC(m_mutex);
-		return getNumberActiveJobs() || getNumberPendingJobs();
-	}
+	void 
+		enqueueAndWait(Job& job);
 
-	virtual void ceaseReception(void)
-	{
-		m_receiver.ceaseReception();
-	}
-
-	void onComplete(Thread* thread)
-	{
-		SYNC(m_mutex);
-		accountForFinish(thread);
-		startNextJob();
-	}
-		
-	void printState(void) const
-	{
-		std::string output = this->toString();
-		printf(output.c_str());
-	}
-
-	void setMaxThreads(uint max)			
-	{ 
-		m_maxThreads = max; 
-	}
+	void 
+		enqueueAndWait(std::vector<Job*>& job);
+*/
+	uint 
+		getMaxThreads(void) const;
 	
-	const std::string toString(void) const;
+	uint 
+		getNumberActiveJobs(void) const;
+	
+	uint 
+		getNumberPendingJobs(void) const;
+	
+	uint 
+		getNumberSystemThreads(void) const;
+	
+	bool 
+		hasAnyWork(void) const;
+			
+	void 
+		printState(void) const;
+	
+	void 
+		setMaxThreads(uint max);
+	
+	const std::string 
+		toString(void) const;
 	
 protected:
 	Scheduler(void);
 	~Scheduler(void);
 	
-	inline void accountForFinish(Thread* job)
-	{
-		SYNC(m_mutex);
-		sint thread_index = -1;
+	void 
+		accountForFinish(Job* finished);
 
-		for (uint i = 0; i < m_numSystemThreads; i++)
-		{
-			if (m_activeJobs[i] == job)
-			{
-				thread_index = static_cast<sint>(i);
-				break;
-			}
-		}
-
-		assert(thread_index != -1);
-		m_activeJobs[thread_index] = NULL;
-		m_numActiveJobs--;
-		printState();
-	}
-
-	inline void accountForNewJob(Thread* job, sint index)
-	{
-		SYNC(m_mutex);
-		m_activeJobs[index] = job;
-		m_numActiveJobs++;
-		printState();
-	}
+	void 
+		accountForStartedJob(Job* started, cpuID index);
 	
-	inline bool getFreeIndex(sint& index)
-	{
-		SYNC(m_mutex);
-		for (uint i = 0; i < m_numSystemThreads; i++)
-		{
-			if (!m_activeJobs[i])
-			{
-				index = static_cast<sint>(i);
-				return true;
-			}
-		}
+	bool 
+		getFreeIndex(cpuID& index);
+	
+	bool 
+		getFreeIndex(cpuID& available, cpuID idealCPU);
 
-		return false;
-	}
+	void
+		initializeNumberSystemThreads(void);
 
-	inline bool getOpenThread(sint& index, sint ideal_thread)
-	{
-		SYNC(m_mutex);
-		if (ideal_thread != noThreadPreference && !m_activeJobs[ideal_thread])
-		{
-			index = ideal_thread;
-			return true;
-		}
-		else
-		{
-			return getFreeIndex(index);
-		}	
-	}
+	bool 
+		isAnyIndexFree(void) const;
+	
+	bool
+		isAnyJobPending(void) const;
+	
+	void 
+		onComplete(Job* completed);
 
-	void			initializeNumberSystemThreads(void);
-
-	void onConnect(signals::Transmitter* sender)
-	{
-		m_receiver.onConnect(sender);
-	}
-
-	void onDisconnect(signals::Transmitter* sender)
-	{
-		m_receiver.onDisconnect(sender);
-	}
-
-	void			startNextJob(void);
-	const std::string toStringActiveJob(Thread* job) const;
-	const std::string toStringInactiveJob(void) const;
+	void
+		startJobs(void);
+	
+	const std::string 
+		toStringActiveJob(Job* job) const;
+	
+	const std::string 
+		toStringInactiveJob(void) const;
 	
 private:
 	Scheduler(const Scheduler&);
 	Scheduler operator=(const Scheduler&);
 	
-	Thread**				m_activeJobs;
+	std::vector<Job*>		m_activeJobs;
 	uint					m_maxThreads;
 	uint					m_numActiveJobs;
 	uint					m_numSystemThreads;

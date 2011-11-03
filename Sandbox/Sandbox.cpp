@@ -14,6 +14,7 @@
 #include "Build.h"
 #include "CompilerChecks.h"
 #include "Composition.h"
+#include "Multithreading.h"
 #include "RedBlackTree.h"
 #include "Sandbox.h"
 #include "Scheduling.h"
@@ -61,6 +62,11 @@ inline void doWork(millisecond milliseconds)
 
 	// delete[] numbers;
 }
+
+void doWork3(void) { doWork(3000); }
+void doWork4(void) { doWork(4000); }
+void doWork5(void) { doWork(5000); }
+void doWork10(void) { doWork(10000); }
 
 typedef enum  
 {
@@ -435,21 +441,27 @@ class TestJob
 : public multithreading::Executable
 {
 public:
-	TestJob(TestRequirement* requirement)
-	: m_requirement(requirement)
-	{ /* empty */ }
+	TestJob(TestRequirement* requirement);
 	
 	virtual ~TestJob(void) 
 	{ /* empty */ }
 	
 	void TestJob::execute(void);
 	
+	const std::string &toString(void) const
+	{
+		return m_name;
+	}
+
 protected:
 	TestJob();
 
 private:
 	TestRequirement*	
 		m_requirement;
+
+	std::string
+		m_name;
 };
 
 class TestRequirement 
@@ -464,7 +476,8 @@ public:
 		// weird testing
 		m_workTime *= 100;
 		// end weird testing
-		m_original = new TestJob(this);
+		m_originalJob = new TestJob(this);
+		m_original = new multithreading::Executor( m_originalJob );
 	}
 
 	virtual 
@@ -490,7 +503,7 @@ public:
 	{
 		SYNC(m_mutex);
 		++m_completedJobs;
-		delete_self = job != m_original;
+		delete_self = job != m_originalJob;
 
 		if (m_completedJobs >= m_childJobs)
 		{
@@ -508,7 +521,7 @@ public:
 		m_completedJobs = 0;
 		std::string name = frameReqName(m_reqID);
 		name += "(o)";
-		multithreading::Scheduler::single().enqueue(m_original, multithreading::noCPUpreference, name.c_str());
+		multithreading::Scheduler::single().enqueue(*m_original);
 	}
 
 private:
@@ -517,8 +530,11 @@ private:
 	sint					
 		m_completedJobs;
 
-	TestJob* 
+	multithreading::Executor* 
 		m_original;
+
+	TestJob*
+		m_originalJob;
 	
 	eFrameRequirementID 
 		m_reqID;
@@ -542,7 +558,9 @@ void TestJob::execute(void)
 		std::string name = frameReqName(m_requirement->getID());
 		name += "(c)";
 		TestJob* job = new TestJob(m_requirement);
-		multithreading::Scheduler::single().enqueue(job, multithreading::noCPUpreference, name.c_str());
+		multithreading::Executor* executor = new multithreading::Executor(job);
+
+		multithreading::Scheduler::single().enqueue(*executor);
 	}
 
 	if (delete_self)
@@ -550,6 +568,11 @@ void TestJob::execute(void)
 		delete this;
 	}
 }
+
+TestJob::TestJob(TestRequirement* requirement)
+: m_requirement(requirement)
+, m_name(frameReqName(requirement->getID()))
+{ /* empty */ }
 
 class Agent 
 : public Composite<Agent>
@@ -644,18 +667,34 @@ void testEngineLoop(void)
 	loop.stop();
 
 	// \todo replace with: multithreading::Scheduler::single().waitForCompletion();
-	while (multithreading::Scheduler::single().hasAnyWork())
+	// while (multithreading::Scheduler::single().hasAnyWork())
 	{
 		multithreading::sleep(3000);
 	}	
 
-	multithreading::Scheduler::single().destroy();
+	// multithreading::Scheduler::single().destroy();
 }
 
 void onPlay(void)
 {
 	testEngineLoop();
+	// multithreading::Thread[] runUs = new multithreading::Thread[];
+	multithreading::Executor* executor = new multithreading::Executor(&doWork3);
+	multithreading::Thread* runMe = new multithreading::Thread(*executor);
+	runMe->executeAndWait();
+	
+	printf("waited once");
 
+	runMe->waitOnCompletion();
+	delete runMe;
+	printf("waited twice");
+
+	executor = new multithreading::Executor(&doWork3);
+	multithreading::Thread* runMeAndWait = new multithreading::Thread(*executor);
+	runMeAndWait->executeAndWait();
+	delete runMeAndWait;
+	
+	// Thread* runMe = new Thread*[];
 
 	Table< RedBlackTree<sint>* > table;
 
