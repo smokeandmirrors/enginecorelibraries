@@ -50,7 +50,8 @@ class Executable
 {
 public:
 	virtual	
-		~Executable(void)=0 {/* empty */}
+		~Executable(void)=0 
+	{/* empty */}
 	
 	virtual void 
 		execute(void)=0;
@@ -66,13 +67,13 @@ public:
 		const std::string& name="un-named")
 		: m_name(name)
 		, m_implementation(new FunctionImplementation(executable)) 
-	{ /* empty */ }
-	
+	{/* empty */}
+
 	Executor(Executable* executable, 
 		const std::string& name="un-named")
 		: m_name(name)
 		, m_implementation(new ObjectImplementation(executable)) 
-	{ /* empty */ }
+	{/* empty */}
 
 	~Executor(void) 
 	{ 
@@ -97,7 +98,7 @@ private:
 	public:
 		virtual ~ExecutorImplementation() 
 		{ /* empty */ }
-		
+
 		virtual void execute(void)=0;
 	}; // ExecutorImplementation
 
@@ -141,7 +142,6 @@ private:
 	ExecutorImplementation* 
 		m_implementation;
 }; // class Executor
-
 
 
 }//namespace multithreading

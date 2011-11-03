@@ -58,17 +58,14 @@ void Thread::disconnect(signals::Receiver* receiver)
 
 void Thread::execute(cpuID suggestedCPU)
 {	
-	initialize(suggestedCPU);
+	if (m_state == suspended)
+		initialize(suggestedCPU);
 }	
 
 void Thread::executeAndWait(cpuID suggestedCPU)
 {
 	execute(suggestedCPU);
-
-	if (m_state == running)
-	{
-		multithreading::waitForCompletion(&m_thread, 1, true, waitInfinitely);
-	}
+	waitOnCompletion();
 }
 
 cpuID Thread::getPreferredCPU(void) const
@@ -114,7 +111,8 @@ void Thread::updateCPUPreference(cpuID suggestedCPU)
 
 void Thread::waitOnCompletion(void)
 {
-	multithreading::waitForCompletion(&m_thread, 1, true, waitInfinitely);
+	if (m_state != error)
+		multithreading::waitForCompletion(&m_thread, 1, true, waitInfinitely);
 }
 
 #if WIN32

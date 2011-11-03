@@ -96,9 +96,6 @@ protected:
 	bool
 		isAnyJobPending(void) const;
 	
-	void 
-		onComplete(Job* completed);
-
 	void
 		startJobs(void);
 	

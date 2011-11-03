@@ -474,16 +474,15 @@ public:
 	, m_childJobs(child_jobs)
 	{
 		// weird testing
-		m_workTime *= 100;
+		// m_workTime *= 100;
 		// end weird testing
 		m_originalJob = new TestJob(this);
-		m_original = new multithreading::Executor( m_originalJob );
+		// m_original = new multithreading::Executor( m_originalJob, frameReqName(ID_one));
 	}
 
 	virtual 
 	~TestRequirement(void)
 	{
-		delete m_original;
 	}
 
 	inline eFrameRequirementID
@@ -521,7 +520,8 @@ public:
 		m_completedJobs = 0;
 		std::string name = frameReqName(m_reqID);
 		name += "(o)";
-		multithreading::Scheduler::single().enqueue(*m_original);
+		multithreading::Executor* executor = new multithreading::Executor(m_originalJob, name);
+		multithreading::Scheduler::single().enqueue(*executor);
 	}
 
 private:
@@ -529,9 +529,6 @@ private:
 	
 	sint					
 		m_completedJobs;
-
-	multithreading::Executor* 
-		m_original;
 
 	TestJob*
 		m_originalJob;
@@ -558,8 +555,7 @@ void TestJob::execute(void)
 		std::string name = frameReqName(m_requirement->getID());
 		name += "(c)";
 		TestJob* job = new TestJob(m_requirement);
-		multithreading::Executor* executor = new multithreading::Executor(job);
-
+		multithreading::Executor* executor = new multithreading::Executor(job, name);
 		multithreading::Scheduler::single().enqueue(*executor);
 	}
 
@@ -682,12 +678,13 @@ void onPlay(void)
 	multithreading::Executor* executor = new multithreading::Executor(&doWork3);
 	multithreading::Thread* runMe = new multithreading::Thread(*executor);
 	runMe->executeAndWait();
-	
-	printf("waited once");
+	// runMe->execute();
+
+	printf("waited once\n");
 
 	runMe->waitOnCompletion();
 	delete runMe;
-	printf("waited twice");
+	printf("waited twice\n");
 
 	executor = new multithreading::Executor(&doWork3);
 	multithreading::Thread* runMeAndWait = new multithreading::Thread(*executor);

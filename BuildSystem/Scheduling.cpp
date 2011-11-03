@@ -214,79 +214,6 @@ Scheduler::~Scheduler(void)
 	delete m_pendingJobs;
 }
 
-void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
-{
-	SYNC(m_mutex);
-	m_pendingJobs->add(executable, preferredCPU);
-	startJobs();
-	printState();
-}
-
-uint Scheduler::getMaxThreads(void) const 
-{ 
-	return m_maxThreads; 
-}
-
-uint Scheduler::getNumberActiveJobs(void) const
-{
-	return m_numActiveJobs;
-}
-
-uint Scheduler::getNumberPendingJobs(void) const
-{
-	SYNC(m_mutex);
-	return m_pendingJobs->getNumber();
-}
-
-uint Scheduler::getNumberSystemThreads(void) const	
-{ 
-	return m_numSystemThreads; 
-}
-
-bool Scheduler::hasAnyWork(void) const
-{
-	SYNC(m_mutex);
-	return getNumberActiveJobs() || getNumberPendingJobs();
-}
-
-void Scheduler::initializeNumberSystemThreads(void)
-{
-#if WIN32
-	SYSTEM_INFO windows_info;
-	GetSystemInfo(&windows_info);
-	m_numSystemThreads = windows_info.dwNumberOfProcessors;
-#else
-	PREVENT_COMPILE
-#endif//WIN32
-}
-
-void Scheduler::printState(void) const
-{
-	std::string output = this->toString();
-	printf(output.c_str());
-}
-
-void Scheduler::setMaxThreads(uint max)			
-{ 
-	m_maxThreads = max; 
-}
-
-void Scheduler::startJobs(void)
-{
-	SYNC(m_mutex);
-		
-	while (isAnyJobPending() && isAnyIndexFree())
-	{
-		cpuID preferred(m_pendingJobs->getNextPreferredCPU());
-		cpuID required;
-		bool success = getFreeIndex(required, preferred);
-		assert(success);
-		Job* job = m_pendingJobs->getNextJob();
-		accountForStartedJob(job, required);
-		job->start(required);
-	}
-}
-
 void Scheduler::accountForFinish(Job* finished)
 {
 	SYNC(m_mutex);
@@ -305,14 +232,22 @@ void Scheduler::accountForFinish(Job* finished)
 	m_activeJobs[thread_index] = NULL;
 	m_numActiveJobs--;
 	m_pendingJobs->recycleJob(finished);
+	startJobs();
 	printState();
 }
 
 void Scheduler::accountForStartedJob(Job* started, cpuID index)
 {
-	SYNC(m_mutex);
 	m_activeJobs[index] = started;
 	m_numActiveJobs++;
+	printState();
+}
+
+void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
+{
+	SYNC(m_mutex);
+	m_pendingJobs->add(executable, preferredCPU);
+	startJobs();
 	printState();
 }
 
@@ -345,9 +280,49 @@ bool Scheduler::getFreeIndex(cpuID& available, cpuID idealCPU)
 	}	
 }
 
-bool Scheduler::isAnyIndexFree(void) const
+uint Scheduler::getMaxThreads(void) const 
+{ 
+	SYNC(m_mutex);
+	return m_maxThreads; 
+}
+
+uint Scheduler::getNumberActiveJobs(void) const
 {
 	SYNC(m_mutex);
+	return m_numActiveJobs;
+}
+
+uint Scheduler::getNumberPendingJobs(void) const
+{
+	SYNC(m_mutex);
+	return m_pendingJobs->getNumber();
+}
+
+uint Scheduler::getNumberSystemThreads(void) const	
+{ 
+	SYNC(m_mutex);
+	return m_numSystemThreads; 
+}
+
+bool Scheduler::hasAnyWork(void) const
+{
+	SYNC(m_mutex);
+	return getNumberActiveJobs() || getNumberPendingJobs();
+}
+
+void Scheduler::initializeNumberSystemThreads(void)
+{
+#if WIN32
+	SYSTEM_INFO windows_info;
+	GetSystemInfo(&windows_info);
+	m_numSystemThreads = windows_info.dwNumberOfProcessors;
+#else
+	PREVENT_COMPILE
+#endif//WIN32
+}
+
+bool Scheduler::isAnyIndexFree(void) const
+{
 	for (uint i = 0; i < m_numSystemThreads; i++)
 	{
 		if (!m_activeJobs[i])
@@ -364,11 +339,31 @@ bool Scheduler::isAnyJobPending(void) const
 	return m_pendingJobs->getNumber() != 0;
 }
 
-void Scheduler::onComplete(Job* completed)
+void Scheduler::printState(void) const
 {
 	SYNC(m_mutex);
-	accountForFinish(completed);
-	startJobs();
+	printf(toString().c_str());
+}
+
+void Scheduler::setMaxThreads(uint max)			
+{ 
+	SYNC(m_mutex);
+	m_maxThreads = max; 
+}
+
+void Scheduler::startJobs(void)
+{
+	SYNC(m_mutex);
+	while (isAnyJobPending() && isAnyIndexFree())
+	{
+		cpuID preferred(m_pendingJobs->getNextPreferredCPU());
+		cpuID required;
+		bool success = getFreeIndex(required, preferred);
+		assert(success);
+		Job* job = m_pendingJobs->getNextJob();
+		job->start(required);
+		accountForStartedJob(job, required);
+	}
 }
 
 const std::string Scheduler::toString(void) const
