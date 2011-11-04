@@ -7,8 +7,11 @@
 
 namespace multithreading
 {
-const millisecond waitInfinitely = 999999999.9f;
-const cpuID noCPUpreference(-1);
+const millisecond 
+	waitInfinitely = 10000000000.0f;
+
+const cpuID 
+	noCPUpreference(-1);
 
 inline void 
 	closeThread(threadHandle);
@@ -16,39 +19,40 @@ inline void
 inline threadHandle	
 	createThread(threadable function, bool startSuspended, threadID& id, void* args, cpuID cpuPreference=noCPUpreference);
 
+inline threadHandle	
+	getCurrentThread(void);
+
+inline threadID
+	getCurrentThreadID(void);
+
 inline bool
 	resumeThread(threadHandle);
 
 inline bool 
-	waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds);
+	waitForCompletion(threadHandle& handle, millisecond milliseconds);
 
-Thread::Thread(Executor& executable,
-   bool startSuspended,
-   cpuID preferredCPU)
-: m_executor(&executable)
-, m_preferredCPU(preferredCPU)
-, m_thread(NULL)
-, m_state(Thread::suspended)
-{ 
-	if (!startSuspended)
-	{
-		execute(preferredCPU);
-	}
-}
+inline bool 
+	waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds);
 
 Thread::~Thread(void)
 {
 	if (m_state == running)
 	{
-		waitOnCompletion();
+		waitOnCompletion(*this);
 	}
 		
-	if (m_state != completed)
+	closeHardware();
+	delete m_executor;
+}
+
+void Thread::closeHardware()
+{
+	if (m_state == completed
+	|| m_state == suspended)
 	{
 		closeThread(m_thread);
+		m_state	= closed;
 	}
-
-	delete m_executor;
 }
 
 void Thread::disconnect(signals::Receiver* receiver)
@@ -56,16 +60,30 @@ void Thread::disconnect(signals::Receiver* receiver)
 	m_onComplete.disconnect(receiver);
 }
 
-void Thread::execute(cpuID suggestedCPU)
+void Thread::execute(cpuID preferredCPU)
 {	
-	if (m_state == suspended)
-		initialize(suggestedCPU);
+	if (m_state == uninitialized)
+	{
+		initializeHardware(preferredCPU, false);
+	}
+	else if (m_state == suspended
+	&& resumeThread(m_thread))
+	{
+		m_state = running;
+	}
 }	
 
 void Thread::executeAndWait(cpuID suggestedCPU)
 {
 	execute(suggestedCPU);
-	waitOnCompletion();
+	waitOnCompletion(*this);
+}
+
+Thread* Thread::getExecuting(Executor& executable, cpuID preferredCPU)
+{
+	Thread* thread = new Thread(executable, preferredCPU);
+	thread->execute(preferredCPU);
+	return thread;
 }
 
 cpuID Thread::getPreferredCPU(void) const
@@ -73,27 +91,44 @@ cpuID Thread::getPreferredCPU(void) const
 	return m_preferredCPU;
 }
 
+Thread* Thread::getSuspended(Executor& executable, cpuID preferredCPU)
+{
+	Thread* thread = new Thread(executable, preferredCPU);
+	thread->initializeSuspended(preferredCPU);
+	return thread;
+}
+
+Thread* Thread::getUninitialized(Executor& executable, cpuID preferredCPU)
+{
+	return new Thread(executable, preferredCPU);
+}
+
 void Thread::internalExecute(void)
 {
 	m_executor->execute();
 	m_state = completed;
 	m_onComplete.send(this);
-	closeThread(m_thread);
+	closeHardware();
 }
 
-void Thread::initialize(cpuID preferredCPU)
+void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
 	updateCPUPreference(preferredCPU);
-	m_thread = multithreading::createThread(Thread::systemExecute, false, m_id, this, m_preferredCPU);
+	m_thread = multithreading::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
 
 	if (m_thread)
 	{
-		m_state = running;
+		m_state = startSuspended ? suspended : running;
 	}
 	else
 	{
 		m_state = error;
 	}
+}
+
+void Thread::initializeSuspended(cpuID preferredCPU)
+{
+	initializeHardware(preferredCPU, true);
 }
 
 const std::string& Thread::toString(void) const 
@@ -109,13 +144,38 @@ void Thread::updateCPUPreference(cpuID suggestedCPU)
 	}
 }
 
-void Thread::waitOnCompletion(void)
+void Thread::waitOnCompletion(Thread& thread)
 {
-	if (m_state != error)
-		multithreading::waitForCompletion(&m_thread, 1, true, waitInfinitely);
+	if (thread.isWaitable())
+	{
+		multithreading::waitForCompletion(thread.m_thread, waitInfinitely);
+	}
+}
+
+void Thread::waitOnCompletion(std::vector<Thread*>& threads)
+{
+	threadHandle* handles = new threadHandle[threads.size()];
+
+	std::vector<Thread*>::iterator sentinel(threads.end());
+
+	uint numValid(0);
+
+	for (std::vector<Thread*>::iterator iter(threads.begin());
+	iter != sentinel;
+	iter++)
+	{
+		if ((*iter)->isWaitable())
+		{
+			handles[numValid] = (*iter)->m_thread;
+			numValid++;
+		}
+	}
+
+	waitForCompletion(handles, numValid, true, waitInfinitely);
 }
 
 #if WIN32
+
 #define THREAD_RESUME_FAILED (0xFFFFFFFF)
 
 inline threadHandle createThread(threadable function, bool startSuspended, threadID& id, void* args, sint/* CPUid*/)
@@ -140,6 +200,11 @@ inline void	closeThread(threadHandle handle)
 	CloseHandle(handle);
 }
 
+inline threadID getCurrentThreadID(void)
+{
+	return static_cast<threadID>(GetCurrentThreadId());
+}
+
 inline bool resumeThread(threadHandle handle)
 {
 	return ResumeThread(handle) != THREAD_RESUME_FAILED;
@@ -148,6 +213,48 @@ inline bool resumeThread(threadHandle handle)
 void sleep(millisecond milliseconds)
 {
 	Sleep(static_cast<uint>(milliseconds));
+}
+
+inline bool waitForCompletion(threadHandle& handle, millisecond milliseconds)
+{
+	bool success(false);
+
+	DWORD result = WaitForSingleObject(handle, 
+		milliseconds == waitInfinitely 
+		? INFINITE 
+		: static_cast<DWORD>(milliseconds));
+
+	success = result != WAIT_FAILED;
+
+	if (!success)
+	{
+		DWORD lastError = GetLastError();
+		printf("ERROR: %d\n", lastError);
+		LPWSTR pMessage = L"%1!*.*s! %4 %5!*s!";
+		DWORD_PTR pArgs[] = { (DWORD_PTR)4, (DWORD_PTR)2, (DWORD_PTR)L"Bill",  // %1!*.*s! refers back to the first insertion string in pMessage
+			(DWORD_PTR)L"Bob",                                                // %4 refers back to the second insertion string in pMessage
+			(DWORD_PTR)6, (DWORD_PTR)L"Bill" };                               // %5!*s! refers back to the third insertion string in pMessage
+		const DWORD size = 100+1;
+		WCHAR buffer[size];
+
+
+		if (!FormatMessage(FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+			pMessage, 
+			0,
+			0,
+			buffer, 
+			size, 
+			(va_list*)pArgs))
+		{
+			wprintf(L"Format message failed with 0x%x\n", GetLastError());
+		}
+		else
+		{
+			wprintf(buffer);
+		}
+	}
+
+	return success;
 }
 
 inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds)
@@ -165,6 +272,35 @@ inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitF
 				: static_cast<DWORD>(milliseconds));
 		
 		success = result != WAIT_FAILED;
+
+		if (!success)
+		{
+			DWORD lastError = GetLastError();
+			printf("ERROR: %d\n", lastError);
+			LPWSTR pMessage = L"%1!*.*s! %4 %5!*s!";
+			DWORD_PTR pArgs[] = { (DWORD_PTR)4, (DWORD_PTR)2, (DWORD_PTR)L"Bill",  // %1!*.*s! refers back to the first insertion string in pMessage
+				(DWORD_PTR)L"Bob",                                                // %4 refers back to the second insertion string in pMessage
+				(DWORD_PTR)6, (DWORD_PTR)L"Bill" };                               // %5!*s! refers back to the third insertion string in pMessage
+			const DWORD size = 100+1;
+			WCHAR buffer[size];
+
+
+			if (!FormatMessage(FORMAT_MESSAGE_FROM_STRING | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+				pMessage, 
+				0,
+				0,
+				buffer, 
+				size, 
+				(va_list*)pArgs))
+			{
+				wprintf(L"Format message failed with 0x%x\n", GetLastError());
+			}
+			else
+			{
+				wprintf(buffer);
+			}
+		}
+
 	}
 	
 	return success;

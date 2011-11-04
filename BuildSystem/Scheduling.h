@@ -37,12 +37,12 @@ class Scheduler
 public:
 	void 
 		enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
+
+	void
+		enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference);
 /*
 	void 
 		enqueue(std::vector<Job*>& job);
-	
-	void 
-		enqueueAndWait(Job& job);
 
 	void 
 		enqueueAndWait(std::vector<Job*>& job);
@@ -109,12 +109,36 @@ private:
 	Scheduler(const Scheduler&);
 	Scheduler operator=(const Scheduler&);
 	
-	std::vector<Job*>		m_activeJobs;
-	uint					m_maxThreads;
-	uint					m_numActiveJobs;
-	uint					m_numSystemThreads;
-	signals::ReceiverMember	m_receiver;
-	PendingJobQueue*		m_pendingJobs;
+	/** \todo
+
+	std::vector<HardwareThreads> m_threads;
+
+	class HardwareThread
+	{
+		Thread* m_softwareThread;
+		DECLARE_MUTEX(m_mutex);
+	}
+	*/
+
+
+	std::vector<Job*>		
+		m_activeJobs;
+	
+	uint 
+		m_maxThreads;
+	
+	uint 
+		m_numActiveJobs;
+	
+	uint
+		m_numSystemThreads;
+	
+	signals::ReceiverMember	
+		m_receiver;
+	
+	PendingJobQueue*		
+		m_pendingJobs;
+	
 	DECLARE_MUTEX(m_mutex);
 }; // class Scheduler
 

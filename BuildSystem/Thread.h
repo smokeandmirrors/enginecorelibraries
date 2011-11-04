@@ -3,6 +3,7 @@
 #define THREADS_H
 
 #include <string>
+#include <vector>
 
 #include "Build.h"
 #include "Multithreading.h"
@@ -29,17 +30,29 @@ typedef void*				threadHandle;
 	PREVENT_COMPILE
 #endif//WIN32
 	
+/** 
+	\todo make thread pool, static borrow/recycle, private constructors, destructors, answer questions about state?
+	\todo make all public functionality static? 
+	\todo static borrow/recycle with waitable
+*/
 class Thread
 {
 public:
-	/** 
-	\todo unify job/thread make Executor public
-	\todo make thread pool, static borrow/recycle, private constructors, destructors, answer questions about state?
-	\todo make all public functionality static? 
-	*/
-	Thread(Executor& executable,
-		bool startSuspended=false,
-		cpuID preferredCPU=noCPUpreference);
+	// for the normal user
+	static Thread* 
+		getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	// for the user/scheduler to wait on it
+	static Thread* 
+		getSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	// for the daring user, for the scheduler to get the preferred CPU
+	static Thread* 
+		getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
+
+	static void
+		waitOnCompletion(Thread& thread);
+
+	static void
+		waitOnCompletion(std::vector<Thread*>& threads);
 
 	virtual 
 		~Thread(void);
@@ -54,10 +67,10 @@ public:
 		disconnect(signals::Receiver* receiver);
 
 	void 
-		execute(cpuID suggestedCPU=noCPUpreference); 
+		execute(cpuID preferredCPU=noCPUpreference); 
 	
 	void 
-		executeAndWait(cpuID suggestedCPU=noCPUpreference);
+		executeAndWait(cpuID preferredCPU=noCPUpreference);
 
 	cpuID 
 		getPreferredCPU(void) const;
@@ -65,17 +78,15 @@ public:
 	const std::string& 
 		toString(void) const;
 
-	void
-		waitOnCompletion(void);
-
 private:
-	
 	enum RunningState
 	{
-		completed,
-		error,
-		running,
-		suspended
+		completed,		// execution complete 
+		closed,			// hardware thread resource returned
+		error,			// hardware initialization failed 
+		uninitialized,	// no hardware thread
+		running,		// hardware thread executing
+		suspended		// hardware execution paused
 	}; // enum Thread::RunningState
 
 #if WIN32
@@ -88,20 +99,37 @@ private:
 #else
 	PREVENT_COMPILE
 #endif//WIN32
-		
+
+	Thread(Executor& executable,
+	cpuID preferredCPU)
+	: m_executor(&executable)
+	, m_preferredCPU(preferredCPU)
+	, m_thread(NULL)
+	, m_state(Thread::uninitialized)
+	{ /* empty */ }
+
 	/** not allowed */
 	Thread(const Thread&);
 	Thread(void);
 
 	void
-		updateCPUPreference(cpuID suggestedCPU);
-	
+		closeHardware(void);
+
 	void 
 		internalExecute(void);
 
+	void
+		initializeHardware(cpuID preferredCPU, bool startSuspended);
+
 	void 
-		initialize(cpuID preferredCPU);
-	
+		initializeSuspended(cpuID preferredCPU);
+
+	inline bool 
+		isWaitable(void) const { return m_state == running || m_state == suspended; }
+
+	void
+		updateCPUPreference(cpuID suggestedCPU);
+
 	RunningState
 		m_state;
 

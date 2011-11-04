@@ -106,16 +106,25 @@ private:
 		m_thread;
 }; // Job 
 
-
-
 class Scheduler::PendingJobQueue
 {
 public:
 	inline void 
-		add(Executor& executable, cpuID preferredCPU)
+		add(Executor& executable, cpuID preferredCPU, Thread** waitable)
 	{
 		Job* job = getFreeJob();
-		Thread* thread = new Thread(executable, true, preferredCPU);
+		Thread* thread; 
+		
+		if (waitable)
+		{
+			thread = Thread::getSuspended(executable, preferredCPU);
+			*waitable = thread;
+		}
+		else
+		{
+			thread = Thread::getUninitialized(executable, preferredCPU);
+		}
+		
 		job->reset(thread);
 		m_pendingJobs.push_back(job);
 	}
@@ -246,8 +255,21 @@ void Scheduler::accountForStartedJob(Job* started, cpuID index)
 void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 {
 	SYNC(m_mutex);
-	m_pendingJobs->add(executable, preferredCPU);
+	m_pendingJobs->add(executable, preferredCPU, NULL);
 	startJobs();
+	printState();
+}
+
+void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
+{
+	Thread* output(NULL);
+	{
+		SYNC(m_mutex);
+		m_pendingJobs->add(executable, preferredCPU, &output);
+		startJobs();
+		printState();
+	}
+	Thread::waitOnCompletion(*output);
 	printState();
 }
 

@@ -59,7 +59,7 @@ inline void doWork(millisecond milliseconds)
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
 	while (realTime::milliseconds() - start < milliseconds);
-
+	printf("Done with Work\n");
 	// delete[] numbers;
 }
 
@@ -675,7 +675,9 @@ void onPlay(void)
 {
 	testEngineLoop();
 	// multithreading::Thread[] runUs = new multithreading::Thread[];
-	multithreading::Executor* executor = new multithreading::Executor(&doWork3);
+	/*
+	multithreading::Executor* executor(NULL);
+	executor = new multithreading::Executor(&doWork3);
 	multithreading::Thread* runMe = new multithreading::Thread(*executor);
 	runMe->executeAndWait();
 	// runMe->execute();
@@ -685,12 +687,29 @@ void onPlay(void)
 	runMe->waitOnCompletion();
 	delete runMe;
 	printf("waited twice\n");
-
 	executor = new multithreading::Executor(&doWork3);
-	multithreading::Thread* runMeAndWait = new multithreading::Thread(*executor);
-	runMeAndWait->executeAndWait();
-	delete runMeAndWait;
+	multithreading::Scheduler::single().enqueueAndWait(*executor);
+	printf("Waited Scheduler\n");
 	
+	executor = new multithreading::Executor(&doWork3);
+	multithreading::Thread* runMeAndWait = multithreading::Thread::getExecuting(*executor);
+	multithreading::Thread::waitOnCompletion(*runMeAndWait);
+	delete runMeAndWait;
+	printf("Waited Thread\n");
+
+	
+	std::vector<multithreading::Thread*> threads;
+	for (int i = 0; i < 32; i++)
+	{
+		executor = new multithreading::Executor(&doWork3);
+		multithreading::Thread* waitable = multithreading::Thread::getExecuting(*executor);
+		threads.push_back(waitable);
+	}
+
+	multithreading::Thread::waitOnCompletion(threads);
+	printf("Waiting for 32 threads\n");
+	*/
+
 	// Thread* runMe = new Thread*[];
 
 	Table< RedBlackTree<sint>* > table;
