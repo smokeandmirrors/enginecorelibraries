@@ -5,7 +5,7 @@
 #include <windows.h>
 #endif//WIN32
 
-namespace multithreading
+namespace concurrency
 {
 #if WIN32
 typedef CRITICAL_SECTION criticalSection;
@@ -67,4 +67,4 @@ void Mutex::release(void)
 }
 
 
-} // namespace multithreading
+} // namespace concurrency

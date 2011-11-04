@@ -111,7 +111,7 @@ private:
 
 // static initialization
 template<typename T> T& (*					Singleton<T>::getter)(void) (Singleton<T>::getUninitialized);
-template<typename T> multithreading::Mutex	Singleton<T>::mutex; 
+template<typename T> concurrency::Mutex	Singleton<T>::mutex; 
 template<typename T> T*						Singleton<T>::singleton(NULL);
 
 } // namespace designPatterns

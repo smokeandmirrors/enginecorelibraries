@@ -21,15 +21,15 @@ Tested in the field	:	NO
 
 /** \todo thread policies */
 #define DECLARE_MUTEX(identifier) \
-	multithreading::Mutex			identifier;
+	concurrency::Mutex			identifier;
 #define DECLARE_MUTABLE_MUTEX(identifier) \
-	mutable multithreading::Mutex	identifier;
+	mutable concurrency::Mutex	identifier;
 #define DECLARE_STATIC_MUTEX(identifier) \
-	static multithreading::Mutex	identifier;
+	static concurrency::Mutex	identifier;
 #define SYNC(mutex) \
-	multithreading::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
+	concurrency::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 
-namespace multithreading
+namespace concurrency
 {
 
 class PlatformMutex;
@@ -74,6 +74,6 @@ private:
 	Mutex& m_mutex;
 }; // class Synchronizer
 
-} // namespace multithreading
+} // namespace concurrency
 
 #endif//SYNCHRONIZATION_H

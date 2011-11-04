@@ -363,7 +363,7 @@ public:
 	}
 
 protected:
-	void addToList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
+	void addToList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex& mutex)
 	{
 		SYNC(mutex)
 		reqs_list.push_back(req);
@@ -400,7 +400,7 @@ protected:
 		assert(m_completed.empty());
 	}
 
-	void removeFromList(FrameRequirement* req, requirements& reqs_list, multithreading::Mutex& mutex)
+	void removeFromList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex& mutex)
 	{
 		SYNC(mutex)
 		for (requirements_iter iter = reqs_list.begin(); iter != reqs_list.end(); iter++)
@@ -438,7 +438,7 @@ private:
 class TestRequirement;
 
 class TestJob
-: public multithreading::Executable
+: public concurrency::Executable
 {
 public:
 	TestJob(TestRequirement* requirement);
@@ -477,7 +477,7 @@ public:
 		// m_workTime *= 100;
 		// end weird testing
 		m_originalJob = new TestJob(this);
-		// m_original = new multithreading::Executor( m_originalJob, frameReqName(ID_one));
+		// m_original = new concurrency::Executor( m_originalJob, frameReqName(ID_one));
 	}
 
 	virtual 
@@ -520,8 +520,8 @@ public:
 		m_completedJobs = 0;
 		std::string name = frameReqName(m_reqID);
 		name += "(o)";
-		multithreading::Executor* executor = new multithreading::Executor(m_originalJob, name);
-		multithreading::Scheduler::single().enqueue(*executor);
+		concurrency::Executor* executor = new concurrency::Executor(m_originalJob, name);
+		concurrency::Scheduler::single().enqueue(*executor);
 	}
 
 private:
@@ -555,8 +555,8 @@ void TestJob::execute(void)
 		std::string name = frameReqName(m_requirement->getID());
 		name += "(c)";
 		TestJob* job = new TestJob(m_requirement);
-		multithreading::Executor* executor = new multithreading::Executor(job, name);
-		multithreading::Scheduler::single().enqueue(*executor);
+		concurrency::Executor* executor = new concurrency::Executor(job, name);
+		concurrency::Scheduler::single().enqueue(*executor);
 	}
 
 	if (delete_self)
@@ -657,56 +657,56 @@ void testEngineLoop(void)
 
 	while (loop.getFrameNumber() < 2)
 	{
-		multithreading::sleep(3000);
+		concurrency::sleep(3000);
 	};
 
 	loop.stop();
 
-	// \todo replace with: multithreading::Scheduler::single().waitForCompletion();
-	// while (multithreading::Scheduler::single().hasAnyWork())
+	// \todo replace with: concurrency::Scheduler::single().waitForCompletion();
+	// while (concurrency::Scheduler::single().hasAnyWork())
 	{
-		multithreading::sleep(3000);
+		concurrency::sleep(3000);
 	}	
 
-	// multithreading::Scheduler::single().destroy();
+	// concurrency::Scheduler::single().destroy();
 }
 
 void onPlay(void)
 {
-	testEngineLoop();
-	// multithreading::Thread[] runUs = new multithreading::Thread[];
-	/*
-	multithreading::Executor* executor(NULL);
-	executor = new multithreading::Executor(&doWork3);
-	multithreading::Thread* runMe = new multithreading::Thread(*executor);
-	runMe->executeAndWait();
-	// runMe->execute();
+	// testEngineLoop();
 
+	// concurrency::Thread[] runUs = new concurrency::Thread[];
+	concurrency::Executor* executor(NULL);
+	executor = new concurrency::Executor(&doWork3);
+	concurrency::Thread* runMe = concurrency::Thread::getExecuting(*executor);
+	concurrency::Thread::waitOnCompletion(*runMe);
 	printf("waited once\n");
-
-	runMe->waitOnCompletion();
-	delete runMe;
+	concurrency::Thread::waitOnCompletion(*runMe);
 	printf("waited twice\n");
-	executor = new multithreading::Executor(&doWork3);
-	multithreading::Scheduler::single().enqueueAndWait(*executor);
+	delete runMe;
+	
+	executor = new concurrency::Executor(&doWork3);
+	concurrency::Scheduler::single().enqueueAndWait(*executor);
 	printf("Waited Scheduler\n");
 	
-	executor = new multithreading::Executor(&doWork3);
-	multithreading::Thread* runMeAndWait = multithreading::Thread::getExecuting(*executor);
-	multithreading::Thread::waitOnCompletion(*runMeAndWait);
+	/*
+	
+	executor = new concurrency::Executor(&doWork3);
+	concurrency::Thread* runMeAndWait = concurrency::Thread::getExecuting(*executor);
+	concurrency::Thread::waitOnCompletion(*runMeAndWait);
 	delete runMeAndWait;
 	printf("Waited Thread\n");
 
 	
-	std::vector<multithreading::Thread*> threads;
+	std::vector<concurrency::Thread*> threads;
 	for (int i = 0; i < 32; i++)
 	{
-		executor = new multithreading::Executor(&doWork3);
-		multithreading::Thread* waitable = multithreading::Thread::getExecuting(*executor);
+		executor = new concurrency::Executor(&doWork3);
+		concurrency::Thread* waitable = concurrency::Thread::getExecuting(*executor);
 		threads.push_back(waitable);
 	}
 
-	multithreading::Thread::waitOnCompletion(threads);
+	concurrency::Thread::waitOnCompletion(threads);
 	printf("Waiting for 32 threads\n");
 	*/
 

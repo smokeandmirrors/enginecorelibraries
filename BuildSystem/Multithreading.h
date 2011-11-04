@@ -15,7 +15,7 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
-namespace multithreading
+namespace concurrency
 {
 #if WIN32
 #define ARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void* args)
@@ -144,6 +144,6 @@ private:
 }; // class Executor
 
 
-}//namespace multithreading
+}//namespace concurrency
 
 #endif//MULTITHREADING_H

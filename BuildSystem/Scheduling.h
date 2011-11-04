@@ -18,7 +18,7 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-namespace multithreading
+namespace concurrency
 {
 
 class Thread;
@@ -39,7 +39,7 @@ public:
 		enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
 
 	void
-		enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference);
+		enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference); // , bool waitOnChildren=false);
 /*
 	void 
 		enqueue(std::vector<Job*>& job);
@@ -140,8 +140,9 @@ private:
 		m_pendingJobs;
 	
 	DECLARE_MUTEX(m_mutex);
+	DECLARE_MUTEX(m_idleMutex);
 }; // class Scheduler
 
-} // multithreading
+} // concurrency
 
 #endif//SCHEDULING_H

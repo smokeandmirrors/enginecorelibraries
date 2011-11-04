@@ -5,7 +5,7 @@
 
 #include "Thread.h"
 
-namespace multithreading
+namespace concurrency
 {
 const millisecond 
 	waitInfinitely = 10000000000.0f;
@@ -114,7 +114,7 @@ void Thread::internalExecute(void)
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
 	updateCPUPreference(preferredCPU);
-	m_thread = multithreading::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
+	m_thread = concurrency::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
 
 	if (m_thread)
 	{
@@ -148,7 +148,7 @@ void Thread::waitOnCompletion(Thread& thread)
 {
 	if (thread.isWaitable())
 	{
-		multithreading::waitForCompletion(thread.m_thread, waitInfinitely);
+		concurrency::waitForCompletion(thread.m_thread, waitInfinitely);
 	}
 }
 
@@ -308,4 +308,4 @@ inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitF
 
 #endif//WIN32
 
-} // namespace multithreading
+} // namespace concurrency

@@ -588,7 +588,7 @@ protected:
 
 private:
 	connections_list				m_receivers;   
-	mutable multithreading::Mutex	m_mutex;
+	mutable concurrency::Mutex	m_mutex;
 };
 
 #define SIGNALS_DECLARE_TRANSMITTER(NUM_ARGS) \

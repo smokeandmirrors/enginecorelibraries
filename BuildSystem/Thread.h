@@ -19,7 +19,7 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
-namespace multithreading
+namespace concurrency
 {
 
 #if WIN32
@@ -161,6 +161,6 @@ void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) co
 	m_onComplete.connect(receiver, function);
 }
 
-} // multithreading
+} // concurrency
 
 #endif//THREADS_H

@@ -13,7 +13,7 @@
 
 using namespace signals;
 
-namespace multithreading
+namespace concurrency
 {
 #if WIN32
 inline uint getNumHardwareThreads(void)
@@ -216,6 +216,7 @@ Scheduler::Scheduler(void)
 	}
 
 	m_pendingJobs = new PendingJobQueue();
+	m_idleMutex.acquire();
 }
 
 Scheduler::~Scheduler(void)
@@ -468,4 +469,4 @@ const std::string Scheduler::toStringInactiveJob(void) const
 {
 	return std::string(" inactive. ");
 }
-} // namespace multithreading
+} // namespace concurrency
