@@ -391,10 +391,10 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Multithreading"
+			Name="Concurrency"
 			>
 			<File
-				RelativePath=".\Multithreading.h"
+				RelativePath=".\Concurrency.h"
 				>
 			</File>
 			<File

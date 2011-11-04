@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MULTITHREADING_H
-#define MULTITHREADING_H
+#ifndef CONCURRENCY_H
+#define CONCURRENCY_H
 
 #include "Build.h"
 #include "Time.h"
@@ -146,4 +146,4 @@ private:
 
 }//namespace concurrency
 
-#endif//MULTITHREADING_H
+#endif//CONCURRENCY_H
