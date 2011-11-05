@@ -18,8 +18,14 @@ Tested in the field	:	NO
 namespace concurrency
 {
 #if WIN32
+
 #define ARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void* args)
 #define NOARGS_EXECUTABLE_FUNCTION(name) uint __stdcall name(void*)
+
+typedef uint(__stdcall*		threadable)(void*);
+typedef uint				threadID;
+typedef void*				threadHandle;
+
 #else
 	PREVENT_COMPILE
 #endif//WIN32
@@ -39,7 +45,6 @@ namespace concurrency
 	}
 
 typedef sint cpuID;
-
 typedef void(*	executableFunction)(void);
 
 extern const cpuID noCPUpreference; 

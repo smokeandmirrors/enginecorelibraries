@@ -45,12 +45,28 @@ public:
 	void
 		reset(Thread* thread)
 	{
+		/*
+		\todo there is a problem here that absolutely needs to be addressed
+		right now, we are leaking the threads that are waited on.
+		If we try and delete them, we crash.
+
 		if (m_thread)
 		{
-			m_thread->disconnect(this);
-			delete m_thread;
+			threadID childID;
+			thread->getID(childID);
+
+			if (!Scheduler::single().isOriginalWaitingOnThread(childID))
+			{
+				m_thread->disconnect(this);
+				delete m_thread;
+			}
+			else
+			{
+				printf("Aha!");
+			}
 		}
-		
+		*/
+
 		m_thread = thread;
 		m_thread->connect(this, &Job::onComplete);
 	}
@@ -82,9 +98,11 @@ public:
 	const std::string& 
 		toString(void) const
 	{
+		static std::string badThreadMessage("invalid");
+		
 		return m_thread 
 			? m_thread->toString() 
-			: "invalid";
+			: badThreadMessage;
 	}
 
 private:
@@ -216,7 +234,6 @@ Scheduler::Scheduler(void)
 	}
 
 	m_pendingJobs = new PendingJobQueue();
-	m_idleMutex.acquire();
 }
 
 Scheduler::~Scheduler(void)
@@ -256,7 +273,43 @@ void Scheduler::accountForStartedJob(Job* started, cpuID index)
 void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 {
 	SYNC(m_mutex);
-	m_pendingJobs->add(executable, preferredCPU, NULL);
+	 
+	threadID parentID = Thread::getCurrentID();
+	std::map<threadID, threadID>::iterator originalIDIter = m_originalByChildren.find(parentID);
+
+	if (originalIDIter != m_originalByChildren.end())
+	{	// parent thread is waiting on this tree, so the child thread must at least get started
+		// \todo use events or some other thing to free up the creation of the threads ahead of time?
+		threadID originalID = originalIDIter->second;
+		
+		// initialize the child thread
+		Thread* childThread(NULL);
+		m_pendingJobs->add(executable, preferredCPU, &childThread);
+		assert(childThread);
+		
+		// add the child thread to the originals list threads to wait on
+		std::map<threadID, std::vector<Thread*>* >::iterator threadsIter =
+			m_childThreadsByOriginalID.find(originalIDIter->second);
+		assert(threadsIter != m_childThreadsByOriginalID.end());
+		std::vector<Thread*>& childThreads = *(threadsIter->second);
+		childThreads.push_back(childThread);
+
+		// make sure we can find the original by the child ID, in case 
+		// the child spawns more threads
+		threadID childID;
+		bool success = childThread->getID(childID);
+		assert(success);
+		// make sure the current thread isn't already waiting on tree of threads
+		assert(m_originalByChildren.find(childID) == m_originalByChildren.end());
+		// map the original ID to the children
+		m_originalByChildren[childID] = originalID;		
+	}
+	else
+	{
+		m_pendingJobs->add(executable, preferredCPU, NULL);
+	}
+	// if parent is waiting on this thread
+		// add child job to original waiting list (use enqueue and wait?)
 	startJobs();
 	printState();
 }
@@ -271,6 +324,56 @@ void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
 		printState();
 	}
 	Thread::waitOnCompletion(*output);
+	printState();
+}
+
+void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU)
+{
+	std::vector<Thread*>* children(NULL);
+	threadID parentID;
+	
+	{
+		SYNC(m_mutex);
+		Thread* output(NULL);
+		m_pendingJobs->add(executable, preferredCPU, &output);
+		// get the current thread ID for the parent
+		parentID = Thread::getCurrentID();
+		// get the child thread ID
+		threadID childID;
+		bool success = output->getID(childID);
+		assert(success);
+		// make sure the current thread isn't already waiting on tree of threads
+		assert(m_originalByChildren.find(parentID) == m_originalByChildren.end());
+		// create the list of child threads do wait on
+		children = new std::vector<Thread*>();
+		children->push_back(output);
+		// map the children to the parent ID
+		m_childThreadsByOriginalID[parentID] = children;
+		// map the parent ID to the children
+		m_originalByChildren[childID] = parentID;
+		// start the jobs
+		startJobs();
+		printState();
+	}
+	
+	Thread::waitOnCompletionOfTree(*children);
+	
+	{
+		SYNC(m_mutex);
+		std::vector<Thread*>::iterator sentinel(children->end());
+		for (std::vector<Thread*>::iterator iter(children->begin());
+		iter != sentinel;
+		iter++)
+		{
+			threadID childID;
+			bool success = (*iter)->getID(childID);
+			assert(success);
+			m_originalByChildren.erase(childID);
+		}
+		m_childThreadsByOriginalID.erase(parentID);
+		delete children;
+	}
+	
 	printState();
 }
 
@@ -327,12 +430,6 @@ uint Scheduler::getNumberSystemThreads(void) const
 	return m_numSystemThreads; 
 }
 
-bool Scheduler::hasAnyWork(void) const
-{
-	SYNC(m_mutex);
-	return getNumberActiveJobs() || getNumberPendingJobs();
-}
-
 void Scheduler::initializeNumberSystemThreads(void)
 {
 #if WIN32
@@ -362,10 +459,16 @@ bool Scheduler::isAnyJobPending(void) const
 	return m_pendingJobs->getNumber() != 0;
 }
 
+bool Scheduler::isOriginalWaitingOnThread(threadID childID) const
+{
+	return m_originalByChildren.find(childID) != m_originalByChildren.end();
+}
+
 void Scheduler::printState(void) const
 {
-	SYNC(m_mutex);
-	printf(toString().c_str());
+	return;
+	//SYNC(m_mutex);
+	// printf(toString().c_str());
 }
 
 void Scheduler::setMaxThreads(uint max)			

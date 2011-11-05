@@ -40,13 +40,14 @@ Thread::~Thread(void)
 	{
 		waitOnCompletion(*this);
 	}
-		
+	
 	closeHardware();
 	delete m_executor;
 }
 
 void Thread::closeHardware()
 {
+	SYNC(m_mutex);
 	if (m_state == completed
 	|| m_state == suspended)
 	{
@@ -62,6 +63,8 @@ void Thread::disconnect(signals::Receiver* receiver)
 
 void Thread::execute(cpuID preferredCPU)
 {	
+	// SYNC(m_mutex);
+	
 	if (m_state == uninitialized)
 	{
 		initializeHardware(preferredCPU, false);
@@ -77,6 +80,11 @@ void Thread::executeAndWait(cpuID suggestedCPU)
 {
 	execute(suggestedCPU);
 	waitOnCompletion(*this);
+}
+
+threadID Thread::getCurrentID(void)
+{
+	return getCurrentThreadID();
 }
 
 Thread* Thread::getExecuting(Executor& executable, cpuID preferredCPU)
@@ -105,14 +113,18 @@ Thread* Thread::getUninitialized(Executor& executable, cpuID preferredCPU)
 
 void Thread::internalExecute(void)
 {
-	m_executor->execute();
-	m_state = completed;
-	m_onComplete.send(this);
-	closeHardware();
+	// // SYNC(m_mutex);
+	// if (isExecutable())
+	{
+		m_executor->execute();
+		m_state = completed;
+		m_onComplete.send(this);
+	}
 }
 
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
+	// SYNC(m_mutex);
 	updateCPUPreference(preferredCPU);
 	m_thread = concurrency::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
 
@@ -148,7 +160,7 @@ void Thread::waitOnCompletion(Thread& thread)
 {
 	if (thread.isWaitable())
 	{
-		concurrency::waitForCompletion(thread.m_thread, waitInfinitely);
+		waitForCompletion(thread.m_thread, waitInfinitely);
 	}
 }
 
@@ -173,6 +185,31 @@ void Thread::waitOnCompletion(std::vector<Thread*>& threads)
 
 	waitForCompletion(handles, numValid, true, waitInfinitely);
 }
+
+void Thread::waitOnCompletionOfTree(std::vector<Thread*>& threads)
+{
+	bool resetLoop = false;
+	do
+	{
+		resetLoop = false;
+		size_t previousSize = threads.size();
+
+		for (size_t i = 0; i < previousSize; i++)
+		{
+			if (threads[i]->isWaitable())
+			{
+				waitForCompletion(threads[i]->m_thread, waitInfinitely);
+			}
+		}
+
+		if (threads.size() != previousSize)
+		{
+			resetLoop = true;
+		}
+	}
+	while (resetLoop);
+}
+
 
 #if WIN32
 

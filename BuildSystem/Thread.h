@@ -21,14 +21,6 @@ Tested in the field	:	NO
 */
 namespace concurrency
 {
-
-#if WIN32
-typedef uint(__stdcall*		threadable)(void*);
-typedef uint				threadID;
-typedef void*				threadHandle;
-#else
-	PREVENT_COMPILE
-#endif//WIN32
 	
 /** 
 	\todo make thread pool, static borrow/recycle, private constructors, destructors, answer questions about state?
@@ -38,6 +30,8 @@ typedef void*				threadHandle;
 class Thread
 {
 public:
+	static threadID
+		getCurrentID(void);
 	// for the normal user
 	static Thread* 
 		getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
@@ -53,6 +47,9 @@ public:
 
 	static void
 		waitOnCompletion(std::vector<Thread*>& threads);
+
+	static void
+		waitOnCompletionOfTree(std::vector<Thread*>& threads);
 
 	virtual 
 		~Thread(void);
@@ -71,6 +68,9 @@ public:
 	
 	void 
 		executeAndWait(cpuID preferredCPU=noCPUpreference);
+
+	inline bool 
+		getID(threadID& id) const;
 
 	cpuID 
 		getPreferredCPU(void) const;
@@ -124,8 +124,14 @@ private:
 	void 
 		initializeSuspended(cpuID preferredCPU);
 
+	inline bool
+		isExecutable(void) const;
+
+	inline bool
+		isHardwareInitialized(void) const;
+
 	inline bool 
-		isWaitable(void) const { return m_state == running || m_state == suspended; }
+		isWaitable(void) const; 
 
 	void
 		updateCPUPreference(cpuID suggestedCPU);
@@ -147,18 +153,45 @@ private:
 
  	signals::Transmitter1<Thread*> 
 		m_onComplete;
+
+	DECLARE_MUTEX(m_mutex);
 };
 
-template<class RECEIVER> 
-void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
+template<class RECEIVER> void 
+Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
 {
 	m_onComplete.connect(receiver, function);
 }
 
-template<class RECEIVER> 
-void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+template<class RECEIVER> void 
+Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
 {
 	m_onComplete.connect(receiver, function);
+}
+
+inline bool 
+Thread::getID(threadID& id) const
+{
+	id = m_id;
+	return isHardwareInitialized();
+}
+
+inline bool
+Thread::isExecutable(void) const
+{
+	return m_state == suspended;
+}
+
+inline bool 
+Thread::isHardwareInitialized(void) const
+{
+	return !(m_state == error || m_state == uninitialized);
+}
+
+inline bool 
+Thread::isWaitable(void) const 
+{ 
+	return isHardwareInitialized(); 
 }
 
 } // concurrency

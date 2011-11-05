@@ -2,6 +2,8 @@
 #ifndef SCHEDULING_H
 #define SCHEDULING_H
 
+#include <map>
+
 #include "Build.h"
 #include "Signals.h"
 #include "Singleton.h"
@@ -40,6 +42,9 @@ public:
 
 	void
 		enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference); // , bool waitOnChildren=false);
+
+	void
+		enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU=noCPUpreference);
 /*
 	void 
 		enqueue(std::vector<Job*>& job);
@@ -58,9 +63,6 @@ public:
 	
 	uint 
 		getNumberSystemThreads(void) const;
-	
-	bool 
-		hasAnyWork(void) const;
 			
 	void 
 		printState(void) const;
@@ -71,10 +73,21 @@ public:
 	const std::string 
 		toString(void) const;
 	
-protected:
+private:
+	/*
+	class WaitingParent
+	{
+	public:
+		std::vector<Thread*> m_children;
+		threadID parentID;
+	}; // class WaitingParent
+	*/
+
 	Scheduler(void);
 	~Scheduler(void);
-	
+	Scheduler(const Scheduler&);
+	Scheduler operator=(const Scheduler&);
+
 	void 
 		accountForFinish(Job* finished);
 
@@ -96,6 +109,9 @@ protected:
 	bool
 		isAnyJobPending(void) const;
 	
+	bool 
+		isOriginalWaitingOnThread(threadID childID) const;
+
 	void
 		startJobs(void);
 	
@@ -105,21 +121,16 @@ protected:
 	const std::string 
 		toStringInactiveJob(void) const;
 	
-private:
-	Scheduler(const Scheduler&);
-	Scheduler operator=(const Scheduler&);
-	
-	/** \todo
+	std::map<threadID, threadID>
+		m_originalByChildren;
 
-	std::vector<HardwareThreads> m_threads;
+	std::map<threadID, std::vector<Thread*>* >
+		m_childThreadsByOriginalID;
 
-	class HardwareThread
-	{
-		Thread* m_softwareThread;
-		DECLARE_MUTEX(m_mutex);
-	}
+	/*
+	std::list<WaitingParent*>
+		m_waitingParents;
 	*/
-
 
 	std::vector<Job*>		
 		m_activeJobs;
@@ -140,7 +151,6 @@ private:
 		m_pendingJobs;
 	
 	DECLARE_MUTEX(m_mutex);
-	DECLARE_MUTEX(m_idleMutex);
 }; // class Scheduler
 
 } // concurrency

@@ -24,6 +24,7 @@
 #include "Time.h"
 #include "Vector.h"
 
+using namespace concurrency;
 using namespace designPatterns;
 using namespace realTime;
 
@@ -58,15 +59,54 @@ inline void doWork(millisecond milliseconds)
 		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	while (realTime::milliseconds() - start < milliseconds);
-	printf("Done with Work\n");
-	// delete[] numbers;
+	while (realTime::milliseconds() - start < milliseconds); // delete[] numbers;
 }
 
 void doWork3(void) { doWork(3000); }
 void doWork4(void) { doWork(4000); }
 void doWork5(void) { doWork(5000); }
 void doWork10(void) { doWork(10000); }
+
+void simpleChildrenPre(void)
+{
+	doWork3();
+	Executor* one = new Executor(&doWork3);
+	Scheduler::single().enqueue(*one);
+}
+
+void simpleChildrenPost(void)
+{
+	Executor* one = new Executor(&doWork3);
+	Scheduler::single().enqueue(*one);
+	doWork3();
+}
+
+void doWork1Children(void)
+{
+	Executor* one = new Executor(&doWork3);
+	Scheduler::single().enqueue(*one);
+	doWork3();
+}
+
+void doWork2Children(void)
+{
+	Executor* one = new Executor(&doWork1Children);
+	Executor* two = new Executor(&doWork1Children);
+	Scheduler::single().enqueue(*one);
+	Scheduler::single().enqueue(*two);
+	doWork3();
+}
+
+void doWork3Children(void) 
+{
+	Executor* one = new Executor(&doWork2Children);
+	Executor* two = new Executor(&doWork2Children);
+	Executor* three = new Executor(&doWork2Children);
+	Scheduler::single().enqueue(*one);
+	Scheduler::single().enqueue(*two);
+	Scheduler::single().enqueue(*three);
+	doWork3();
+}
 
 typedef enum  
 {
@@ -657,6 +697,7 @@ void testEngineLoop(void)
 
 	while (loop.getFrameNumber() < 2)
 	{
+		// replace with waiting on the jobs
 		concurrency::sleep(3000);
 	};
 
@@ -676,20 +717,19 @@ void onPlay(void)
 	// testEngineLoop();
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
+	/*
 	concurrency::Executor* executor(NULL);
 	executor = new concurrency::Executor(&doWork3);
 	concurrency::Thread* runMe = concurrency::Thread::getExecuting(*executor);
 	concurrency::Thread::waitOnCompletion(*runMe);
-	printf("waited once\n");
 	concurrency::Thread::waitOnCompletion(*runMe);
-	printf("waited twice\n");
 	delete runMe;
 	
 	executor = new concurrency::Executor(&doWork3);
 	concurrency::Scheduler::single().enqueueAndWait(*executor);
 	printf("Waited Scheduler\n");
 	
-	/*
+	
 	
 	executor = new concurrency::Executor(&doWork3);
 	concurrency::Thread* runMeAndWait = concurrency::Thread::getExecuting(*executor);
@@ -699,7 +739,8 @@ void onPlay(void)
 
 	
 	std::vector<concurrency::Thread*> threads;
-	for (int i = 0; i < 32; i++)
+	uint numThreads(32);
+	for (uint i = 0; i < numThreads; i++)
 	{
 		executor = new concurrency::Executor(&doWork3);
 		concurrency::Thread* waitable = concurrency::Thread::getExecuting(*executor);
@@ -708,7 +749,17 @@ void onPlay(void)
 
 	concurrency::Thread::waitOnCompletion(threads);
 	printf("Waiting for 32 threads\n");
+
+	for (uint i = 0; i < numThreads; i++)
+	{
+		delete threads[i];
+	}
 	*/
+	Executor* original = new Executor(&doWork3Children);
+	Scheduler::single().enqueueAndWaitOnChildren(*original);
+	// Executor* original = new Executor(&simpleChildrenPost);
+	// Scheduler::single().enqueueAndWaitOnChildren(*original);
+	printf("Nice!  That was awesome!");
 
 	// Thread* runMe = new Thread*[];
 
