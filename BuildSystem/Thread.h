@@ -21,12 +21,6 @@ Tested in the field	:	NO
 */
 namespace concurrency
 {
-	
-/** 
-	\todo make thread pool, static borrow/recycle, private constructors, destructors, answer questions about state?
-	\todo make all public functionality static? 
-	\todo static borrow/recycle with waitable
-*/
 class Thread
 {
 public:

@@ -35,54 +35,54 @@ class Scheduler
 	class Job;
 	class PendingJobQueue;
 	friend class designPatterns::Singleton<Scheduler>;
+/**
+\todo Scheduler Todo List:
+1 use events or some other thing to free up the creation of the threads ahead of time?
+2 set ideal processor at job execution time
+3 wait on completion of all jobs?
+4 Write a scheduler, if not MT testing suite to allow for safe running and modification
+of this file
+*/
+
 
 public:
 	void 
-		enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
 
 	void
-		enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference); // , bool waitOnChildren=false);
+	enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference); // , bool waitOnChildren=false);
 
 	void
-		enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU=noCPUpreference);
 /*
 	void 
-		enqueue(std::vector<Job*>& job);
+	enqueue(std::vector<Job*>& job);
 
 	void 
-		enqueueAndWait(std::vector<Job*>& job);
+	enqueueAndWait(std::vector<Job*>& job);
 */
 	uint 
-		getMaxThreads(void) const;
+	getMaxThreads(void) const;
 	
 	uint 
-		getNumberActiveJobs(void) const;
+	getNumberActiveJobs(void) const;
 	
 	uint 
-		getNumberPendingJobs(void) const;
+	getNumberPendingJobs(void) const;
 	
 	uint 
-		getNumberSystemThreads(void) const;
+	getNumberSystemThreads(void) const;
 			
 	void 
-		printState(void) const;
+	printState(void) const;
 	
 	void 
-		setMaxThreads(uint max);
+	setMaxThreads(uint max);
 	
 	const std::string 
-		toString(void) const;
+	toString(void) const;
 	
 private:
-	/*
-	class WaitingParent
-	{
-	public:
-		std::vector<Thread*> m_children;
-		threadID parentID;
-	}; // class WaitingParent
-	*/
-
 	Scheduler(void);
 	~Scheduler(void);
 	Scheduler(const Scheduler&);
@@ -110,7 +110,7 @@ private:
 		isAnyJobPending(void) const;
 	
 	bool 
-		isOriginalWaitingOnThread(threadID childID) const;
+		isOriginalWaitingOnThread(threadID childID, threadID* originalID=NULL) const;
 
 	void
 		startJobs(void);
@@ -127,10 +127,8 @@ private:
 	std::map<threadID, std::vector<Thread*>* >
 		m_childThreadsByOriginalID;
 
-	/*
-	std::list<WaitingParent*>
-		m_waitingParents;
-	*/
+	std::map<threadID, std::vector<Job*>*>
+		m_childJobsByOriginalID;
 
 	std::vector<Job*>		
 		m_activeJobs;
