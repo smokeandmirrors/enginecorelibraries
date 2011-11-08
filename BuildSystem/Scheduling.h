@@ -3,6 +3,8 @@
 #define SCHEDULING_H
 
 #include <map>
+#include <queue>
+#include <vector>
 
 #include "Build.h"
 #include "Signals.h"
@@ -49,18 +51,21 @@ public:
 	void 
 	enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
 
+	void 
+	enqueue(std::queue<Executor*>& work);
+	
 	void
 	enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference); // , bool waitOnChildren=false);
 
+	void 
+	enqueueAndWait(std::queue<Executor*>& work);
+	
 	void
 	enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU=noCPUpreference);
-/*
+	
 	void 
-	enqueue(std::vector<Job*>& job);
+	enqueueAndWaitOnChildren(std::queue<Executor*>& work);
 
-	void 
-	enqueueAndWait(std::vector<Job*>& job);
-*/
 	uint 
 	getMaxThreads(void) const;
 	
@@ -94,6 +99,20 @@ private:
 	void 
 		accountForStartedJob(Job* started, cpuID index);
 	
+	void 
+		accountForWaitedOnThread(
+			Executor& executable,
+			cpuID preferredCPU,
+			threadID originalID, 
+			std::vector<Thread*>& children, 
+			std::vector<Job*>& childJobs);
+
+	void
+		accountForWaitedOnThreadCompletion(
+			threadID originalID, 
+			std::vector<Thread*>& children, 
+			std::vector<Job*>& childJobs);
+
 	bool 
 		getFreeIndex(cpuID& index);
 	

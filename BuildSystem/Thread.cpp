@@ -118,7 +118,7 @@ void Thread::internalExecute(void)
 	{
 		m_executor->execute();
 		m_state = completed;
-		m_onComplete.send(this);
+		m_onComplete.transmit(this);
 	}
 }
 

@@ -309,7 +309,7 @@ private:
 		virtual Connection*	clone(void)=0;
 		virtual Connection*	duplicate(Receiver* receiver)=0;
 		virtual Receiver*	getReceiver(void) const=0;
-		virtual void		send(void) const=0;
+		virtual void		transmit(void) const=0;
 	};
 	/** 
 	templated abstraction for receivers that registered non-const 
@@ -344,7 +344,7 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void) const
+		virtual void transmit(void) const
 		{
 			(m_object->*m_function)();
 		}
@@ -387,7 +387,7 @@ private:
 			return m_object;
 		}
 
-		virtual void send(void) const
+		virtual void transmit(void) const
 		{
 			(m_object->*m_function)();
 		}
@@ -509,7 +509,7 @@ public:
 	}
 
 	/** call each method registered by all receivers */
-	void send(void) const
+	void transmit(void) const
 	{
 		SYNC(m_mutex);
 		connections_list copy(m_receivers);
@@ -518,7 +518,7 @@ public:
 
 		while (iter != sentinel)
 		{
-			(*iter)->send();
+			(*iter)->transmit();
 			++iter;
 		}
 	}
@@ -526,7 +526,7 @@ public:
 	/** call each method registered by all receivers */
 	inline void operator()(void) const
 	{
-		send();
+		transmit();
 	}
 
 protected:
@@ -604,7 +604,7 @@ private:
 			virtual Connection < CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS >* clone(void)=0; \
 			virtual Connection< CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS >* duplicate(Receiver* receiver)=0; \
 			virtual Receiver* getReceiver(void) const=0; \
-			virtual void send( CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS ) const=0; \
+			virtual void transmit( CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_##NUM_ARGS ) const=0; \
 		}; \
 		template< class RECEIVER, CW_TEMPLATE_ARGS_RETS_0_ARGS_##NUM_ARGS > \
 		class volatile##NUM_ARGS \
@@ -631,7 +631,7 @@ private:
 			{ \
 				return m_object; \
 			} \
-			virtual void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
+			virtual void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 			{ \
 				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 			} \
@@ -664,7 +664,7 @@ private:
 			{ \
 				return m_object; \
 			} \
-			virtual void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
+			virtual void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 			{ \
 				(m_object->*m_function)(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 			} \
@@ -757,7 +757,7 @@ private:
 				++iter; \
 			} \
 		} \
-		void send(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
+		void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 		{ \
 			SYNC(m_mutex); \
 			connections_list copy(m_receivers); \
@@ -765,13 +765,13 @@ private:
 			connections_list::const_iterator sentinel = copy.end(); \
 			while (iter != sentinel) \
 			{ \
-				(*iter)->send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+				(*iter)->transmit(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 				++iter; \
 			} \
 		} \
 		inline void operator()(CW_DECLARE_FUNCTION_RETS_0_ARGS_##NUM_ARGS) const \
 		{ \
-			send(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
+			transmit(CW_CALL_RETS_0_ARGS_##NUM_ARGS); \
 		} \
 	protected: \
 		void onDisconnect(Receiver* receiver) \

@@ -1,5 +1,6 @@
 #include <list>
 #include <map>
+#include <queue>
 #if WIN32
 #include <process.h>
 #endif//WIN32
@@ -184,7 +185,6 @@ public:
 	void ceaseTransmission(void)
 	{
 		m_onComplete.ceaseTransmission();
-		m_onQueuedWork.ceaseTransmission();
 	}
 	
 	void noticeNextFrame(EngineLoop*)
@@ -219,36 +219,13 @@ public:
 		m_receiver.onDisconnect(sender);
 	}
 
-	template<class RECEIVER>
-	void onQueuedWorkConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
-	{
-		m_onQueuedWork.connect(receiver, function);
-	}
-
-	template<class RECEIVER>
-	void onQueuedWorkConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
-	{
-		m_onQueuedWork.connect(receiver, function);
-	}
-
-	void onQueuedWorkDisconnect(signals::Receiver* receiver)
-	{
-		m_onQueuedWork.disconnect(receiver);
-	}
-
-	void queueWork(void)
-	{
-		onQueueWork();
-		m_onQueuedWork(this);
-	}
+	virtual void getInitialRequiredWork(std::queue<Executor*>& work)=0;
 
 protected:	
 	void notifyComplete(void) 
 	{
 		m_onComplete(this);
 	}
-
-	virtual void onQueueWork(void)=0;
 	
 private:
 	bool	
@@ -259,9 +236,6 @@ private:
 	
 	signals::Transmitter1<FrameRequirement*> 
 		m_onComplete;
-
-	signals::Transmitter1<FrameRequirement*> 
-		m_onQueuedWork;
 }; // class FrameRequirement
 
 class EngineLoop
@@ -289,7 +263,6 @@ public:
 		SYNC(m_mutex);
 		m_onComplete.connect(requirement, &FrameRequirement::noticeNextFrame);
 		requirement->onCompleteConnect(this, &EngineLoop::noticeComplete);
-		requirement->onQueuedWorkConnect(this, &EngineLoop::noticeWorkQueued);
 		m_incomplete.push_back(requirement);
 	}
 
@@ -341,30 +314,6 @@ public:
 		}
 	}
 	
-	void noticeWorkQueued(FrameRequirement* requirement)
-	{
-		SYNC(m_mutex);
-		bool queue_next(false);
-		requirements_iter iter = m_incomplete.begin(); 
-		requirements_iter sentinel = m_incomplete.end();
-		
-		while (iter != sentinel)
-		{
-			if (queue_next)
-			{
-				(*iter)->queueWork();
-				break;
-			}
-
-			if (*iter == requirement)
-			{
-				queue_next = true;
-			}
-
-			++iter;
-		}
-	}
-
 	void onConnect(signals::Transmitter* sender)
 	{
 		m_receiver.onConnect(sender);
@@ -385,8 +334,6 @@ public:
 	
 	void start(void)
 	{
-		SYNC(m_incompleteMutex)
-		
 		if (!m_isRunning)
 		{
 			m_isRunning = true;
@@ -416,12 +363,8 @@ protected:
 	
 	void markFrameCompleted(void)
 	{
-		if (isRunning())
-		{
-			m_frameNumber++;
-			markRequirementsIncomplete();
-			startFrame();
-		}
+		m_frameNumber++;
+		markRequirementsIncomplete();
 	}
 	
 	void markRequirementCompleted(FrameRequirement* requirement)
@@ -455,9 +398,22 @@ protected:
 
 	void startFrame(void)
 	{
-		if (!m_incomplete.empty())
+		while (m_frameNumber < 200) // should continue
 		{
-			(*m_incomplete.front()).queueWork();
+			std::queue<Executor*> work;
+			{
+				SYNC(m_incompleteMutex)
+				requirements_iter iter = m_incomplete.begin();
+				requirements_iter sentinel = m_incomplete.end();
+
+				while (iter != sentinel)
+				{
+					(*iter)->getInitialRequiredWork(work);
+					iter++;
+				}
+			}
+
+			Scheduler::single().enqueueAndWaitOnChildren(work);
 		}
 	}
 
@@ -514,7 +470,7 @@ public:
 	, m_childJobs(child_jobs)
 	{
 		// weird testing
-		// m_workTime *= 100;
+		m_workTime *= 100;
 		// end weird testing
 		m_originalJob = new TestJob(this);
 		// m_original = new concurrency::Executor( m_originalJob, frameReqName(ID_one));
@@ -555,13 +511,13 @@ public:
 		}
 	}
 
-	void onQueueWork(void)
+	void getInitialRequiredWork(std::queue<Executor*>& work)
 	{
 		m_completedJobs = 0;
 		std::string name = frameReqName(m_reqID);
 		name += "(o)";
-		concurrency::Executor* executor = new concurrency::Executor(m_originalJob, name);
-		concurrency::Scheduler::single().enqueue(*executor);
+		Executor* executor = new concurrency::Executor(m_originalJob, name);
+		work.push(executor);
 	}
 
 private:
@@ -671,6 +627,7 @@ sreal getRand(sreal min, sreal max)
 void testEngineLoop(void)
 {
 	EngineLoop loop;	
+	
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
 	loop.addFrameRequirement(&physics_sych);
 	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
@@ -693,28 +650,14 @@ void testEngineLoop(void)
 	loop.addFrameRequirement(&garbage_collection);
 	TestRequirement networking(2, eFR_Networking, 4);
 	loop.addFrameRequirement(&networking);
+	
 	loop.start();
-
-	while (loop.getFrameNumber() < 2)
-	{
-		// replace with waiting on the jobs
-		concurrency::sleep(3000);
-	};
-
 	loop.stop();
-
-	// \todo replace with: concurrency::Scheduler::single().waitForCompletion();
-	// while (concurrency::Scheduler::single().hasAnyWork())
-	{
-		concurrency::sleep(3000);
-	}	
-
-	// concurrency::Scheduler::single().destroy();
 }
 
 void onPlay(void)
 {
-	// testEngineLoop();
+	testEngineLoop();
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
 	/*
@@ -754,13 +697,13 @@ void onPlay(void)
 	{
 		delete threads[i];
 	}
-	*/
+	
 	Executor* original = new Executor(&doWork3Children);
 	Scheduler::single().enqueueAndWaitOnChildren(*original);
 	// Executor* original = new Executor(&simpleChildrenPost);
 	// Scheduler::single().enqueueAndWaitOnChildren(*original);
 	printf("Nice!  That was awesome!");
-
+	*/
 	// Thread* runMe = new Thread*[];
 
 	Table< RedBlackTree<sint>* > table;

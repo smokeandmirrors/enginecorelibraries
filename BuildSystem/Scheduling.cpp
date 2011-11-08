@@ -13,8 +13,20 @@
 
 using namespace signals;
 
+
+
 namespace concurrency
 {
+
+inline threadID 
+getInitializedID(const Thread& thread)
+{
+	threadID id;
+	bool success = thread.getID(id);
+	assert(success);
+	return id;
+}
+
 #if WIN32
 inline uint 
 getNumHardwareThreads(void)
@@ -289,6 +301,56 @@ void Scheduler::accountForStartedJob(Job* started, cpuID index)
 	printState();
 }
 
+void Scheduler::accountForWaitedOnThread(Executor& executable,
+										 cpuID preferredCPU,
+										 threadID originalID, 
+										 std::vector<Thread*>& children, 
+										 std::vector<Job*>& childJobs)
+{
+	Thread* thread(NULL);
+	m_pendingJobs->add(executable, preferredCPU, &thread);
+	// get the child thread ID
+	threadID childID = getInitializedID(*thread);
+	// make sure the current thread isn't already waiting on tree of threads
+	assert(m_originalByChildren.find(originalID) == m_originalByChildren.end());
+	// map the children to the parent ID
+	m_childThreadsByOriginalID[originalID] = &children;
+	m_childJobsByOriginalID[originalID] = &childJobs;
+	// map the parent ID to the children
+	m_originalByChildren[childID] = originalID;	
+	// store the thread for deletion	
+	children.push_back(thread);
+}
+
+void Scheduler::accountForWaitedOnThreadCompletion(threadID originalID, std::vector<Thread*>& children, std::vector<Job*>& childJobs)
+{
+	SYNC(m_mutex);
+	
+	{
+		std::vector<Thread*>::iterator sentinel(children.end());
+		for (std::vector<Thread*>::iterator iter(children.begin());
+		iter != sentinel;
+		iter++)
+		{
+			m_originalByChildren.erase(getInitializedID(*(*iter)));
+		}
+		
+		m_childThreadsByOriginalID.erase(originalID);
+	}
+	
+	{
+		std::vector<Job*>::iterator sentinel(childJobs.end());
+		for (std::vector<Job*>::iterator iter(childJobs.begin());
+		iter != sentinel;
+		iter++)
+		{
+			m_pendingJobs->recycleJob(*iter);
+		}
+
+		m_childJobsByOriginalID.erase(originalID);
+	}
+}
+
 void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 {
 	SYNC(m_mutex);
@@ -327,8 +389,7 @@ void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 	{
 		m_pendingJobs->add(executable, preferredCPU, NULL);
 	}
-	// if parent is waiting on this thread
-		// add child job to original waiting list (use enqueue and wait?)
+	
 	startJobs();
 	printState();
 }
@@ -347,73 +408,53 @@ void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
 }
 
 void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU)
-{
-	std::vector<Thread*>* children(NULL);
-	std::vector<Job*>* childJobs(NULL);
-
-	threadID originalID;
+{	// create the list of child threads to wait on
+	std::vector<Thread*>* children = new std::vector<Thread*>();
+	// create the list of child jobs that will be used to clean up the threads
+	std::vector<Job*>* childJobs = new std::vector<Job*>();
+	// get the current thread ID for the parent
+	threadID originalID = Thread::getCurrentID();
 	
 	{
 		SYNC(m_mutex);
-		Thread* output(NULL);
-		m_pendingJobs->add(executable, preferredCPU, &output);
-		// get the current thread ID for the parent
-		originalID = Thread::getCurrentID();
-		// get the child thread ID
-		threadID childID;
-		bool success = output->getID(childID);
-		assert(success);
-		// make sure the current thread isn't already waiting on tree of threads
-		assert(m_originalByChildren.find(originalID) == m_originalByChildren.end());
-		// create the list of child threads do wait on
-		children = new std::vector<Thread*>();
-		children->push_back(output);
-		childJobs = new std::vector<Job*>();
-		// map the children to the parent ID
-		m_childThreadsByOriginalID[originalID] = children;
-		m_childJobsByOriginalID[originalID] = childJobs;
-		// map the parent ID to the children
-		m_originalByChildren[childID] = originalID;
-		// start the jobs
+		accountForWaitedOnThread(executable, preferredCPU, originalID, *children, *childJobs);
 		startJobs();
 		printState();
 	}
 	
 	Thread::waitOnCompletionOfTree(*children);
-	
+	accountForWaitedOnThreadCompletion(originalID, *children, *childJobs);
+	printState();
+	delete children;
+	delete childJobs;
+}
+
+void Scheduler::enqueueAndWaitOnChildren(std::queue<Executor*>& work)
+{
+	std::vector<Thread*>* children = new std::vector<Thread*>();
+	// create the list of child jobs that will be used to clean up the threads
+	std::vector<Job*>* childJobs = new std::vector<Job*>();
+	// get the current thread ID for the parent
+	threadID originalID = Thread::getCurrentID();
+
 	{
 		SYNC(m_mutex);
-		{
-			std::vector<Thread*>::iterator sentinel(children->end());
-			for (std::vector<Thread*>::iterator iter(children->begin());
-			iter != sentinel;
-			iter++)
-			{
-				threadID childID;
-				bool success = (*iter)->getID(childID);
-				assert(success);
-				m_originalByChildren.erase(childID);
-			}
-			m_childThreadsByOriginalID.erase(originalID);
-			delete children;
-		}
 		
+		for (size_t i = 0; i < work.size(); i++)
 		{
-			std::vector<Job*>::iterator sentinel(childJobs->end());
-			for (std::vector<Job*>::iterator iter(childJobs->begin());
-			iter != sentinel;
-			iter++)
-			{
-				m_pendingJobs->recycleJob(*iter);
-			}
-
-			m_childJobsByOriginalID.erase(originalID);
-			delete childJobs;
+			accountForWaitedOnThread(*(work.front()), noCPUpreference, originalID, *children, *childJobs);
+			work.pop();
 		}
 
+		startJobs();
+		printState();
 	}
-	
+
+	Thread::waitOnCompletionOfTree(*children);
+	accountForWaitedOnThreadCompletion(originalID, *children, *childJobs);
 	printState();
+	delete children;
+	delete childJobs;
 }
 
 bool Scheduler::getFreeIndex(cpuID& index)
@@ -520,9 +561,8 @@ bool Scheduler::isOriginalWaitingOnThread(threadID childID, threadID* originalID
 
 void Scheduler::printState(void) const
 {
-	return;
-	//SYNC(m_mutex);
-	// printf(toString().c_str());
+	SYNC(m_mutex);
+	printf(toString().c_str());
 }
 
 void Scheduler::setMaxThreads(uint max)			

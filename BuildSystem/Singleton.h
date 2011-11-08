@@ -4,7 +4,7 @@
 /**
 \file Singleton.h
 
-Defines a template Singleton implemenation, that simply provides
+Defines a template Singleton implementation, that simply provides
 most of the Singleton requirements: initialization, accessor,
 destruction, protected constructor/destructor.
 

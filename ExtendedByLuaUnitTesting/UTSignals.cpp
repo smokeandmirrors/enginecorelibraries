@@ -223,9 +223,9 @@ public:
 		t1.connect(&trb, &TestReceiverBase::increment1ReceptionCount);
 		t2.connect(&trb, &TestReceiverBase::increment2ReceptionCount);
 		
-		t0.send();
-		t1.send(value1);
-		t2.send(value1, value2);
+		t0.transmit();
+		t1.transmit(value1);
+		t2.transmit(value1, value2);
 
 		CFIXCC_ASSERT_EQUALS(trb.get0ConstReceptionCount(), 0);
 		CFIXCC_ASSERT_EQUALS(trb.get0ReceptionCount(), 1);
@@ -242,9 +242,9 @@ public:
 		t1.connect(&trb, &TestReceiverBase::increment1ConstReceptionCount);
 		t2.connect(&trb, &TestReceiverBase::increment2ConstReceptionCount);
 
-		t0.send();
-		t1.send(value1);
-		t2.send(value1, value2);
+		t0.transmit();
+		t1.transmit(value1);
+		t2.transmit(value1, value2);
 
 		CFIXCC_ASSERT_EQUALS(trb.get0ConstReceptionCount(), 1);
 		CFIXCC_ASSERT_EQUALS(trb.get0ReceptionCount(), 1);
