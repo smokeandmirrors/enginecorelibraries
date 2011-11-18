@@ -5,6 +5,7 @@
 #include <process.h>
 #endif//WIN32
 #include <stdio.h>
+#include <sstream>
 #include <tchar.h>
 #include <typeinfo>
 #include <vector>
@@ -28,6 +29,26 @@
 using namespace concurrency;
 using namespace designPatterns;
 using namespace realTime;
+
+
+template<typename NUMBER>
+NUMBER getRand(NUMBER min, NUMBER max) 
+{
+	PREVENT_COMPILE
+}
+
+template<>
+sint getRand(sint min, sint max) 
+{
+	return (rand() % (max - min)) + min;
+}
+
+template<>
+sreal getRand(sreal min, sreal max) 
+{
+	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
+	return v * (max - min) + min;
+}
 
 void onPlay(void);
 
@@ -156,6 +177,23 @@ frameReqName(eFrameRequirementID frameReqID)
 			assert(false);
 			return NULL;
 	};
+}
+
+std::string 
+getFormattedName(eFrameRequirementID frameReqID, sint completedJobs, sint maxJobs)
+{
+	std::stringstream namestream;
+	namestream << frameReqName(frameReqID);
+	namestream << "(";
+	if (completedJobs < 10)
+		namestream << " ";
+	namestream << completedJobs;
+	namestream << " / ";
+	if (maxJobs < 10)
+		namestream << " ";
+	namestream << maxJobs;
+	namestream << ")";
+	return namestream.str();
 }
 
 class EngineLoop;
@@ -398,7 +436,7 @@ protected:
 
 	void startFrame(void)
 	{
-		while (m_frameNumber < 200) // should continue
+		while (true) // should continue
 		{
 			std::queue<Executor*> work;
 			{
@@ -470,7 +508,8 @@ public:
 	, m_childJobs(child_jobs)
 	{
 		// weird testing
-		m_workTime *= 100;
+		m_workTime *= 1;
+		m_childJobs *= 1;
 		// end weird testing
 		m_originalJob = new TestJob(this);
 		// m_original = new concurrency::Executor( m_originalJob, frameReqName(ID_one));
@@ -494,11 +533,14 @@ public:
 	}
 
 	void 
-	noticeTestJobComplete(TestJob* job, bool& spawn_new, bool& delete_self)
+	noticeTestJobComplete(TestJob* job, bool& spawn_new, bool& delete_self, sint& jobNumber, sint& maxNumber)
 	{
 		SYNC(m_mutex);
 		++m_completedJobs;
 		delete_self = job != m_originalJob;
+
+		jobNumber = m_completedJobs;
+		maxNumber = m_childJobs;
 
 		if (m_completedJobs >= m_childJobs)
 		{
@@ -514,8 +556,7 @@ public:
 	void getInitialRequiredWork(std::queue<Executor*>& work)
 	{
 		m_completedJobs = 0;
-		std::string name = frameReqName(m_reqID);
-		name += "(o)";
+		std::string name = getFormattedName(m_reqID, m_completedJobs, m_childJobs);
 		Executor* executor = new concurrency::Executor(m_originalJob, name);
 		work.push(executor);
 	}
@@ -544,12 +585,13 @@ void TestJob::execute(void)
 	doWork(m_requirement->getWorkTime());
 	bool spawn_new;
 	bool delete_self;
-	m_requirement->noticeTestJobComplete(this, spawn_new, delete_self);
+	sint maxJobs;
+	sint jobNumber;
+	m_requirement->noticeTestJobComplete(this, spawn_new, delete_self, jobNumber, maxJobs);
 	
 	if (spawn_new)
 	{
-		std::string name = frameReqName(m_requirement->getID());
-		name += "(c)";
+		std::string name = getFormattedName(m_requirement->getID(), jobNumber, maxJobs);
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
 		concurrency::Scheduler::single().enqueue(*executor);
@@ -603,24 +645,6 @@ class Shadows
 
 };
 
-template<typename NUMBER>
-NUMBER getRand(NUMBER min, NUMBER max) 
-{
-	PREVENT_COMPILE
-}
-
-template<>
-sint getRand(sint min, sint max) 
-{
-	return (rand() % (max - min)) + min;
-}
-
-template<>
-sreal getRand(sreal min, sreal max) 
-{
-	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
-	return v * (max - min) + min;
-}
 
 #include "Table.h"
 
@@ -628,25 +652,25 @@ void testEngineLoop(void)
 {
 	EngineLoop loop;	
 	
-	TestRequirement physics_sych(8, eFR_PhysicsSync, 0);
+	TestRequirement physics_sych(8, eFR_PhysicsSync, 5);
 	loop.addFrameRequirement(&physics_sych);
-	TestRequirement physics_asych(4, eFR_PhysicsAsync, 1);
+	TestRequirement physics_asych(4, eFR_PhysicsAsync, 10);
 	loop.addFrameRequirement(&physics_asych);
-	TestRequirement rendering(6, eFR_Rendering, 4);
+	TestRequirement rendering(6, eFR_Rendering, 40);
 	loop.addFrameRequirement(&rendering);
-	TestRequirement lighting(4, eFR_Lighting, 3);
+	TestRequirement lighting(4, eFR_Lighting, 30);
 	loop.addFrameRequirement(&lighting);
-	TestRequirement animation(3, eFR_Animation, 2);
+	TestRequirement animation(3, eFR_Animation, 20);
 	loop.addFrameRequirement(&animation);
-	TestRequirement audio(2, eFR_Audio, 4);
+	TestRequirement audio(2, eFR_Audio, 40);
 	loop.addFrameRequirement(&audio);
-	TestRequirement events(1, eFR_Events, 0);
+	TestRequirement events(1, eFR_Events, 5);
 	loop.addFrameRequirement(&events);
-	TestRequirement gameplay(1, eFR_Gameplay, 0);
+	TestRequirement gameplay(1, eFR_Gameplay, 5);
 	loop.addFrameRequirement(&gameplay);
 	TestRequirement ai(1, eFR_AI, 30);
 	loop.addFrameRequirement(&ai);
-	TestRequirement garbage_collection(2, eFR_GarbageCollection, 0);
+	TestRequirement garbage_collection(2, eFR_GarbageCollection, 2);
 	loop.addFrameRequirement(&garbage_collection);
 	TestRequirement networking(2, eFR_Networking, 4);
 	loop.addFrameRequirement(&networking);
