@@ -3,6 +3,7 @@
 #include <windows.h>
 #endif//WIN32
 
+#include "Scheduling.h"
 #include "Thread.h"
 
 namespace concurrency
@@ -12,6 +13,9 @@ const millisecond
 
 const cpuID 
 	noCPUpreference(-1);
+
+const threadID
+	invalidThreadID(0xFFFFFFFF);
 
 inline void 
 	closeThread(threadHandle);
@@ -43,6 +47,7 @@ Thread::~Thread(void)
 	
 	closeHardware();
 	delete m_executor;
+	assert(Scheduler::single().isOkToDeleteTheChildren());
 }
 
 void Thread::closeHardware()
@@ -55,6 +60,14 @@ void Thread::closeHardware()
 		m_state	= closed;
 	}
 }
+
+
+void Thread::destroyThread(Thread& thread)
+{
+	assert(Scheduler::single().isOkToDeleteTheChildren());
+	// delete &thread;
+}
+
 
 void Thread::disconnect(signals::Receiver* receiver)
 {
@@ -189,23 +202,21 @@ void Thread::waitOnCompletion(std::vector<Thread*>& threads)
 void Thread::waitOnCompletionOfTree(std::vector<Thread*>& threads)
 {
 	bool resetLoop = false;
+	size_t i(0);
+
 	do
 	{
 		resetLoop = false;
 		size_t previousSize = threads.size();
 
-		for (size_t i = 0; i < previousSize; i++)
+		for (; i < previousSize; i++)
 		{
-			if (threads[i]->isWaitable())
-			{
-				waitForCompletion(threads[i]->m_thread, waitInfinitely);
-			}
+			Thread* thread = threads[i];
+			assert(thread->isWaitable());
+			waitForCompletion(thread->m_thread, waitInfinitely);
 		}
 
-		if (threads.size() != previousSize)
-		{
-			resetLoop = true;
-		}
+		resetLoop = (previousSize != threads.size());
 	}
 	while (resetLoop);
 }

@@ -13,7 +13,7 @@
 
 using namespace signals;
 
-
+#define SCHEDULE_PRINT printState();
 
 namespace concurrency
 {
@@ -40,7 +40,7 @@ getNumHardwareThreads(void)
 
 /** a wrapper for a Thread that can be added to the scheduler */
 class Scheduler::Job : public Receiver
-{
+{	/** todo: make sure no jobs are holding onto the same thread */
 public:
 	void 
 	ceaseReception(void)
@@ -65,7 +65,7 @@ public:
 		}
 		else
 		{
-			id = 0xFFFFFFFF;
+			id = invalidThreadID; 
 		}
 
 		return id;
@@ -99,9 +99,13 @@ public:
 	inline void
 	onRecycle(void)
 	{
-		m_thread->disconnect(this);
-		delete m_thread;
-		m_thread = NULL;
+		if (m_thread)
+		{
+			m_thread->disconnect(this);
+			assert(Scheduler::single().isOkToDeleteTheChildren());
+			Thread::destroyThread(*m_thread);
+			m_thread = NULL;
+		}
 	}
 
 	inline void
@@ -129,7 +133,11 @@ private:
 
 	~Job(void)
 	{
-		delete m_thread;
+		if (m_thread)
+		{
+			assert(Scheduler::single().isOkToDeleteTheChildren());
+			Thread::destroyThread(*m_thread);
+		}
 	}
 
 	signals::ReceiverMember	
@@ -278,7 +286,7 @@ void Scheduler::accountForFinish(Job* finished)
 
 	threadID originalID;
 
-	if (Scheduler::single().isOriginalWaitingOnThread(finished->getThreadID(), &originalID))
+	if (isOriginalWaitingOnThread(finished->getThreadID(), &originalID))
 	{
 		std::map<threadID, std::vector<Job*>*>::iterator iter =
 			m_childJobsByOriginalID.find(originalID);
@@ -291,14 +299,14 @@ void Scheduler::accountForFinish(Job* finished)
 	}
 	
 	startJobs();
-	printState();
+	SCHEDULE_PRINT
 }
 
 void Scheduler::accountForStartedJob(Job* started, cpuID index)
 {
 	m_activeJobs[index] = started;
 	m_numActiveJobs++;
-	printState();
+	SCHEDULE_PRINT
 }
 
 void Scheduler::accountForWaitedOnThread(Executor& executable,
@@ -391,7 +399,6 @@ void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 	}
 	
 	startJobs();
-	printState();
 }
 
 void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
@@ -401,14 +408,13 @@ void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
 		SYNC(m_mutex);
 		m_pendingJobs->add(executable, preferredCPU, &output);
 		startJobs();
-		printState();
 	}
 	Thread::waitOnCompletion(*output);
-	printState();
 }
 
 void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU)
-{	// create the list of child threads to wait on
+{	
+	// create the list of child threads to wait on
 	std::vector<Thread*>* children = new std::vector<Thread*>();
 	// create the list of child jobs that will be used to clean up the threads
 	std::vector<Job*>* childJobs = new std::vector<Job*>();
@@ -419,40 +425,41 @@ void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCP
 		SYNC(m_mutex);
 		accountForWaitedOnThread(executable, preferredCPU, originalID, *children, *childJobs);
 		startJobs();
-		printState();
 	}
 	
 	Thread::waitOnCompletionOfTree(*children);
 	accountForWaitedOnThreadCompletion(originalID, *children, *childJobs);
-	printState();
 	delete children;
 	delete childJobs;
 }
 
 void Scheduler::enqueueAndWaitOnChildren(std::queue<Executor*>& work)
 {
+	unMarkDebugCheck();
+	// create the list of child threads to wait on
 	std::vector<Thread*>* children = new std::vector<Thread*>();
 	// create the list of child jobs that will be used to clean up the threads
 	std::vector<Job*>* childJobs = new std::vector<Job*>();
+	
 	// get the current thread ID for the parent
 	threadID originalID = Thread::getCurrentID();
 
 	{
 		SYNC(m_mutex);
 		
-		for (size_t i = 0; i < work.size(); i++)
+		while (!work.empty())
 		{
 			accountForWaitedOnThread(*(work.front()), noCPUpreference, originalID, *children, *childJobs);
 			work.pop();
 		}
 
 		startJobs();
-		printState();
 	}
 
 	Thread::waitOnCompletionOfTree(*children);
+	markDebugCheck();
 	accountForWaitedOnThreadCompletion(originalID, *children, *childJobs);
-	printState();
+	unMarkDebugCheck();
 	delete children;
 	delete childJobs;
 }
@@ -599,9 +606,9 @@ const std::string Scheduler::toString(void) const
 	} 
 	while (index);
 	
-	sprintf_s(buffer, "\n\n*** Scheduler state ***\n"
-		"System Threads: %d\n"
-		"Max Threads: %d\n"
+	sprintf_s(buffer, ""
+		"SysThreads: %2d "
+		"MaxThreads: %2d "
 		, m_numSystemThreads
 		, m_maxThreads
 		);
@@ -614,7 +621,7 @@ const std::string Scheduler::toString(void) const
 		buffer[index] = '\0';
 	} 
 	while (index);
-	sprintf_s(buffer, "Number of pending jobs: %d\n", getNumberPendingJobs());
+	sprintf_s(buffer, "Pending: %3d", getNumberPendingJobs());
 	output += buffer;
 
 	for (uint hardware_index = 0; hardware_index < getNumberSystemThreads(); hardware_index++)
@@ -641,7 +648,7 @@ const std::string Scheduler::toString(void) const
 		output += " ";
 	}	
 
-	output += "|\n\n";
+	output += "|\n";
 
 	return output;
 }
@@ -664,6 +671,6 @@ const std::string Scheduler::toStringActiveJob(Job* job) const
 
 const std::string Scheduler::toStringInactiveJob(void) const
 {
-	return std::string(" inactive. ");
+	return std::string("    inactive.    ");
 }
 } // namespace concurrency

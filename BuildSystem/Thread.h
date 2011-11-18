@@ -24,6 +24,9 @@ namespace concurrency
 class Thread
 {
 public:
+	static void 
+		destroyThread(Thread& thread);
+	
 	static threadID
 		getCurrentID(void);
 	// for the normal user
@@ -35,7 +38,7 @@ public:
 	// for the daring user, for the scheduler to get the preferred CPU
 	static Thread* 
 		getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
-
+	
 	static void
 		waitOnCompletion(Thread& thread);
 
@@ -44,9 +47,6 @@ public:
 
 	static void
 		waitOnCompletionOfTree(std::vector<Thread*>& threads);
-
-	virtual 
-		~Thread(void);
 
 	template<class RECEIVER> void
 		connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
@@ -101,6 +101,10 @@ private:
 	, m_thread(NULL)
 	, m_state(Thread::uninitialized)
 	{ /* empty */ }
+
+
+	virtual 
+	~Thread(void);
 
 	/** not allowed */
 	Thread(const Thread&);

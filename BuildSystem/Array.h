@@ -6,11 +6,11 @@ template<typename ELEMENT>
 class Array
 {
 public:
-	Array(void)
-		: size(0)
-		, data(NULL)
+	Array(uint reservedSize=0)
+	: size(0)
+	, data(NULL)
 	{
-		
+			
 	}
 
 private:

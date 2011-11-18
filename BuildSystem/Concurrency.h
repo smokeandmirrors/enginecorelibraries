@@ -47,7 +47,8 @@ typedef void*				threadHandle;
 typedef sint cpuID;
 typedef void(*	executableFunction)(void);
 
-extern const cpuID noCPUpreference; 
+extern const cpuID noCPUpreference;
+extern const threadID invalidThreadID;
 
 void sleep(millisecond milliseconds);
 

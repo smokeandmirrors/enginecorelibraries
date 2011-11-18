@@ -48,6 +48,8 @@ of this file
 
 
 public:
+	bool isOkToDeleteTheChildren(void) const { return m_isOkToDeleteTheChildren; }
+
 	void 
 	enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
 
@@ -168,6 +170,11 @@ private:
 		m_pendingJobs;
 	
 	DECLARE_MUTEX(m_mutex);
+	void markDebugCheck(void) { m_isOkToDeleteTheChildren = true; }
+	void unMarkDebugCheck(void) { m_isOkToDeleteTheChildren = false; }
+
+	bool
+		m_isOkToDeleteTheChildren;
 }; // class Scheduler
 
 } // concurrency

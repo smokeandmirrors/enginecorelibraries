@@ -14,18 +14,23 @@ Tested in the field	:	NO
 
 #define UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) \
 	sychronized##number
+
 #define UNIQUE_SYNCHRONIZATION_PREFIX(sychronized,number) \
 	UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) 
+
 #define UNIQUE_SYNCHRONIZATION(sychronized) \
 	UNIQUE_SYNCHRONIZATION_PREFIX(sychronized, __COUNTER__)
 
 /** \todo thread policies */
 #define DECLARE_MUTEX(identifier) \
 	concurrency::Mutex			identifier;
+
 #define DECLARE_MUTABLE_MUTEX(identifier) \
 	mutable concurrency::Mutex	identifier;
+
 #define DECLARE_STATIC_MUTEX(identifier) \
 	static concurrency::Mutex	identifier;
+
 #define SYNC(mutex) \
 	concurrency::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 
