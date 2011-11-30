@@ -6,7 +6,7 @@
 #include <queue>
 #include <vector>
 
-#include "Build.h"
+#include "Platform.h"
 #include "Signals.h"
 #include "Singleton.h"
 #include "Synchronization.h"

@@ -12,7 +12,7 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 /* GARBAGE COLLECTION!!! DUE TO THE JAVA SOURCE, THIS LEAKS LIKE CRAZY  */
 /************************************************************************/
 
-#include "Build.h"
+#include "Platform.h"
 
 template<typename ELEMENT>
 class RedBlackTree

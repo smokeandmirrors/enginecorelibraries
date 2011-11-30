@@ -23,7 +23,7 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
-#include "Build.h"
+#include "Platform.h"
 #include "Synchronization.h"
 
 namespace designPatterns

@@ -32,7 +32,7 @@ Tested in the field	:	NO
 all singletons in the beginning of main()
 
 */
-#include "Build.h"
+#include "Platform.h"
 #include "Synchronization.h"
 
 namespace designPatterns

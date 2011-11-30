@@ -2,7 +2,7 @@
 #ifndef CONCURRENCY_H
 #define CONCURRENCY_H
 
-#include "Build.h"
+#include "Platform.h"
 #include "Time.h"
 
 /**

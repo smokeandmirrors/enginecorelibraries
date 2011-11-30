@@ -423,10 +423,10 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Foundation"
+			Name="Platform"
 			>
 			<File
-				RelativePath=".\Build.h"
+				RelativePath=".\Platform.h"
 				>
 			</File>
 			<File

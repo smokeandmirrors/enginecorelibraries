@@ -14,7 +14,7 @@ Tested in the field	:	NO
 */
 #include <stdio.h>
 
-#include "Build.h"
+#include "Platform.h"
 
 #include "math.h"
 
