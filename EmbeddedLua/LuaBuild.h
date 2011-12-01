@@ -1,6 +1,6 @@
 #ifndef LUABUILD_H
 #define LUABUILD_H
-#include "Build.h"
+#include "Platform.h"
 
 struct lua_State;
 struct lua_Debug;

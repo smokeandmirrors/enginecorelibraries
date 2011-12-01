@@ -74,7 +74,7 @@ C function.
 
 */
 
-#include "Build.h"
+#include "Platform.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"

@@ -29,7 +29,7 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-#include "Build.h"
+#include "Platform.h"
 #include "Lua.h"
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"

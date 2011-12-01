@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "Build.h"
+#include "Platform.h"
 #include "CompilerChecks.h"
 
 namespace compilerChecks 

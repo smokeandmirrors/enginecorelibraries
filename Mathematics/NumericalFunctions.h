@@ -5,7 +5,7 @@
 #include <math.h>
 #include <float.h>
 
-#include "Build.h"
+#include "Platform.h"
 #include "Numbers.h"
 /**
 \file NumbericalFunctions.h

@@ -41,7 +41,7 @@ Vector classes and operations
 #include <math.h>
 #include <assert.h>
 
-#include "Build.h"
+#include "Platform.h"
 #include "Numbers.h"
 #include "NumericalFunctions.h"
 

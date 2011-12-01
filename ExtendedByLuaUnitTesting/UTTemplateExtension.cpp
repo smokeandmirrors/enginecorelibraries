@@ -1,4 +1,4 @@
-#include "Build.h"
+#include "Platform.h"
 #if 0 //WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include "UTTools.h"

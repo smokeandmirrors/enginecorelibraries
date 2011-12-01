@@ -1,4 +1,4 @@
-#include "Build.h"
+#include "Platform.h"
 #if WITH_UNIT_TESTING && EXTENDED_BY_LUA
 #include <cfixcc.h>
 

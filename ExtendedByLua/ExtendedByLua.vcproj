@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -63,7 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="LuaLib.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\BuildSystem\$(ConfigurationName)\&quot;"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)..\Sandbox\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\EmbeddedLua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Mathematics\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\LuaLib\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Lua\Lua\$(ConfigurationName)\&quot;;&quot;$(SolutionDir)..\Platform\$(ConfigurationName)\&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="libc.lib;libcmt.lib;msvcrt.lib;libcd.lib;msvcrtd.lib"
 				GenerateDebugInformation="true"
@@ -122,7 +122,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -289,7 +289,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\Mathematics&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\Mathematics&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -370,7 +370,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\BuildSystem&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"

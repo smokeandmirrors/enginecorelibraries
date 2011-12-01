@@ -13,7 +13,7 @@
 #include <windows.h>
 #endif//WIN32
 
-#include "Build.h"
+#include "Platform.h"
 #include "CompilerChecks.h"
 #include "Composition.h"
 #include "Concurrency.h"

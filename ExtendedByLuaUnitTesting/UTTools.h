@@ -2,7 +2,7 @@
 #ifndef UNITTESTINGTOOLS_H
 #define UNITTESTINGTOOLS_H
 
-#include "Build.h"
+#include "Platform.h"
 #if WITH_UNIT_TESTING
 #include "Lua.h"
 

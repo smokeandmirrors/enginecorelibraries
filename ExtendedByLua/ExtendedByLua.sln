@@ -34,7 +34,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLuaUnitTesting", 
 		{8A0857CB-869F-4727-9FAA-C80E5A183377} = {8A0857CB-869F-4727-9FAA-C80E5A183377}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildSystem", "..\BuildSystem\BuildSystem.vcproj", "{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform", "..\Platform\Platform.vcproj", "{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

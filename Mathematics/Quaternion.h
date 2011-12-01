@@ -33,7 +33,7 @@ math classes, constants, functions and formulas
 #include <math.h>
 #include <assert.h>
 
-#include "Build.h"
+#include "Platform.h"
 #include "Numbers.h"
 
 #if EXTENDED_BY_LUA

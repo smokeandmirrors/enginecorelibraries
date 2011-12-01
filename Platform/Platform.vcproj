@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="BuildSystem"
+	Name="Platform"
 	ProjectGUID="{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
-	RootNamespace="BuildSystem"
+	RootNamespace="Platform"
 	Keyword="Win32Proj"
 	>
 	<Platforms>

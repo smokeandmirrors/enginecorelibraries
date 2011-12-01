@@ -3,7 +3,7 @@
 #define LUAMATHEXTENSIONS_H
 
 #if EXTENDED_BY_LUA
-#include "Build.h"
+#include "Platform.h"
 #include "LuaExtensibility.h"
 #include "LuaStateInteraction.h"
 #include "Vector.h"
