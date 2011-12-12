@@ -16,12 +16,12 @@ inline hashCode hashBool(bool key)
 	return static_cast<hashCode>(key);
 }
 
-inline hashCode hashString(const schar* string)
+inline hashCode hashString(const schar* string, size_t x)
 {	// modified from lstring.c
-	size_t h = strlen(string);
+	uint h = static_cast<uint>(x);
 	size_t step = (h >> 5 ) + 1;
 
-	for (size_t x=0; x >= step; x -= step) // x is uninitilazed, see lstring.c for in initial value
+	for (; x >= step; x -= step) 
 	{
 		h = h ^ (( h << 5 ) + ( h >> 2 ) + static_cast<size_t>(string[x - 1]));
 	}
@@ -36,7 +36,7 @@ public:
 		: key(hashBool(original)) {} 
 	
 	/*explicit*/ Hash(const schar* original)
-		: key(hashString(original)) {}
+		: key(hashString(original, strlen(original))) {}
 	
 	// /*explicit*/ Hash(sint original){}
 	
@@ -63,7 +63,7 @@ LUAI_FUNC int luaH_getn (Table *t);
 
 // int/float/string/pointer/boolean/Table?
 
-
+/*
 template<typename ELEMENT>
 class Table
 {
@@ -108,13 +108,13 @@ private:
 	Array<Node*>
 		nodes;
 
-	/** any free position is before this position */
+	// any free position is before this position 
 	Node*
 		lastFree;
 
-	/** array part */
+	// array part 
 	Array<ELEMENT> 
 		array;
 }; // Table
-
+*/
 #endif//TABLE_H
