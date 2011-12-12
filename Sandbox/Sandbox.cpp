@@ -730,12 +730,12 @@ void onPlay(void)
 	*/
 	// Thread* runMe = new Thread*[];
 
-	Table< RedBlackTree<sint>* > table;
+	// Table< RedBlackTree<sint>* > table;
 
 	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
 
-	table.insert("make work", outstanding);
-	table.get("make work");
+	// table.insert("make work", outstanding);
+	// table.get("make work");
 	
 	srand(static_cast<uint>(realTime::cycles()));
 	
