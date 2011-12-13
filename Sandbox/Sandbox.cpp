@@ -187,7 +187,7 @@ getFormattedName(eFrameRequirementID frameReqID, sint completedJobs, sint maxJob
 	namestream << "(";
 	if (completedJobs < 10)
 		namestream << " ";
-	namestream << completedJobs;
+	namestream << (completedJobs + 1);
 	namestream << " / ";
 	if (maxJobs < 10)
 		namestream << " ";
@@ -436,8 +436,14 @@ protected:
 
 	void startFrame(void)
 	{
+		int frame(0);
+		realTime::ClockReal realClock;
+		realTime::Stopwatch timer(realClock);
+		timer.start();
+
 		while (true) // should continue
 		{
+			timer.reset();
 			std::queue<Executor*> work;
 			{
 				SYNC(m_incompleteMutex)
@@ -450,8 +456,10 @@ protected:
 					iter++;
 				}
 			}
-
+			
+			frame++;
 			Scheduler::single().enqueueAndWaitOnChildren(work);
+			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
 		}
 	}
 
@@ -507,9 +515,9 @@ public:
 	, m_workTime(work_time)
 	, m_childJobs(child_jobs)
 	{
-		// weird testing
-		m_workTime *= 1;
-		m_childJobs *= 1;
+		// time adjustment testing
+		m_workTime *= 0.1;
+		m_childJobs *= 0.1;
 		// end weird testing
 		m_originalJob = new TestJob(this);
 		// m_original = new concurrency::Executor( m_originalJob, frameReqName(ID_one));

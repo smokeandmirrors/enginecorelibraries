@@ -71,7 +71,7 @@ public:
 		tick(void)=0;
 }; // Clock
 
-
+/* todo, this should be a singleton(?) */
 class ClockReal : public Clock 
 {
 public:
@@ -257,9 +257,14 @@ public:
 	millisecond milliseconds(void) const	
 	{ 
 		if (m_active)
-			return static_cast<millisecond>(m_reference.milliseconds() - m_start); 
+		{
+			millisecond current = m_reference.milliseconds();
+			return current - m_start;
+		}
 		else
-			return static_cast<millisecond>(m_stop - m_start);
+		{
+			return m_stop - m_start;
+		}
 	}
 
 	second seconds(void) const

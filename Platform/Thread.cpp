@@ -54,7 +54,8 @@ void Thread::closeHardware()
 {
 	SYNC(m_mutex);
 	if (m_state == completed
-	|| m_state == suspended)
+	|| m_state == suspended
+	|| m_state == resumed)
 	{
 		closeThread(m_thread);
 		m_state	= closed;
@@ -65,7 +66,7 @@ void Thread::closeHardware()
 void Thread::destroyThread(Thread& thread)
 {
 	assert(Scheduler::single().isOkToDeleteTheChildren());
-	// delete &thread;
+	delete &thread;
 }
 
 
@@ -76,16 +77,22 @@ void Thread::disconnect(signals::Receiver* receiver)
 
 void Thread::execute(cpuID preferredCPU)
 {	
-	// SYNC(m_mutex);
-	
+	SYNC(m_mutex);
+	assert(invalidThreadID == m_launcherID);
+	m_launcherID = getCurrentThreadID();
+
 	if (m_state == uninitialized)
 	{
 		initializeHardware(preferredCPU, false);
 	}
-	else if (m_state == suspended
-	&& resumeThread(m_thread))
+	else if (m_state == suspended)
 	{
-		m_state = running;
+		m_state = resumed;
+		resumeThread(m_thread);
+	}
+	else
+	{
+		assert(false);
 	}
 }	
 
@@ -126,24 +133,31 @@ Thread* Thread::getUninitialized(Executor& executable, cpuID preferredCPU)
 
 void Thread::internalExecute(void)
 {
-	// // SYNC(m_mutex);
-	// if (isExecutable())
-	{
-		m_executor->execute();
-		m_state = completed;
-		m_onComplete.transmit(this);
-	}
+	assert(getCurrentThreadID() == m_id);
+	assert(isExecutable());	
+	m_state = running;
+	m_executor->execute();
+	m_state = completed;
+	m_onComplete.transmit(this);
 }
 
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
 	// SYNC(m_mutex);
 	updateCPUPreference(preferredCPU);
+	
+	if (!startSuspended)
+		m_state = suspended;
+
 	m_thread = concurrency::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
 
 	if (m_thread)
 	{
-		m_state = startSuspended ? suspended : running;
+		if (startSuspended)
+			m_state = suspended;
+		// else 
+		//	m_state = handled in the attempt to call execute()
+		
 	}
 	else
 	{
@@ -177,48 +191,75 @@ void Thread::waitOnCompletion(Thread& thread)
 	}
 }
 
-void Thread::waitOnCompletion(std::vector<Thread*>& threads)
+void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 {
-	threadHandle* handles = new threadHandle[threads.size()];
-
-	std::vector<Thread*>::iterator sentinel(threads.end());
-
+	size_t size = threads.getSize();
+	assert(size > 1);
+	assert(startingIndex >= 0);
+	assert(startingIndex < static_cast<sint>(size));
+	
+#define WAIT_ON_MULTIPLE 0
+#if WAIT_ON_MULTIPLE 
+	size_t numHandles = size - startingIndex;
+	threadHandle* handles = new threadHandle[numHandles];
 	uint numValid(0);
 
-	for (std::vector<Thread*>::iterator iter(threads.begin());
-	iter != sentinel;
-	iter++)
+	for (size_t index = startingIndex; index < size; index++)
 	{
-		if ((*iter)->isWaitable())
+		Thread* thread = threads[index];
+
+		if (thread->isWaitable())
 		{
-			handles[numValid] = (*iter)->m_thread;
+			handles[numValid] = thread->m_thread;
 			numValid++;
 		}
+		else
+		{
+			assert(false);
+		}
 	}
 
-	waitForCompletion(handles, numValid, true, waitInfinitely);
-}
-
-void Thread::waitOnCompletionOfTree(std::vector<Thread*>& threads)
-{
-	bool resetLoop = false;
-	size_t i(0);
-
-	do
+	for (size_t index = numValid; index < numHandles; index++)
 	{
-		resetLoop = false;
-		size_t previousSize = threads.size();
+		handles[index] = NULL; // should be unnecessary
+	}
 
-		for (; i < previousSize; i++)
+	for (size_t index = 0; index < numValid; index++)
+	{
+		assert(handles[index] != NULL);
+	}
+
+	// change this to single wait version
+	waitForCompletion(handles, numValid, true, waitInfinitely);
+	
+	for (size_t i = 0; i < numHandles; i++)
+		handles[i] = NULL; // should be unnecessary
+
+	delete[] handles;
+#else // !WAIT_ON_MULTIPLE
+	for (size_t index = startingIndex; index < size; index++)
+	{
+		Thread* thread = threads[index];
+		
+		if (thread->isWaitable())
 		{
-			Thread* thread = threads[i];
-			assert(thread->isWaitable());
 			waitForCompletion(thread->m_thread, waitInfinitely);
 		}
-
-		resetLoop = (previousSize != threads.size());
 	}
-	while (resetLoop);
+#endif//WAIT_ON_MULTIPLE
+}
+
+void Thread::waitOnCompletionOfTree(Thread::Tree& threads)
+{
+	size_t previousSize = 0; 
+	
+	do
+	{
+		size_t startingIndex = previousSize;
+		previousSize = threads.getSize();
+		waitOnCompletion(threads, startingIndex);		
+	}
+	while (previousSize != threads.getSize());
 }
 
 
@@ -277,7 +318,7 @@ inline bool waitForCompletion(threadHandle& handle, millisecond milliseconds)
 	if (!success)
 	{
 		DWORD lastError = GetLastError();
-		printf("ERROR: %d\n", lastError);
+		printf("waitForCompletion single ERROR: %d\n", lastError);
 		LPWSTR pMessage = L"%1!*.*s! %4 %5!*s!";
 		DWORD_PTR pArgs[] = { (DWORD_PTR)4, (DWORD_PTR)2, (DWORD_PTR)L"Bill",  // %1!*.*s! refers back to the first insertion string in pMessage
 			(DWORD_PTR)L"Bob",                                                // %4 refers back to the second insertion string in pMessage
@@ -324,7 +365,7 @@ inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitF
 		if (!success)
 		{
 			DWORD lastError = GetLastError();
-			printf("ERROR: %d\n", lastError);
+			printf("waitForCompletion array ERROR: %d\n", lastError);
 			LPWSTR pMessage = L"%1!*.*s! %4 %5!*s!";
 			DWORD_PTR pArgs[] = { (DWORD_PTR)4, (DWORD_PTR)2, (DWORD_PTR)L"Bill",  // %1!*.*s! refers back to the first insertion string in pMessage
 				(DWORD_PTR)L"Bob",                                                // %4 refers back to the second insertion string in pMessage

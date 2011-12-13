@@ -6,11 +6,13 @@
 #include <queue>
 #include <vector>
 
+#include "Concurrency.h"
 #include "Platform.h"
 #include "Signals.h"
 #include "Singleton.h"
 #include "Synchronization.h"
-#include "Concurrency.h"
+#include "Thread.h"
+
 /**
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
@@ -24,8 +26,6 @@ Tested in the field	:	NO
 
 namespace concurrency
 {
-
-class Thread;
 
 /** 
 a class that handles processing concurrent execution
@@ -101,19 +101,8 @@ private:
 	void 
 		accountForStartedJob(Job* started, cpuID index);
 	
-	void 
-		accountForWaitedOnThread(
-			Executor& executable,
-			cpuID preferredCPU,
-			threadID originalID, 
-			std::vector<Thread*>& children, 
-			std::vector<Job*>& childJobs);
-
 	void
-		accountForWaitedOnThreadCompletion(
-			threadID originalID, 
-			std::vector<Thread*>& children, 
-			std::vector<Job*>& childJobs);
+		accountForWaitedOnThreadCompletion(Thread::Tree* children);
 
 	bool 
 		getFreeIndex(cpuID& index);
@@ -121,6 +110,13 @@ private:
 	bool 
 		getFreeIndex(cpuID& available, cpuID idealCPU);
 
+
+	void 
+		initializeAndTrackJob(
+			Executor& executable,
+			cpuID preferredCPU,
+			Thread::Tree* children);
+	
 	void
 		initializeNumberSystemThreads(void);
 
@@ -145,11 +141,8 @@ private:
 	std::map<threadID, threadID>
 		m_originalByChildren;
 
-	std::map<threadID, std::vector<Thread*>* >
-		m_childThreadsByOriginalID;
-
-	std::map<threadID, std::vector<Job*>*>
-		m_childJobsByOriginalID;
+	std::map<threadID, Thread::Tree* >
+		m_childrenByOriginal;
 
 	std::vector<Job*>		
 		m_activeJobs;
@@ -170,6 +163,7 @@ private:
 		m_pendingJobs;
 	
 	DECLARE_MUTEX(m_mutex);
+	
 	void markDebugCheck(void) { m_isOkToDeleteTheChildren = true; }
 	void unMarkDebugCheck(void) { m_isOkToDeleteTheChildren = false; }
 

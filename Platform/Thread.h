@@ -5,8 +5,9 @@
 #include <string>
 #include <vector>
 
-#include "Platform.h"
+// #include "Array.h"
 #include "Concurrency.h"
+#include "Platform.h"
 #include "Signals.h"
 
 /**
@@ -21,9 +22,114 @@ Tested in the field	:	NO
 */
 namespace concurrency
 {
+
 class Thread
 {
 public:
+	class Tree
+	{
+	public:
+		typedef std::vector<Thread*>::const_iterator ThreadIterConst; 
+		typedef std::vector<Thread*>::iterator ThreadIter; 
+
+		Tree(void)
+		: rootID(Thread::getCurrentID())
+		{
+			/* empty */
+		}
+
+		~Tree()
+		{
+			Thread::Tree::ThreadIter sentinel(threads.end());
+			for (Thread::Tree::ThreadIter iter(threads.begin());
+				iter != sentinel;
+				iter++)
+			{
+				Thread& thread = *(*iter);
+				destroyThread(thread);
+			}
+		}
+	
+		inline ThreadIter
+			begin(void) 
+		{
+			SYNC(mutex);
+			return threads.begin();
+		}
+		
+		inline ThreadIterConst
+			begin(void) const
+		{
+			SYNC(mutex);
+			return threads.begin();
+		}
+
+		inline ThreadIter
+			end(void) 
+		{
+			SYNC(mutex);
+			return threads.end();
+		}
+
+		inline ThreadIterConst
+			end(void) const
+		{
+			SYNC(mutex);
+			return threads.end();
+		}
+
+		inline size_t
+			getSize(void) const
+		{
+			SYNC(mutex);
+			return threads.size();
+		}
+
+		inline threadID 
+			getOriginalID(void) const
+		{
+			return rootID;
+		}
+
+		inline Thread*
+			operator[](size_t index) 
+		{
+			SYNC(mutex);
+			return threads[index];
+		}
+
+		inline const Thread*
+			operator[](size_t index) const
+		{
+			SYNC(mutex);
+			return threads[index];
+		}
+
+		inline void
+			push(Thread* thread)
+		{
+			SYNC(mutex);
+			threads.push_back(thread);
+		}
+
+		inline void
+			waitOnCompletion(void)
+		{
+			waitOnCompletionOfTree(*this);
+		}
+
+	private:
+		Thread& operator=(const Thread&);
+
+		threadID
+			rootID;
+
+		DECLARE_MUTEX(mutex);
+		
+		std::vector<Thread*>
+			threads;
+	}; // class Thread::Tree
+
 	static void 
 		destroyThread(Thread& thread);
 	
@@ -43,10 +149,10 @@ public:
 		waitOnCompletion(Thread& thread);
 
 	static void
-		waitOnCompletion(std::vector<Thread*>& threads);
+		waitOnCompletion(Tree& threads, size_t startingIndex=0);
 
 	static void
-		waitOnCompletionOfTree(std::vector<Thread*>& threads);
+		waitOnCompletionOfTree(Tree& threads);
 
 	template<class RECEIVER> void
 		connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
@@ -80,6 +186,7 @@ private:
 		error,			// hardware initialization failed 
 		uninitialized,	// no hardware thread
 		running,		// hardware thread executing
+		resumed,		// hardware resume / start created attempted
 		suspended		// hardware execution paused
 	}; // enum Thread::RunningState
 
@@ -100,6 +207,7 @@ private:
 	, m_preferredCPU(preferredCPU)
 	, m_thread(NULL)
 	, m_state(Thread::uninitialized)
+	, m_launcherID(invalidThreadID)
 	{ /* empty */ }
 
 
@@ -143,6 +251,9 @@ private:
 	threadID
 		m_id;
 
+	threadID
+		m_launcherID;
+
 	cpuID 
 		m_preferredCPU;
 
@@ -177,7 +288,7 @@ Thread::getID(threadID& id) const
 inline bool
 Thread::isExecutable(void) const
 {
-	return m_state == suspended;
+	return m_state == resumed || m_state == suspended;
 }
 
 inline bool 
@@ -191,7 +302,6 @@ Thread::isWaitable(void) const
 { 
 	return isHardwareInitialized(); 
 }
-
 } // concurrency
 
 #endif//THREADS_H
