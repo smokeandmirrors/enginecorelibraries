@@ -41,15 +41,10 @@ class Scheduler
 \todo Scheduler Todo List:
 1 use events or some other thing to free up the creation of the threads ahead of time?
 2 set ideal processor at job execution time
-3 wait on completion of all jobs?
-4 Write a scheduler, if not MT testing suite to allow for safe running and modification
-of this file
 */
 
 
 public:
-	bool isOkToDeleteTheChildren(void) const { return m_isOkToDeleteTheChildren; }
-
 	void 
 	enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
 
@@ -163,14 +158,7 @@ private:
 		m_pendingJobs;
 	
 	DECLARE_MUTEX(m_mutex);
-	
-	void markDebugCheck(void) { m_isOkToDeleteTheChildren = true; }
-	void unMarkDebugCheck(void) { m_isOkToDeleteTheChildren = false; }
-
-	bool
-		m_isOkToDeleteTheChildren;
 }; // class Scheduler
-
 } // concurrency
 
 #endif//SCHEDULING_H

@@ -14,6 +14,9 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
 #include "Platform.h"
 
+namespace containers
+{
+
 template<typename ELEMENT>
 class RedBlackTree
 {
@@ -582,5 +585,7 @@ void RedBlackTree<ELEMENT>::removeMin(void)
 	assert(Node::numNodes == getSize());
 	// check();
 }
+
+} // namespace containers
 
 #endif//REDBLACKTREE_H

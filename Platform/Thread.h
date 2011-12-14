@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-// #include "Array.h"
 #include "Concurrency.h"
 #include "Platform.h"
 #include "Signals.h"
@@ -35,7 +34,7 @@ public:
 		Tree(void)
 		: rootID(Thread::getCurrentID())
 		{
-			/* empty */
+			threads.reserve(20);
 		}
 
 		~Tree()

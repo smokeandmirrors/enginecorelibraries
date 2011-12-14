@@ -22,14 +22,16 @@
 #include "Scheduling.h"
 #include "Synchronization.h"
 #include "Signals.h"
+#include "Table.h"
 #include "Thread.h"
 #include "Time.h"
 #include "Vector.h"
 
+using namespace algorithms;
+using namespace containers;
 using namespace concurrency;
 using namespace designPatterns;
 using namespace realTime;
-
 
 template<typename NUMBER>
 NUMBER getRand(NUMBER min, NUMBER max) 
@@ -518,9 +520,7 @@ public:
 		// time adjustment testing
 		m_workTime *= 0.1;
 		m_childJobs *= 0.1;
-		// end weird testing
 		m_originalJob = new TestJob(this);
-		// m_original = new concurrency::Executor( m_originalJob, frameReqName(ID_one));
 	}
 
 	virtual 
@@ -738,13 +738,12 @@ void onPlay(void)
 	*/
 	// Thread* runMe = new Thread*[];
 
-	// Table< RedBlackTree<sint>* > table;
+	Table< RedBlackTree<sint>* > mytable;
 
 	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
-
-	// table.insert("make work", outstanding);
-	// table.get("make work");
-	
+	mytable["awesome"] = outstanding;
+	RedBlackTree<sint>* awesome = mytable["awesome"];
+	awesome->insert(5);
 	srand(static_cast<uint>(realTime::cycles()));
 	
 	for (int i = 0; i < 10; i++)

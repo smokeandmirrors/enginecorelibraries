@@ -42,7 +42,7 @@ getNumHardwareThreads(void)
 
 /** a wrapper for a Thread that can be added to the scheduler */
 class Scheduler::Job : public Receiver
-{	/** todo: make sure no jobs are holding onto the same thread */
+{	
 public:
 	void 
 	ceaseReception(void)
@@ -113,7 +113,6 @@ public:
 		if (m_thread)
 		{
 			m_thread->disconnect(this);
-			assert(Scheduler::single().isOkToDeleteTheChildren());
 			Thread::destroyThread(*m_thread);
 			m_thread = NULL;
 		}
@@ -146,7 +145,6 @@ private:
 	{
 		if (m_thread)
 		{
-			assert(Scheduler::single().isOkToDeleteTheChildren());
 			Thread::destroyThread(*m_thread);
 		}
 	}
@@ -370,52 +368,39 @@ void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
 }
 
 void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU)
-{	
-	unMarkDebugCheck();
-	Thread::Tree* children = new Thread::Tree();
+{	// Thread::Tree* children = new Thread::Tree();
+	Thread::Tree children;
 
 	{
 		SYNC(m_mutex);
-		initializeAndTrackJob(executable, preferredCPU, children);
+		initializeAndTrackJob(executable, preferredCPU, &children);
 		startJobs();
 	}
 
-	children->waitOnCompletion();
-	markDebugCheck();
-	accountForWaitedOnThreadCompletion(children);
-	delete children;
-	unMarkDebugCheck();
-	
-	/* OR?
-	WaitableSignal signal;
-	BunchOfJobs jobs(..., signal);
-	Scheduler.doJobs(jobs); // acquires signal
-	signal.acquire();
-	*/
+	children.waitOnCompletion();
+	accountForWaitedOnThreadCompletion(&children);
+	// delete children;
 }
 
 void Scheduler::enqueueAndWaitOnChildren(std::queue<Executor*>& work)
-{
-	unMarkDebugCheck();
-	Thread::Tree* children = new Thread::Tree();
+{	// Thread::Tree* children = new Thread::Tree();
+	Thread::Tree children;
 		
 	{
 		SYNC(m_mutex);
 		
 		while (!work.empty())
 		{
-			initializeAndTrackJob(*(work.front()), noCPUpreference, children);
+			initializeAndTrackJob(*(work.front()), noCPUpreference, &children);
 			work.pop();
 		}
 
 		startJobs();
 	}
 
-	children->waitOnCompletion();
-	markDebugCheck();
-	accountForWaitedOnThreadCompletion(children);
-	delete children;
-	unMarkDebugCheck();
+	children.waitOnCompletion();
+	accountForWaitedOnThreadCompletion(&children);
+	// delete children;
 }
 
 bool Scheduler::getFreeIndex(cpuID& index)
