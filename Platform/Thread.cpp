@@ -47,7 +47,6 @@ Thread::~Thread(void)
 	
 	closeHardware();
 	delete m_executor;
-	assert(Scheduler::single().isOkToDeleteTheChildren());
 }
 
 void Thread::closeHardware()
@@ -65,7 +64,6 @@ void Thread::closeHardware()
 
 void Thread::destroyThread(Thread& thread)
 {
-	assert(Scheduler::single().isOkToDeleteTheChildren());
 	delete &thread;
 }
 

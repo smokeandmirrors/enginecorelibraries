@@ -687,9 +687,11 @@ void testEngineLoop(void)
 	loop.stop();
 }
 
+// #include <map>
+
 void onPlay(void)
 {
-	testEngineLoop();
+	
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
 	/*
@@ -738,12 +740,26 @@ void onPlay(void)
 	*/
 	// Thread* runMe = new Thread*[];
 
-	Table< RedBlackTree<sint>* > mytable;
+
+	std::map<int, int> numberToNumber;
+	numberToNumber[10] = 100;
+	int index100 = numberToNumber[100];
 
 	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
+	RedBlackTree<sint>* awesome;
+
+	std::map<const char*, RedBlackTree<sint>*> numberToTree;
+	awesome = NULL;
+	numberToTree["awesome"] = outstanding;
+	awesome = numberToTree["awesome"];
+	awesome->insert(5); 
+
+	Table< RedBlackTree<sint>* > mytable;
+	awesome = NULL;
 	mytable["awesome"] = outstanding;
-	RedBlackTree<sint>* awesome = mytable["awesome"];
-	awesome->insert(5);
+	awesome = mytable["awesome"];
+	
+
 	srand(static_cast<uint>(realTime::cycles()));
 	
 	for (int i = 0; i < 10; i++)
@@ -792,6 +808,8 @@ void onPlay(void)
 	}
 	
 	delete pRbt;
+
+	testEngineLoop();
 	
 // 	for (int i = 0; i < 10000; i++)
 // 	{

@@ -11,38 +11,75 @@ Lua table.
 
 namespace algorithms
 {
+
 typedef uint hashCode;
 
-inline hashCode hashBool(bool key);
-inline hashCode hashString(const schar* string);
-inline hashCode hashString(const schar* string, size_t x);
+inline hashCode 
+	hashBool(const bool key);
+
+template<typename T>
+inline hashCode
+	hashGeneric(const T* pointer);
+
+inline hashCode
+	hashInteger(sint number);
+
+inline hashCode
+	hashPointer(const void* pointer);
+
+inline hashCode
+	hashReal(sreal number);
+
+inline hashCode 
+	hashString(const schar* string);
+
+inline hashCode 
+	hashString(const schar* string, size_t x);
 
 } // namespace algorithms
 
 namespace containers
 {
 
-class Hash
+struct Hash
 {
-public:
-	/*explicit*/ Hash(bool original)
-		: key(algorithms::hashBool(original)) {} 
+	// todo template this?
+	enum HashableType
+	{
+		HashableTypes_bool,
+		HashableTypes_pointer,
+		HashableTypes_sint,
+		HashableTypes_sreal,
+		HashableTypes_string,
+	};
 	
 	/*explicit*/ Hash(const schar* original)
-		: key(algorithms::hashString(original, strlen(original))) {}
+		: key(algorithms::hashString(original, strlen(original)))
+		, type(HashableTypes_string)
+		{ }
 	
-	// /*explicit*/ Hash(sint original){}
-	
+	// same lua get function
 	/** \todo if this is ever finished, profile and optimize the float to int conversion */
+	// /*explicit*/ Hash(sint original){}
 	// /*explicit*/ Hash(sreal original){}
 	
+	// same lua get function
+	///*explicit*/ Hash(bool original)
+	//	: key(algorithms::hashBool(original)) {} 
+	// /*explicit*/ Hash(void* original){}
 	// /*explicit*/ Hash(void* original){}
 	
-	const algorithms::hashCode key;
+	const algorithms::hashCode 
+		key;
+	
+	const HashableType 
+		type;
 
 private:
-	Hash(void) : key(0) {}
-	void operator=(const Hash&);
+	Hash(void);
+	
+	void 
+		operator=(const Hash&);
 }; // Hash
 
 /*
@@ -56,8 +93,9 @@ LUAI_FUNC int luaH_getn (Table *t);
 
 // int/float/string/pointer/boolean/Table?
 
+
 template<typename ELEMENT>
-class Table
+class Table 
 {
 	struct Node
 	{
@@ -77,20 +115,37 @@ public:
 		operator[](const Hash& key);
 	
 	const ELEMENT& 
-		operator[](const Hash& key) const;	
-	
-protected:
-	inline Node* 
-		getMainPosition(const Hash& key) const
-	{
-		return nodes[key.key]; 
-	}
+		operator[](const Hash& key) const;
+
+	bool 
+		has(const Hash& key) const;
 	
 private:
+	inline Node* 
+		getMainPosition(const Hash& key) const;
+	
+	inline Node*
+		findNodeWithBool(const Hash& key) const;
+
+	inline Node*
+		findNodeWithPointer(const Hash& key) const;
+	
+	inline Node*
+		findNodeWithReal(const Hash& key) const;
+
+	inline Node*
+		findNodeWithSignedInteger(const Hash& key) const;
+		
+	inline Node*
+		findNodeWithString(const Hash& key) const;
+
+	inline Node*
+		insert(const Hash& key, ELEMENT& value); 
+	
 	uchar 
 		log2NodeArraySize;
 
-	std::vector<Node*>
+	std::list<Node*>
 		nodes;
 	 
 	Node*					// any free position is before this position
@@ -142,12 +197,85 @@ Table<ELEMENT>::~Table(void)
 	// free nodes and stuff
 }
 
+template<typename ELEMENT> 
+typename Table<ELEMENT>::Node* Table<ELEMENT>::findNodeWithString(const Hash& key) const
+{	// HashableTypes_string
+	// hashstr(this, key); -> hashpow2(this, (key)->tsv.hash)
+	// hashpow2(this, key.key); -> hashpow2(this,key.key)      ( gnode(this, lmod((key.key), sizenode(this))) )
+	//		sizenode(this) -> twoto((this)->log2NodeArraySize)
+	//			twoto -> 1<<(log2NodeArraySize)
+	//		lmod(key.key, 1<<log2NodeArraySize)); -> lmod(key.key,log2NodeArraySize) = ()
+	//			check_exp( (log2NodeArraySize&(log2NodeArraySize-1))==0, ( ) ) )
+	//				(lua_assert((log2NodeArraySize&(log2NodeArraySize-1))==0), (cast(int, (key.key) & ((log2NodeArraySize)-1)))
+	//		gnode(this,i)	-> (&(this)->node[i])
+
+	// Node *n = (gnode(this, lmod((key.key), sizenode(this))))
+	return NULL;
+
+	/*
+	luaH_get(t, string key) == luaH_getstr(t, rawtsvalue(key));
+
+	do {  // check whether `key' is somewhere in the chain 
+		// if the keytype is a string && the keys are equal
+		if (ttisstring(gkey(n)) && rawtsvalue(gkey(n)) == key)
+			return gval(n);  // that's it 
+		else n = gnext(n);
+	} while (n);
+	return NULL;;
+	*/
+}
+
+template<typename ELEMENT> 
+typename Table<ELEMENT>::Node* Table<ELEMENT>::getMainPosition(const Hash& key) const
+{
+	switch (key.type)
+	{
+		/*
+	case Hash::HashableTypes_bool:
+		return findNodeWithBool(key.key);
+	
+	case Hash::HashableTypes_pointer:
+		return findNodeWithPointer(key.key);
+	
+	case Hash::HashableTypes_sint:
+		return findNodeWithSignedInteger(key.key);
+	
+	case Hash::HashableTypes_sreal:
+		return findNodeWithReal(key.key);
+	*/
+	case Hash::HashableTypes_string:
+		return findNodeWithString(key);
+	
+	default:
+		assert(false);
+	}
+	return NULL;
+}
+
 /* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
 template<typename ELEMENT> 
-ELEMENT& Table<ELEMENT>::operator[](const Hash& /* key */)
+typename ELEMENT& Table<ELEMENT>::operator[](const Hash& key )
 {	// finish me
-	return array[0];
+	
+
+	// just make the stuff compile right now
+	Node* n = getMainPosition(key);
+	
+	if (!n)
+	{
+		ELEMENT defaultElement;
+		n = insert(key, defaultElement);
+	}
+	
+	return n->value;
+	
+
+
+	
+	
+	
+	// return array[0];
 }
 /* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
