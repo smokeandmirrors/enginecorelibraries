@@ -442,8 +442,9 @@ protected:
 		realTime::ClockReal realClock;
 		realTime::Stopwatch timer(realClock);
 		timer.start();
+		bool forever = true;
 
-		while (true) // should continue
+		while (forever) // should continue
 		{
 			timer.reset();
 			std::queue<Executor*> work;
@@ -518,8 +519,8 @@ public:
 	, m_childJobs(child_jobs)
 	{
 		// time adjustment testing
-		m_workTime *= 0.1;
-		m_childJobs *= 0.1;
+		m_workTime *= 0.1f;
+		m_childJobs *= static_cast<sint>(0.1f);
 		m_originalJob = new TestJob(this);
 	}
 
@@ -744,6 +745,9 @@ void onPlay(void)
 	std::map<int, int> numberToNumber;
 	numberToNumber[10] = 100;
 	int index100 = numberToNumber[100];
+	
+	if (index100 < 0)
+		printf("referenced");
 
 	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
 	RedBlackTree<sint>* awesome;
