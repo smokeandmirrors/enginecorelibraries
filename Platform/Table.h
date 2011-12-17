@@ -100,23 +100,23 @@ LUAI_FUNC int luaH_getn (Table *t);
 
 static const sint maxBits(26);
 static const sint maxArraySize( 1 << maxBits);
+static const sint valid(1);
+static const sint invalid(0);
+
 
 template<typename ELEMENT>
 class Table 
 {
 	struct Value
 	{
-		static const sint valid(1);
-		static const sint invalid(0);
-
 		Value(void)
-		: isValid(Value::invalid)
+		: isValid(invalid)
 		{
 			/* empty */
 		}
 
 		Value(ELEMENT v)
-		: isValid(Value::valid)
+		: isValid(valid)
 		, value(v)
 		{
 			/* empty */
@@ -138,10 +138,16 @@ class Table
 
 	struct Node
 	{
-		Node(ELEMENT v, containers::Hash k)
-		, value(v)
-		, key(k)
+		Node(void)
+		: key(Hash::getInvalid())
+		{
+			/* empty */
+		}
+
+		Node(ELEMENT v, const containers::Hash& k)
+		: key(k)
 		, next(NULL) 
+		, value(v)
 		{
 			/* empty */
 		}
@@ -610,18 +616,18 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Hash& key)
 /* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
 template<typename ELEMENT> 
-typename ELEMENT& Table<ELEMENT>::operator[](const Hash& key )
+ELEMENT& Table<ELEMENT>::operator[](const Hash& key )
 {	// finish me
 	// just make the stuff compile right now
 	Node* n = getMainPosition(key);
 	
 	if (!n)
 	{
-		ELEMENT defaultElement;
+		// ELEMENT defaultElement;
 		// n = insert(key, defaultElement);
 	}
 	
-	return n->value;		
+	return n->value.value;		
 	// return arrayPart[0];
 }
 /* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
@@ -689,7 +695,7 @@ void Table<ELEMENT>::resize(sint newArraySize, sint newHashSize)
 			i--;
 			Node* old = oldHashPart + i;
 			
-			if (!old->isValid)
+			if (!old->value.isValid)
 			{	//									old->key, old->value
 				// setobjt2t(L, luaH_set(L, t, key2tval(old)), gval(old));
 				// is a copy (1 , 2) 1 := 2 
@@ -707,13 +713,13 @@ void Table<ELEMENT>::resize(sint newArraySize, sint newHashSize)
 
 
 template<typename ELEMENT> 
-void Table<ELEMENT>::resizeArray(sint newArraySize)
+void Table<ELEMENT>::resizeArray(sint /*newArraySize*/)
 {
 
 }
 
 template<typename ELEMENT> 
-void Table<ELEMENT>::resizeHash(sint newHashSize)
+void Table<ELEMENT>::resizeHash(sint /*newHashSize*/)
 {
 
 }
