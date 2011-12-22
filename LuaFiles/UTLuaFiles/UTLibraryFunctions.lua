@@ -1,4 +1,7 @@
-module(..., package.seeall)
+local UT = require'UnitTestingFramework'
+local coroutine = coroutine
+require'Utilities'
+_ENV = deprecatedNaughtyModule(..., package.seeall)
 ----------------------------------------------------------------------
 -- UTLibraryFunctions.lua
 --
@@ -8,8 +11,8 @@ module(..., package.seeall)
 --	\author Smoke and Mirrors Development
 --	\email smokeandmirrorsdevelopment@gmail.com
 --	\copyright 2010
-local UT = require'UnitTestingFramework'
-require'Utilities'
+
+
 
 --[[ testing Utilities.lua ]]--
 UT.test('dostring',

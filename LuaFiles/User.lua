@@ -1,9 +1,11 @@
-module(..., package.seeall)
-
 require'Utilities'
 require'ObjectOrientedParadigm'
-require'Vector3PureLua'
-UT = require'UnitTestingFramework'
+
+function _G.doit()
+	require'UnitTestingFramework'
+	require'UTLibraryFunctions'
+	UnitTestingFramework.testAll()
+end
 
 function _G.enginetest()
 	rerequire'TestSequenceOne'
@@ -99,7 +101,7 @@ function _G.testIPairs(iterations, size, t, sum)
 	local pairsSum = 0
 	local pairsStart = os.clock()
 	for i=1, iterations do
-		pairsSum = pairsSum + iterateIPairs(unpack(t))
+		pairsSum = pairsSum + iterateIPairs(table.unpack(t))
 	end
 	local pairsEnd = os.clock()
 	local pairsTotal = os.difftime(pairsEnd, pairsStart)
@@ -119,7 +121,7 @@ function _G.testPairs(iterations, size, t, sum)
 	local pairsSum = 0
 	local pairsStart = os.clock()
 	for i=1, iterations do
-		pairsSum = pairsSum + iteratePairs(unpack(t))
+		pairsSum = pairsSum + iteratePairs(table.unpack(t))
 	end
 	local pairsEnd = os.clock()
 	local pairsTotal = os.difftime(pairsEnd, pairsStart)
@@ -136,7 +138,7 @@ function _G.testSelect(iterations, size, t, sum)
 	local selectSum = 0
 	local selectStart = os.clock()
 	for i=1, iterations do
-		selectSum = selectSum + iterateSelect(unpack(t))
+		selectSum = selectSum + iterateSelect(table.unpack(t))
 	end
 	local selectEnd = os.clock()
 	local selectTotal = os.difftime(selectEnd, selectStart)
@@ -153,8 +155,6 @@ function _G.testIteration(iterations, size)
 	testIPairs(iterations, size, t, sum)
 	testSelect(iterations, size, t, sum)	
 end
-
-
 
 _G.u = function()
 	rerequire'User'
@@ -219,7 +219,7 @@ _G.loader = function(modulename)
 		local file = io.open(filename, "rb")
 		if file then
 			-- Compile and return the module
-			return assert(loadstring(assert(file:read("*a")), filename))
+			return assert(load(assert(file:read("*a")), filename))
 		end
 		--]]
 		errmsg = errmsg.."\n\tno file '"..filename.."' (checked with custom loader)"

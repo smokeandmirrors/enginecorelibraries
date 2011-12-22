@@ -18,6 +18,8 @@ public:
 	void test_define_lua_LuaExtendable_by_proxy(void);
 };
 
+
+// BEGIN SINGLE
 class Single
 {
 public:
@@ -79,6 +81,8 @@ DEFINE_LUA_LIBRARY(Single)
 	LUA_ENTRY_NAMED("getValue", getValueSingle)
 	LUA_ENTRY_NAMED("increment", incrementSingle)
 END_LUA_LIBRARY(Single)
+// END SINGLE
+
 
 void Classes::test_define_lua_class()
 {

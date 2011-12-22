@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 
 require 'ObjectOrientedParadigm'
 UT = require'UnitTestingFramework'

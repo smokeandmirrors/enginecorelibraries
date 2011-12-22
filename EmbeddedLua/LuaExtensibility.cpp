@@ -138,13 +138,9 @@ void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 	Lua::require(L, "ObjectOrientedParadigm"); 
 	// hiding the not found error, since once can declare classes
 	// without any %Lua file support.
-	Lua::require(L, derived, true, false); 
+	Lua::require(L, derived, true, false);
 	completeLuaClassDeclaration(L, derived, super);
-	lua_getglobal(L, "ObjectOrientedParadigm");
-	if (!lua_istable(L, -1))
-		return;
-	//s: OOP
-	lua_getfield(L, -1, "declareClass");
+	lua_getglobal(L, "declareClass");
 	assert(lua_isfunction(L, -1));
 	//s: declareClass
 	lua_getglobal(L, derived);
@@ -170,6 +166,11 @@ inline bool isInstanceBeingRefreshed(lua_State* L)
 	{
 		return false;
 	}
+}
+
+bool embeddedLua::isIndexTable(lua_State* L, sint index)
+{
+	return lua_istable(L, index);
 }
 
 void printToLua(lua_State* L, const schar* string)
@@ -374,9 +375,21 @@ sint setUserdataMetatable(lua_State* L)
 }
 
 sint LuaExtendable::__gcmetamethod(lua_State* L)
-{
+{	
 	LuaExtendable* udata = to<LuaExtendable*>(L, -1);
 	delete udata;
+	return 0;
+}
+
+sint LuaExtendable::__gcmetamethodProxy(lua_State* L)
+{	// in Lua 5.2 tables can have finalizers 
+	// LuaExtendables will have this method called on the userdat
+	// AND the table
+	if (!lua_istable(L, -1))
+	{
+		LuaExtendable* udata = to<LuaExtendable*>(L, -1);
+		delete udata;
+	}
 	return 0;
 }
 

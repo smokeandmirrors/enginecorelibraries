@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 
 function memberReturn2Param2(self, one, two)
 

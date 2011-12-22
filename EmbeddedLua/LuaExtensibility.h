@@ -35,7 +35,7 @@ END_LUA_LIBRARY(example)
 
 namespace lua_library_example 
 {
-	static const luaL_reg example_library[] = {
+	static const luaL_Reg example_library[] = {
 		{"Method", method}, 
 		...,
 		{NULL, NULL}
@@ -43,7 +43,8 @@ namespace lua_library_example
 
 	sint luaopen_example(lua_State* L)
 	{
-		luaL_register(L, "example", example_library);
+		lua_pushglobaltable(L); 
+		registerLibrary(L, example_library, 0, "example");
 		return 1;
 	}
 }
@@ -316,7 +317,7 @@ or the same if it has no parent class
 */
 #define DEFINE_LUA_CLASS_BY_PROXY(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
-		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR_PROXY(CLASS) \
 		LUA_ENTRY_CLASS__isExtendableByProxy \
 		LUA_ENTRY_CLASS__isnewindexable_TRUE \
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
@@ -325,7 +326,7 @@ or the same if it has no parent class
 
 #define DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
-		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
+		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR_PROXY(CLASS) \
 		LUA_ENTRY_CLASS__isExtendableByProxy \
 		LUA_ENTRY_CLASS__isnewindexable_TRUE \
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
@@ -569,7 +570,8 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_OPENER(NAME) \
 	sint key(lua_State* L) \
 	{ \
-		luaL_register(L, #NAME, NAME##_library); \
+		lua_pushglobaltable(L); \
+		Lua::registerLibrary(L, NAME##_library, 0, #NAME); \
 		return 1; \
 	} 
 
@@ -578,7 +580,8 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
 	sint key(lua_State* L) \
 	{ \
-		luaL_register(L, #CLASS, CLASS##_library); \
+		lua_pushglobaltable(L); \
+		Lua::registerLibrary(L, CLASS##_library, 0, #CLASS); \
 		embeddedLua::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
 		return 1; \
 	} 
@@ -588,7 +591,8 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
 	sint key(lua_State* L) \
 	{ \
-		luaL_register(L, #NAME, NAME##_library); \
+		lua_pushglobaltable(L); \
+		Lua::registerLibrary(L, NAME##_library, 0, #NAME); \
 		Lua::nilLoadedStatus(L, #NAME); \
 		return 1; \
 	} 
@@ -833,7 +837,7 @@ back out of %Lua.
 	}
 
 /**
-This closes out the luaL_reg and defines the library opener function, 
+This closes out the luaL_Reg and defines the library opener function, 
 which will register the exposed function and declare a %Lua class
 via ObjectOrientedParadgim.lua.
 \param CLASS the name of the CLASS being exposed, with no delimiters
@@ -1032,6 +1036,11 @@ the require() function.
 
 /** 
 */
+#define LUA_ENTRY_CLASS__gc_DESTRUCTOR_PROXY(CLASS) \
+	LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethodProxy<##CLASS##>) 
+
+/** 
+*/
 #define LUA_ENTRY_CLASS__isExtendableByProxy \
 	LUA_ENTRY_NAMED("__isExtendableByProxy", embeddedLua::pushTrue) 
 
@@ -1090,6 +1099,12 @@ add a lua method to a definition by the same name
 
 /** 
 */
+#define LUA_ENTRY_EXTENDABLE__gc_DESTRUCTOR_PROXY(CLASS) \
+	LUA_ENTRY_NAMED("__gc", LuaExtendable::__gcmetamethodProxy)
+
+
+/** 
+*/
 #define LUA_ENTRY_EXTENDABLE__newindex_ERROR_AUTO(CLASS) \
 	LUA_ENTRY_NAMED("__newindex", LuaExtendable::__newindexError) 
 
@@ -1139,7 +1154,7 @@ add a lua method to a definition by a different name
 /** 
 */
 #define OPEN_LUA_LIB(NAME) \
-	static const luaL_reg NAME##_library[] = \
+	static const luaL_Reg NAME##_library[] = \
 	{	/* begin function list */
 
 /** 
@@ -1190,6 +1205,14 @@ public:
 	*/
 	static sint 
 		__gcmetamethod(lua_State* L);
+
+	/**
+	__gc method for the metatable of a LuaExtendable with a proxy exposed to %Lua.
+	Using this will cause the C++ object get destroyed when all references to it
+	in a lua_State are destroyed, but will NOT be called on its proxy table
+	*/
+	static sint 
+		__gcmetamethodProxy(lua_State* L);
 	
 	/**
 	\note __newindex methods:
@@ -1260,6 +1283,24 @@ LUA_FUNC(__gcmetamethod)
 	delete udata;
 	return 0;
 }
+
+/** 
+metamethod for proxy classes that do not implement
+LuaExtendable
+*/
+template<typename CLASS>
+LUA_FUNC(__gcmetamethodProxy)
+{	// in Lua 5.2 tables can have finalizers 
+	// LuaExtendables will have this method called on the userdat
+	// AND the table
+	if (!isIndexTable(L, -1))
+	{
+		CLASS* udata = to<CLASS*>(L, -1);
+		delete udata;
+	}
+	return 0;
+}
+
 
 /**
 */

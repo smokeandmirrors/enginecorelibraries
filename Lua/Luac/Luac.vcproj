@@ -260,10 +260,6 @@
 				RelativePath="..\Lua\luac.c"
 				>
 			</File>
-			<File
-				RelativePath="..\Lua\print.c"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

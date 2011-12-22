@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 local OOP = require'ObjectOrientedParadigm'
 local UT = require'UnitTestingFramework'
 require 'Utilities'

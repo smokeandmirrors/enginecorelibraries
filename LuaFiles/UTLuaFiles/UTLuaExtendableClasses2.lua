@@ -1,9 +1,9 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 local UT = require'UnitTestingFramework'
 require 'Utilities'
 
 ----------------------------------------------------------------------
-UT.test('simple declaration',
+UT.test('simple declaration2',
 	function()
 		local OOP = rerequire'ObjectOrientedParadigm'
 		UT.testClassProperties('Simple2')

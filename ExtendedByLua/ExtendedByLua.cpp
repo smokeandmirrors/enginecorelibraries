@@ -43,7 +43,7 @@ are included in the macro below
 
 #if UNIT_TEST_VERIFICATION
 
-#endif//UNIT_TEST_VERIFICATION
+
 
 class AllPublic
 {
@@ -300,6 +300,8 @@ END_LUA_FUNC__newindex_PUBLIC_MEMBERS(AllPublicGrandChild, AllPublicChild)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, AllPublicGrandChild, AllPublicChild)
 	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<AllPublicGrandChild, sint, &AllPublicGrandChild::grandChildMethod>))
 END_LUA_CLASS(AllPublicGrandChild, AllPublicChild)
+#endif//UNIT_TEST_VERIFICATION
+
 
 //////////////////////////////////////////////////////////////////////////
 enum eNumbers
@@ -420,6 +422,10 @@ DEFINE_LUA_CLASS_NO_CTOR(CLASS, Timer, Timer)
 	LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Timer, second, &Timer::seconds>))
 END_LUA_CLASS(Timer, Timer)
 
+
+// UT END
+// UT BEGIN
+
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
 #if EXTENDED_BY_LUA 
@@ -429,17 +435,13 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		registerGlobalLibrary(lua.getState());
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
+		lua.require("User");
+
 		REGISTER_LUA_ENUM((&lua), BoolEnum)
 		REGISTER_LUA_ENUM((&lua), eDirections)
 		REGISTER_LUA_ENUM((&lua), eNumbers)
 		REGISTER_LUA_ENUM((&lua), ReadOnly)
-
-		REGISTER_LUA_LIBRARY((&lua), AllPublic)
-		REGISTER_LUA_LIBRARY((&lua), AllPublicChild)
-		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChild)
-		REGISTER_LUA_LIBRARY((&lua), AllPublicLE)
-		REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE)
-		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChildLE)
+				
 		REGISTER_LUA_LIBRARY((&lua), Vector2)
 		REGISTER_LUA_LIBRARY((&lua), Vector3)
 
@@ -452,13 +454,15 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		REGISTER_LUA_LIBRARY((&lua), Stopwatch) 
 
 #if UNIT_TEST_VERIFICATION
-		REGISTER_LUA_LIBRARY((&lua), Grandparent2)
-		REGISTER_LUA_LIBRARY((&lua), Parent2)
-		REGISTER_LUA_LIBRARY((&lua), Child2)
+		REGISTER_LUA_LIBRARY((&lua), AllPublic)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicChild)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChild)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicLE)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE)
+		REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChildLE)
 #endif // UNIT_TEST_VERIFICATION
 
-		// get the user file for easier rapid iteration
-		lua.require("User");
+		
 		
 #define POOR_MANS_TESTING 0
 #if POOR_MANS_TESTING		
@@ -539,7 +543,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		
 		// callStaticReturn0Param0(L, "throwError");
 #endif//POOR_MANS_TESTING
-		// lua.runConsole();
+		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 	

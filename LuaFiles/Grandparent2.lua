@@ -1,5 +1,5 @@
-module(..., package.seeall)
-local OOP = require 'ObjectOrientedParadigm'
+require'Utilities'
+_ENV = deprecatedNaughtyModule(...)
 
 construct = function(self, ...)
 	self.numberOfKids = 2

@@ -38,10 +38,11 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	{
 		lua = new Lua();
 		lua->setPackagePath(UNIT_TESTING_LUA_PACKAGE_PATH);
+		lua->require("Utilities");
 		delete_lua = true;
 	}
 
-	lua->require("UnitTestingFramework");
+	assert(lua->require("UnitTestingFramework"));
 	if (!lua->require(module))
 	{
 		size_t origsize = strlen(module) + 1;
@@ -79,11 +80,11 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	mbstowcs_s(&convertedChars, wreport, origsize, report, _TRUNCATE);
 	CFIX_LOG(L"\nLua Unit Test Report: %s", wreport);
 	
+	CFIX_ASSERT(!result);
+
 	delete[] wreport;
 	if (delete_lua)
 		delete lua;
-
-	CFIX_ASSERT(!result);
 }
 #endif
 

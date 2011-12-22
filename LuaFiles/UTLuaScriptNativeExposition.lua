@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 require'Utilities'
 local U = require'Utilities'
 local tabs = {}

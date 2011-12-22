@@ -1,4 +1,4 @@
-module(..., package.seeall)
+_ENV = deprecatedNaughtyModule(..., package.seeall)
 
 One2.decrement = function(i) 
 	return i - 1 

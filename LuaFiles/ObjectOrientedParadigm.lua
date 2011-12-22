@@ -1,4 +1,3 @@
-module('ObjectOrientedParadigm', package.seeall)
 ----------------------------------------------------------------------
 -- ObjectOrientedParadigm.lua
 --
@@ -9,7 +8,38 @@ module('ObjectOrientedParadigm', package.seeall)
 --	\author Smoke and Mirrors Development
 --	\email smokeandmirrorsdevelopment@gmail.com
 --	\copyright 2010
-require'Utilities'
+
+-- begin module declaration
+local modname = ...
+local OOP = {}
+_G[modname] = OOP
+package.loaded[modname] = OOP
+	
+-- conditional halt functionality in error reporting
+local assert = assert
+local collectgarbage = collectgarbage
+-- halt functionality in error reporting
+local DEBUG_INTERPRETATION = DEBUG_INTERPRETATION
+local error = error
+local getmetatable = getmetatable
+local next = next
+local pairs = pairs
+-- non-error message reporting
+local print = print -- declareclasserror...runtimeerror, etc.
+local rawequal = rawequal
+local rawget = rawget
+local rawset = rawset
+local require = require
+local setmetatable = setmetatable
+local string = string
+local table = table
+local type = type
+local Utilities = require'Utilities'
+local _G = _G
+
+_ENV = OOP
+-- end module declaration
+
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
@@ -21,15 +51,7 @@ require'Utilities'
 -- change the following values to change compilation, error handling,
 -- error reporting, and informative messages
 
--- for condition interpretation
--- recommended to be defined from C
--- local DEBUG_INTERPRETATION = true
--- non-error message reporting
-local print = print -- declareclasserror...runtimeerror, etc.
--- halt functionality error reporting
-local error = error
--- conditional halt functionality error reporting
-local assert = assert
+
 
 ----------------------------------------------------------------------
 -- Checks for implemetation of a specified interface on an instance
@@ -325,7 +347,7 @@ missingFunctions			= {}
 if DEBUG_INTERPRETATION then
 --	These values allow one to refresh instantiated 
 --	objects	with new function tables if the class gets redefined 
-classesNeedRefresh			= false
+classesNeedRefresh		= false
 refreshInstances_PRIVATE	= setmetatable({}, {__mode = 'v'})
 end -- if DEBUG_INTERPRETATION
 
@@ -333,19 +355,18 @@ end -- if DEBUG_INTERPRETATION
 -- this replaces having a base class of 'object', saving an index 
 -- lookup for every class read of these values
 function addCommonClassProperties_PRIVATE(class, super, class_name)
-	local OOP = ObjectOrientedParadigm 
 	class.ACTS_AS		= _G.ACTS_AS
 	class.class			= class
 	class.className		= class_name
-	class.getClass		= OOP.getClass
-	class.getClassName	= OOP.getClassName
+	class.getClass		= getClass
+	class.getClassName	= getClassName
 	class.getName		= class.getName or getName
-	class.getSuperclass = OOP.getSuperclass
+	class.getSuperclass = getSuperclass
 	class.IS_A			= _G.IS_A
 	class.IS_EXACTLY_A	= _G.IS_EXACTLY_A
 	class.__isnewindexable = class.__isnewindexable or _G.truef
-	class.toString		= class.__tostring or class.toString or OOP.toString
-	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or OOP.toStringConcat
+	class.toString		= class.__tostring or class.toString or toString
+	metatables_PRIVATE[class_name].__concat = metatables_PRIVATE[class_name].__concat or toStringConcat
 	metatables_PRIVATE[class_name].__tostring = metatables_PRIVATE[class_name].__tostring or class.toString
 	assert(type(class.toString) == 'function')
 	class.super = super
@@ -399,7 +420,12 @@ function beginClassDeclaration_PRIVATE(definition)
 	local extends = definition.extends
 	-- there should only be functions left in the definition
 	local def = {}
-	table.copyif(definition, def, Utilities.isValueFunction)
+	table.copyif(
+		definition, 
+		def, 
+		function(key, value)
+			return type(value) == 'function'
+		end)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		classesNeedRefresh = true
@@ -443,7 +469,12 @@ function beginClassDeclaration_PRIVATE(definition)
 	local extends = definition.extends
 	-- there should only be functions left in the definition
 	local def = {}
-	table.copyif(definition, def, Utilities.isValueFunction)
+	table.copyif(
+		definition, 
+		def, 
+		function(key, value)
+			return type(value) == 'function'
+		end)
 	-- validate the class name
 	if findClassName_PRIVATE(name) then
 		-- warn(false, 'Class '..name..' already exists!')
@@ -970,3 +1001,4 @@ function verifyKeywords_PRIVATE(class, name)
 	return verified
 end
 
+return OOP

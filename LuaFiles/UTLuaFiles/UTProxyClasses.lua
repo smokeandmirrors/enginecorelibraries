@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 local OOP = require'ObjectOrientedParadigm'
 local UT = require'UnitTestingFramework'
 require 'Utilities'
@@ -7,9 +7,9 @@ UT.test('inheritance',
 	function()
 		local g = new'Grandparent'
 		-- C++ functions
-		UT.check(type(g.getFamilyName) == 'function')
+		UT.checkT(g.getFamilyName, 'function')
 		UT.checkEqual(g:getFamilyName(), 'Curran')
-		UT.check(type(g.getTitle) == 'function')
+		UT.checkT(g.getTitle, 'function')
 		UT.checkEqual(g:getTitle(), 'Grandparent')
 		UT.checkT(g.__eq, 'function')
 		UT.check(g == g)
@@ -131,7 +131,6 @@ UT.test('proxy useage',
 ----------------------------------------------------------------------
 UT.test('proxy OOP friendliness',
 	function()
-		UT.testClassProperties('Grandparent')
 		UT.testClassProperties('Parent', 'Grandparent')
 		UT.testClassProperties('Child', 'Parent')
 	end

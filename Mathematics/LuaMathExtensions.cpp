@@ -62,7 +62,7 @@ namespace lua_library_Vector2
 
 	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector2)
 	
-	static const luaL_reg Vector2_library[] = 
+	static const luaL_Reg Vector2_library[] = 
 	{
 		LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethod<Vector2>)
 		LUA_ENTRY_CLASS__isnewindexable_FALSE
@@ -289,7 +289,7 @@ namespace lua_library_Vector3
 
 	DEFINE_LUA_CLASS_AUTO_METAMETHODS(Vector3)
 		
-	static const luaL_reg Vector3_library[] = 
+	static const luaL_Reg Vector3_library[] = 
 	{
 		LUA_ENTRY_NAMED("__gc", embeddedLua::__gcmetamethod<Vector3>)
 		LUA_ENTRY_CLASS__isnewindexable_FALSE

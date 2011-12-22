@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 
 local U = require'Utilities'
 local CW = require'CodeWriting'

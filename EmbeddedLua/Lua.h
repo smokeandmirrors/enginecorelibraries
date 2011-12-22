@@ -34,7 +34,6 @@ of application and library code for %Lua.
 
 namespace embeddedLua 
 {
-
 /**
 \class Lua
 \brief The Lua class encapsulates a lua_Struct.  It will allow for easier
@@ -55,15 +54,18 @@ public:
 	sets package.loaded[module] = nil 
 	allows for extending of C declared libraries by %Lua files in packages
 	by the same name using require.
-	This needs to be done because luaL_register modifies the package.loaded table.
+	This needs to be done because luaL_setfuncs modifies the package.loaded table.
 	*/
 	static void			nilLoadedStatus(lua_State* L, const schar* module);
+	/**
+	*/
+	static void		registerLibrary(lua_State* L, const luaL_Reg* lib, sint numUpValues=0, const schar* libname="_G");
 	/**
 	reports output from the lua_State after a function call
 	\param L the %Lua state in which the function was called
 	\param status the error code from calling the function
 	*/
-	static sint		report(lua_State* L, sint status);
+	static void		report(lua_State* L, sint status);
 	/**
 	call require from C++
 	*/
@@ -124,7 +126,7 @@ public:
 protected:
 	/**
 	*/
-	void				conditionallyOpen(lua_function key, const schar* name);
+	bool				conditionallyOpenStandardLibrary(lua_function key, const schar* name);
 	/**
 	pushes a default implementation for __gc && __tostring for
 	LuaExtendable classes.

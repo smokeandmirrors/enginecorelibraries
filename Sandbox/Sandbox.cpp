@@ -27,7 +27,7 @@
 #include "Time.h"
 #include "Vector.h"
 
-using namespace algorithms;
+// using namespace algorithms;
 using namespace containers;
 using namespace concurrency;
 using namespace designPatterns;
@@ -654,9 +654,6 @@ class Shadows
 
 };
 
-
-#include "Table.h"
-
 void testEngineLoop(void)
 {
 	EngineLoop loop;	
@@ -757,12 +754,13 @@ void onPlay(void)
 	numberToTree["awesome"] = outstanding;
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
-
+	
+#if DEVELOP_TABLE
 	Table< RedBlackTree<sint>* > mytable;
 	awesome = NULL;
 	mytable["awesome"] = outstanding;
 	awesome = mytable["awesome"];
-	
+#endif // DEVELOP_TABLE	
 
 	srand(static_cast<uint>(realTime::cycles()));
 	

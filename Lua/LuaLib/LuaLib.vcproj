@@ -230,7 +230,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Lua\lbitlib.c"
+				>
+			</File>
+			<File
 				RelativePath="..\Lua\lcode.c"
+				>
+			</File>
+			<File
+				RelativePath="..\Lua\lcorolib.c"
+				>
+			</File>
+			<File
+				RelativePath="..\Lua\lctype.c"
 				>
 			</File>
 			<File
@@ -349,6 +361,10 @@
 			</File>
 			<File
 				RelativePath="..\Lua\lcode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Lua\lctype.h"
 				>
 			</File>
 			<File

@@ -1,4 +1,4 @@
-module(..., package.seeall)
+_ENV = deprecatedNaughtyModule(...)
 require 'Grandparent2'
 require 'ObjectOrientedParadigm'
 

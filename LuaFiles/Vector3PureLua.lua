@@ -1,4 +1,4 @@
-module(..., package.seeall)
+deprecatedNaughtyModule(..., package.seeall)
 ----------------------------------------------------------------------
 -- @file Vector3PureLua.lua
 -- a 3D Vector for experimenting with extention from C

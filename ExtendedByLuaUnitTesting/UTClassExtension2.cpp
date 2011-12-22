@@ -84,8 +84,7 @@ END_LUA_LIBRARY(One2)
 
 void UTClassExtension2::test_define_lua_class()
 {
-	embeddedLua::Lua lua; 
-	lua.setPackagePath(UNIT_TESTING_LUA_PACKAGE_PATH);
+	DECLARE_UNIT_TESTING_LUA_OBJECT
 	REGISTER_LUA_LIBRARY((&lua), One2);
 	CFIX_ASSERT(lua.doString("_G.one = One2.new()"));
 	lua_State* L = lua.getState();

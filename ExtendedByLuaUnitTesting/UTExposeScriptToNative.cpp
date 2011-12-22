@@ -21,6 +21,6 @@ public:
 };
 
 CFIXCC_BEGIN_CLASS(UTExposeScriptToNative)
-	CFIXCC_METHOD(Test)
+	// CFIXCC_METHOD(Test)
 CFIXCC_END_CLASS()
 #endif//WITH_UNIT_TESTING

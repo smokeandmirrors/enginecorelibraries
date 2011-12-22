@@ -1,4 +1,4 @@
-module('UnitTestingFramework', package.seeall)
+_ENV = deprecatedNaughtyModule('UnitTestingFramework', package.seeall)
 ----------------------------------------------------------------------
 -- UnitTestingFramework.lua
 --
@@ -101,8 +101,8 @@ end
 -- \return the number of failures
 runAll = function(print_out)
 	local start_time = os.clock()
-	for _, tester in pairs(unitTests) do
-		tester();
+	for test, tester in pairs(unitTests) do
+		tester.func();
 	end
 	local end_time = os.clock()
 	local num_failures, results = getResultsReport(end_time - start_time)
@@ -126,7 +126,7 @@ end
 ----------------------------------------------------------------------
 -- creates a test out of the passed in function
 -- the result is returned for manual testing, and will
--- get exicuted by runAll()
+-- get executed by runAll()
 test = function(name, test_function)
 	createTestFunction(name, test_function)
 end
@@ -158,13 +158,16 @@ end
 
 ----------------------------------------------------------------------
 createTestFunction = function(name, f)
-	local tester = function()
-		-- local success, error_message = pcall(f)
-		local success, error_message = xpcall(f, errorHandler)
-		if not success then
-			reportFailure(name, error_message)
+	local tester = {
+		name = name,
+		func = function()
+			-- local success, error_message = pcall(f)
+			local success, error_message = xpcall(f, errorHandler)
+			if not success then
+				reportFailure(name, error_message)
+			end
 		end
-	end
+	}
 	
 	table.insert(unitTests, tester)
 end
@@ -214,7 +217,8 @@ function testClassProperties(class_name, super_name, interfaces)
 	if type(class_name) == 'string' then
 		if not _G.getClass(class_name) then
 			pcall(function() require(class_name) end)
-			OOP.declareClass(_G[class_name])
+			declareClass(_G[class_name])
+			checkT(_G.getClass(class_name), 'table')
 		end
 	end
 			

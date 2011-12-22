@@ -14,8 +14,6 @@ namespace embeddedLua
 // \note taken straight from lua.c
 static sint traceback (lua_State* L)
 {
-  // if (!lua_isstring(L, 1))  /* 'message' not a string? */
-  //  return 1;  /* keep it intact */
   lua_getglobal(L, "debug");
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
@@ -71,25 +69,28 @@ sint Lua::callProtected(lua_State* L, sint num_args, sint num_return_values)
 	lua_insert(L, errorfunc_index);					
 	sint error_code = lua_pcall(L, num_args, num_return_values, errorfunc_index);
 	lua_remove(L, errorfunc_index);					
+	report(L, error_code);
 
 	if (error_code)
 	{	// in case of error, fully collect %Lua garbage  
 		lua_gc(L, LUA_GCCOLLECT, 0); 
 	}
 	
-	return report(L, error_code);
+	return error_code;
 }
 
-void Lua::conditionallyOpen(lua_function key, const schar* name)
+bool Lua::conditionallyOpenStandardLibrary(lua_function key, const schar* name)
 {
 	lua_getglobal(L, name); 
 	if (lua_isnil(L, -1)) 
-	{ 
-		openLibrary(key); 
+	{	// the final true stores the result into a global table 'name'
+		luaL_requiref(L, name, key, true);
+		return true;
 	} 
 	else 
 	{ 
 		lua_pop(L, 1); 
+		return false;
 	}
 }
 
@@ -176,7 +177,7 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 		}
 	}
 	else
-	{ 
+	{	
 		free(ptr);
 		lua->m_bytes -= osize;
 		return NULL;
@@ -218,21 +219,54 @@ bool Lua::openLibrary(lua_function opener) const
 
 void Lua::openStandardLibraries(void) 
 {
+	conditionallyOpenStandardLibrary(luaopen_base, "base");
+	conditionallyOpenStandardLibrary(luaopen_coroutine, "coroutine");
 #if	DEBUG 
-	conditionallyOpen(luaopen_debug, "debug");
+	conditionallyOpenStandardLibrary(luaopen_debug, "debug");
 #endif // DEBUG 
-	conditionallyOpen(luaopen_io, "io");
-	conditionallyOpen(luaopen_math, "math");
-	conditionallyOpen(luaopen_os, "os");
-	conditionallyOpen(luaopen_package, "package");
-	conditionallyOpen(luaopen_string, "string");
-	conditionallyOpen(luaopen_table, "table");
-	// for some reason, I have to do this last for now
-	conditionallyOpen(luaopen_base, "base");
+	conditionallyOpenStandardLibrary(luaopen_io, "io");
+	conditionallyOpenStandardLibrary(luaopen_math, "math");
+	conditionallyOpenStandardLibrary(luaopen_os, "os");
+	conditionallyOpenStandardLibrary(luaopen_package, "package");
+	conditionallyOpenStandardLibrary(luaopen_string, "string");
+	conditionallyOpenStandardLibrary(luaopen_table, "table");
+}
+
+void Lua::registerLibrary(lua_State* L, const luaL_Reg* lib, sint numUpValues/* =0 */, const schar* libname/* ="_G" */)
+{	
+	assert(numUpValues <= 0);
+	/// \todo handle positive numUpValues
+	//s: ?
+	if (lua_istable(L, -1))
+	{
+		lua_getfield(L, -1, libname);
+	}
+	else
+	{
+		lua_getglobal(L, libname);
+	}
+
+	//s: ? t
+	
+	if (lua_isnil(L, -1))
+	{	//s: t nil
+		lua_pop(L, 1);
+		//s: t
+		lua_newtable(L);
+		//s: t {}
+		lua_setfield(L, -2, libname);
+		//s: t
+		lua_getfield(L, -1, libname);
+	}
+	//s: t t.libname
+	luaL_setfuncs(L, lib, numUpValues);
+	//s: t t.libname
+	lua_pop(L, 1);
+	//s: t
 }
 
 // \note taken and modified from from lua.c 
-sint Lua::report(lua_State* L, sint error_code)
+void Lua::report(lua_State* L, sint error_code)
 {
 	if (error_code && lua_isstring(L, -1)) 
 	{
@@ -245,8 +279,6 @@ sint Lua::report(lua_State* L, sint error_code)
 		fflush(stderr);
 		lua_pop(L, 1);
 	}
-	
-	return error_code;
 }
 
 bool Lua::require(lua_State* L, const schar* module, bool hideNotFoundError, bool hideSyntaxError)
@@ -295,9 +327,9 @@ void Lua::runConsole(void) const
 
 void Lua::setPackagePath(const char* luaPath)
 {
-	conditionallyOpen(luaopen_package, "package");
+	conditionallyOpenStandardLibrary(luaopen_package, "package");
 	lua_getglobal(L, "package");	//s: package
-	push(L, luaPath);				//s: package, LUA_PATH,2B
+	push(L, luaPath);				//s: package, LUA_PATH
 	lua_setfield(L, -2, "path");	//s: package
 	lua_pop(L, 1);					//s: 
 }

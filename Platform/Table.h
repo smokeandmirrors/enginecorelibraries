@@ -2,6 +2,9 @@
 #ifndef TABLE_H
 #define TABLE_H
 
+#define DEVELOP_TABLE 0
+#if DEVELOP_TABLE
+
 #include <vector>
 
 /**
@@ -172,15 +175,21 @@ class Table
 public:
 	Table(sint reserveArraySize=0, sint reserveHashSize=0); 
 	~Table(void); // LUAI_FUNC void luaH_free (lua_State *L, Table *t);
-	
+	/*
 	ELEMENT& 
 		operator[](const Hash& key);
 	
 	const ELEMENT& 
 		operator[](const Hash& key) const;
+	*/
+	inline const Value*
+		get(const Hash& key) const;
 
 	bool 
 		has(const Hash& key) const;
+
+	inline Value*
+		set(const Hash& key);
 	
 private:
 	/** will template versions of these be unnecessarily generated? */
@@ -226,9 +235,6 @@ private:
 	inline Node*
 		findNodeWithString(const Hash& key) const;
 
-	inline const Value*
-		get(const Hash& key) const;
-
 	inline Node*
 		getFreePosition(void);
 
@@ -252,9 +258,6 @@ private:
 
 	inline void
 		resizeHash(sint newHashSize);
-
-	inline Value*
-		set(const Hash& key);
 
 	uchar 
 		log2HashPartArraySize;
@@ -421,7 +424,7 @@ sint Table<ELEMENT>::countKeysInArray(sint* perSlotOutput) const
 		total += counter;
 	}
 
-	return total;
+	return total;;
 }
 
 template<typename ELEMENT>
@@ -491,6 +494,35 @@ typename Table<ELEMENT>::Node* Table<ELEMENT>::findNodeWithString(const Hash& ke
 	return NULL;;
 	*/
 }
+
+template<typename ELEMENT> 
+typename const Table<ELEMENT>::Value* Table<ELEMENT>::get(const Hash& key) const
+{
+	switch (key.type)
+	{
+	
+	case Hash::HashableTypes_sint:
+	{	
+		uint index = static_cast<uint>(key.key);
+		
+		if (index < arrayPartSize)
+		{
+			return arrayPart[index];
+		}
+		else
+		{
+			Node* n = 
+		}
+
+		break;
+	}
+	
+	default:
+		assert(false);
+	} // switch (key.type)
+
+	return NULL;
+} // const Table<ELEMENT>::Value* Table<ELEMENT>::get(const Hash& key) const
 
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Node* Table<ELEMENT>::getFreePosition(void) 
@@ -618,17 +650,7 @@ LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
 template<typename ELEMENT> 
 ELEMENT& Table<ELEMENT>::operator[](const Hash& key )
 {	// finish me
-	// just make the stuff compile right now
-	Node* n = getMainPosition(key);
-	
-	if (!n)
-	{
-		// ELEMENT defaultElement;
-		// n = insert(key, defaultElement);
-	}
-	
-	return n->value.value;		
-	// return arrayPart[0];
+	switch
 }
 /* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
 LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
@@ -745,5 +767,7 @@ sint Table<ELEMENT>::twoTo(sint x)
 }
 
 } // namespace containers
+
+#endif// DEVELOP_TABLE
 
 #endif//TABLE_H

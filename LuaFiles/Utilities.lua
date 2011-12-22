@@ -1,4 +1,3 @@
-module(..., package.seeall)
 ----------------------------------------------------------------------
 --	Utilities.lua
 --	
@@ -9,16 +8,73 @@ module(..., package.seeall)
 --	smokeandmirrorsdevelopment@gmail.com
 --	copyright 2010
 
+-- conditional halt functionality error reporting
+
+--[[
+
+local assert = assert
+local collectgarbage = collectgarbage
+-- halt functionality error reporting
+local error = error
+local getmetatable = getmetatable
+local next = next
+-- non-error message reporting
+local pairs = pairs
+local print = print -- declareclasserror...runtimeerror, etc.
+local rawget = rawget
+local oldrequire = require
+local setmetatable = setmetatable
+local table = table
+local package = package
+local select = select
+local string = string
+local tostring = tostring
+local type = type
+local xpcall = xpcall
+local _G = _G
+
+local function localFunction()
+	print'I am a local function'
+end
+--]]
+
+function _G.deprecatedNaughtyModule(...)
+	local modname = ...
+	local globalType = type(_G[modname])
+	
+	if globalType == 'nil' then
+		_G[modname] = {}
+	elseif globalType ~= 'table' then
+		print('WARNING! module: '..modname..' declaration blows away a global variable of type: '..globalType)
+	else
+		assert(package.loaded[modname] == nil or _G[modname] == package.loaded[modname])
+	end
+	
+	local M = _G[modname]
+	_G.tassert('table', M)
+	
+	if not getmetatable(M) then
+		setmetatable(M, { __index = _G })
+	end
+	
+	package.loaded[modname] = M
+	_ENV = M
+	return M
+end
+
+-- module('Utilities')
+--]]
+
 --[[ global (Lua) utilities ]]--
 ----------------------------------------------------------------------
 -- executes the given string as code
 function _G.dostring(s)
-	local func = loadstring(s)
+	local func = load(s) -- Lua 5.1.4 loadstring()
 	if type(func) == 'function' then
 		func()
 	else
 		print('dostring() argument wasn\'t a fuction after running through '..
-			'loadstring')
+			'load')
 		print('argument: '..tostring(s))
 		print('result type: '..type(func))
 	end
@@ -88,7 +144,6 @@ function debug.functionline(event, line)
 		function_name ~= '(for generator)' and
 		function_name ~= 'print' and
 		function_name ~= 'type' and
-		function_name ~= 'setfenv' and
 		function_name ~= 'print'
 	then
 		print('debug function:', function_name, 'event:', event, 'line:', line)
@@ -102,15 +157,15 @@ if package then
 -- reloads a module
 function _G.rerequire(name, hideNotFoundError, hideSyntaxError)
 	package.loaded[name] = nil
-	return require(name, hideNotFoundError, hideSyntaxError)
+	return _G.require(name, hideNotFoundError, hideSyntaxError)
 end
 
-if not oldrequire then
-	oldrequire = require
-end
+local oldrequire = require
 
 function _G.require(name, hideNotFoundError, hideSyntaxError)
+	-- print('new require() '..name)
 	if package.loaded[name] then
+		-- print('\tfound')
 		return package.loaded[name]
 	else
 		local status, pack = xpcall(
@@ -118,6 +173,7 @@ function _G.require(name, hideNotFoundError, hideSyntaxError)
 				return oldrequire(name) 
 			end, 
 			function(err)
+				print('error message: '..err)
 				local isMissing = string.match(err, 'module \''..name..'\' not found:')
 				if ((not hideNotFoundError) and isMissing)
 				or ((not hideSyntaxError) and (not isMissing)) then
@@ -125,8 +181,10 @@ function _G.require(name, hideNotFoundError, hideSyntaxError)
 				end
 			end)		
 		if status then
+			-- print('\tnot found, produced')
 			return pack
 		end
+		-- print('\tnot found, not produced')
 	end
 end
 
@@ -145,16 +203,12 @@ end
 -- \param predicate_book_key_value is a function that takes a key, 
 -- and a value from the original table and returns a boolean expression
 table.copyif = function(original, copy, predicate)
+	_G.tassert('function', predicate)
 	for key, val in pairs(original) do
 		if predicate(key, val) then
 			copy[key] = val
 		end
 	end
-end
-
----------------------------------------------------------------------
-isValueFunction = function(key, value)
-	return type(value) == 'function'
 end
 
 ---------------------------------------------------------------------

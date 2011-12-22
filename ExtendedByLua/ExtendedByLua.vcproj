@@ -520,6 +520,10 @@
 				RelativePath=".\ExtendedByLua.cpp"
 				>
 			</File>
+			<Filter
+				Name="LuaFiles"
+				>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>
