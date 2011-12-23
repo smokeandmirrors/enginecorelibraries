@@ -152,6 +152,12 @@ public:
 
 		return difference;
 	}
+
+	static bool 
+		isEqual(const schar* a, const schar* b)
+	{
+		return !compare(a, b);
+	}
 }; // String
 
 #endif//BUILD_H

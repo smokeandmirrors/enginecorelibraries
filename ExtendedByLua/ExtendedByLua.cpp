@@ -43,7 +43,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		registerGlobalLibrary(lua.getState());
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
-		lua.require("User");lua.runConsole();
+		lua.require("User");
+		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 	return 0;
