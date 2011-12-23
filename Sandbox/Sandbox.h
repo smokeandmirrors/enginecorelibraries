@@ -17,6 +17,7 @@ Tested in the field	:	NO
 namespace sandbox 
 {
 	void play(void);
+	void tableRnD(void);
 } // namespace sandbox
 
 #endif//SANDBOX

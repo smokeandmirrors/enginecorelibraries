@@ -107,24 +107,24 @@ for public members that can be pushed directly into %Lua
  
 \*/
 #define __index_MEMBER(INDEX) \
-	if (!strcmp(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
+	if (!String::compare(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
 
 /**
 */
 #define __index_PROXY_MEMBER(INDEX) \
-	if (!strcmp(k, #INDEX )) { pushTrue(L); push(L, t.##INDEX##); return 2; }
+	if (!String::compare(k, #INDEX )) { pushTrue(L); push(L, t.##INDEX##); return 2; }
 
 /**
 used for an entry in a "setter" function 
 for public members that can be set directly from %Lua
 */
 #define __newindex_MEMBER(INDEX, TYPE) \
-	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
+	if (!String::compare(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
 
 /**
 */
 #define __newindex_PROXY_MEMBER(INDEX, TYPE) \
-	if (!strcmp(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); pushTrue(L); return 1; }
+	if (!String::compare(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); pushTrue(L); return 1; }
 
 /**
 used to end a function list of functions to expose to %Lua
@@ -699,7 +699,7 @@ This method is ideal for static classes or libraries.
 				{ \
 					return NULL; \
 				} \
-				return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
 			template<> inline CLASS* to< CLASS* >(lua_State* L, int index) \
 			{ \
@@ -707,7 +707,7 @@ This method is ideal for static classes or libraries.
 				{ \
 					return NULL; \
 				} \
-				return *static_cast< CLASS** >(lua_touserdata(L, index)); \			
+				return *static_cast< CLASS** >(lua_touserdata(L, index)); \
 			} \
 			template<> inline CLASS& to< CLASS& >(lua_State* L, int index) \
 			{ \
@@ -902,7 +902,7 @@ calls nilLoadedStatus() in declareLuaClass
  
 */
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-		if (strcmp(className, #SUPER_CLASS)) \
+		if (String::compare(className, #SUPER_CLASS)) \
 		{	/* here would be a recursive call that would be never called */ \
 			return SUPER_CLASS##__indexSupport(t, k, L, #SUPER_CLASS); \
 		} \
@@ -928,7 +928,7 @@ calls nilLoadedStatus() in declareLuaClass
 /**
 */
 #define END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-		if (strcmp(className, #SUPER_CLASS))\
+		if (String::compare(className, #SUPER_CLASS))\
 		{	/* here would be a recursive call that would be never called */ \
 			return SUPER_CLASS##__indexSupportImplementation(t, k, L, #SUPER_CLASS); \
 		} \
@@ -948,7 +948,7 @@ calls nilLoadedStatus() in declareLuaClass
  
 */
 #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-	if (strcmp(className, #SUPER_CLASS)) \
+	if (String::compare(className, #SUPER_CLASS)) \
 	{	/* here would be a recursive call that would be never called */ \
 		return SUPER_CLASS##__newindexSupport(t, k, L, #SUPER_CLASS); \
 	} \
@@ -970,7 +970,7 @@ LUA_FUNC(##CLASS##__newindex) \
 /**
 */
 #define END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-		if (strcmp(className, #SUPER_CLASS)) \
+		if (String::compare(className, #SUPER_CLASS)) \
 		{	/* here would be a recursive call that would be never called */ \
 			return SUPER_CLASS##__newindexImplementation(t, k, L, #SUPER_CLASS); \
 		} \

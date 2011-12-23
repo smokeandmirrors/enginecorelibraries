@@ -52,6 +52,12 @@ Tested in the field	:	NO
 /** preprocessor control for unit testing compilation */
 #define WITH_UNIT_TESTING 1
 
+#if DEBUG
+#define IF_DEBUG(code) code 
+#else
+#define IF_DEBUG(code) 
+#endif//DEBUG
+
 enum BoolEnum
 {
 	BoolEnum_False=0,
@@ -129,5 +135,23 @@ const TO& checked_cast(const FROM& from)
 	assert(static_cast<const TO*>(&from) == dynamic_cast<const TO*>(&from));
 	return static_cast<const TO&>(from);
 }
+
+class String
+{
+public:
+	static sint 
+		compare(const schar* a, const schar* b)
+	{
+		int difference(*(unsigned char *)a - *(unsigned char *)b);
+		
+		while (!difference && *b)
+		{
+			++a, ++b;
+			difference = *(unsigned char *)a - *(unsigned char *)b;
+		}
+
+		return difference;
+	}
+}; // String
 
 #endif//BUILD_H

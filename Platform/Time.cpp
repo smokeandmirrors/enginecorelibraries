@@ -13,7 +13,7 @@ inline cycle _getCurrentCycle(void)
 {
 #if WIN32
 	LARGE_INTEGER perf_query;
-	int success = QueryPerformanceCounter(&perf_query);
+	IF_DEBUG(sint success = ) QueryPerformanceCounter(&perf_query);
 	assert(success);
 	return perf_query.QuadPart;
 #else
@@ -32,7 +32,7 @@ inline cycle _getSystemHertz(void)
 {
 #if WIN32
 	LARGE_INTEGER perf_query;
-	int success = QueryPerformanceFrequency(&perf_query);
+	IF_DEBUG(sint success =) QueryPerformanceFrequency(&perf_query);
 	assert(success);
 	return static_cast<cycle>(perf_query.QuadPart);
 #else

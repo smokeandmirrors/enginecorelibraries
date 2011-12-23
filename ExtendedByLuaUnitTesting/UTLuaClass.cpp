@@ -34,7 +34,7 @@ public:
 		Lua* args_lua = new Lua("testing", false, false);
 		CFIX_ASSERT(args_lua);
 		CFIX_ASSERT(args_lua->getState());
-		CFIX_ASSERT(strcmp("testing", args_lua->getName()) == 0);
+		CFIX_ASSERT(String::compare("testing", args_lua->getName()) == 0);
 		delete args_lua;
 		
 		Lua stack_lua;

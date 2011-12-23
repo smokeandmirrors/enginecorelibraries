@@ -24,7 +24,7 @@ inline threadID
 getInitializedID(const Thread& thread)
 {
 	threadID id;
-	bool success = thread.getID(id);
+	IF_DEBUG(bool success =) thread.getID(id);
 	assert(success);
 	return id;
 }
@@ -546,7 +546,7 @@ void Scheduler::startJobs(void)
 	{
 		cpuID preferred(m_pendingJobs->getNextPreferredCPU());
 		cpuID required;
-		bool success = getFreeIndex(required, preferred);
+		IF_DEBUG(bool success =) getFreeIndex(required, preferred);
 		assert(success);
 		Job* job = m_pendingJobs->getNextJob();
 		job->start(required);

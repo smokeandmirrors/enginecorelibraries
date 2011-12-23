@@ -22,9 +22,10 @@
 #include "Scheduling.h"
 #include "Synchronization.h"
 #include "Signals.h"
-#include "Table.h"
+
 #include "Thread.h"
 #include "Time.h"
+#include "UnitTestVerification.h"
 #include "Vector.h"
 
 // using namespace algorithms;
@@ -689,7 +690,8 @@ void testEngineLoop(void)
 
 void onPlay(void)
 {
-	
+	sandbox::verifyUnitTests();
+	sandbox::tableRnD();
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
 	/*
@@ -755,13 +757,6 @@ void onPlay(void)
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
 	
-#if DEVELOP_TABLE
-	Table< RedBlackTree<sint>* > mytable;
-	awesome = NULL;
-	mytable["awesome"] = outstanding;
-	awesome = mytable["awesome"];
-#endif // DEVELOP_TABLE	
-
 	srand(static_cast<uint>(realTime::cycles()));
 	
 	for (int i = 0; i < 10; i++)

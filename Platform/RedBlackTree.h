@@ -12,6 +12,7 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 /* GARBAGE COLLECTION!!! DUE TO THE JAVA SOURCE, THIS LEAKS LIKE CRAZY  */
 /************************************************************************/
 
+#include <vector>
 #include "Platform.h"
 
 namespace containers

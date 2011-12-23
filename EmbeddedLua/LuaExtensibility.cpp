@@ -86,7 +86,7 @@ void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar
 	//s: class_def ?
 	if (lua_isstring(L, -1))
 	{	//s: class_def class_def.name
-		assert(!strcmp(lua_tostring(L, -1), derived));
+		assert(!String::compare(lua_tostring(L, -1), derived));
 		lua_pop(L, 1);
 		//s: class_def
 	}
@@ -103,7 +103,7 @@ void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar
 		lua_getfield(L, -1, "name");
 		assert(lua_isstring(L, -1));
 		//s: class_def class_def.name
-		assert(!strcmp(lua_tostring(L, -1), derived));
+		assert(!String::compare(lua_tostring(L, -1), derived));
 		lua_pop(L, 1);
 		//s: class_def 
 	}
@@ -113,11 +113,11 @@ void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar
 	//s: class_def ?
 	if (lua_isstring(L, -1))
 	{	//s: class_def class_def.extends
-		assert(!strcmp(lua_tostring(L, -1), super));
+		assert(!String::compare(lua_tostring(L, -1), super));
 		lua_pop(L, 1);
 		//s: class_def
 	}
-	else if (super && (strcmp(super, derived) != 0))
+	else if (super && (String::compare(super, derived) != 0))
 	{	//s: class_def nil	
 		assert(lua_isnil(L, -1));
 		lua_pop(L, 1);

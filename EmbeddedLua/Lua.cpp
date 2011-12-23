@@ -310,7 +310,7 @@ void Lua::runConsole(void) const
 			*d++ = *s++;
 		}
 
-		if (strcmp(quit, "lua_quit"))
+		if (String::compare(quit, "lua_quit"))
 		{
 			if (luaL_loadbuffer(L, buff, strlen(buff), "line") || callProtected(L))
 			{

@@ -415,6 +415,26 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Unit Test Verification"
+			>
+			<File
+				RelativePath=".\UnitTestVerification.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UnitTestVerification.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resarch And Development"
+			>
+			<File
+				RelativePath=".\TableRnD.cpp"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath=".\Sandbox.cpp"
 			>
