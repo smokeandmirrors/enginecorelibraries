@@ -426,7 +426,15 @@
 			Name="Platform"
 			>
 			<File
+				RelativePath=".\Hashing.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Platform.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Strings.h"
 				>
 			</File>
 			<File

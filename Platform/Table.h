@@ -2,42 +2,17 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#include <vector>
-#include "math.h"
-#include "float.h"
+#include "Hashing.h"
+#include "Strings.h"
 
 /**
-An implementation of associative arrayPart based on the
+An implementation of an associative array, based on the
 Lua table.
+
+\todo there is no way the memory management here correct, due to the use
+of realloc in the lua version
+
 */
-
-namespace algorithms
-{
-
-typedef uint hash;
-
-inline hash 
-	computeHash(const bool key);
-
-inline hash 
-	computeHash(const schar* string);
-
-inline hash 
-	computeHash(const schar* string, size_t length);
-
-template<typename T> inline hash
-	computeHash(const T* pointer);
-
-inline hash
-	computeHash(const void* pointer);
-
-inline hash
-	computeHash(sint number);
-
-inline hash
-	computeHash(sreal number);
-
-} // namespace algorithms
 
 namespace containers
 {
@@ -282,10 +257,10 @@ private:
 		getSizeOfHashPart(void) const;
 	// #define hashmod(t,n)	(gnode(t, ((n) % ((sizenode(t)-1)|1))))
 	inline uint
-		hashMod(const uint key) const;
+		hashMod(const algorithms::hash  key) const;
 	// #define hashpow2(t,n)      (gnode(t, lmod((n), sizenode(t))))
 	inline uint
-		hashModPowerOf2(const uint powerOf2) const;
+		hashModPowerOf2(const algorithms::hash  powerOf2) const;
 	inline bool
 		isMainPositionIsTaken(Node*) const;
 	// TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key)
@@ -325,74 +300,6 @@ private:
 
 } // namespace containers
 
-namespace algorithms
-{
-
-inline algorithms::hash algorithms::computeHash(bool key)
-{
-	return static_cast<algorithms::hash>(key);
-}
-
-inline algorithms::hash algorithms::computeHash(const schar* string)
-{	
-	return computeHash(string, strlen(string));
-}
-
-inline algorithms::hash algorithms::computeHash(const schar* string, size_t length)
-{	// modified from lstring.c
-	algorithms::hash h = static_cast<algorithms::hash>(length);
-	algorithms::hash step = static_cast<hash>((length >> 5) + 1);
-
-	for ( ; length >= step; length -= step) 
-	{
-		h = h ^ ((h << 5) + (h >> 2) + static_cast<algorithms::hash>(string[length - 1]));
-	}
-
-	return h;
-}
-
-inline algorithms::hash algorithms::computeHash(const void* pointer)
-{
-	return static_cast<algorithms::hash>(reinterpret_cast<ulong>(pointer));
-}
-
-inline hash computeHash(sint number)
-{
-	return computeHash(static_cast<sreal>(number));
-}
-
-inline hash computeHash(sreal number)
-{
-/** if the compiler can handle it, \see llimits.h
-#define luai_hashnum(i,n)  \
-	{ volatile union luai_Cast u; u.l_d = (n) + 1.0;   avoid -0  \
-	(i) = u.l_p[0]; (i) += u.l_p[1]; }   add double bits for his hash */
-	
-	/// casting from float to sint is reportedly slow
-	/// investigate faster options.  \see lua_number2int
-	
-	// begin luai_hashnum(i, n)
-	sint exponent; 
-	sint key = static_cast<sint>(frexp(number, &exponent) * static_cast<sreal>(INT_MAX - DBL_MAX_EXP));
-	key += exponent; 
-	// end luai_hashnum(i, n)
-	
-	if (key < 0) 
-	{	// use unsigned to avoid overflows 
-		if (static_cast<unsigned int>(key) == 0u - key)  
-		{	 // handle INT_MIN 
-			 key = 0; 
-		}
-		else
-		{	// must be a positive value 
-			key = -key;  
-		}
-	}	
-
-	return static_cast<hash>(key);
-}
-
-} // namespace algorithms
 
 namespace containers
 {
@@ -437,17 +344,15 @@ sint Table<ELEMENT>::calculateArrayIndex(const Key& key)
 }
 
 template<typename ELEMENT>
-uint Table<ELEMENT>::hashMod(const uint key) const
+uint Table<ELEMENT>::hashMod(const algorithms::hash key) const
 {	// hashmod
 	return key % ((getSizeOfHashPart() - 1) | 1);
 }
 
 template<typename ELEMENT>
-uint Table<ELEMENT>::hashModPowerOf2(const uint powerOf2) const
+uint Table<ELEMENT>::hashModPowerOf2(const algorithms::hash key) const
 {	
-	const uint sizeHashPart = getSizeOfHashPart();
-	assert((sizeHashPart & (sizeHashPart - 1)) == 0);
-	return powerOf2 & (sizeHashPart - 1);
+	return algorithms::modHashPowerOf2(key, getSizeOfHashPart());
 }
 
 template<typename ELEMENT>

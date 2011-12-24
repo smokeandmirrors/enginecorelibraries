@@ -3,9 +3,11 @@
 #include "Platform.h"
 #include "RedBlackTree.h"
 #include "Sandbox.h"
+#include "Strings.h"
 #include "Table.h"
 
 using namespace containers;
+
 
 void sandbox::tableRnD(void)
 {
@@ -29,4 +31,7 @@ void sandbox::tableRnD(void)
 		printf("awesome\n");
 	else
 		printf("not awesome\n");
+
+	const Strings::Immutable& immutable = Strings::getImmutable("can't change!");
+	printf(immutable.string.c_str());
 }

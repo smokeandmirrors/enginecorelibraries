@@ -3,6 +3,7 @@
 #define NUMBERS_H
 
 #include "Platform.h"
+
 /**
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
@@ -12,6 +13,9 @@ Unit Tested			:	YES
 Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	NO
+
+\todo move this to the platform library 
+
 */
 namespace math
 {
