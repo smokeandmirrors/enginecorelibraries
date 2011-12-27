@@ -80,6 +80,8 @@ the ObjectOrientedParadigm
 
 #include <typeinfo>
 #include "LuaBuild.h"
+#include "Strings.h"
+
 /**
 \defgroup LuaExtension Lua Extension
 macros, classes and functions to 

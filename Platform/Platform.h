@@ -136,29 +136,4 @@ const TO& checked_cast(const FROM& from)
 	return static_cast<const TO&>(from);
 }
 
-class String
-{
-	/// \todo get move this to the Strings.h file
-public:
-	static sint 
-		compare(const schar* a, const schar* b)
-	{
-		int difference(*(unsigned char *)a - *(unsigned char *)b);
-		
-		while (!difference && *b)
-		{
-			++a, ++b;
-			difference = *(unsigned char *)a - *(unsigned char *)b;
-		}
-
-		return difference;
-	}
-
-	static bool 
-		isEqual(const schar* a, const schar* b)
-	{
-		return !compare(a, b);
-	}
-}; // String
-
 #endif//BUILD_H

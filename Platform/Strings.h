@@ -2,25 +2,56 @@
 #ifndef STRINGS_H
 #define STRINGS_H
 
-#define DEVELOP_INTERNAL_STRING 1
-#if DEVELOP_INTERNAL_STRING
+#include <string>
+#include <vector>
 
 #include "Hashing.h"
-#include <string>
 #include "Platform.h"
 #include "Singleton.h"
 
-class Strings 
-	: public designPatterns::Singleton<Strings>
+class String 
+	: public designPatterns::Singleton<String>
 {
 	class ImmutableInternal;
-	friend class designPatterns::Singleton<Strings>;
+	friend class designPatterns::Singleton<String>;
 
 public:
 	class Argument;
 	class Immutable;
 	class Mutable;
 	
+	static sint 
+		compare(const schar* a, const schar* b)
+	{
+		int difference(*(unsigned char *)a - *(unsigned char *)b);
+
+		while (!difference && *b)
+		{
+			++a, ++b;
+			difference = *(unsigned char *)a - *(unsigned char *)b;
+		}
+
+		return difference;
+	}
+
+	inline static sint
+		compare(const Immutable& a, const Immutable& b)
+	{
+		return compare(a.c_str(), b.c_str());
+	}
+
+	static bool 
+		isEqual(const schar* a, const schar* b)
+	{
+		return !compare(a, b);
+	}
+
+	static bool
+		isEqual(const Immutable& a, const Immutable& b)
+	{
+		return a == b;
+	}
+
 	class Argument
 	{
 	public:
@@ -82,7 +113,7 @@ public:
 	public:
 		// inline wrap all the const std::string methods
 		Immutable(const Argument& s)
-			: internal(Strings::single().find(s))
+			: internal(String::single().find(s))
 		{
 			internal.acquire();
 		}
@@ -104,6 +135,12 @@ public:
 			return internal.string.c_str();
 		}
 
+		inline algorithms::hash 
+			getHash(void) const
+		{
+			return internal.hashCode;
+		}	
+
 	private:
 		Immutable&
 			operator=(const Immutable&);
@@ -120,8 +157,8 @@ public:
 	}; // strings::Mutable
 
 protected:	
-	Strings(void);
-	~Strings(void);
+	String(void);
+	~String(void);
 
 
 private:
@@ -147,10 +184,10 @@ private:
 			--references; 
 
 			if (!references)
-			{	// tell the Strings singleton
+			{	// tell the String singleton
 				// about the fact there are no more references
 				// to this string
-				Strings::single().notifyDeadString(this);
+				String::single().notifyDeadString(this);
 				delete this;
 			}
 		}
@@ -187,116 +224,7 @@ private:
 	std::vector<ImmutableInternal*> 
 		table;
 
-}; // class Strings
+}; // class String
 
-Strings::Strings(void)
-: numUsed(0)
-{
-	table.push_back(NULL);
-}
-
-Strings::~Strings(void)
-{
-	/** \todo free all the ImmutableInternal */
-}
-
-const Strings::ImmutableInternal& Strings::find(const Argument& search) 
-{
-	const schar* search_string = search.c_str();
-	size_t search_size = search.length();
-	const algorithms::hash key = algorithms::computeHash(search_string, search_size);
-	const uint index = algorithms::modHashPowerOf2(key, static_cast<uint>(table.size()));
-		
-	for (ImmutableInternal* s = table[index]; s != NULL; s = s->next)
-	{
-		if (s->hashCode == key 
-		&& s->string.size() == search_size
-		&& String::isEqual(s->string.c_str(), search_string))
-		{	// found the key
-			return *s;
-		}
-	}
-	// not found, create a new name	
-	if (numUsed >= table.size() 
-	&& table.size() <= (INT_MAX / 2))
-	{
-		resizeImmutableTable(static_cast<uint>(table.size() * 2));
-	}
-	
-	ImmutableInternal* string = new ImmutableInternal(search_string, search_size, key);
-	const uint newindex = algorithms::modHashPowerOf2(key, static_cast<uint>(table.size()));
-	
-	if (table[newindex])
-	{
-		string->next = table[newindex];
-	}
-	else
-	{
-		table[newindex] = string;
-	}
-	
-	numUsed++;
-	return *string;
-}
- 
-void Strings::notifyDeadString(const ImmutableInternal* dead)
-{
-	const uint index = algorithms::modHashPowerOf2(dead->hashCode, static_cast<uint>(table.size()));
-	ImmutableInternal* previous(NULL);
-
-	for (ImmutableInternal* s = table[index]; s != NULL; s = s->next)
-	{
-		if (s == dead)
-		{
-			if (previous)
-			{
-				previous->next = dead->next;
-			}
-		}
-
-		previous = s;
-		s = s->next;
-	}
-}
-
-void Strings::resizeImmutableTable(sint newSize)
-{
-	sint oldCapacity = static_cast<sint>(table.size());
-	// grow
-	if (newSize > oldCapacity)
-	{
-		table.resize(newSize);
-		
-		for (sint i = oldCapacity; i < newSize; i++)
-		{
-			table[i] = NULL;
-		}
-	}
-	// rehash
-	for (sint i = 0; i < oldCapacity; i++)
-	{
-		ImmutableInternal* p = table[i];
-
-		while (p)
-		{
-			// save next
-			ImmutableInternal* next = p->next;
-			// calc new position
-			uint index = algorithms::modHashPowerOf2(p->hashCode, newSize);
-			// chain it
-			p->next = table[index];
-			table[index] = p;
-			p = next;
-		}
-	}
-	// shrink
-	if (newSize < oldCapacity)
-	{
-		assert(table[newSize] == NULL && table[oldCapacity - 1] == NULL);
-		table.resize(newSize);
-	}
-}
-
-#endif//DEVELOP_INTERNAL_STRING
 
 #endif//STRINGS_H

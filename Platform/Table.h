@@ -2,7 +2,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#define DEVELOP_TABLE 0
+#define DEVELOP_TABLE 1
 #if DEVELOP_TABLE
 
 #include "Hashing.h"
@@ -58,17 +58,11 @@ public:
 		, key(algorithms::computeHash(original))  
 		{ /* empty */ }
 
-		Key(const schar* original)
+		Key(String::Immutable* original)
 		: originalString(original)
 		, type(original ? Key::string : Key::invalid)
-		, key(original ? algorithms::computeHash(original, strlen(original)) : 0)
+		, key(original ? original->getHash() : 0)
 		{ /* empty */ }
-
-		Key(const schar* original, size_t length)
-		: originalString(original) 
-		, type(original ? Key::string : Key::invalid)
-		, key(original ? algorithms::computeHash(original, length) : 0)
-		{/* empty */}
 
 		Key(const void* original)
 		: originalPointer(original) 
@@ -110,11 +104,11 @@ public:
 
 		union
 		{
-			const schar*	originalString;
-			bool			originalBool;
-			const void*		originalPointer;
-			sint			originalInteger;
-			sreal			originalReal;
+			String::Immutable*	originalString;
+			bool				originalBool;
+			const void*			originalPointer;
+			sint				originalInteger;
+			sreal				originalReal;
 		};
 
 		const Type 
@@ -204,6 +198,9 @@ public:
 	// TValue *luaH_set (lua_State *L, Table *t, const TValue *key);
 	inline Value*
 		set(const Key& key);
+	
+	inline void 
+		reserve(sint reserveArraySize, sint reserveHashSize=0);
 	
 private:
 	/// \todo will template versions of these be unnecessarily generated? 
@@ -311,14 +308,15 @@ typename Table<ELEMENT>::Node Table<ELEMENT>::dummyNode(Table<ELEMENT>::createDu
 
 // LUAI_FUNC Table *luaH_new (lua_State *L, int narray, int lnhash);
 template<typename ELEMENT> 
-Table<ELEMENT>::Table(sint /*reserveArraySize*/, sint /*reserveHashSize*/)
+Table<ELEMENT>::Table(sint reserveArraySize, sint reserveHashSize)
 : log2HashPartSize(0)
 , arrayPartSize(0)
 , hashPart(&dummyNode)
 , lastFree(NULL)
 , arrayPart(NULL)
 {
-	// resize(reserveArraySize, reserveHashSize);
+	if (reserveArraySize || reserveHashSize)
+		resize(reserveArraySize, reserveHashSize);
 }
 // LUAI_FUNC void luaH_free (lua_State *L, Table *t);
 template<typename ELEMENT>
@@ -507,13 +505,12 @@ template<typename ELEMENT>
 typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithString(const Key& key) const
 {	
 	uint index = hashMod(key.key);
-	// how this is never NULL, I don't know
 	Node* n = &hashPart[index];
 
 	do 
 	{
 		if (n->key.type & Key::string
-		&& String::isEqual(n->key.originalString, key.originalString))
+		&& *n->key.originalString == *key.originalString)
 		{
 			return &n->value;
 		}
@@ -759,6 +756,16 @@ void Table<ELEMENT>::rehash(const Key& key)
 	resize(nasize, totaluse - na);	
 }
 
+template<typename ELEMENT>
+void Table<ELEMENT>::reserve(sint newArraySize, sint newHashSize)
+{
+	if (newArraySize > arrayPartSize 
+	|| newHashSize > twoTo(log2HashPartSize))
+	{
+		resize(newArraySize, newHashSize);
+	}
+}
+								
 template<typename ELEMENT> 
 void Table<ELEMENT>::resize(sint newArraySize, sint newHashSize)
 {
@@ -835,9 +842,9 @@ void Table<ELEMENT>::resizeArray(uint newArraySize)
 
 template<typename ELEMENT> 
 void Table<ELEMENT>::resizeHash(uint newHashSize)
-{
+{	// old hash part is deleted in resize()
 	sint log2ofSize;
-
+	
 	if (newHashSize)
 	{
 		log2ofSize = logTwoCeil(newHashSize);

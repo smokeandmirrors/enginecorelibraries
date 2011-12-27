@@ -33,13 +33,7 @@ void sandbox::tableRnD(void)
 		printf("awesome\n");
 	else
 		printf("not awesome\n");
-
-	const Strings::Immutable& immutable = Strings::getImmutable("can't change!");
-	printf(immutable.string.c_str());
 #endif DEVELOP_TABLE
-
-#if DEVELOP_INTERNAL_STRING
-#endif//DEVELOP_INTERNAL_STRING
 
 	std::string really("rel", 3);
 	printf("%s\n", really.c_str());
@@ -47,10 +41,10 @@ void sandbox::tableRnD(void)
 	printf("%d\n", sum);
 	
 	{
-		Strings::Immutable stackVersion("stackVersion");
-		Strings::Immutable* heapVersion = new Strings::Immutable("stackVersion");
-		Strings::Immutable stackVersion2("stackVersion2");
-		Strings::Immutable* heapVersion2 = new Strings::Immutable("stackVersion2");
+		String::Immutable stackVersion("stackVersion");
+		String::Immutable* heapVersion = new String::Immutable("stackVersion");
+		String::Immutable stackVersion2("stackVersion2");
+		String::Immutable* heapVersion2 = new String::Immutable("stackVersion2");
 		delete heapVersion2;
 		delete heapVersion;
 	}
