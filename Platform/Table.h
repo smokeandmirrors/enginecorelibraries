@@ -2,6 +2,9 @@
 #ifndef TABLE_H
 #define TABLE_H
 
+#define DEVELOP_TABLE 0
+#if DEVELOP_TABLE
+
 #include "Hashing.h"
 #include "Strings.h"
 
@@ -898,5 +901,7 @@ sint Table<ELEMENT>::twoTo(sint x)
 }
 
 } // namespace containers
+
+#endif//DEVELOP_TABLE
 
 #endif//TABLE_H

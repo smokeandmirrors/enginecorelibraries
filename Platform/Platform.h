@@ -138,6 +138,7 @@ const TO& checked_cast(const FROM& from)
 
 class String
 {
+	/// \todo get move this to the Strings.h file
 public:
 	static sint 
 		compare(const schar* a, const schar* b)
