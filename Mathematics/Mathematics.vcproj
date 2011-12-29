@@ -233,7 +233,7 @@
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="0"
+				RuntimeLibrary="1"
 				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"

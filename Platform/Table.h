@@ -12,8 +12,8 @@
 An implementation of an associative array, based on the
 Lua table.
 
-\todo there is no way the memory management here correct, due to the use
-of realloc in the lua version
+\todo iteration (next)
+\todo sort
 
 */
 
@@ -41,51 +41,54 @@ public:
 			string	= 1 << 5,		
 		}; // enum Type
 
-		inline static bool 
-			isValid(const Key& h)
-		{
-			return h.type != Key::invalid;
-		}
-
 		Key(void)
 		: type(Key::invalid)
 		, key(0)
 		{ /* empty */ }
 		
-		Key(bool original)
-		: originalBool(original)
+		explicit Key(bool source)
+		: original(source)
 		, type(Key::boolean)
-		, key(algorithms::computeHash(original))  
+		, key(algorithms::computeHash(source))  
 		{ /* empty */ }
 
-		Key(String::Immutable* original)
-		: originalString(original)
-		, type(original ? Key::string : Key::invalid)
-		, key(original ? original->getHash() : 0)
+		Key(const char* source)
+		: original(new String::Immutable(source))
+		, type(Key::string)
+		, key(originalKeyString.getHash())
+		{ /* empty */ }
+		/** 
+		\todo this below should have worked for const char* 
+		there are enough conversion operators, 
+		but it doesn't 
+		*/
+		Key(const String::Immutable& source)
+		: original(new String::Immutable(source))
+		, type(Key::string)
+		, key(originalKeyString.getHash())
 		{ /* empty */ }
 
-		Key(const void* original)
-		: originalPointer(original) 
-		, type(original ? Key::pointer : Key::invalid)
-		, key(original ? algorithms::computeHash(original) : 0)
+		explicit Key(const void* source)
+		: original(source) 
+		, type(source ? Key::pointer : Key::invalid)
+		, key(source ? algorithms::computeHash(source) : 0)
 		{/* empty */}
 
-		Key(sint original)
-		: originalInteger(original)
+		Key(sint source)
+		: original(source)
 		, type(Key::integer) 
-		, key(algorithms::computeHash(original))
+		, key(algorithms::computeHash(source))
 		{/* empty */}
 
-		Key(sreal original) 
-		: originalReal(original) 
+		explicit Key(sreal source) 
+		: original(source) 
 		, type(Key::real)
-		, key(algorithms::computeHash(original))
+		, key(algorithms::computeHash(source))
 		{/* empty */}
-
 		
 		bool operator!(void) const
 		{
-			return type & Key::invalid;
+			return (type & Key::invalid) != 0;
 		}
 
 		bool operator==(const Key& other) const
@@ -93,34 +96,56 @@ public:
 			return (type & other.type) && key == other.key;
 		}
 
-		Key& operator=(const Key& original)
+		Key& operator=(const Key& source)
 		{
+			
 			algorithms::hash& mutableKey = const_cast<algorithms::hash&>(key);
-			mutableKey = original.key;
+			mutableKey = source.key;
 			Type& mutableType = const_cast<Type&>(type);
-			mutableType = original.type;
+			mutableType = source.type;
+			original = source.original;
 			return *this;
 		}
 
-		union
+		union originalType
 		{
-			String::Immutable*	originalString;
-			bool				originalBool;
-			const void*			originalPointer;
-			sint				originalInteger;
-			sreal				originalReal;
-		};
+			bool				keyBool;
+			const void*			keyPointer;
+			sint				keyInteger;
+			sreal				keyReal;
+			
+			originalType() 
+				{}
+			
+			originalType(bool source) 
+				: keyBool(source) {}
+			
+			originalType(const void* source) 
+				: keyPointer(source) {}
+			
+			originalType(sint source) 
+				: keyInteger(source) {}
+			
+			originalType(sreal source) 
+				: keyReal(source) {}
+			
+		} original;
+
+		String::Immutable
+			originalKeyString;
 
 		const Type 
 			type;
 
 		const algorithms::hash 
 			key;
+
 	}; // Key
 
 private:
-	struct Value
+	class Value
 	{
+	public:
 		Value(void)
 		: isValid(invalid)
 		{
@@ -134,18 +159,43 @@ private:
 			/* empty */
 		}
 
-		Value& operator=(const Value& original)
+		Value& 
+			operator=(const Value& original)
 		{
 			isValid = original.isValid;
 			value = original.value;
 			return *this;
 		}	
 
-		sint 
-			isValid;
+		bool 
+			operator!(void) const
+		{
+			return isValid != valid;
+		}
+
+		void
+			validate(void)
+		{
+			isValid = valid;
+		}
+		
+		void 
+			invalidate(void)
+		{
+			isValid = invalid;
+		}
+		
+		operator sint(void) const
+		{
+			return isValid;
+		}
 
 		ELEMENT 
 			value;
+	
+	private:
+		sint 
+			isValid;
 	}; // Value
 
 	struct Node
@@ -188,28 +238,47 @@ public:
 	~Table(void); 
 	
 	ELEMENT& 
-		operator[](const Key& key);
+		get(const Key& key);
 	
 	const ELEMENT& 
-		operator[](const Key& key) const;
+		get(const Key& key) const;
 	
+	bool
+		iterate(Key& key, ELEMENT& value)
+	{
+		Value* v(NULL);
+		
+		if (next(key, v))
+		{
+			value = v->value;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	bool 
 		has(const Key& key) const;
-	// TValue *luaH_set (lua_State *L, Table *t, const TValue *key);
-	inline Value*
-		set(const Key& key);
+
+	void
+		remove(const Key& key);
 	
-	inline void 
+	void 
 		reserve(sint reserveArraySize, sint reserveHashSize=0);
 	
+	void
+		set(const Key& key, ELEMENT&);
+
 private:
 	/// \todo will template versions of these be unnecessarily generated? 
-	// static int arrayindex (const TValue *key)
-	static inline sint
-		calculateArrayIndex(const Key& key);
 	// static int computesizes (int nums[], int *narray)
+	static inline bool
+		calculateArrayIndex(const Key& key, sint& arrayIndex);
+	
 	static inline sint
-		calculateNewArraySize(sint nums[], sint* numArrays);
+		calculateNewArraySize(sint nums[], sint& numArrays);
 	// static int countint (const TValue *key, int *nums)
 	static inline sint
 		countInt(const Key& key, sint* outputNumbers);
@@ -230,10 +299,13 @@ private:
 		countKeysInArray(sint* perSlotOutput) const;
 	// static int numusehash (const Table *t, int *nums, int *pnasize)
 	inline sint 
-		countKeysInHash(sint* perSlotOutput, sint* keysInArray) const;
+		countKeysInHash(sint* perSlotOutput, sint& keysInArray) const;
 	// const TValue *luaH_get (Table *t, const TValue *key);
 	inline Value*
-		get(const Key& key) const;
+		getInternal(const Key& key) const;
+	// static int findindex (lua_State *L, Table *t, StkId key)
+	inline sint 
+		findIndex(const Key& key) const;
 	// const TValue *luaH_getint (Table *t, int key);
 	inline Value*
 		findValueWithSignedInteger(const Key& key) const;
@@ -263,21 +335,27 @@ private:
 		hashModPowerOf2(const algorithms::hash  powerOf2) const;
 	inline bool
 		isMainPositionIsTaken(Node*) const;
+	// LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
+	inline bool
+		next(Key& iter, Value*& value) const;
 	// TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key)
 	inline Value*
 		newKey(const Key& key);
 	// static void rehash (lua_State *L, Table *t, const TValue *ek)
 	inline void
 		rehash(const Key& key);
-	// void luaH_resize (lua_State *L, Table *t, int nasize, int nhsize);
+	// void luaH_resize (lua_State *L, Table *t, int newArraySize, int nhsize);
 	inline void
 		resize(sint arraySize, sint hashSize);
-	// void luaH_resizearray (lua_State *L, Table *t, int nasize);
+	// void luaH_resizearray (lua_State *L, Table *t, int newArraySize);
 	inline void
 		resizeArray(uint newArraySize);
 	// static void setnodevector (lua_State *L, Table *t, int size)
 	inline void
 		resizeHash(uint newHashSize);
+	// TValue *luaH_set (lua_State *L, Table *t, const TValue *key);
+	inline Value*
+		setInternal(const Key& key);
 	// void luaH_setint (lua_State *L, Table *t, int key, TValue *value);
 	inline void /* very good optimization candidate? */
 		setWithInteger(const Key& key, ELEMENT& value);
@@ -331,20 +409,6 @@ Table<ELEMENT>::~Table(void)
 }
 
 template<typename ELEMENT>
-sint Table<ELEMENT>::calculateArrayIndex(const Key& key)
-{
-	if (key.key == Key::integer
-	&& key.key >= 0) 
-	{	// check if is integer value, and if the key is the same value as the number
-		return key.key;
-	}
-	else
-	{
-		return -1;
-	}
-}
-
-template<typename ELEMENT>
 uint Table<ELEMENT>::hashMod(const algorithms::hash key) const
 {	// hashmod
 	return key % ((getSizeOfHashPart() - 1) | 1);
@@ -357,16 +421,31 @@ uint Table<ELEMENT>::hashModPowerOf2(const algorithms::hash key) const
 }
 
 template<typename ELEMENT>
-sint Table<ELEMENT>::calculateNewArraySize(sint nums[], sint* numArrays)
+bool Table<ELEMENT>::calculateArrayIndex(const Key& key, sint& arrayIndex)
+{
+	if (key.type & Key::integer
+	&& key.original.keyInteger >= 0)
+	{
+		arrayIndex = key.original.keyInteger;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+template<typename ELEMENT>
+sint Table<ELEMENT>::calculateNewArraySize(sint nums[], sint& numArrays)
 {
 	sint i;
-	sint twotoi;  /* 2^i */
-	sint a = 0;  /* number of elements smaller than 2^i */
-	sint na = 0;  /* number of elements to go to array part */
-	sint n = 0;  /* optimal size for array part */
-	for (i = 0, twotoi = 1; twotoi/2 < *numArrays; i++, twotoi *= 2) 
+	sint twotoi;	/* 2^i */
+	sint a = 0;		/* number of elements smaller than 2^i */
+	sint na = 0;	/* number of elements to go to array part */
+	sint n = 0;		/* optimal size for array part */
+	for (i = 0, twotoi = 1; twotoi/2 < numArrays; i++, twotoi *= 2) 
 	{
-		if (nums[i] > 0) 
+		if (nums[i] >= 0) 
 		{
 			a += nums[i];
 			
@@ -377,35 +456,36 @@ sint Table<ELEMENT>::calculateNewArraySize(sint nums[], sint* numArrays)
 			}
 		}
 
-		if (a == *numArrays) 
+		if (a == numArrays) 
 			break;  /* all elements already counted */
 	}
-	*numArrays = n;
-	assert(*numArrays/2 <= na && na <= *numArrays);
+	numArrays = n;
+	assert(numArrays/2 <= na && na <= numArrays);
 	return na;
 }
 
 template<typename ELEMENT>
 sint Table<ELEMENT>::countInt(const Key& key, sint* outputNumbers)
 {
-	sint arrayIndex = calculateArrayIndex(key);
+	sint arrayIndex;
 	
-	if (arrayIndex > 0 && arrayIndex <= maxArraySize)
+	if (calculateArrayIndex(key, arrayIndex))
 	{
-		outputNumbers[logTwoCeil(arrayIndex)]++;
-		return 1;
+		if (arrayIndex < maxArraySize)
+		{
+			outputNumbers[logTwoCeil(arrayIndex + 1)]++;
+			return 1;
+		}
 	}
-	else
-	{
-		return 0;
-	}
+
+	return 0;
 }
 
 template<typename ELEMENT> 
 sint Table<ELEMENT>::countKeysInArray(sint* perSlotOutput) const
 {	
 	sint logBase2;
-	sint twoToLogBase2;  /* 2 ^logBase2 */
+	sint twoToLogBase2;  /* 2 ^ logBase2 */
 	sint total = 0;  
 	sint index = 1;  
 	sint arraySize = arrayPartSize;
@@ -418,21 +498,17 @@ sint Table<ELEMENT>::countKeysInArray(sint* perSlotOutput) const
 		if (upperLimit > arraySize) 
 		{
 			upperLimit = arraySize;  
+			
 			if (index > upperLimit)
 			{	// no more elements to count
 				break;  
 			}
 		}
 		
-		{	// count elements in range (2^(logBase2-1), 2^logBase2]
-			sint n = index - 1;
-
-			for (; n < upperLimit; n++) 
-			{	
-				counter += arrayPart[n].isValid;				
-			}
-
-			index = n + 1;
+		// count elements in range (2^(logBase2-1), 2^logBase2]
+		for (; index <= upperLimit; index++) 
+		{	
+			counter += arrayPart[index - 1];				
 		}
 		
 		perSlotOutput[logBase2] += counter;
@@ -443,7 +519,7 @@ sint Table<ELEMENT>::countKeysInArray(sint* perSlotOutput) const
 }
 
 template<typename ELEMENT>
-sint Table<ELEMENT>::countKeysInHash(sint* perSlotOutput, sint* keysInArray) const
+sint Table<ELEMENT>::countKeysInHash(sint* perSlotOutput, sint& keysInArray) const
 {
 	sint totaluse = 0;  /* total number of elements */
 	sint summationOfNums = 0;  /* summation of `nums' */
@@ -453,14 +529,14 @@ sint Table<ELEMENT>::countKeysInHash(sint* perSlotOutput, sint* keysInArray) con
 	{
 		Node *n = &(hashPart[i]);
 		
-		if (!n->value.isValid) 
+		if (n->value) 
 		{
 			summationOfNums += countInt(n->key, perSlotOutput);
 			totaluse++;
 		}
 	}
 	
-	*keysInArray += summationOfNums;
+	keysInArray += summationOfNums;
 	return totaluse;
 }
 
@@ -469,16 +545,56 @@ typename Table<ELEMENT>::Node Table<ELEMENT>::createDummyNode(void)
 {
 	Node node;
 	node.next = NULL;
-	node.value.isValid = 0;
+	node.value.invalidate();
 	return node;
+}
+
+template<typename ELEMENT>
+sint Table<ELEMENT>::findIndex(const Key& iter) const
+{
+	if (!iter)
+	{// first iteration
+		return -1;
+	}
+	else
+	{	
+		sint index;
+
+		if (calculateArrayIndex(iter, index)
+			&& index < static_cast<sint>(arrayPartSize))
+		{	// in the array part
+			return index;
+		}
+		else
+		{	// check for hash part
+			Node* n = getMainPosition(iter);
+
+			do 
+			{
+				if (n->key == iter)
+				{
+					assert(n - hashPart == n - &hashPart[0]);
+					return static_cast<sint>(n - hashPart);
+				}
+				else
+				{
+					n = n->next;
+				}
+			} 
+			while (n);
+			/*else invalid key, assert?*/
+			assert(false);
+			return -2;
+		}
+	}
 }
 
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithSignedInteger(const Key& key) const
 {	
-	sint index = key.originalInteger;
+	sint index = key.original.keyInteger;
 	
-	if (index > 0 
+	if (index >= 0 
 	&& index < static_cast<sint>(arrayPartSize))
 	{
 		return &arrayPart[index];
@@ -489,7 +605,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithSignedInteger(const
 	do 
 	{
 		if (n->key.type & Key::integer
-			&& n->key.originalInteger == key.originalInteger)
+			&& n->key.original.keyInteger == key.original.keyInteger)
 		{
 			return &n->value;
 		}
@@ -510,7 +626,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithString(const Key& k
 	do 
 	{
 		if (n->key.type & Key::string
-		&& *n->key.originalString == *key.originalString)
+		&& n->key.originalKeyString == key.originalKeyString)
 		{
 			return &n->value;
 		}
@@ -521,9 +637,30 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithString(const Key& k
 
 	return NULL;
 }
+/* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
+LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
+template<typename ELEMENT> 
+typename ELEMENT& Table<ELEMENT>::get(const Key& key)
+{	
+	Value* position = getInternal(key);
+
+	if (!position)
+	{
+		position = newKey(key);
+	}
+
+	return position->value;
+}
+/* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
+LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
+template<typename ELEMENT> 
+const ELEMENT& Table<ELEMENT>::get(const Key& key) const
+{	
+	return get(key);
+}
 
 template<typename ELEMENT> 
-typename Table<ELEMENT>::Value* Table<ELEMENT>::get(const Key& key) const
+typename Table<ELEMENT>::Value* Table<ELEMENT>::getInternal(const Key& key) const
 {
 	switch (key.type)
 	{
@@ -562,7 +699,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::get(const Key& key) const
 	} // switch (key.type)
 
 	return NULL;
-} // const Table<ELEMENT>::Value* Table<ELEMENT>::get(const Key& key) const
+} // const Table<ELEMENT>::Value* Table<ELEMENT>::getInternal(const Key& key) const
 
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Node* Table<ELEMENT>::getFreePosition(void) 
@@ -571,7 +708,7 @@ typename Table<ELEMENT>::Node* Table<ELEMENT>::getFreePosition(void)
 	{
 		lastFree--;
 
-		if (!lastFree->value.isValid)
+		if (!lastFree->value)
 			return lastFree;
 	}	
 	// no free position
@@ -620,9 +757,16 @@ uint Table<ELEMENT>::getSizeOfHashPart(void) const
 }
 
 template<typename ELEMENT> 
+bool Table<ELEMENT>::has(const Key& key) const
+{
+	Value* v = getInternal(key);
+	return v && *v;
+}
+
+template<typename ELEMENT> 
 bool Table<ELEMENT>::isMainPositionIsTaken(Node* mainPosition) const
 {
-	return mainPosition->value.isValid || (mainPosition == &dummyNode);
+	return mainPosition->value || (mainPosition == &dummyNode);
 }
 
 template<typename ELEMENT> 
@@ -640,8 +784,9 @@ sint Table<ELEMENT>::logTwoCeil(uint x)
 	};
 
 	sint l = 0;
+	assert(x > 0);
 	x--;
-	
+
 	while (x >= 256) 
 	{ 
 		l += 8; 
@@ -649,6 +794,35 @@ sint Table<ELEMENT>::logTwoCeil(uint x)
 	}
 	
 	return l + logBaseTwoArray[x];
+}
+
+template<typename ELEMENT>
+bool Table<ELEMENT>::next(Key& iter, Value*& value) const
+{
+	sint index = findIndex(iter) + 1;
+	for (; index < static_cast<sint>(arrayPartSize); index++)
+	{
+		if (arrayPart[index])
+		{
+			value = &arrayPart[index];
+			iter.original.keyInteger = index + 1;
+			return true;
+		}
+	}
+
+	sint sizeHashPart = static_cast<sint>(getSizeOfHashPart());
+	
+	for (index -= arrayPartSize; index < sizeHashPart; index++)
+	{
+		if (hashPart[index].value)
+		{
+			value = &hashPart[index].value;
+			iter = hashPart[index].key;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /*
@@ -661,7 +835,7 @@ sint Table<ELEMENT>::logTwoCeil(uint x)
 template<typename ELEMENT>
 typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 {
-	assert(Key::isValid(key));
+	assert(key); 
 	Node* mainPosition = getMainPosition(key);
 		
 	if (isMainPositionIsTaken(mainPosition))
@@ -671,7 +845,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 		if (!freePosition)
 		{
 			rehash(key);
-			return set(key);
+			return setInternal(key);
 		}
 		
 		assert(mainPosition != &dummyNode);
@@ -690,7 +864,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 			*freePosition = *mainPosition;
 			// main position is now free
 			mainPosition->next = NULL;
-			mainPosition->value.isValid = invalid;
+			mainPosition->value.invalidate();
 		}
 		else
 		{	// colling node is in its own main position
@@ -703,57 +877,38 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 	}
 	
 	mainPosition->key = key;
-	assert(!mainPosition->value.isValid);
+	assert(!mainPosition->value);
 	return &(mainPosition->value);
 }
 
-/* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
-LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
-template<typename ELEMENT> 
-typename ELEMENT& Table<ELEMENT>::operator[](const Key& key)
-{	
-	Value* position = get(key);
-	
-	if (!position)
-	{
-		position = newKey(key);
-	}
-
-	return position->value;
-}
-/* LUAI_FUNC const TValue *luaH_get (Table *t, const TValue *key);
-LUAI_FUNC TValue *luaH_set (lua_State *L, Table *t, const TValue *key);	*/
-template<typename ELEMENT> 
-const ELEMENT& Table<ELEMENT>::operator[](const Key& key) const
-{	
-	Value* position = get(key);
-
-	if (!position)
-	{
-		position = newKey(key);;
-	}
-
-	return position->value;
-}
 
 template<typename ELEMENT> 
 void Table<ELEMENT>::rehash(const Key& key)
 {
-	sint nasize, na;
+	sint newArraySize, numUsedInArray;
 	sint nums[maxBits+1];  /* nums[i] = number of keys with, 2^(i-1) keys 2^i */
 	sint i;
 	sint totaluse;
 	for (i=0; i<=maxBits; i++) nums[i] = 0;  /* reset counts */
-	nasize = countKeysInArray(nums);  /* count keys in arrayPart part */
-	totaluse = nasize;  /* all those keys are integer keys */
-	totaluse += countKeysInHash(nums, &nasize);  /* count keys in hash part */
+	newArraySize = countKeysInArray(nums);  /* count keys in arrayPart part */
+	totaluse = newArraySize;  /* all those keys are integer keys */
+	totaluse += countKeysInHash(nums, newArraySize);  /* count keys in hash part */
 	/* count extra key */
-	nasize += countInt(key, nums);
+	newArraySize += countInt(key, nums);
 	totaluse++;
 	/* compute new size for arrayPart part */
-	na = calculateNewArraySize(nums, &nasize);
+	numUsedInArray = calculateNewArraySize(nums, newArraySize);
 	/* resize the table to new computed sizes */
-	resize(nasize, totaluse - na);	
+	resize(newArraySize, totaluse - numUsedInArray);	
+}
+
+template<typename ELEMENT>
+void Table<ELEMENT>::remove(const Key& key)
+{
+	if (Value* value = getInternal(key))
+	{
+		value->invalidate();
+	}
 }
 
 template<typename ELEMENT>
@@ -780,23 +935,21 @@ void Table<ELEMENT>::resize(sint newArraySize, sint newHashSize)
 	}
 	// create a new hash part with appropriate size
 	resizeHash(newHashSize);  
-
+		
 	if (newArraySize < oldArraySize) 
-	{ 
-		arrayPartSize = newArraySize;
-		// re-insert elements from the vanishing slice		
+	{	// re-insert elements from the vanishing slice into the hash table		
 		for (sint index = newArraySize; index < oldArraySize; index++) 
 		{
-			if (arrayPart[index].isValid)
+			if (arrayPart[index])
 			{	
-				setWithInteger(index + 1, arrayPart[index].value); 
+				setWithInteger(Key(index), arrayPart[index].value); 
 			}
 		}
 		// shrink the array
 		resizeArray(newArraySize);
 	}
 	
-	sint index = twoTo(oldHashSize) - 1;
+	sint index = twoTo(oldHashSize);
 	// re-insert elements from hash part 
 	if (index > 0)
 	{
@@ -805,9 +958,9 @@ void Table<ELEMENT>::resize(sint newArraySize, sint newHashSize)
 			index--;
 			Node* oldPosition = oldHashPart + index;
 			
-			if (oldPosition->value.isValid)
+			if (oldPosition->value)
 			{	
-				Value* oldValueInNewPosition = set(oldPosition->key);
+				Value* oldValueInNewPosition = setInternal(oldPosition->key);
 				oldValueInNewPosition->value = oldPosition->value.value;				
 			}
 		} 
@@ -825,19 +978,21 @@ template<typename ELEMENT>
 void Table<ELEMENT>::resizeArray(uint newArraySize)
 {	
 	Value* newArrayPart = new Value[newArraySize];
-	
-	if (newArraySize)
+	sint index = arrayPartSize < newArraySize ? arrayPartSize : newArraySize;
+
+	if (index)
 	{
 		do 
 		{
-			newArraySize--;
-			newArrayPart[newArraySize] = arrayPart[newArraySize];
+			index--;
+			newArrayPart[index] = arrayPart[index];
 		} 
-		while (newArraySize);
+		while (index);
 	}
 
 	delete[] arrayPart;
 	arrayPart = newArrayPart;
+	arrayPartSize = newArraySize;
 }
 
 template<typename ELEMENT> 
@@ -860,8 +1015,8 @@ void Table<ELEMENT>::resizeHash(uint newHashSize)
 			--index;
 			--newNode;
 			assert(newNode->next == NULL);
-			assert(!Key::isValid(newNode->key));
-			assert(!newNode->value.isValid);
+			assert(!newNode->key); 
+			assert(!newNode->value);
 		} 
 		while (index);
 	}
@@ -875,10 +1030,19 @@ void Table<ELEMENT>::resizeHash(uint newHashSize)
 	lastFree = &hashPart[newHashSize];
 }
 
+
 template<typename ELEMENT> 
-typename Table<ELEMENT>::Value* Table<ELEMENT>::set(const Key& key)
+void Table<ELEMENT>::set(const Key& key, ELEMENT& value)
 {
-	if (Value* v = get(key))
+	Value& v = *setInternal(key);
+	v.value = value;
+	v.validate();
+}
+
+template<typename ELEMENT> 
+typename Table<ELEMENT>::Value* Table<ELEMENT>::setInternal(const Key& key)
+{
+	if (Value* v = getInternal(key))
 	{
 		return v;
 	}

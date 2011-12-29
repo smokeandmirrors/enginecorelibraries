@@ -55,7 +55,7 @@ public:
 	class Argument
 	{
 	public:
-		Argument(const schar* v)
+		Argument(const char* v)
 		: cStyleString(v)
 		, size(-1)
 		{ assert(cStyleString != NULL); }
@@ -112,40 +112,69 @@ public:
 	{
 	public:
 		// inline wrap all the const std::string methods
-		Immutable(const Argument& s)
-			: internal(String::single().find(s))
+		inline Immutable()
+		: internal(&String::single.find(""))
 		{
-			internal.acquire();
+			internal->acquire();
+		}
+		
+		inline Immutable(const Argument& s)
+		: internal(&String::single.find(s))
+		{
+			internal->acquire();
+		}
+
+		inline Immutable(const Immutable& s)
+		: internal(s.internal)
+		{
+			internal->acquire();
 		}
 
 		~Immutable(void)
 		{
-			internal.release();
+			internal->release();
 		}
 
-		inline bool
-			operator==(const Immutable& other) const
+		inline void
+			acquire(void)
 		{
-			return &internal == &other.internal;
+			internal->acquire();
+		}
+
+		inline void
+			release(void)
+		{
+			internal->release();
 		}
 
 		inline const char*
 			c_str(void) const
 		{
-			return internal.string.c_str();
+			return internal->string.c_str();
 		}
 
 		inline algorithms::hash 
 			getHash(void) const
 		{
-			return internal.hashCode;
+			return internal->hashCode;
 		}	
 
-	private:
-		Immutable&
-			operator=(const Immutable&);
+		inline Immutable&
+			operator=(const Immutable& source)
+		{
+			internal->release();
+			internal = source.internal;
+			internal->acquire();
+		}
 
-		const ImmutableInternal&
+		inline bool
+			operator==(const Immutable& other) const
+		{
+			return internal == other.internal;
+		}
+
+	private:
+		const ImmutableInternal*
 			internal;
 	}; // class Immutable
 
@@ -165,8 +194,8 @@ private:
 	class ImmutableInternal
 	{
 	public:
-		ImmutableInternal(const schar* cstring, size_t length, const algorithms::hash key)
-		: next(NULL)
+		ImmutableInternal(const schar* cstring, size_t length, const algorithms::hash key, ImmutableInternal* nextInternal)
+		: next(nextInternal)
 		, string(cstring, length)
 		, hashCode(key)
 		, references(0)
@@ -187,7 +216,7 @@ private:
 			{	// tell the String singleton
 				// about the fact there are no more references
 				// to this string
-				String::single().notifyDeadString(this);
+				String::single.notifyDeadString(this);
 				delete this;
 			}
 		}
@@ -210,7 +239,7 @@ private:
 	}; // strings::Immutable
 	
 	const ImmutableInternal&
-		find(const Argument& s)	;
+		find(const Argument& s);	
 
 	void 
 		notifyDeadString(const ImmutableInternal* dead);

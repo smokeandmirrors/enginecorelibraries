@@ -92,7 +92,7 @@ public:
 	inline void
 	onComplete(Thread*)
 	{
-		Scheduler::single().accountForFinish(this);
+		Scheduler::single.accountForFinish(this);
 	}
 
 	inline void

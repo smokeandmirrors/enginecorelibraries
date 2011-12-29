@@ -4,6 +4,8 @@
 /**
 \file Singleton.h
 
+I am running out of love for the singleton pattern
+
 Defines a template Singleton implementation, that simply provides
 most of the Singleton requirements: initialization, accessor,
 destruction, protected constructor/destructor.
@@ -33,7 +35,6 @@ all singletons in the beginning of main()
 
 */
 #include "Platform.h"
-#include "Synchronization.h"
 
 namespace designPatterns
 {
@@ -42,28 +43,16 @@ template<typename T>
 class Singleton
 {
 public:
-	/** get the only reference to the singleton */
-	static T& single(void)
-	{
-		return (*getter)();
-	} // static T& single(void)
-	
 	/** 
-	destroy the only reference to the singleton 
-	\warning use once only!
+	the single, static instance of T 
+	\todo I never see this implementation.  I understand the reasoning behind
+	the lazy evaluation methods, buy (at least in C++) they bring up all kinds of 
+	problems.  I thought the problems with a single static instance would
+	be related to multiple instantiation in different libraries or compilation units,
+	but so far, I can't substantiate that either.
 	*/
-	static void destroy(void)
-	{
-		SYNC(mutex);
-
-		if (singleton)
-		{
-			delete singleton;
-			singleton = NULL;
-			getter = getUninitialized;
-		}
-	} // static void destroy(void)
-
+	static T single;
+	
 protected:
 	/** empty no args ctor */
 	Singleton(void)
@@ -78,42 +67,12 @@ protected:
 	} // virtual ~Singleton(void) 
 
 private:
-	/** returns the initialized, dereferenced pointer to the only T */
-	static T& getInitialized(void)
-	{
-		return *singleton;
-	} // static T& getInitialized(void)
-
-	/** creates the only T and returns the the dereferenced pointer to it */
-	static T& getUninitialized(void)
-	{
-		SYNC(mutex);
-
-		if (!singleton)
-		{
-			singleton = new T();
-			getter = getInitialized;
-		}
-
-		return *singleton;
-	} // static T& getUninitialized(void)
-
-	/** a pointer to the current getter function */
-	static T& (*					getter)(void);
-	/** a mutex to guard the creation/destruction of the singleton */
-	DECLARE_STATIC_MUTEX(mutex);
-	/** the static pointer to the only instance of T */
-	static T*						singleton;
 	// not allowed
 	Singleton(const Singleton&);
 	Singleton operator=(const Singleton&);
 }; // class Singleton
-
 // static initialization
-template<typename T> T& (*					Singleton<T>::getter)(void) (Singleton<T>::getUninitialized);
-template<typename T> concurrency::Mutex	Singleton<T>::mutex; 
-template<typename T> T*						Singleton<T>::singleton(NULL);
-
+template<typename T> T Singleton<T>::single; 
 } // namespace designPatterns
 
 #endif//SINGLETON_H

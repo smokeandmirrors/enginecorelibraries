@@ -8,10 +8,6 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
 */
 
-/************************************************************************/
-/* GARBAGE COLLECTION!!! DUE TO THE JAVA SOURCE, THIS LEAKS LIKE CRAZY  */
-/************************************************************************/
-
 #include <vector>
 #include "Platform.h"
 
@@ -24,7 +20,6 @@ class RedBlackTree
 public:
 	static const bool red;
 	static const bool black;
-	static std::vector<uint> depths;
 	
 	RedBlackTree(void)
 		: m_root(NULL)
@@ -35,7 +30,6 @@ public:
 	~RedBlackTree(void)
 	{ 
 		Node::recycle(m_root);
-		assert(Node::numNodes == 0);
 	}
 
 	ELEMENT
@@ -84,8 +78,6 @@ private:
 			}
 		}
 
-		static uint numNodes;
-		
 		bool	
 			m_color;
 		
@@ -104,12 +96,11 @@ private:
 		, m_left(left)
 		, m_right(right)
 		, m_value(value)
-		{ /* empty */numNodes++; }
+		{ /* empty */}
 
 		~Node(void)
-		{
-			numNodes--;
-		}
+		{ /* empty */}
+
 	}; // class Node
 
 	inline Node* 
@@ -421,13 +412,12 @@ private:
 public:
 	bool
 		isSpreadLessThan(uint spread)
-	{
-		// needs to be 1 lg n
-		depths.clear();
+	{	// needs to be 1 lg n
+		std::vector<ELEMENT> depths;
 
 		if (m_root)
 		{
-			fillDepths(m_root, 0);
+			fillDepths(m_root, 0, depths);
 		}
 		uint mindepth(100000);
 		uint maxdepth(0);
@@ -444,7 +434,7 @@ public:
 	}
 
 	void 
-		fillDepths(Node* node, uint depth)
+		fillDepths(Node* node, uint depth, std::vector<ELEMENT>& depths)
 	{
 		if (!node)
 		{
@@ -453,8 +443,8 @@ public:
 		else
 		{
 			depth++;
-			fillDepths(node->m_left, depth);
-			fillDepths(node->m_right, depth);
+			fillDepths(node->m_left, depth, depths);
+			fillDepths(node->m_right, depth, depths);
 		}
 	}
 
@@ -462,47 +452,34 @@ public:
 
 template<typename ELEMENT> const bool RedBlackTree<ELEMENT>::red(true);
 template<typename ELEMENT> const bool RedBlackTree<ELEMENT>::black(false);
-template<typename ELEMENT> std::vector<uint> RedBlackTree<ELEMENT>::depths;
-template<typename ELEMENT> uint RedBlackTree<ELEMENT>::Node::numNodes;
 
 template<typename ELEMENT> 
 ELEMENT RedBlackTree<ELEMENT>::getMax(void) const
-{
-	// check();
-	
+{	// check();
 	if (m_root)
 		getMax(m_root);
-	
 	// check();
-
 	return m_root ? getMax(m_root)->m_value : NULL;
 }
 
 template<typename ELEMENT> 
 ELEMENT RedBlackTree<ELEMENT>::getMin(void) const
-{
-	// check();
-	
+{	// check();
 	if (m_root)
 		getMin(m_root);
-	
 	// check();
-
 	return m_root ? getMin(m_root)->m_value : NULL;
 }
 
 template<typename ELEMENT> 
 uint RedBlackTree<ELEMENT>::getSize(void) const
-{
-	// check();
+{	// check();
 	return m_size;
 }
 
 template<typename ELEMENT> 
 bool RedBlackTree<ELEMENT>::has(ELEMENT value) const
-{
-	// check();
-	
+{	// check();
 	if (Node* node = m_root)
 	{
 		do 
@@ -524,29 +501,21 @@ bool RedBlackTree<ELEMENT>::has(ELEMENT value) const
 
 template<typename ELEMENT> 
 void RedBlackTree<ELEMENT>::insert(ELEMENT value)
-{
-	// check();
+{	// check();
 	m_root = insert(m_root, value);
 	m_root->m_color = black;
-	assert(Node::numNodes == getSize());
 	// check();
 }
 
 template<typename ELEMENT> 
 bool RedBlackTree<ELEMENT>::isEmpty(void) const
-{
-	// check();
-	if (m_root == NULL)
-		assert(Node::numNodes == 0);
-	
+{	// check();
 	return m_root == NULL;
 }
 
 template<typename ELEMENT> 
 void RedBlackTree<ELEMENT>::remove(ELEMENT value)
-{
-	// check();
-	
+{	// check();
 	if (has(value))
 		m_size--;
 
@@ -555,35 +524,28 @@ void RedBlackTree<ELEMENT>::remove(ELEMENT value)
 	
 	if (m_root)
 		m_root->m_color = black;
-	assert(Node::numNodes == getSize());
 	// check();
 }
 
 template<typename ELEMENT> 
 void RedBlackTree<ELEMENT>::removeMax(void)
-{
-	// check();
-	
+{	// check();
 	if (m_root)
 		m_root = removeMax(m_root);
 
 	if (m_root)
 		m_root->m_color = black;
-	assert(Node::numNodes == getSize());
 	// check();
 }
 
 template<typename ELEMENT> 
 void RedBlackTree<ELEMENT>::removeMin(void)
-{
-	// check();
-	
+{	// check();
 	if (m_root)
 		m_root = removeMin(m_root);
 
 	if (m_root)
 		m_root->m_color = black;
-	assert(Node::numNodes == getSize());
 	// check();
 }
 

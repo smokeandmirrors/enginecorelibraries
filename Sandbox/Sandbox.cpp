@@ -96,20 +96,20 @@ void simpleChildrenPre(void)
 {
 	doWork3();
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single().enqueue(*one);
+	Scheduler::single.enqueue(*one);
 }
 
 void simpleChildrenPost(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single().enqueue(*one);
+	Scheduler::single.enqueue(*one);
 	doWork3();
 }
 
 void doWork1Children(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single().enqueue(*one);
+	Scheduler::single.enqueue(*one);
 	doWork3();
 }
 
@@ -117,8 +117,8 @@ void doWork2Children(void)
 {
 	Executor* one = new Executor(&doWork1Children);
 	Executor* two = new Executor(&doWork1Children);
-	Scheduler::single().enqueue(*one);
-	Scheduler::single().enqueue(*two);
+	Scheduler::single.enqueue(*one);
+	Scheduler::single.enqueue(*two);
 	doWork3();
 }
 
@@ -127,9 +127,9 @@ void doWork3Children(void)
 	Executor* one = new Executor(&doWork2Children);
 	Executor* two = new Executor(&doWork2Children);
 	Executor* three = new Executor(&doWork2Children);
-	Scheduler::single().enqueue(*one);
-	Scheduler::single().enqueue(*two);
-	Scheduler::single().enqueue(*three);
+	Scheduler::single.enqueue(*one);
+	Scheduler::single.enqueue(*two);
+	Scheduler::single.enqueue(*three);
 	doWork3();
 }
 
@@ -462,7 +462,7 @@ protected:
 			}
 			
 			frame++;
-			Scheduler::single().enqueueAndWaitOnChildren(work);
+			Scheduler::single.enqueueAndWaitOnChildren(work);
 			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
 		}
 	}
@@ -604,7 +604,7 @@ void TestJob::execute(void)
 		std::string name = getFormattedName(m_requirement->getID(), jobNumber, maxJobs);
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
-		concurrency::Scheduler::single().enqueue(*executor);
+		concurrency::Scheduler::single.enqueue(*executor);
 	}
 
 	if (delete_self)
@@ -688,10 +688,23 @@ void testEngineLoop(void)
 
 // #include <map>
 
+class StuffDoer : public Singleton<StuffDoer>
+{	
+	friend class Singleton<StuffDoer>;
+public:
+	int doOtherStuff(void) const { return 7; }
+	
+protected:
+	StuffDoer() {}
+};
+
 void onPlay(void)
 {
-	sandbox::verifyUnitTests();
+	// sandbox::verifyUnitTests();
 	sandbox::tableRnD();
+
+	StuffDoer::single.doOtherStuff();
+
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
 	/*
@@ -703,7 +716,7 @@ void onPlay(void)
 	delete runMe;
 	
 	executor = new concurrency::Executor(&doWork3);
-	concurrency::Scheduler::single().enqueueAndWait(*executor);
+	concurrency::Scheduler::single.enqueueAndWait(*executor);
 	printf("Waited Scheduler\n");
 	
 	
@@ -733,9 +746,9 @@ void onPlay(void)
 	}
 	
 	Executor* original = new Executor(&doWork3Children);
-	Scheduler::single().enqueueAndWaitOnChildren(*original);
+	Scheduler::single.enqueueAndWaitOnChildren(*original);
 	// Executor* original = new Executor(&simpleChildrenPost);
-	// Scheduler::single().enqueueAndWaitOnChildren(*original);
+	// Scheduler::single.enqueueAndWaitOnChildren(*original);
 	printf("Nice!  That was awesome!");
 	*/
 	// Thread* runMe = new Thread*[];
