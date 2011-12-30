@@ -49,20 +49,20 @@ void sandbox::tableRnD(void)
 	myarray.set(0, outstanding);
 	myarray.set(1, outstanding);
 	myarray.set(30, outstanding);
+	myarray.pushBack(outstanding);
+	myarray.insert(outstanding, 10);
 
-	RedBlackTree<sint>* mine(NULL);
-	Table< RedBlackTree<sint>* >::Key iter;
+	
+	Table<int>::Key iter;
+	Table<int> mynumbs;
+	mynumbs.pushBack(1);
+	mynumbs.pushBack(2);
+	mynumbs.set(6, 1);
 
-	while (myarray.iterate(iter, mine))
+	int mine;
+	while (mynumbs.iterate(iter, mine))
 	{
-		if (mine == outstanding)
-		{
-			printf("awesome");
-		}
-		else
-		{
-			printf("oh, crap!");
-		}
+		printf("Mine: %d\n", mine);
 	}
 
 	std::map<const char*, RedBlackTree<sint>*> numberToTree;
@@ -76,7 +76,7 @@ void sandbox::tableRnD(void)
 	String::Immutable imm("awesome");
 	Table< RedBlackTree<sint>* >::Key karg("awesome");
 	
-	if (karg.type)
+	if (karg.isValid())
 		printf("Karg is valid");
 	else
 		printf("awesome");
@@ -84,7 +84,7 @@ void sandbox::tableRnD(void)
 	Table< RedBlackTree<sint>* >::Key kkarg(arg);
 	Table< RedBlackTree<sint>* >::Key kimm(imm);
 
-	if (kimm.type && kkarg.type)
+	if (kimm.isValid() && kkarg.isValid())
 		printf("awesome");
 
 	Table< RedBlackTree<sint>* > mytable;

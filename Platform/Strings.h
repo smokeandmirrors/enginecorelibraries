@@ -165,6 +165,7 @@ public:
 			internal->release();
 			internal = source.internal;
 			internal->acquire();
+			return *this;
 		}
 
 		inline bool

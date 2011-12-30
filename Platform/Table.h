@@ -29,8 +29,11 @@ template<typename ELEMENT>
 class Table 
 {
 public:
-	struct Key
+	class Key
 	{
+	friend class Table;
+
+	public:
 		enum Type
 		{
 			boolean = 1 << 0,
@@ -86,24 +89,31 @@ public:
 		, key(algorithms::computeHash(source))
 		{/* empty */}
 		
-		bool operator!(void) const
+		inline bool
+			isValid(void) const
+		{
+			return (type & Key::invalid) == 0;
+		}
+
+		inline bool 
+			operator!(void) const
 		{
 			return (type & Key::invalid) != 0;
 		}
 
-		bool operator==(const Key& other) const
+		inline bool 
+			operator==(const Key& other) const
 		{
 			return (type & other.type) && key == other.key;
 		}
 
-		Key& operator=(const Key& source)
+		inline Key& 
+			operator=(const Key& source)
 		{
-			
-			algorithms::hash& mutableKey = const_cast<algorithms::hash&>(key);
-			mutableKey = source.key;
-			Type& mutableType = const_cast<Type&>(type);
-			mutableType = source.type;
+			key = source.key;
+			type = source.type;
 			original = source.original;
+			originalKeyString = source.originalKeyString;
 			return *this;
 		}
 
@@ -129,17 +139,23 @@ public:
 			originalType(sreal source) 
 				: keyReal(source) {}
 			
-		} original;
+		} original; // union originalType
+
+	private:
+		inline void 
+			beginIteration(void)
+		{
+			type = Key::integer;
+		}
 
 		String::Immutable
 			originalKeyString;
 
-		const Type 
+		Type 
 			type;
 
-		const algorithms::hash 
+		algorithms::hash 
 			key;
-
 	}; // Key
 
 private:
@@ -243,6 +259,9 @@ public:
 	const ELEMENT& 
 		get(const Key& key) const;
 	
+	void
+		insert(const ELEMENT& value, sint index);
+
 	bool
 		iterate(Key& key, ELEMENT& value)
 	{
@@ -262,6 +281,12 @@ public:
 	bool 
 		has(const Key& key) const;
 
+	ELEMENT&
+		popBack(void);
+
+	void
+		pushBack(const ELEMENT& value);
+	
 	void
 		remove(const Key& key);
 	
@@ -269,7 +294,7 @@ public:
 		reserve(sint reserveArraySize, sint reserveHashSize=0);
 	
 	void
-		set(const Key& key, ELEMENT&);
+		set(const Key& key, const ELEMENT& value);
 
 private:
 	/// \todo will template versions of these be unnecessarily generated? 
@@ -294,6 +319,9 @@ private:
 
 	static Node
 		dummyNode;
+	// auxiliary search function (which is duplicate code in ltable.c)
+	inline sint 
+		binarySearch(uint high, uint low) const;
 	// static int numusearray (const Table *t, int *nums)
 	inline sint 
 		countKeysInArray(sint* perSlotOutput) const;
@@ -305,7 +333,10 @@ private:
 		getInternal(const Key& key) const;
 	// static int findindex (lua_State *L, Table *t, StkId key)
 	inline sint 
-		findIndex(const Key& key) const;
+		findIndex(Key& key) const;
+	// LUAI_FUNC int luaH_getn (Table *t);
+	inline sint
+		findLowestValidNumericalIndexFollowedByInvalidValue(void) const;
 	// const TValue *luaH_getint (Table *t, int key);
 	inline Value*
 		findValueWithSignedInteger(const Key& key) const;
@@ -357,8 +388,8 @@ private:
 	inline Value*
 		setInternal(const Key& key);
 	// void luaH_setint (lua_State *L, Table *t, int key, TValue *value);
-	inline void /* very good optimization candidate? */
-		setWithInteger(const Key& key, ELEMENT& value);
+	inline Value* /* very good optimization candidate? */
+		setWithInteger(const Key& key, const ELEMENT& value);
 	// lu_byte lsizenode;
 	uchar 
 		log2HashPartSize;
@@ -376,11 +407,6 @@ private:
 		arrayPart;
 }; // Table
 
-} // namespace containers
-
-
-namespace containers
-{
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Node Table<ELEMENT>::dummyNode(Table<ELEMENT>::createDummyNode());
 
@@ -550,10 +576,11 @@ typename Table<ELEMENT>::Node Table<ELEMENT>::createDummyNode(void)
 }
 
 template<typename ELEMENT>
-sint Table<ELEMENT>::findIndex(const Key& iter) const
+sint Table<ELEMENT>::findIndex(Key& iter) const
 {
 	if (!iter)
 	{// first iteration
+		iter.beginIteration();
 		return -1;
 	}
 	else
@@ -573,8 +600,7 @@ sint Table<ELEMENT>::findIndex(const Key& iter) const
 			{
 				if (n->key == iter)
 				{
-					assert(n - hashPart == n - &hashPart[0]);
-					return static_cast<sint>(n - hashPart);
+					return static_cast<sint>(n - hashPart) + arrayPartSize;
 				}
 				else
 				{
@@ -586,6 +612,67 @@ sint Table<ELEMENT>::findIndex(const Key& iter) const
 			assert(false);
 			return -2;
 		}
+	}
+}
+
+template<typename ELEMENT>
+sint Table<ELEMENT>::binarySearch(uint high, uint low) const
+{
+	while (high - low > 1)
+	{
+		uint middle = (high + low) / 2;
+
+		if (!arrayPart[middle - 1])
+		{
+			high = middle;
+		}
+		else
+		{
+			low = middle;
+		}
+	}
+
+	return static_cast<sint>(low);
+}
+
+template<typename ELEMENT>
+sint Table<ELEMENT>::findLowestValidNumericalIndexFollowedByInvalidValue(void) const
+{
+	uint high = arrayPartSize;
+
+	if (arrayPartSize > 0 && !arrayPart[high - 1])
+	{	// there is a boundary in the array part, binary search for it
+		/// \todo why binary search here, are the arry keys sorted somehow?
+		return binarySearch(high, 0);
+	}
+	else if (hashPart == &dummyNode)
+	{
+		return static_cast<sint>(high) - 1;
+	}
+	else
+	{	// unbound search
+		uint low = high;
+		high++;
+
+		while (findValueWithSignedInteger(high))
+		{	// find high and low such that high is present and low is not
+			low = high;
+			high *= 2;
+			
+			if (static_cast<sint>(high) > (INT_MAX-2))
+			{	// "table was built with bad purposes: resort to linear search" - ltable.c
+				low = 0;
+				
+				while (findValueWithSignedInteger(low))
+				{
+					low++;
+				}
+
+				return low;
+			}
+		}
+		// now binary search between them
+		return binarySearch(high, low);
 	}
 }
 
@@ -605,7 +692,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::findValueWithSignedInteger(const
 	do 
 	{
 		if (n->key.type & Key::integer
-			&& n->key.original.keyInteger == key.original.keyInteger)
+		&& n->key.original.keyInteger == key.original.keyInteger)
 		{
 			return &n->value;
 		}
@@ -764,6 +851,28 @@ bool Table<ELEMENT>::has(const Key& key) const
 }
 
 template<typename ELEMENT> 
+void Table<ELEMENT>::insert(const ELEMENT& value, sint index)
+{
+	sint lowest = findLowestValidNumericalIndexFollowedByInvalidValue() + 1;
+	
+	if (index > lowest)
+		lowest = index;
+	
+	Key key(1);
+
+	for (sint i = lowest; i > index; i--)
+	{
+		key.original.keyInteger = i - 1;
+		Value* v = findValueWithSignedInteger(key);
+		key.original.keyInteger = i;
+		setWithInteger(key, v->value);
+	}
+
+	Value* v = setWithInteger(index, value);
+	v->validate();
+}
+
+template<typename ELEMENT> 
 bool Table<ELEMENT>::isMainPositionIsTaken(Node* mainPosition) const
 {
 	return mainPosition->value || (mainPosition == &dummyNode);
@@ -805,7 +914,7 @@ bool Table<ELEMENT>::next(Key& iter, Value*& value) const
 		if (arrayPart[index])
 		{
 			value = &arrayPart[index];
-			iter.original.keyInteger = index + 1;
+			iter.original.keyInteger = index;
 			return true;
 		}
 	}
@@ -835,7 +944,7 @@ bool Table<ELEMENT>::next(Key& iter, Value*& value) const
 template<typename ELEMENT>
 typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 {
-	assert(key); 
+	assert(key.isValid()); 
 	Node* mainPosition = getMainPosition(key);
 		
 	if (isMainPositionIsTaken(mainPosition))
@@ -881,6 +990,13 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 	return &(mainPosition->value);
 }
 
+template<typename ELEMENT>
+void Table<ELEMENT>::pushBack(const ELEMENT& value)
+{
+	sint index = findLowestValidNumericalIndexFollowedByInvalidValue() + 1;
+	Value* v = setWithInteger(index, value);
+	v->validate();
+}
 
 template<typename ELEMENT> 
 void Table<ELEMENT>::rehash(const Key& key)
@@ -1032,7 +1148,7 @@ void Table<ELEMENT>::resizeHash(uint newHashSize)
 
 
 template<typename ELEMENT> 
-void Table<ELEMENT>::set(const Key& key, ELEMENT& value)
+void Table<ELEMENT>::set(const Key& key, const ELEMENT& value)
 {
 	Value& v = *setInternal(key);
 	v.value = value;
@@ -1053,7 +1169,7 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::setInternal(const Key& key)
 }
 
 template<typename ELEMENT> 
-void Table<ELEMENT>::setWithInteger(const Key& key, ELEMENT& value)
+typename Table<ELEMENT>::Value* Table<ELEMENT>::setWithInteger(const Key& key, const ELEMENT& value)
 {	
 	Value* position = findValueWithSignedInteger(key);
 	
@@ -1063,6 +1179,7 @@ void Table<ELEMENT>::setWithInteger(const Key& key, ELEMENT& value)
 	}
 	
 	position->value = value;
+	return position;
 }
 
 template<typename ELEMENT> 
