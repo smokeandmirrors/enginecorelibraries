@@ -14,8 +14,22 @@ Lua table.
 
 \todo iteration (next)
 \todo sort
+\todo remove
+\todo popback
+\todo pushback
 
 */
+
+
+template<typename T> 
+class isLess
+{
+public:
+	bool operator()(const T& a, const T& b) const
+	{
+		return a < b;
+	}
+};
 
 namespace containers
 {
@@ -28,11 +42,13 @@ static const sint invalid(0);
 template<typename ELEMENT>
 class Table 
 {
+	class Value;
 public:
+	friend class Iterator;
+
 	class Key
 	{
 	friend class Table;
-
 	public:
 		enum Type
 		{
@@ -158,6 +174,74 @@ public:
 			key;
 	}; // Key
 
+	class Iterator
+	{
+	friend class Table;
+	public:
+		Iterator(Table& table)
+			: k(table.getIterator())
+			, t(table)
+			, v(NULL)
+		{
+			shouldContinue = t.next(k, v);
+		}
+
+		operator bool(void) const
+		{
+			return shouldContinue;
+		}
+
+		bool
+			operator!(void) const
+		{
+			return !shouldContinue;
+		}
+
+		Iterator& 
+			operator ++(void) 
+		{
+			shouldContinue = t.next(k, v);
+			return *this;
+		}
+
+		Iterator
+			operator ++(int)
+		{
+			shouldContinue = t.next(k, v);
+			return *this;
+		}
+
+		ELEMENT&
+			operator->(void)
+		{
+			return v->value;
+		}	
+
+		ELEMENT&
+			operator*(void)
+		{
+			return v->value;
+		}
+
+	private:
+		Iterator(void);
+		
+		Iterator
+			operator=(const Iterator&);
+
+		bool
+			shouldContinue;
+
+		Table& 
+			t;
+
+		Value*
+			v;
+		
+		Key 
+			k;
+	}; // class Iterator
+
 private:
 	class Value
 	{
@@ -260,28 +344,12 @@ public:
 		get(const Key& key) const;
 	
 	void
-		insert(const ELEMENT& value, sint index);
-
-	bool
-		iterate(Key& key, ELEMENT& value)
-	{
-		Value* v(NULL);
-		
-		if (next(key, v))
-		{
-			value = v->value;
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
+		insertAtIndex(const ELEMENT& value, uint index);
 
 	bool 
 		has(const Key& key) const;
 
-	ELEMENT&
+	void
 		popBack(void);
 
 	void
@@ -290,11 +358,21 @@ public:
 	void
 		remove(const Key& key);
 	
+	void
+		removeAtIndex(sint index);
+		
 	void 
 		reserve(sint reserveArraySize, sint reserveHashSize=0);
 	
 	void
 		set(const Key& key, const ELEMENT& value);
+
+	template<typename COMPARATOR> inline void 
+		sort(COMPARATOR predicate)
+	{
+		sint hi = findLowestValidNumericalIndexFollowedByInvalidValue();
+		sortImplementation(0, hi, predicate);		
+	}
 
 private:
 	/// \todo will template versions of these be unnecessarily generated? 
@@ -346,6 +424,8 @@ private:
 	// static Node *getfreepos (Table *t)
 	inline Node*
 		getFreePosition(void);
+	inline Key
+		getIterator(void) const;
 	// #define hashboolean(t,p)        hashpow2(t, p)
 	inline Node*
 		getPositionHashMod(const Key& key) const;
@@ -367,8 +447,8 @@ private:
 	inline bool
 		isMainPositionIsTaken(Node*) const;
 	// LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
-	inline bool
-		next(Key& iter, Value*& value) const;
+	inline bool 
+		next(Key& k, Value*& v) const;
 	// TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key)
 	inline Value*
 		newKey(const Key& key);
@@ -390,6 +470,137 @@ private:
 	// void luaH_setint (lua_State *L, Table *t, int key, TValue *value);
 	inline Value* /* very good optimization candidate? */
 		setWithInteger(const Key& key, const ELEMENT& value);
+	// auxsort
+	template<typename COMPARATOR> inline void 
+		sortImplementation(sint lo, sint hi, const COMPARATOR& predicate)
+	{
+		/*
+		Quicksort
+		** (based on `Algorithms in MODULA-3', Robert Sedgewick;
+		**  Addison-Wesley, 1993.)
+		** based on ltablib.c
+		*/
+		while (lo < hi)
+		{	// sort elements t[lo], t[(lo + hi) / 2] and t[hi] 
+			sint i, j;
+			{
+				{
+					const ELEMENT& vlo = get(lo);
+					const ELEMENT& vhi = get(hi);
+					
+					if (predicate(vlo, vhi))
+					{	// a[lo] < a[hi]
+						swap(vlo, lo, vhi, hi);
+					}
+				}
+				// there are only two
+				if ((hi-lo) == 1)
+					break; 
+
+				i = (lo + hi) / 2;
+
+				{
+					const ELEMENT& vi = get(i);
+					const ELEMENT& vlo = get(lo);
+					
+					if (predicate(vi, vlo))
+					{	// a[i] < a[lo]
+						swap(vi, i, vlo, lo);
+					}
+					else
+					{
+						const ELEMENT& vhi = get(hi);
+
+						if (predicate(vhi, vi))
+						{	// a[hi] < a[i]
+							swap(vi, i, vhi, hi);
+						}
+					}
+				}
+				// there are only 3
+				if ((hi - lo) == 2)
+					break;
+			}
+			// t[lo] <= Pivot == t[hi -1] <= t[hi]; sort lo+1 to hi-2
+			{
+				// pivot
+				const ELEMENT& pivot = get(i);
+				const ELEMENT& vhiMinusOne = get(hi - 1);
+				swap(pivot, i, vhiMinusOne, hi - 1);
+				i = lo;
+				j = hi - 1;
+				
+				for (;;) // invariant: t[lo..i] <= Pivot <= t[j..hi]
+				{	// repeat ++i until t[i] >= Pivot
+					for(;;)
+					{
+						++i;
+						const ELEMENT& vi = get(i);
+						if (predicate(vi, pivot))
+						{
+							assert(i >= hi); // , "invalid sort function");
+						}
+						else
+						{
+							break;
+						}
+					} // repeat ++i until t[i] >= Pivot
+					// repeat --j until t[j] <= Pivot
+					for(;;)
+					{
+						--j;
+						const ELEMENT& vj = get(j);
+						if (predicate(pivot, vj))
+						{
+							assert(j <= lo); // , "invalid sort function");
+						}
+						else
+						{
+							break;
+						}		
+					} // repeat --j until t[j] <= Pivot
+
+					if (j < i)
+					{
+						break;
+					}
+
+					const ELEMENT& vi = get(i);
+					const ELEMENT& vj = get(j);
+					swap(vi, i, vj, j);
+					
+				} // invariant: t[lo..i] <= Pivot <= t[j..hi]	
+			} 
+			// swap pivot (a[u-1]) with a[i]
+			const ELEMENT& pivot = get(i);
+			const ELEMENT& vhiMinusOne = get(hi - 1);
+			swap(pivot, i, vhiMinusOne, hi - 1);			
+			// a[l..i-1] <= a[i] == P <= a[i+1..u] 
+			// adjust so that smaller half is in [j..i] and larger one in [l..u] 
+ 			if (i - lo < hi - 1)
+			{
+				--i;
+				j = lo;
+				lo = i + 2;
+			}
+			else
+			{
+				j = i + 1;
+				i = hi;
+				hi = j - 2;
+			}
+
+			sortImplementation(j, i, predicate);
+		}
+	}
+
+	inline void
+		swap(const ELEMENT& vlo, const Key& lo, const ELEMENT& vhi, const Key& hi) 
+	{
+		set(lo, vhi);
+		set(hi, vlo);
+	}
+
 	// lu_byte lsizenode;
 	uchar 
 		log2HashPartSize;
@@ -643,7 +854,7 @@ sint Table<ELEMENT>::findLowestValidNumericalIndexFollowedByInvalidValue(void) c
 	if (arrayPartSize > 0 && !arrayPart[high - 1])
 	{	// there is a boundary in the array part, binary search for it
 		/// \todo why binary search here, are the arry keys sorted somehow?
-		return binarySearch(high, 0);
+		return binarySearch(high, 0) - 1;
 	}
 	else if (hashPart == &dummyNode)
 	{
@@ -659,7 +870,7 @@ sint Table<ELEMENT>::findLowestValidNumericalIndexFollowedByInvalidValue(void) c
 			low = high;
 			high *= 2;
 			
-			if (static_cast<sint>(high) > (INT_MAX-2))
+			if (static_cast<sint>(high) > (INT_MAX - 2))
 			{	// "table was built with bad purposes: resort to linear search" - ltable.c
 				low = 0;
 				
@@ -668,11 +879,11 @@ sint Table<ELEMENT>::findLowestValidNumericalIndexFollowedByInvalidValue(void) c
 					low++;
 				}
 
-				return low;
+				return low - 1;
 			}
 		}
 		// now binary search between them
-		return binarySearch(high, low);
+		return binarySearch(high, low) - 1;
 	}
 }
 
@@ -744,6 +955,12 @@ template<typename ELEMENT>
 const ELEMENT& Table<ELEMENT>::get(const Key& key) const
 {	
 	return get(key);
+}
+
+template<typename ELEMENT>
+typename Table<ELEMENT>::Key Table<ELEMENT>::getIterator(void) const
+{
+	return Key();
 }
 
 template<typename ELEMENT> 
@@ -851,24 +1068,27 @@ bool Table<ELEMENT>::has(const Key& key) const
 }
 
 template<typename ELEMENT> 
-void Table<ELEMENT>::insert(const ELEMENT& value, sint index)
+void Table<ELEMENT>::insertAtIndex(const ELEMENT& value, uint p)
 {
-	sint lowest = findLowestValidNumericalIndexFollowedByInvalidValue() + 1;
-	
-	if (index > lowest)
-		lowest = index;
-	
+	sint position = static_cast<sint>(p);
+	sint index = findLowestValidNumericalIndexFollowedByInvalidValue();
+
+	if (position > index && index >= 0)
+	{
+		index = position;
+	}
+
 	Key key(1);
 
-	for (sint i = lowest; i > index; i--)
+	for (sint i = index; i > position; i--)
 	{
-		key.original.keyInteger = i - 1;
-		Value* v = findValueWithSignedInteger(key);
 		key.original.keyInteger = i;
+		Value* v = findValueWithSignedInteger(key);
+		key.original.keyInteger = i + 1;
 		setWithInteger(key, v->value);
 	}
 
-	Value* v = setWithInteger(index, value);
+	Value* v = setWithInteger(position, value);
 	v->validate();
 }
 
@@ -909,6 +1129,7 @@ template<typename ELEMENT>
 bool Table<ELEMENT>::next(Key& iter, Value*& value) const
 {
 	sint index = findIndex(iter) + 1;
+	
 	for (; index < static_cast<sint>(arrayPartSize); index++)
 	{
 		if (arrayPart[index])
@@ -991,6 +1212,18 @@ typename Table<ELEMENT>::Value* Table<ELEMENT>::newKey(const Key& key)
 }
 
 template<typename ELEMENT>
+void Table<ELEMENT>::popBack(void)
+{
+	sint index = findLowestValidNumericalIndexFollowedByInvalidValue();
+	
+	if (index >= 0)
+	{
+		Value* v = findValueWithSignedInteger(index);
+		v->invalidate();
+	}
+}
+
+template<typename ELEMENT>
 void Table<ELEMENT>::pushBack(const ELEMENT& value)
 {
 	sint index = findLowestValidNumericalIndexFollowedByInvalidValue() + 1;
@@ -1025,6 +1258,28 @@ void Table<ELEMENT>::remove(const Key& key)
 	{
 		value->invalidate();
 	}
+}
+
+template<typename ELEMENT>
+void Table<ELEMENT>::removeAtIndex(sint position)
+{
+	sint index = findLowestValidNumericalIndexFollowedByInvalidValue();
+	
+	if (position >= 0 
+	&& index >= 0 
+	&& position <= index)
+	{
+		Value* atPosition = findValueWithSignedInteger(position);
+
+		for (; position < index; position++)
+		{
+			Value* atPositionPlusOne = findValueWithSignedInteger(position + 1);
+			*atPosition = *atPositionPlusOne;
+			atPosition = atPositionPlusOne;
+		}
+		// 
+		atPosition->invalidate();
+	}	
 }
 
 template<typename ELEMENT>

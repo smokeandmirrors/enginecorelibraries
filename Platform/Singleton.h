@@ -28,12 +28,8 @@ Unit Tested			:	NO
 Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
-
-
-\todo get rid of the thread safety of this class and use a registration system instead that registers
-all singletons in the beginning of main()
-
 */
+
 #include "Platform.h"
 
 namespace designPatterns
@@ -69,7 +65,13 @@ protected:
 private:
 	// not allowed
 	Singleton(const Singleton&);
-	Singleton operator=(const Singleton&);
+	
+	Singleton 
+		operator=(const Singleton&);
+	
+	template<typename ANY> 
+	Singleton 
+		operator=(const ANY&);
 }; // class Singleton
 // static initialization
 template<typename T> T Singleton<T>::single; 

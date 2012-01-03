@@ -50,19 +50,27 @@ void sandbox::tableRnD(void)
 	myarray.set(1, outstanding);
 	myarray.set(30, outstanding);
 	myarray.pushBack(outstanding);
-	myarray.insert(outstanding, 10);
+	myarray.insertAtIndex(outstanding, 10);
 
-	
-	Table<int>::Key iter;
 	Table<int> mynumbs;
 	mynumbs.pushBack(1);
 	mynumbs.pushBack(2);
-	mynumbs.set(6, 1);
-
-	int mine;
-	while (mynumbs.iterate(iter, mine))
+	mynumbs.set(6, 30);
+	
+	for (Table<int>::Iterator i(mynumbs); i; i++)
 	{
-		printf("Mine: %d\n", mine);
+		printf("MyNumbs: %d\n", *i);
+	}
+
+
+	printf("mynumbs[0]: %d\n", mynumbs.get(0));
+	printf("mynumbs[2]: %d\n", mynumbs.get(2));
+
+	mynumbs.sort(isLess<sint>());
+
+	for (Table<int>::Iterator i(mynumbs); i; i++)
+	{
+		printf("MyNumbs: %d\n", *i);
 	}
 
 	std::map<const char*, RedBlackTree<sint>*> numberToTree;
