@@ -53,9 +53,9 @@ void sandbox::tableRnD(void)
 	myarray.insertAtIndex(outstanding, 10);
 
 	Table<int> mynumbs;
-	mynumbs.pushBack(1);
+	mynumbs.pushBack(30);
 	mynumbs.pushBack(2);
-	mynumbs.set(6, 30);
+	mynumbs.set(6, 6);
 	
 	for (Table<int>::Iterator i(mynumbs); i; i++)
 	{
@@ -63,10 +63,7 @@ void sandbox::tableRnD(void)
 	}
 
 
-	printf("mynumbs[0]: %d\n", mynumbs.get(0));
-	printf("mynumbs[2]: %d\n", mynumbs.get(2));
-
-	mynumbs.sort(isLess<sint>());
+	mynumbs.sort(isGreater<sint>());
 
 	for (Table<int>::Iterator i(mynumbs); i; i++)
 	{

@@ -349,6 +349,10 @@
 				RelativePath=".\UTSignals.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\UTTable.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="EmbeddedLua"
@@ -458,6 +462,10 @@
 				</Filter>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\UTExample.cpp"
+			>
+		</File>
 		<File
 			RelativePath=".\UTTools.cpp"
 			>

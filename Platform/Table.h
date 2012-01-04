@@ -9,17 +9,9 @@
 #include "Strings.h"
 
 /**
-An implementation of an associative array, based on the
-Lua table.
-
-\todo iteration (next)
-\todo sort
-\todo remove
-\todo popback
-\todo pushback
-
+An implementation of an associative array, explicity based on the
+Lua table as much as possible.
 */
-
 
 template<typename T> 
 class isLess
@@ -28,6 +20,16 @@ public:
 	bool operator()(const T& a, const T& b) const
 	{
 		return a < b;
+	}
+};
+
+template<typename T> 
+class isGreater
+{
+public:
+	bool operator()(const T& a, const T& b) const
+	{
+		return a > b;
 	}
 };
 
@@ -368,7 +370,7 @@ public:
 		set(const Key& key, const ELEMENT& value);
 
 	template<typename COMPARATOR> inline void 
-		sort(COMPARATOR predicate)
+		sort(COMPARATOR predicate=isGreater<ELEMENT>())
 	{
 		sint hi = findLowestValidNumericalIndexFollowedByInvalidValue();
 		sortImplementation(0, hi, predicate);		
@@ -536,9 +538,10 @@ private:
 					{
 						++i;
 						const ELEMENT& vi = get(i);
+						
 						if (predicate(vi, pivot))
 						{
-							assert(i >= hi); // , "invalid sort function");
+							// assert(i >= hi); // , "invalid sort function");
 						}
 						else
 						{
@@ -550,9 +553,10 @@ private:
 					{
 						--j;
 						const ELEMENT& vj = get(j);
+						
 						if (predicate(pivot, vj))
 						{
-							assert(j <= lo); // , "invalid sort function");
+							// assert(j <= lo); // , "invalid sort function");
 						}
 						else
 						{
@@ -577,7 +581,7 @@ private:
 			swap(pivot, i, vhiMinusOne, hi - 1);			
 			// a[l..i-1] <= a[i] == P <= a[i+1..u] 
 			// adjust so that smaller half is in [j..i] and larger one in [l..u] 
- 			if (i - lo < hi - 1)
+ 			if ((i - lo) < (hi - 1))
 			{
 				--i;
 				j = lo;
@@ -595,7 +599,7 @@ private:
 	}
 
 	inline void
-		swap(const ELEMENT& vlo, const Key& lo, const ELEMENT& vhi, const Key& hi) 
+		swap(const ELEMENT vlo, const Key& lo, const ELEMENT vhi, const Key& hi) 
 	{
 		set(lo, vhi);
 		set(hi, vlo);

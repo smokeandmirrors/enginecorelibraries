@@ -174,6 +174,18 @@ public:
 			return internal == other.internal;
 		}
 
+		inline bool
+			operator<(const Immutable& other) const
+		{
+			return compare(*this, other) < 0;
+		}
+
+		inline bool
+			operator>(const Immutable& other) const
+		{
+			return compare(*this, other) > 0;
+		}
+
 	private:
 		const ImmutableInternal*
 			internal;
