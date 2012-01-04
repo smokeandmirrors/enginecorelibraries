@@ -490,8 +490,8 @@ private:
 					const ELEMENT& vlo = get(lo);
 					const ELEMENT& vhi = get(hi);
 					
-					if (predicate(vlo, vhi))
-					{	// a[lo] < a[hi]
+					if (predicate(vhi, vlo))
+					{	// a[vhi] < a[vlo]
 						swap(vlo, lo, vhi, hi);
 					}
 				}
@@ -541,7 +541,7 @@ private:
 						
 						if (predicate(vi, pivot))
 						{
-							// assert(i >= hi); // , "invalid sort function");
+							assert(i <= hi); // invalid sort function
 						}
 						else
 						{
@@ -556,7 +556,7 @@ private:
 						
 						if (predicate(pivot, vj))
 						{
-							// assert(j <= lo); // , "invalid sort function");
+							assert(j >= lo); // invalid sort function
 						}
 						else
 						{
@@ -581,10 +581,10 @@ private:
 			swap(pivot, i, vhiMinusOne, hi - 1);			
 			// a[l..i-1] <= a[i] == P <= a[i+1..u] 
 			// adjust so that smaller half is in [j..i] and larger one in [l..u] 
- 			if ((i - lo) < (hi - 1))
+ 			if ((i - lo) < (hi - i))
 			{
-				--i;
 				j = lo;
+				--i;
 				lo = i + 2;
 			}
 			else
