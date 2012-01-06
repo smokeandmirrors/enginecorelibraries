@@ -16,7 +16,6 @@ class String
 	friend class designPatterns::Singleton<String>;
 
 public:
-	class Argument;
 	class Immutable;
 	class Mutable;
 	
@@ -55,55 +54,31 @@ public:
 	class Argument
 	{
 	public:
-		Argument(const char* v)
-		: cStyleString(v)
-		, size(-1)
-		{ assert(cStyleString != NULL); }
-
-		Argument(const schar* v, size_t valueLength)
-		: cStyleString(v)
-		, size(static_cast<sint>(valueLength))
-		{ assert(cStyleString != NULL); }
-
 		Argument(const std::string& v)
-		: cStyleString(NULL)
-		, cppStyleString(&v) // could I be taking the address of temporaries here?
-		{ assert(cppStyleString != NULL); }
+		: cppStyleString(v) // could I be taking the address of temporaries here?
+		{}
+
+		Argument(const schar* v)
+		: cppStyleString(v) // could I be taking the address of temporaries here?
+		{}
 
 		const char* 
 			c_str(void) const
 		{
-			return cStyleString ? cStyleString : cppStyleString->c_str();
+			return cppStyleString.c_str();
 		}
 
 		size_t
 			length(void) const
 		{
-			if (cStyleString)
-			{
-				if (size > 0)
-				{
-					return size;
-				}
-				else
-				{	
-					return strlen(cStyleString);
-				}
-			}
-			else
-			{
-				return cppStyleString->length();
-			} 
+			return cppStyleString.length();
 		}
 
 	private:
-		const schar*
-			cStyleString;
+		Argument(const Argument&);
+		Argument& operator=(const Argument&);
 
-		sint 
-			size;
-
-		const std::string*
+		const std::string
 			cppStyleString;
 	}; // Argument
 
@@ -118,6 +93,12 @@ public:
 			internal->acquire();
 		}
 		
+		inline Immutable(const schar* s)
+		: internal(&String::single.find(s))
+		{
+			internal->acquire();
+		}
+
 		inline Immutable(const Argument& s)
 		: internal(&String::single.find(s))
 		{
@@ -132,7 +113,7 @@ public:
 
 		~Immutable(void)
 		{
-			internal->release();
+  			internal->release();
 		}
 
 		inline void

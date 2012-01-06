@@ -1,6 +1,6 @@
 #pragma once
 #ifndef BUILD_H
-#define BUILD_H
+#define BUILD_H 1
 /**
 \file Build.h 
 Defines typdefs, macros for the foundation for programming in
@@ -34,6 +34,7 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 #include <assert.h>
+#include <stdio.h>
 
 #ifndef NULL
 #ifdef __cplusplus

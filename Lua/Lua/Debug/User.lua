@@ -1,5 +1,25 @@
 require'Utilities'
 
+function go()
+	t = {}
+	for i=6,1,-1 do
+		table.insert(t, i)
+	end
+	--[[
+	table.insert(t, -6)
+	table.insert(t, -8)
+	table.insert(t, 8)
+	table.insert(t, 8)
+	table.insert(t, -6)
+	table.insert(t, -1)
+	table.insert(t, -10)
+	table.insert(t, 4)
+	table.insert(t, -3)
+	table.insert(t, -9)
+	--]]
+	table.sort(t)
+end
+
 function isGlobal()
 	_G.t = {}
 	local t = _G.t

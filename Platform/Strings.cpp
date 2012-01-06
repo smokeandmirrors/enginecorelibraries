@@ -28,15 +28,15 @@ const String::ImmutableInternal& String::find(const Argument& search)
 	for (ImmutableInternal* s = table[index]; s != NULL; s = s->next)
 	{
 		if (s->hashCode == key 
-			&& s->string.size() == search_size
-			&& String::isEqual(s->string.c_str(), search_string))
+		&& s->string.size() == search_size
+		&& String::isEqual(s->string.c_str(), search_string))
 		{	// found the key
 			return *s;
 		}
 	}
 	// not found, create a new name	
 	if (numUsed >= table.size() 
-		&& table.size() <= (INT_MAX / 2))
+	&& table.size() <= (INT_MAX / 2))
 	{
 		resizeImmutableTable(static_cast<uint>(table.size() * 2));
 	}
@@ -54,6 +54,12 @@ void String::notifyDeadString(const ImmutableInternal* dead)
 {
 	const uint index = algorithms::modHashPowerOf2(dead->hashCode, static_cast<uint>(table.size()));
 	ImmutableInternal* previous(NULL);
+
+	if (index == 32)
+	{
+		printf("break");
+	}
+
 	ImmutableInternal* current = table[index];
 
 	IF_DEBUG( bool found(false); )
@@ -70,7 +76,7 @@ void String::notifyDeadString(const ImmutableInternal* dead)
 			}
 			else
 			{
-				table[index] = NULL;
+				table[index] = current->next;
 			}
 	
 			IF_DEBUG( found = true; )

@@ -37,6 +37,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//SANDBOX	
 
 #if EXTENDED_BY_LUA 
+	if (false)
 	{
 		embeddedLua::Lua lua;
 		lua.setPackagePath(LUA_PACKAGE_PATH_RUN_FROM_SOLUTION_DIR);

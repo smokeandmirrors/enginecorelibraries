@@ -22,7 +22,8 @@
 #include "Scheduling.h"
 #include "Synchronization.h"
 #include "Signals.h"
-
+#include "Strings.h"
+#include "Table.h"
 #include "Thread.h"
 #include "Time.h"
 #include "UnitTestVerification.h"
@@ -33,6 +34,7 @@ using namespace containers;
 using namespace concurrency;
 using namespace designPatterns;
 using namespace realTime;
+using namespace std;
 
 template<typename NUMBER>
 NUMBER getRand(NUMBER min, NUMBER max) 
@@ -52,6 +54,14 @@ sreal getRand(sreal min, sreal max)
 	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
 	return v * (max - min) + min;
 }
+
+
+template<>
+schar getRand(schar min, schar max) 
+{
+	return static_cast<schar>((rand() % (max - min)) + min);
+}
+
 
 void onPlay(void);
 
@@ -698,13 +708,19 @@ protected:
 	StuffDoer() {}
 };
 
+const char* megaString = ""
+"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz123456789012345678901";
+
+typedef std::string TestStringType; // String::Immutable
+
+
+
+
 void onPlay(void)
 {
 	// sandbox::verifyUnitTests();
-	sandbox::tableRnD();
-
+	
 	StuffDoer::single.doOtherStuff();
-
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
 	/*
@@ -819,7 +835,7 @@ void onPlay(void)
 	
 	delete pRbt;
 
-	testEngineLoop();
+	// testEngineLoop();
 	
 // 	for (int i = 0; i < 10000; i++)
 // 	{

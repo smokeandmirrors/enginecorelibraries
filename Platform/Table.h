@@ -2,7 +2,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#define DEVELOP_TABLE 1
+#define DEVELOP_TABLE 0
 #if DEVELOP_TABLE
 
 #include "Hashing.h"
@@ -11,6 +11,9 @@
 /**
 An implementation of an associative array, explicity based on the
 Lua table as much as possible.
+
+WARNING: THIS IS A LEARNING EXERCISE, AND IS NOT
+INTENDED FOR DEPLOYMENT
 */
 
 template<typename T> 
@@ -33,6 +36,25 @@ public:
 	}
 };
 
+template<> 
+class isLess<std::string>
+{
+public:
+	bool operator()(const std::string& a, const std::string& b) const
+	{
+		return String::compare(a.c_str(), b.c_str()) < 0;
+	}
+};
+
+template<> 
+class isGreater<std::string>
+{
+public:
+	bool operator()(const std::string& a, const std::string& b) const
+	{
+		return String::compare(a.c_str(), b.c_str()) > 0;
+	}
+};
 namespace containers
 {
 
@@ -65,26 +87,28 @@ public:
 		Key(void)
 		: type(Key::invalid)
 		, key(0)
+		, originalKeyString("")
 		{ /* empty */ }
 		
 		explicit Key(bool source)
 		: original(source)
 		, type(Key::boolean)
 		, key(algorithms::computeHash(source))  
+		, originalKeyString("")
 		{ /* empty */ }
 
 		Key(const char* source)
-		: original(new String::Immutable(source))
+		: originalKeyString(source)
 		, type(Key::string)
 		, key(originalKeyString.getHash())
-		{ /* empty */ }
+		{ }
 		/** 
 		\todo this below should have worked for const char* 
 		there are enough conversion operators, 
 		but it doesn't 
 		*/
 		Key(const String::Immutable& source)
-		: original(new String::Immutable(source))
+		: originalKeyString(source)
 		, type(Key::string)
 		, key(originalKeyString.getHash())
 		{ /* empty */ }
@@ -93,18 +117,21 @@ public:
 		: original(source) 
 		, type(source ? Key::pointer : Key::invalid)
 		, key(source ? algorithms::computeHash(source) : 0)
+		, originalKeyString("")
 		{/* empty */}
 
 		Key(sint source)
 		: original(source)
 		, type(Key::integer) 
 		, key(algorithms::computeHash(source))
+		, originalKeyString("")
 		{/* empty */}
 
 		explicit Key(sreal source) 
 		: original(source) 
 		, type(Key::real)
 		, key(algorithms::computeHash(source))
+		, originalKeyString("")
 		{/* empty */}
 		
 		inline bool
@@ -474,14 +501,82 @@ private:
 		setWithInteger(const Key& key, const ELEMENT& value);
 	// auxsort
 	template<typename COMPARATOR> inline void 
-		sortImplementation(sint lo, sint hi, const COMPARATOR& predicate)
+		sortImplementation(const sint left, const sint right, const COMPARATOR& predicate)
 	{
+		/*
+		Quicksort with 3-way partitioning
+		from QUICKSORT IS OPTIMAL
+		Robert Sedgewick
+		Jon Bentley
+		http://www.sorting-algorithms.com/static/QuicksortIsOptimal.pdf
+		*/
+		
+
+		if (left < right)
+		{
+			sint i = left - 1;
+			sint j = right;
+			sint p = left - 1;
+			sint q = right;
+			
+			ELEMENT v = get(right);
+
+			for (;;)
+			{
+				while (predicate(get(++i), v))
+				{ /* empty */ }
+				
+				while (predicate(v, get(--j)))
+				{
+					if (j == left)
+					{
+						break;
+					}
+				}
+
+				if (i >= j)
+				{
+					break;
+				}
+				
+				quickSwap(get(i), get(j));
+				
+				if (get(i) == v)
+				{
+					++p;
+					quickSwap(get(p), get(i));
+				}
+
+				if (v == get(j))
+				{
+					--q;
+					quickSwap(get(j), get(q));
+				}
+			} // for (;;)
+
+			quickSwap(get(i), get(right));
+			j = i - 1;
+			i = i + 1;
+			
+			for (sint k = left; k < p; k++, j--)
+			{
+				quickSwap(get(k), get(j));
+			}
+
+			for (sint k = right - 1; k > q; k--, i++)
+			{
+				quickSwap(get(i), get(k));
+			}
+
+			sortImplementation(left, j, predicate);
+			sortImplementation(i, right, predicate);
+		} // if (left < right)
+
 		/*
 		Quicksort
 		** (based on `Algorithms in MODULA-3', Robert Sedgewick;
 		**  Addison-Wesley, 1993.)
 		** based on ltablib.c
-		*/
 		while (lo < hi)
 		{	// sort elements t[lo], t[(lo + hi) / 2] and t[hi] 
 			sint i, j;
@@ -523,9 +618,8 @@ private:
 				if ((hi - lo) == 2)
 					break;
 			}
-			// t[lo] <= Pivot == t[hi -1] <= t[hi]; sort lo+1 to hi-2
-			{
-				// pivot
+			// t[lo] <= Pivot == t[hi - 1] <= t[hi]; sort lo + 1 to hi - 2
+			{	// pivot
 				const ELEMENT& pivot = get(i);
 				const ELEMENT& vhiMinusOne = get(hi - 1);
 				swap(pivot, i, vhiMinusOne, hi - 1);
@@ -541,7 +635,7 @@ private:
 						
 						if (predicate(vi, pivot))
 						{
-							assert(i <= hi); // invalid sort function
+							assert(i < hi); // invalid sort function
 						}
 						else
 						{
@@ -556,7 +650,7 @@ private:
 						
 						if (predicate(pivot, vj))
 						{
-							assert(j >= lo); // invalid sort function
+							assert(j > lo); // invalid sort function
 						}
 						else
 						{
@@ -596,15 +690,36 @@ private:
 
 			sortImplementation(j, i, predicate);
 		}
+		*/
 	}
 
 	inline void
-		swap(const ELEMENT vlo, const Key& lo, const ELEMENT vhi, const Key& hi) 
+		swap(const ELEMENT& vlo, const Key& lo, const ELEMENT& vhi, const Key& hi) 
 	{
-		set(lo, vhi);
-		set(hi, vlo);
+		Value& loV = *findValueWithSignedInteger(lo);
+		Value& hiV = *findValueWithSignedInteger(hi);
+		const ELEMENT c = vlo;
+		loV.value = vhi;
+		hiV.value = c;
 	}
 
+	inline void 
+		swap(const Key& lo, const Key& hi) 
+	{
+		Value& loV = *findValueWithSignedInteger(lo);
+		Value& hiV = *findValueWithSignedInteger(hi);
+		const ELEMENT c = loV.value;
+		loV.value = hiV.value;
+		hiV.value = c;
+	}
+
+	inline void
+		quickSwap(ELEMENT& a, ELEMENT& b) 
+	{
+		ELEMENT c(a);
+		a = b;
+		b = c;
+	}
 	// lu_byte lsizenode;
 	uchar 
 		log2HashPartSize;
