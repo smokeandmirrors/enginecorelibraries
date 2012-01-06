@@ -128,8 +128,7 @@ public:
 	void
 	add(AbstractComponent<OWNER>& component) 
 	{
-		//typeid(component)
-		uint id = 0; //component.getComponentID();
+		Component_GUID id(component.getGUID());
 
 		if (!m_components[id])
 		{
@@ -142,7 +141,7 @@ public:
 	COMPONENT* 
 	get(bool construct_missing=false)
 	{
-		uint id = COMPONENT::componentGUID;
+		Component_GUID id = COMPONENT::componentGUID;
 		AbstractComponent<OWNER>* component = m_components[id];
 		
 		if (!component && construct_missing)

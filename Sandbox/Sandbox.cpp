@@ -665,8 +665,43 @@ class Shadows
 
 };
 
+template<typename POSSESSION>
+class Owner
+{
+public:
+	POSSESSION& get(void) { return possession; }
+	const POSSESSION& get(void) const { return get(); }
+
+private:
+	POSSESSION possession;
+};
+
+class Possession
+{
+public:
+	float number;
+};
+
+class Hoarder 
+	: public Owner<sint>
+	, public Owner<Possession>
+{
+public:
+
+	template<typename POSSESSION>
+	POSSESSION& get(void)
+	{	
+		return this->Owner<POSSESSION>::get();
+	}
+};
+
+
 void testEngineLoop(void)
 {
+	Hoarder h;
+	sint& integer = h.get<sint>();
+	Possession& number = h.get<Possession>();
+	
 	EngineLoop loop;	
 	
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 5);
@@ -719,7 +754,38 @@ typedef std::string TestStringType; // String::Immutable
 void onPlay(void)
 {
 	// sandbox::verifyUnitTests();
-	
+
+
+ 	Agent alpha;
+ 	Movement movement;
+ 	Attack attack;
+ 	Defense defense;
+ 	alpha.add(movement);
+ 	alpha.add(attack);
+ 
+ 	uint movement_ID = movement.getGUID();
+ 	uint static_movement_ID = Movement::componentGUID;
+ 	uint attack_ID = attack.getGUID();
+ 	uint static_attack_ID = Attack::componentGUID;
+ 	uint defense_ID = defense.getGUID();
+ 	uint static_defense_ID = Defense::componentGUID;
+  
+	std::map<type_info, sint> crazytalk;
+ 	
+ 	assert(alpha.has<Movement>());
+ 	assert(alpha.has<Attack>());
+ 	assert(!alpha.has<Defense>());
+ 	assert(&movement == alpha.get<Movement>());
+ 	assert(&attack == alpha.get<Attack>());
+ 	assert(NULL == alpha.get<Defense>());
+ 	alpha.remove(movement);
+ 	assert(!alpha.has<Movement>());
+ 	assert(NULL == alpha.get<Movement>());
+ 	alpha.remove(attack);
+ 	assert(!alpha.has<Attack>());
+ 	assert(NULL == alpha.get<Attack>());
+
+
 	StuffDoer::single.doOtherStuff();
 
 	// concurrency::Thread[] runUs = new concurrency::Thread[];
@@ -856,52 +922,6 @@ void onPlay(void)
 // 	assert(rbt.isEmpty());
 }
 
-// 	Agent alpha;
-// 	Movement movement;
-// 	Attack attack;
-// 	Defense defense;
-// 	alpha.add(movement);
-// 	alpha.add(attack);
-// 
-// 	uint movement_ID = movement.getGUID();
-// 	uint static_movement_ID = Movement::componentGUID;
-// 	uint attack_ID = attack.getGUID();
-// 	uint static_attack_ID = Attack::componentGUID;
-// 	uint defense_ID = defense.getGUID();
-// 	uint static_defense_ID = Defense::componentGUID;
-// 
-// 	uint one = __COUNTER__;
-// 	uint two = __COUNTER__;
-// 	uint three = __COUNTER__;
-// 
-// 	std::map<type_info, sint> crazytalk;
-// 	
-// 	
-// 	int idone = typeid(Movement).before(typeid(Movement));
-// 	int MbeforeA = typeid(Movement).before(typeid(Attack));
-// 	int AbeforeM = typeid(Attack).before(typeid(Movement));
-// 
-// 	if (typeid(Movement) == typeid(Attack))
-// 	{
-// 		printf("sweet");
-// 	}
-// 	else
-// 	{
-// 		printf("awesome");
-// 	}
-// 
-// 	assert(alpha.has<Movement>());
-// 	assert(alpha.has<Attack>());
-// 	assert(!alpha.has<Defense>());
-// 	assert(&movement == alpha.get<Movement>());
-// 	assert(&attack == alpha.get<Attack>());
-// 	assert(NULL == alpha.get<Defense>());
-// 	alpha.remove(movement);
-// 	assert(!alpha.has<Movement>());
-// 	assert(NULL == alpha.get<Movement>());
-// 	alpha.remove(attack);
-// 	assert(!alpha.has<Attack>());
-// 	assert(NULL == alpha.get<Attack>());
 // 
 // 	
 // 	ClockReal realSingle;
