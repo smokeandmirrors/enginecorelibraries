@@ -778,6 +778,7 @@ This method is ideal for static classes or libraries.
 defines functions that can be used to get specific class pointers
 back out of %Lua.
 \note compile-time directive
+\todo explore type safe-ish userdata storage without RTTI
 */
 #if ARGUMENT_ERRORS
 #define DEFINE_TO_LUAEXTENDABLES(CLASS) \

@@ -21,7 +21,6 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \date 1/20/2011
 
 \todo NULL, assert, warn, error
-\todo find/create a decent set of containers
 \todo global bit packing investigation
 
 <DEVELOPMENT STATUS>
@@ -107,6 +106,7 @@ typedef double				dreal;
 
 /**@}*/
 
+#if DEFINE_CHECKED_CAST
 template<class TO, class FROM>
 TO* checked_cast(FROM* from)
 {
@@ -134,5 +134,6 @@ const TO& checked_cast(const FROM& from)
 	assert(static_cast<const TO*>(&from) == dynamic_cast<const TO*>(&from));
 	return static_cast<const TO&>(from);
 }
+#endif//DEFINE_CHECKED_CAST
 
 #endif//BUILD_H

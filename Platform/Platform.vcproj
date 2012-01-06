@@ -458,10 +458,6 @@
 			Name="Design Patterns"
 			>
 			<File
-				RelativePath=".\Composition.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Signals.h"
 				>
 			</File>
@@ -491,10 +487,6 @@
 			</File>
 			<File
 				RelativePath=".\RedBlackTree.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Table.h"
 				>
 			</File>
 		</Filter>

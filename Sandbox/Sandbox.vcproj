@@ -428,10 +428,22 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Resarch And Development"
+			Name="Research And Development"
 			>
 			<File
 				RelativePath=".\TableRnD.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Rejected"
+			>
+			<File
+				RelativePath=".\Composition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Table.h"
 				>
 			</File>
 		</Filter>

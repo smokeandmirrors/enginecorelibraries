@@ -103,7 +103,7 @@ public:
 		, key(originalKeyString.getHash())
 		{ }
 		/** 
-		\todo this below should have worked for const char* 
+		todo this below should have worked for const char* 
 		there are enough conversion operators, 
 		but it doesn't 
 		*/
@@ -404,7 +404,6 @@ public:
 	}
 
 private:
-	/// \todo will template versions of these be unnecessarily generated? 
 	// static int computesizes (int nums[], int *narray)
 	static inline bool
 		calculateArrayIndex(const Key& key, sint& arrayIndex);
