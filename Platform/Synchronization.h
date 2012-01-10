@@ -31,6 +31,9 @@ Tested in the field	:	NO
 #define DECLARE_STATIC_MUTEX(identifier) \
 	static concurrency::Mutex	identifier;
 
+#define DEFINE_STATIC_MUTEX(SCOPE, INDENTIFIER) \
+	concurrency::Mutex SCOPE##::##INDENTIFIER;
+
 #define SYNC(mutex) \
 	concurrency::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
 

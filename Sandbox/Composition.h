@@ -23,7 +23,12 @@ Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
 */
+
 #include "Platform.h"
+
+#include <algorithm>
+#include <list>
+
 #include "Synchronization.h"
 
 namespace designPatterns
@@ -32,148 +37,98 @@ namespace designPatterns
 typedef uint Component_GUID;
 
 template<typename OWNER>
-class AbstractComponent
+class Component
 {
 	template<typename OWNER> friend class Composite;
 
 public:
-	AbstractComponent(void)
+	Component(void)
 	: m_owner(NULL)
 	{
 		/* empty */
 	}
-
-	virtual
-	~AbstractComponent(void)=0
+	
+	virtual ~Component(void)
 	{
 		/* empty */
 	}
 
-	virtual 
-	Component_GUID
-	getGUID(void) const=0;
-
-	const OWNER* 
-	getOwner(void) const
+	const OWNER* getOwner(void) const
 	{
 		return m_owner;
 	}
 
 protected:
-	virtual 
-	void 
-	onAttachTo(void)
+	virtual void onAttachTo(void)
 	{
 		/* empty */
 	}
 
-	virtual 
-	void 
-	onDetach(void)
+	virtual void onDetach(void)
 	{
 		/* empty */
 	}
 
 private:
-	OWNER*	m_owner;
-
-	void 
-	attach(OWNER* owner)
+	void attach(OWNER* owner)
 	{
 		assert(owner);
+		assert(!m_owner);
 		m_owner = owner;
 		onAttachTo();
 	}
 
-	void 
-	detach(void)
+	void detach(void)
 	{
+		assert(m_owner);
 		onDetach();
 		m_owner = NULL;
 	}
+
+	OWNER* m_owner;
 }; // Component
-
-template<typename OWNER, typename DERIVED_CLASS>
-class Component : public AbstractComponent<OWNER>
-{
-public:
-	static const Component_GUID componentGUID;
-
-	Component_GUID 
-	getGUID(void) const
-	{
-		return componentGUID;
-	}
-}; // Component
-
-template<typename OWNER, typename DERIVED_CLASS> 
-const Component_GUID Component<OWNER, DERIVED_CLASS>::componentGUID = __COUNTER__;
 
 template<typename OWNER>
 class Composite // interface/base/member
 {
-	typedef std::map<uint, AbstractComponent<OWNER>*> 
+	typedef std::list< Component<OWNER>* > 
 		components;
 	
-	typedef typename std::map<uint, AbstractComponent<OWNER>*>::iterator 
+	typedef typename std::list< Component<OWNER>* >::iterator 
 		components_iter;
 	
 public:
 	virtual
 	~Composite(void)=0
 	{
-		/* empty */
+		std::for_each(m_components.begin(), m_components.end(), DeleteHelper());
 	}
 
-	void
-	add(AbstractComponent<OWNER>& component) 
+	void add(Component<OWNER>& component) 
 	{
-		Component_GUID id(component.getGUID());
-
-		if (!m_components[id])
-		{
-			m_components[id] = &component;
-			component.attach(static_cast<OWNER*>(this));
-		}
+		component.attach(static_cast<OWNER*>(this));
+		m_components.push_back(&component);
 	}
 	
-	template<typename COMPONENT> 
-	COMPONENT* 
-	get(bool construct_missing=false)
-	{
-		Component_GUID id = COMPONENT::componentGUID;
-		AbstractComponent<OWNER>* component = m_components[id];
-		
-		if (!component && construct_missing)
-		{
-			component = new COMPONENT();
-			component->attach(static_cast<OWNER*>(this));
-		}
-
-		return static_cast<COMPONENT*>(component);
-	}
-
-	template<typename COMPONENT>
-	bool 
-	has(void) const
-	{
-		return m_components.find(COMPONENT::componentGUID) != m_components.end();
-	}
-	
-	void 
-	remove(AbstractComponent<OWNER>& component)
-	{
-		components_iter iter = m_components.find(component.getGUID());
-		
-		if (iter != m_components.end())
-		{
-			m_components.erase(iter);
-		}
+	void remove(Component<OWNER>& component)
+	{	
+		assert(component.getOwner() == this);
+		component.detach();
+		m_components.erase(std::find(m_components.begin(), m_components.end(), &component));
 	}
 	
 private:
-	components	
-		m_components;
+	class DeleteHelper
+	{
+	public:
+		void operator()(Component<OWNER>* object)
+		{
+			object->detach();
+			delete object;
+		}
+	};
+
+	components m_components;
 }; // Composite
 
 } // namespace designPatterns

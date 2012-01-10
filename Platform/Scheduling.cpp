@@ -79,13 +79,15 @@ public:
 		if (m_thread)
 		{
 			m_thread->disconnect(this);
+			m_thread->removeReference();
 		}
 
 		m_thread = thread;
 
-		if (thread)
+		if (m_thread)
 		{
 			m_thread->connect(this, &Job::onComplete);
+			m_thread->addReference();
 		}
 	}
 
@@ -113,7 +115,7 @@ public:
 		if (m_thread)
 		{
 			m_thread->disconnect(this);
-			Thread::destroyThread(*m_thread);
+			m_thread->removeReference();
 			m_thread = NULL;
 		}
 	}
@@ -145,7 +147,7 @@ private:
 	{
 		if (m_thread)
 		{
-			Thread::destroyThread(*m_thread);
+			m_thread->removeReference();
 		}
 	}
 

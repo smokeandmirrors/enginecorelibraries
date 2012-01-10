@@ -106,6 +106,52 @@ typedef double				dreal;
 
 /**@}*/
 
+
+template<typename T> 
+class isLess
+{
+public:
+	inline static bool evaluate(const T& a, const T& b) 
+	{
+		return a < b;
+	}
+	
+	inline bool operator()(const T& a, const T& b) const
+	{
+		return evaluate(a, b);
+	}
+};
+
+template<typename T> 
+class isGreater
+{
+public:
+	inline static bool evaluate(const T& a, const T& b) 
+	{
+		return a > b;
+	}
+	
+	inline bool operator()(const T& a, const T& b) const
+	{
+		return evaluate(a, b);
+	}
+};
+
+template<typename T>
+class isEqual
+{
+public:
+	inline static bool evaluate(const T& a, const T& b) 
+	{
+		return a == b;
+	}
+	
+	inline bool operator()(const T& a, const T& b) const
+	{
+		return evaluate(a, b);
+	}
+};
+
 #if DEFINE_CHECKED_CAST
 template<class TO, class FROM>
 TO* checked_cast(FROM* from)

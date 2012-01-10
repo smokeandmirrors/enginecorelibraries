@@ -38,6 +38,11 @@ inline bool
 inline bool 
 	waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds);
 
+#if TEST_THREAD_DESTRUCTION	
+uint Thread::m_created(0);
+DEFINE_STATIC_MUTEX(Thread, m_createdMutex)
+#endif//TEST_THREAD_DESTRUCTION	
+
 Thread::~Thread(void)
 {
 	if (m_state == running)
@@ -60,13 +65,6 @@ void Thread::closeHardware()
 		m_state	= closed;
 	}
 }
-
-
-void Thread::destroyThread(Thread& thread)
-{
-	delete &thread;
-}
-
 
 void Thread::disconnect(signals::Receiver* receiver)
 {
@@ -137,6 +135,7 @@ void Thread::internalExecute(void)
 	m_executor->execute();
 	m_state = completed;
 	m_onComplete.transmit(this);
+	removeReference();
 }
 
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
@@ -152,10 +151,9 @@ void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 	if (m_thread)
 	{
 		if (startSuspended)
+		{
 			m_state = suspended;
-		// else 
-		//	m_state = handled in the attempt to call execute()
-		
+		} // else m_state will be handled in the attempt to call execute() 
 	}
 	else
 	{
@@ -192,7 +190,7 @@ void Thread::waitOnCompletion(Thread& thread)
 void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 {
 	size_t size = threads.getSize();
-	assert(size > 1);
+	assert(size > 0);
 	assert(startingIndex >= 0);
 	assert(startingIndex < static_cast<sint>(size));
 	

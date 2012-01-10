@@ -15,7 +15,8 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 namespace containers
 {
 
-template<typename ELEMENT>
+// template<typename ELEMENT, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
+template<typename ELEMENT> //, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
 class RedBlackTree
 {
 public:

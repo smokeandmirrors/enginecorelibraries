@@ -1206,17 +1206,13 @@ public:
 	Using this will cause the C++ object get destroyed when all references to it
 	in a lua_State are destroyed.
 	*/
-	static sint 
-		__gcmetamethod(lua_State* L);
-
+	static sint __gcmetamethod(lua_State* L);
 	/**
 	__gc method for the metatable of a LuaExtendable with a proxy exposed to %Lua.
 	Using this will cause the C++ object get destroyed when all references to it
 	in a lua_State are destroyed, but will NOT be called on its proxy table
 	*/
-	static sint 
-		__gcmetamethodProxy(lua_State* L);
-	
+	static sint __gcmetamethodProxy(lua_State* L);
 	/**
 	\note __newindex methods:
 	returns true if %Lua code like userdata[k] = v will operate correctly 
@@ -1236,26 +1232,18 @@ public:
 	should be configured to the desired error level for the build.
 	e.g.: throw errors in a debug build, warn in a release build, etc.
 	*/
-	static sint				
-		__newindexError(lua_State* L);
-	
+	static sint __newindexError(lua_State* L);
 	/**
 	__tostring method for the metatable of a class exposed to %Lua.
 	*/
-	static sint				
-		__tostring(lua_State* L);	
-			 
+	static sint __tostring(lua_State* L);	
 	/** empty dtor */
-	virtual					
-		~LuaExtendable(void)=0 {/* empty */};
-	
+	virtual	~LuaExtendable(void)=0 {/* empty */};
 	/** 
 	a function that classes must implement to make them easier to make into well formed
 	%Lua classes
 	*/
-	virtual const schar*		
-		getClassName(void) const=0;
-	
+	virtual const schar* getClassName(void) const=0;
 	/**
 	objects of this type will have a metatable assigned to them when pushed into
 	a lua_State.  %Lua doesn't allow setmetatable calls on userdata pointers
@@ -1263,16 +1251,13 @@ public:
 	It is mostly easily implemented in terms of one of the static LuaExtendable
 	functions.
 	*/
-	virtual sint			
-		setMetatable(lua_State* L)=0;
-	
+	virtual sint setMetatable(lua_State* L)=0;
 	/**
 	a to string function is almost always necessary, since so much of %Lua
 	use is simply to make inspection of objects very easy, there is often
 	a lot of information about them printed, logged, or rendered
 	*/
-	virtual const schar*		
-		toString(void)=0;
+	virtual const schar* toString(void)=0;
 }; // class LuaExtendable
 
 /** 
@@ -1327,22 +1312,19 @@ completes a %Lua class declaration in case no script accompanied
 the class in %Lua.
 \ingroup LuaExtension
 */
-void 
-	completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar* super);
+void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar* super);
 
 /**
 makes sure that the class is declared declared in the lua OOP system.
 \note run-time directive
 */
-void				
-	declareLuaClass(lua_State* L, const schar* derived, const schar* super);
+void declareLuaClass(lua_State* L, const schar* derived, const schar* super);
 
 /**
 print the string to the %Lua output
 \ingroup LuaExtension
 */
-void 
-	printToLua(lua_State* L, const schar* string);
+void printToLua(lua_State* L, const schar* string);
 
 /**
 helper function for pushing a class to %Lua an preserving the ability
@@ -1350,37 +1332,32 @@ to compare userdata and use them as equivalent table keys
 \see comments in the implementation of void Lua::initializeUserdataStorage(void)
 \ingroup LuaExtension
 */
-sint 
-	pushRegisteredClass(lua_State* L, void* pushee);
+sint pushRegisteredClass(lua_State* L, void* pushee);
 
 /**
 helper function for simply registering global native functions to %Lua
 \ingroup LuaExtension
 */
-void 
-	registerGlobalLibrary(lua_State* L);
+void registerGlobalLibrary(lua_State* L);
 
 /**
 helps set a userdata metatable from script
 \warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 */
-sint				
-	setProxyMetatable(lua_State* L);
+sint setProxyMetatable(lua_State* L);
 
 /**
 helps set a userdata metatable from script
 \warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua. 
 */
-sint 
-	setProxyMetatablePublicMembers(lua_State* L);
+sint setProxyMetatablePublicMembers(lua_State* L);
 
 /**
 helps set a userdata metatable from script, this is a exact C version of the function in %Lua,
 since you can't call setmetatable on a userdata value in %Lua.
 \warning USE JUDICIOUSLY.  This violates some safety precedence in %Lua.
 */
-sint
-	setUserdataMetatable(lua_State* L);
+sint setUserdataMetatable(lua_State* L);
 } // namespace embeddedLua 
 
 /** @} */

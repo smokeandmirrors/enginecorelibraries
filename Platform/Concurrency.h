@@ -55,30 +55,27 @@ void sleep(millisecond milliseconds);
 class Executable 
 {
 public:
-	virtual	
-		~Executable(void)=0 
+	virtual	~Executable(void)=0 
 	{/* empty */}
 	
-	virtual void 
-		execute(void)=0;
+	virtual void execute(void)=0;
 
-	virtual const std::string&
-		toString(void) const=0;
+	virtual const std::string& toString(void) const=0;
 }; // class Executable
 
 class Executor
 {
 public:
 	Executor(executableFunction executable, 
-		const std::string& name="un-named")
-		: m_name(name)
-		, m_implementation(new FunctionImplementation(executable)) 
+	const std::string& name="un-named")
+	: m_name(name)
+	, m_implementation(new FunctionImplementation(executable)) 
 	{/* empty */}
 
 	Executor(Executable* executable, 
-		const std::string& name="un-named")
-		: m_name(name)
-		, m_implementation(new ObjectImplementation(executable)) 
+	const std::string& name="un-named")
+	: m_name(name)
+	, m_implementation(new ObjectImplementation(executable)) 
 	{/* empty */}
 
 	~Executor(void) 
@@ -86,14 +83,12 @@ public:
 		delete m_implementation; 
 	}
 
-	void 
-		execute(void) 
+	void execute(void) 
 	{ 
 		m_implementation->execute(); 
 	}
 
-	const std::string&
-		toString(void) const
+	const std::string& toString(void) const
 	{
 		return m_name;
 	}
@@ -112,11 +107,10 @@ private:
 	{
 	public:
 		ObjectImplementation(Executable* object) 
-			: m_object(object) 
+		: m_object(object) 
 		{ /* empty */ }
 
-		void 
-			execute(void) 
+		void execute(void) 
 		{ 
 			m_object->execute(); 
 		}					
@@ -129,11 +123,10 @@ private:
 	{
 	public:		
 		FunctionImplementation(executableFunction function) 
-			: m_function(function) 
+		: m_function(function) 
 		{ /* empty */ }
 
-		void 
-			execute(void) 
+		void execute(void) 
 		{ 
 			(*m_function)(); 
 		}		
@@ -148,7 +141,6 @@ private:
 	ExecutorImplementation* 
 		m_implementation;
 }; // class Executor
-
 
 }//namespace concurrency
 

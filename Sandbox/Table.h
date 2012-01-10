@@ -16,25 +16,6 @@ WARNING: THIS IS A LEARNING EXERCISE, AND IS NOT
 INTENDED FOR DEPLOYMENT
 */
 
-template<typename T> 
-class isLess
-{
-public:
-	bool operator()(const T& a, const T& b) const
-	{
-		return a < b;
-	}
-};
-
-template<typename T> 
-class isGreater
-{
-public:
-	bool operator()(const T& a, const T& b) const
-	{
-		return a > b;
-	}
-};
 
 template<> 
 class isLess<std::string>

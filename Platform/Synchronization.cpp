@@ -20,26 +20,26 @@ public:
 	/** \todo inspect SetCriticalSectionSpinCount */
 	inline PlatformMutex(void)
 	{
-		InitializeCriticalSection(&m_criticalsection);
+		InitializeCriticalSection(&m_criticalSection);
 	}
 
 	inline ~PlatformMutex(void)
 	{
-		DeleteCriticalSection(&m_criticalsection);
+		DeleteCriticalSection(&m_criticalSection);
 	}
 
 	inline void acquire(void)
 	{
-		EnterCriticalSection(&m_criticalsection);
+		EnterCriticalSection(&m_criticalSection);
 	}
 	
 	inline void release(void)
 	{
-		LeaveCriticalSection(&m_criticalsection);
+		LeaveCriticalSection(&m_criticalSection);
 	}
 
-protected:
-	criticalSection	m_criticalsection;
+private:
+	criticalSection	m_criticalSection;
 #else
 	PREVENT_COMPILE
 #endif//WIN32

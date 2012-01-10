@@ -41,78 +41,68 @@ public:
 		{
 			Thread::Tree::ThreadIter sentinel(threads.end());
 			for (Thread::Tree::ThreadIter iter(threads.begin());
-				iter != sentinel;
-				iter++)
+			iter != sentinel;
+			iter++)
 			{
-				Thread& thread = *(*iter);
-				destroyThread(thread);
+				(*iter)->removeReference();
 			}
 		}
 	
-		inline ThreadIter
-			begin(void) 
+		inline ThreadIter begin(void) 
 		{
 			SYNC(mutex);
 			return threads.begin();
 		}
 		
-		inline ThreadIterConst
-			begin(void) const
+		inline ThreadIterConst begin(void) const
 		{
 			SYNC(mutex);
 			return threads.begin();
 		}
 
-		inline ThreadIter
-			end(void) 
+		inline ThreadIter end(void) 
 		{
 			SYNC(mutex);
 			return threads.end();
 		}
 
-		inline ThreadIterConst
-			end(void) const
+		inline ThreadIterConst end(void) const
 		{
 			SYNC(mutex);
 			return threads.end();
 		}
 
-		inline size_t
-			getSize(void) const
+		inline size_t getSize(void) const
 		{
 			SYNC(mutex);
 			return threads.size();
 		}
 
-		inline threadID 
-			getOriginalID(void) const
+		inline threadID getOriginalID(void) const
 		{
 			return rootID;
 		}
 
-		inline Thread*
-			operator[](size_t index) 
+		inline Thread* operator[](size_t index) 
 		{
 			SYNC(mutex);
 			return threads[index];
 		}
 
-		inline const Thread*
-			operator[](size_t index) const
+		inline const Thread* operator[](size_t index) const
 		{
 			SYNC(mutex);
 			return threads[index];
 		}
 
-		inline void
-			push(Thread* thread)
+		inline void push(Thread* thread)
 		{
 			SYNC(mutex);
+			thread->addReference();
 			threads.push_back(thread);
 		}
 
-		inline void
-			waitOnCompletion(void)
+		inline void waitOnCompletion(void)
 		{
 			waitOnCompletionOfTree(*this);
 		}
@@ -120,62 +110,53 @@ public:
 	private:
 		Thread& operator=(const Thread&);
 
-		threadID
-			rootID;
+		threadID rootID;
 
 		DECLARE_MUTEX(mutex);
 		
-		std::vector<Thread*>
-			threads;
+		std::vector<Thread*> threads;
 	}; // class Thread::Tree
 
-	static void 
-		destroyThread(Thread& thread);
-	
-	static threadID
-		getCurrentID(void);
+	static threadID getCurrentID(void);
+	/// \todo these all need to be handled via shared_ptr
 	// for the normal user
-	static Thread* 
-		getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	static Thread* getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
 	// for the user/scheduler to wait on it
-	static Thread* 
-		getSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	static Thread* getSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
 	// for the daring user, for the scheduler to get the preferred CPU
-	static Thread* 
-		getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
+	static Thread* getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
 	
-	static void
-		waitOnCompletion(Thread& thread);
+	static void waitOnCompletion(Thread& thread);
 
-	static void
-		waitOnCompletion(Tree& threads, size_t startingIndex=0);
+	static void waitOnCompletion(Tree& threads, size_t startingIndex=0);
 
-	static void
-		waitOnCompletionOfTree(Tree& threads);
+	static void waitOnCompletionOfTree(Tree& threads);
 
-	template<class RECEIVER> void
-		connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
+	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
 
-	template<class RECEIVER> void 
-		connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
+	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
 
-	void 
-		disconnect(signals::Receiver* receiver);
+	void addReference(void) const { ++m_referenceCount; }
 
-	void 
-		execute(cpuID preferredCPU=noCPUpreference); 
+	void disconnect(signals::Receiver* receiver);
+
+	void execute(cpuID preferredCPU=noCPUpreference); 
 	
-	void 
-		executeAndWait(cpuID preferredCPU=noCPUpreference);
+	void executeAndWait(cpuID preferredCPU=noCPUpreference);
 
-	inline bool 
-		getID(threadID& id) const;
+	inline bool getID(threadID& id) const;
 
-	cpuID 
-		getPreferredCPU(void) const;
+	cpuID getPreferredCPU(void) const;
 
-	const std::string& 
-		toString(void) const;
+	void removeReference(void) const 
+	{
+		assert(m_referenceCount);
+		--m_referenceCount;
+		if (!m_referenceCount)
+			delete this;
+	}
+
+	const std::string& toString(void) const;
 
 private:
 	enum RunningState
@@ -190,8 +171,7 @@ private:
 	}; // enum Thread::RunningState
 
 #if WIN32
-	static uint __stdcall 
-		systemExecute(threadHandle thread)
+	static uint __stdcall systemExecute(threadHandle thread)
 	{
 		static_cast<Thread*>(thread)->internalExecute();
 		return 0;
@@ -207,62 +187,71 @@ private:
 	, m_thread(NULL)
 	, m_state(Thread::uninitialized)
 	, m_launcherID(invalidThreadID)
+	, m_referenceCount(1)
 	{ /* empty */ }
 
 
-	virtual 
-	~Thread(void);
+	virtual ~Thread(void);
 
 	/** not allowed */
 	Thread(const Thread&);
 	Thread(void);
 
-	void
-		closeHardware(void);
+	void closeHardware(void);
 
-	void 
-		internalExecute(void);
+	void internalExecute(void);
 
-	void
-		initializeHardware(cpuID preferredCPU, bool startSuspended);
+	void initializeHardware(cpuID preferredCPU, bool startSuspended);
 
-	void 
-		initializeSuspended(cpuID preferredCPU);
+	void initializeSuspended(cpuID preferredCPU);
 
-	inline bool
-		isExecutable(void) const;
+	inline bool isExecutable(void) const;
 
-	inline bool
-		isHardwareInitialized(void) const;
+	inline bool isHardwareInitialized(void) const;
 
-	inline bool 
-		isWaitable(void) const; 
+	inline bool isWaitable(void) const; 
 
-	void
-		updateCPUPreference(cpuID suggestedCPU);
+	void updateCPUPreference(cpuID suggestedCPU);
 
-	RunningState
-		m_state;
+	RunningState m_state;
 
-	Executor*			
-		m_executor;
+	Executor* m_executor;
 	
-	threadID
-		m_id;
+	mutable uint m_referenceCount;
 
-	threadID
-		m_launcherID;
+	threadID m_id;
 
-	cpuID 
-		m_preferredCPU;
+	threadID m_launcherID;
 
-	threadHandle		
-		m_thread;
+	cpuID m_preferredCPU;
 
- 	signals::Transmitter1<Thread*> 
-		m_onComplete;
+	threadHandle m_thread;
+
+ 	signals::Transmitter1<Thread*> m_onComplete;
 
 	DECLARE_MUTEX(m_mutex);
+
+#if TEST_THREAD_DESTRUCTION	
+	static uint m_created;
+	DECLARE_STATIC_MUTEX(m_createdMutex);
+	static void incrementCreated(void)
+	{
+		SYNC(m_createdMutex);
+		++m_created;
+	}
+	static void decrementCreated(void)
+	{
+		SYNC(m_createdMutex);
+		--m_created;
+	}
+
+public:
+	static void checkDestruction(void)
+	{
+		SYNC(m_createdMutex);
+		assert(m_created == 0);
+	}
+#endif//TEST_THREAD_DESTRUCTION
 };
 
 template<class RECEIVER> void 

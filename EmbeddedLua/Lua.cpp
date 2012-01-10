@@ -32,7 +32,7 @@ static sint traceback (lua_State* L)
 #endif//!GOLDMASTER
 
 Lua::Lua(const char *name, bool open_standard_libs, bool initialize_userdata_storage)
-: m_bytes(0)
+: bytesInUse(0)
 , m_name(NULL)
 , L(NULL)
 {
@@ -164,11 +164,11 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 		
 	if (nsize)
 	{
-		lua->m_bytes += nsize;
+		lua->bytesInUse += nsize;
 			
 		if (osize)
 		{
-			lua->m_bytes -= osize;
+			lua->bytesInUse -= osize;
 			return realloc(ptr, nsize);
 		}
 		else
@@ -179,7 +179,7 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 	else
 	{	
 		free(ptr);
-		lua->m_bytes -= osize;
+		lua->bytesInUse -= osize;
 		return NULL;
 	}
 }

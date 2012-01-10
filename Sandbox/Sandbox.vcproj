@@ -431,6 +431,10 @@
 			Name="Research And Development"
 			>
 			<File
+				RelativePath=".\SchedulingAndEngineRnD.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TableRnD.cpp"
 				>
 			</File>

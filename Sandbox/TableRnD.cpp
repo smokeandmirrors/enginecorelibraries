@@ -5,6 +5,33 @@
 #include "Sandbox.h"
 #include "Strings.h"
 #include "Table.h"
+#include "Time.h"
+
+template<typename NUMBER>
+NUMBER getRand(NUMBER min, NUMBER max) 
+{
+	PREVENT_COMPILE
+}
+
+template<>
+sint getRand(sint min, sint max) 
+{
+	return (rand() % (max - min)) + min;
+}
+
+template<>
+sreal getRand(sreal min, sreal max) 
+{
+	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
+	return v * (max - min) + min;
+}
+
+
+template<>
+schar getRand(schar min, schar max) 
+{
+	return static_cast<schar>((rand() % (max - min)) + min);
+}
 
 using namespace containers;
 
@@ -33,6 +60,74 @@ struct TestUnion
 
 void sandbox::tableRnD(void)
 {
+
+	
+	std::map<int, int> numberToNumber;
+	numberToNumber[10] = 100;
+	int index100 = numberToNumber[100];
+	
+	if (index100 < 0)
+		printf("referenced");
+
+	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
+	RedBlackTree<sint>* awesome;
+
+	std::map<const char*, RedBlackTree<sint>*> numberToTree;
+	awesome = NULL;
+	numberToTree["awesome"] = outstanding;
+	awesome = numberToTree["awesome"];
+	awesome->insert(5); 
+	
+	srand(static_cast<uint>(realTime::cycles()));
+	
+	for (int i = 0; i < 10; i++)
+		printf("%f\n", getRand<sreal>(-1.0f, 1.0f));
+
+	for (int i = 0; i < 10; i++)
+		printf("%d\n", getRand<sint>(-10, 10));
+
+	// RedBlackTree<sint> rbt;
+	RedBlackTree<sint>* pRbt = new RedBlackTree<sint>();
+	RedBlackTree<sint>& rbt = *pRbt;
+	assert(rbt.isEmpty());
+	rbt.insert(-1);
+	rbt.remove(-1);
+	rbt.getMax();
+	rbt.getMin();
+	rbt.getSize();
+	assert(!rbt.has(2));
+	rbt.removeMax();
+	rbt.removeMin();
+
+	uint sum = 0;
+	
+	std::vector<sint> numbers;
+	sint randomNumber;
+	
+	for (sint i = 0; i < 10000; i++)
+	{
+		// randomNumber = getRand<sint>(-100, 100);
+		randomNumber = i;
+		numbers.push_back(randomNumber);
+		
+		assert(!rbt.has(randomNumber));
+		assert(rbt.getSize() == sum);
+		sum++;
+		rbt.insert(randomNumber);
+		assert(rbt.getSize() == sum);
+		assert(rbt.has(randomNumber));
+		
+		/*
+		assert(!rbt.has(-101));
+		assert(!rbt.has(101));
+		assert(rbt.getMax() <= 100);
+		assert(rbt.getMin() >= -100);		
+		*/
+	}
+	
+	delete pRbt;
+
+
 	TestUnion intVersion(3);
 	TestUnion boolVersion(false);
 
@@ -109,20 +204,21 @@ void sandbox::tableRnD(void)
 
 
 #endif DEVELOP_TABLE
-
-	std::string really("rel", 3);
-	printf("%s\n", really.c_str());
-	size_t sum = really.size() + really.length();
-	printf("%d\n", sum);
-	
 	{
-		String::Immutable stackVersion("stackVersion");
-		String::Immutable* heapVersion = new String::Immutable("stackVersion");
-		String::Immutable stackVersion2("stackVersion2");
-		String::Immutable* heapVersion2 = new String::Immutable("stackVersion2");
-		delete heapVersion2;
-		delete heapVersion;
+		std::string really("rel", 3);
+		printf("%s\n", really.c_str());
+		size_t sum = really.size() + really.length();
+		printf("%d\n", sum);
+		
+		{
+			String::Immutable stackVersion("stackVersion");
+			String::Immutable* heapVersion = new String::Immutable("stackVersion");
+			String::Immutable stackVersion2("stackVersion2");
+			String::Immutable* heapVersion2 = new String::Immutable("stackVersion2");
+			delete heapVersion2;
+			delete heapVersion;
+		}
+		
+		printf("woot\n");
 	}
-	
-	printf("woot\n");
 }

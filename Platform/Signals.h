@@ -823,7 +823,239 @@ private:
 		DECLARE_MUTABLE_MUTEX(m_mutex) \
 	};
 
-SIGNALS_DECLARE_TRANSMITTER(1);
+template < CW_TEMPLATE_ARGS_RETS_0_ARGS_1 > 
+class Transmitter1 : public Transmitter 
+{ 
+private: 
+	template< CW_TEMPLATE_ARGS_RETS_0_ARGS_1 > 
+	class Connection 
+	{ 
+	public: 
+		virtual ~Connection(void)=0 {}; 
+		virtual Connection < CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1 >* clone(void)=0; 
+		virtual Connection< CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1 >* duplicate(Receiver* receiver)=0; 
+		virtual Receiver* getReceiver(void) const=0; 
+		virtual void transmit( CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1 ) const=0; 
+	}; 
+	template< class RECEIVER, CW_TEMPLATE_ARGS_RETS_0_ARGS_1 > 
+	class volatile1 
+		: public Connection< CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1 > 
+	{ 
+	public: 
+		volatile1(void) 
+			: m_object(NULL) 
+			, m_function(NULL) 
+		{} 
+		volatile1(RECEIVER* object, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1)) 
+			: m_object(object) 
+			, m_function(function) 
+		{} 
+		virtual Connection* clone(void) 
+		{ 
+			return new volatile1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(*this); 
+		} 
+		virtual Connection* duplicate(Receiver* receiver) 
+		{ 
+			return new volatile1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(static_cast<RECEIVER*>(receiver), m_function); 
+		} 
+		virtual Receiver* getReceiver(void) const 
+		{ 
+			return m_object; 
+		} 
+		virtual void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_1) const 
+		{ 
+			(m_object->*m_function)(CW_CALL_RETS_0_ARGS_1); 
+		} 
+	private: 
+		RECEIVER*			m_object; 
+		void (RECEIVER::*	m_function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1); 
+	}; 
+	template<class RECEIVER, CW_TEMPLATE_ARGS_RETS_0_ARGS_1> 
+	class const1 
+		: public Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1> 
+	{ 
+	public: 
+		const1(void) 
+			: m_object(NULL) 
+			, m_function(NULL) 
+		{} 
+		const1(RECEIVER* object, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1) const) 
+			: m_object(object) 
+			, m_function(function) 
+		{} 
+		virtual Connection* clone(void) 
+		{ 
+			return new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(*this); 
+		} 
+		virtual Connection* duplicate(Receiver* receiver) 
+		{ 
+			return new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(static_cast<RECEIVER*>(receiver), m_function); 
+		} 
+		virtual Receiver* getReceiver(void) const 
+		{ 
+			return m_object; 
+		} 
+		virtual void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_1) const 
+		{ 
+			(m_object->*m_function)(CW_CALL_RETS_0_ARGS_1); 
+		} 
+	private: 
+		RECEIVER*			m_object; 
+		void (RECEIVER::*	m_function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1) const; 
+	}; 
+public: 
+	typedef std::list<Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1> *> connections_list; 
+	Transmitter1(void) 
+	{} 
+	Transmitter1(const Transmitter1& s) 
+		: Transmitter(s) 
+	{ 
+		SYNC(m_mutex); 
+		connections_list::const_iterator iter = s.m_receivers.begin(); 
+		connections_list::const_iterator sentinel = s.m_receivers.end(); 
+		while (iter != sentinel) 
+		{ 
+			(*iter)->getReceiver()->onConnect(this); 
+			m_receivers.push_back((*iter)->clone()); 
+			++iter; 
+		} 
+	} 
+	virtual ~Transmitter1(void) 
+	{ 
+		disconnectAll(); 
+	} 
+	template<class RECEIVER> 
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1)) 
+	{ 
+		if (receiver && function) 
+		{ 
+			SYNC(m_mutex); 
+			connections_list::const_iterator iter = m_receivers.begin(); 
+			connections_list::const_iterator sentinel = m_receivers.end(); 
+			while (iter != sentinel) 
+			{ 
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) 
+				{ 
+					return; 
+				} 
+				++iter; 
+			} 
+			m_receivers.push_back(new volatile1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(receiver, function)); 
+			receiver->onConnect(this); 
+		} 
+	} 
+	template<class RECEIVER> 
+	void connect(RECEIVER* receiver, void (RECEIVER::* function)(CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1) const) 
+	{ 
+		if (receiver && function) 
+		{ 
+			SYNC(m_mutex); 
+			connections_list::const_iterator iter = m_receivers.begin(); 
+			connections_list::const_iterator sentinel = m_receivers.end(); 
+			while (iter != sentinel) 
+			{ 
+				if ((*iter)->getReceiver() == static_cast<Receiver*>(receiver)) 
+				{ 
+					return; 
+				} 
+				++iter; 
+			} 
+			m_receivers.push_back(new const1<RECEIVER, CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>(receiver, function)); 
+			receiver->onConnect(this); 
+		} 
+	} 
+	void ceaseTransmission(void) 
+	{ 
+		SYNC(m_mutex); 
+		disconnectAll(); 
+		m_receivers.erase(m_receivers.begin(), m_receivers.end()); 
+	} 
+	void disconnect(Receiver* receiver) 
+	{ 
+		SYNC(m_mutex); 
+		connections_list::iterator iter = m_receivers.begin(); 
+		connections_list::iterator sentinel = m_receivers.end(); 
+		while (iter != sentinel) 
+		{ 
+			Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>* connection = *iter; 
+			if (connection->getReceiver() == receiver) 
+			{ 
+				receiver->onDisconnect(this); 
+				delete connection; 
+				m_receivers.erase(iter); 
+				return; 
+			} 
+			++iter; 
+		} 
+	} 
+	void transmit(CW_DECLARE_FUNCTION_RETS_0_ARGS_1) const 
+	{ 
+		SYNC(m_mutex); 
+		connections_list copy(m_receivers); 
+		connections_list::const_iterator iter = copy.begin(); 
+		connections_list::const_iterator sentinel = copy.end(); 
+		while (iter != sentinel) 
+		{ 
+			(*iter)->transmit(CW_CALL_RETS_0_ARGS_1); 
+			++iter; 
+		} 
+	} 
+	inline void operator()(CW_DECLARE_FUNCTION_RETS_0_ARGS_1) const 
+	{ 
+		transmit(CW_CALL_RETS_0_ARGS_1); 
+	} 
+protected: 
+	void onDisconnect(Receiver* receiver) 
+	{ 
+		SYNC(m_mutex); 
+		connections_list::iterator iter = m_receivers.begin(); 
+		connections_list::iterator sentinel = m_receivers.end(); 
+		while (iter != sentinel) 
+		{ 
+			Connection<CW_TEMPLATE_ARGS_SIGNATURE_RETS_0_ARGS_1>* connection = *iter; 
+			if (connection->getReceiver() == receiver) 
+			{ 
+				delete connection; 
+				m_receivers.erase(iter); 
+				return; 
+			} 
+			++iter; 
+		} 
+	} 
+	void disconnectAll(void) 
+	{ 
+		SYNC(m_mutex); 
+		connections_list::const_iterator iter = m_receivers.begin(); 
+		connections_list::const_iterator sentinel = m_receivers.end(); 
+		while (iter != sentinel) 
+		{ 
+			(*iter)->getReceiver()->onDisconnect(this); 
+			delete *iter; 
+			++iter; 
+		} 
+	} 
+	void replicate(const Receiver* receiver, Receiver* new_receiver) 
+	{ 
+		SYNC(m_mutex); 
+		connections_list::iterator iter = m_receivers.begin(); 
+		connections_list::iterator sentinel = m_receivers.end(); 
+		while (iter != sentinel) 
+		{ 
+			if ((*iter)->getReceiver() == receiver) 
+			{ 
+				m_receivers.push_back((*iter)->duplicate(new_receiver)); 
+				return; 
+			} 
+			++iter; 
+		} 
+	} 
+private: 
+	connections_list				m_receivers; 
+	DECLARE_MUTABLE_MUTEX(m_mutex) 
+};
+
+
+// SIGNALS_DECLARE_TRANSMITTER(1);
 SIGNALS_DECLARE_TRANSMITTER(2);
 SIGNALS_DECLARE_TRANSMITTER(3);
 SIGNALS_DECLARE_TRANSMITTER(4);
