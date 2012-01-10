@@ -446,9 +446,6 @@ protected:
 			frame++;
 			Scheduler::single.enqueueAndWaitOnChildren(work);
 			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
-
-			if (frame > 1000)
-				break;
 		}
 	}
 
