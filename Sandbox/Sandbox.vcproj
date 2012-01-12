@@ -438,6 +438,26 @@
 				RelativePath=".\TableRnD.cpp"
 				>
 			</File>
+			<Filter
+				Name="AI"
+				>
+				<File
+					RelativePath=".\AI_Behavior.h"
+					>
+				</File>
+				<File
+					RelativePath=".\AI_DecisionTree.h"
+					>
+				</File>
+				<File
+					RelativePath=".\AI_GOAP.h"
+					>
+				</File>
+				<File
+					RelativePath=".\AI_HSFM.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Rejected"

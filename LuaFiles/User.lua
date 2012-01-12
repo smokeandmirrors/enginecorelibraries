@@ -7,6 +7,13 @@ function _G.doit()
 	UnitTestingFramework.testAll()
 end
 
+function _G.cS()
+	rerequire'CodeWritingSignals'
+	local CWS = CodeWritingSignals
+	local myFile = io.open('MyFile.h', 'w+')
+	CWS.writeToFile(myFile, 10)
+end
+
 function _G.enginetest()
 	rerequire'TestSequenceOne'
 	require'Sequence'

@@ -1,5 +1,11 @@
 require'Utilities'
 
+function checkString()
+	local myString   = "will this work"
+	"or will it not"
+	print(myString)
+end
+
 function go()
 	t = {}
 	for i=6,1,-1 do
@@ -204,6 +210,12 @@ function cs2n()
 	local ES2N = rerequire'LuaExposeScriptToNative'
 	local myFile = io.open('MyFile.h', 'w+')
 	ES2N.generateHeader(myFile, 10, 10)
+end
+
+function _G.cS()
+	local CWS = rerequire'CodeWritingSignals'
+	local myFile = io.open('MyFile.h', 'w+')
+	CWS.writeToFile(myFile, 5)
 end
 
 function _G.n2s()

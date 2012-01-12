@@ -646,7 +646,7 @@ void sandbox::schedulingRnD(void)
 
 	concurrency::Executor* executor2 = new concurrency::Executor(&doWork3);
 	concurrency::Scheduler::single.enqueue(*executor2); // enqueueAndWait
-	concurrency::sleep(10000);
+	concurrency::sleep(5000);
 	printf("Waited enqueue\n");
 	// Thread::checkDestruction();
 	

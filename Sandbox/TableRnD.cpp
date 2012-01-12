@@ -2,6 +2,7 @@
 
 #include "Platform.h"
 #include "RedBlackTree.h"
+#include "RedBlackMap.h"
 #include "Sandbox.h"
 #include "Strings.h"
 #include "Table.h"
@@ -60,8 +61,11 @@ struct TestUnion
 
 void sandbox::tableRnD(void)
 {
-
-	
+	RedBlackMap<const schar*, int> stringToNumber;
+	stringToNumber.set("awesome", 10);
+	stringToNumber.set("bitchin", 20);
+	sint bitchin = stringToNumber.get("bitchin");
+		
 	std::map<int, int> numberToNumber;
 	numberToNumber[10] = 100;
 	int index100 = numberToNumber[100];

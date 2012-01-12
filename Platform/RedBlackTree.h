@@ -14,9 +14,9 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
 namespace containers
 {
+// template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 
-// template<typename ELEMENT, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
-template<typename ELEMENT> //, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
+template<typename ELEMENT, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
 class RedBlackTree
 {
 public:
@@ -131,10 +131,10 @@ private:
 			
 		const ELEMENT& currentValue = node->m_value;
 		
-		if (value < currentValue)
+		if (IS_LESS::evaluate(value, currentValue))
 			node->m_left = insert(node->m_left, value);
 		
-		else if (value > currentValue)
+		else if (IS_GREATER::evaluate(value, currentValue))
 			node->m_right = insert(node->m_right, value);
 		
 		if (isRed(node->m_right))
@@ -211,7 +211,7 @@ private:
 	inline Node*
 		remove(Node* node, ELEMENT value)
 	{
-		if (value < node->m_value)
+		if (IS_LESS::evaluate(value, node->m_value))
 		{
 			if (!isRed(node->m_left) && !isRed(node->m_left->m_left))
 				node = moveRedLeft(node);
@@ -223,7 +223,7 @@ private:
 			if (isRed(node->m_left))
 				node = rotateRight(*node);
 			
-			if (value == node->m_value && !node->m_right)
+			if (IS_EQUAL::evaluate(value, node->m_value) && !node->m_right)
 			{
 				Node::recycle(node);			
 				return NULL;
@@ -232,7 +232,7 @@ private:
 			if (!isRed(node->m_right) && !isRed(node->m_right->m_left))
 				node = moveRedRight(node);
 
-			if (value == node->m_value)
+			if (IS_EQUAL::evaluate(value, node->m_value))
 			{
 				node = getMin(node->m_right);
 				node->m_right = removeMin(node->m_right);
@@ -404,7 +404,7 @@ private:
 		if (!root)
 			return true;
 
-		if ((max < root->m_value) || (min > root->m_value))
+		if (IS_LESS::evaluate(max, root->m_value) || IS_GREATER::evaluate(min > root->m_value))
 			return false;
 
 		return isBST(root->m_left, root->m_value, min)
@@ -452,11 +452,11 @@ public:
 
 }; // class RedBlackTree
 
-template<typename ELEMENT> const bool RedBlackTree<ELEMENT>::red(true);
-template<typename ELEMENT> const bool RedBlackTree<ELEMENT>::black(false);
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> const bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::red(true);
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> const bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::black(false);
 
-template<typename ELEMENT> 
-ELEMENT RedBlackTree<ELEMENT>::getMax(void) const
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> 
+ELEMENT RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::getMax(void) const
 {	// check();
 	if (m_root)
 		getMax(m_root);
@@ -464,8 +464,8 @@ ELEMENT RedBlackTree<ELEMENT>::getMax(void) const
 	return m_root ? getMax(m_root)->m_value : NULL;
 }
 
-template<typename ELEMENT> 
-ELEMENT RedBlackTree<ELEMENT>::getMin(void) const
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+ELEMENT RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::getMin(void) const
 {	// check();
 	if (m_root)
 		getMin(m_root);
@@ -473,23 +473,23 @@ ELEMENT RedBlackTree<ELEMENT>::getMin(void) const
 	return m_root ? getMin(m_root)->m_value : NULL;
 }
 
-template<typename ELEMENT> 
-uint RedBlackTree<ELEMENT>::getSize(void) const
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+uint RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::getSize(void) const
 {	// check();
 	return m_size;
 }
 
-template<typename ELEMENT> 
-bool RedBlackTree<ELEMENT>::has(ELEMENT value) const
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::has(ELEMENT value) const
 {	// check();
 	if (Node* node = m_root)
 	{
 		do 
 		{
-			if (value == node->m_value)
+			if (IS_EQUAL::evaluate(value, node->m_value))
 				return true;
 
-			else if (value < node->m_value)
+			else if (IS_LESS::evaluate(value, node->m_value))
 				node = node->m_left;
 
 			else 
@@ -501,22 +501,22 @@ bool RedBlackTree<ELEMENT>::has(ELEMENT value) const
 	return false;
 }
 
-template<typename ELEMENT> 
-void RedBlackTree<ELEMENT>::insert(ELEMENT value)
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::insert(ELEMENT value)
 {	// check();
 	m_root = insert(m_root, value);
 	m_root->m_color = black;
 	// check();
 }
 
-template<typename ELEMENT> 
-bool RedBlackTree<ELEMENT>::isEmpty(void) const
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::isEmpty(void) const
 {	// check();
 	return m_root == NULL;
 }
 
-template<typename ELEMENT> 
-void RedBlackTree<ELEMENT>::remove(ELEMENT value)
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::remove(ELEMENT value)
 {	// check();
 	if (has(value))
 		m_size--;
@@ -529,8 +529,8 @@ void RedBlackTree<ELEMENT>::remove(ELEMENT value)
 	// check();
 }
 
-template<typename ELEMENT> 
-void RedBlackTree<ELEMENT>::removeMax(void)
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::removeMax(void)
 {	// check();
 	if (m_root)
 		m_root = removeMax(m_root);
@@ -540,8 +540,8 @@ void RedBlackTree<ELEMENT>::removeMax(void)
 	// check();
 }
 
-template<typename ELEMENT> 
-void RedBlackTree<ELEMENT>::removeMin(void)
+template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::removeMin(void)
 {	// check();
 	if (m_root)
 		m_root = removeMin(m_root);
