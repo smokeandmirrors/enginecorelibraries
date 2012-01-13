@@ -139,7 +139,7 @@ function templateDeclareFunctionSignature(nrets, nargs)
 	end
 	
 	for i = 2, nargs do
-		output = output..(', ARG_'..i..' arg1')
+		output = output..(', ARG_'..i..' arg'..i)
 	end
 	-- output: 'ARG_1, ..., ARG_N'
 	return output
