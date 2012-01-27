@@ -486,6 +486,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\RedBlackMap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\RedBlackTree.h"
 				>
 			</File>
