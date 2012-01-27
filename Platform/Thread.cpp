@@ -245,7 +245,7 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 #endif//WAIT_ON_MULTIPLE
 }
 
-void Thread::waitOnCompletionOfTree(Thread::Tree& threads)
+void Thread::waitOnCompletionOfChildren(Thread::Tree& threads)
 {
 	size_t previousSize = 0; 
 	

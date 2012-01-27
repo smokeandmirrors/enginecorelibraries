@@ -25,15 +25,7 @@ namespace compilerChecks
 
 	const int Math<int>::ZERO_TOLERANCE = 5;
 	const float Math<float>::ZERO_TOLERANCE = 0.0f;
-
-	sreal number = 0x3eea161e;
-
-
 	void check(void);
-
 } // namespace compilerChecks
-
-
-
 
 #endif//COMPILERCHECKS_H

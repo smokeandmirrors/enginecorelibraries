@@ -33,7 +33,7 @@ are included in the macro below
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
 #if SANDBOX
-	// sandbox::play();// just plays with C/C++ compile/runtime functionality
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
 #endif//SANDBOX	
 
 #if EXTENDED_BY_LUA 

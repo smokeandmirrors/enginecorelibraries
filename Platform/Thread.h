@@ -41,8 +41,8 @@ public:
 		{
 			Thread::Tree::ThreadIter sentinel(threads.end());
 			for (Thread::Tree::ThreadIter iter(threads.begin());
-			iter != sentinel;
-			iter++)
+				iter != sentinel;
+				iter++)
 			{
 				(*iter)->removeReference();
 			}
@@ -102,11 +102,6 @@ public:
 			threads.push_back(thread);
 		}
 
-		inline void waitOnCompletion(void)
-		{
-			waitOnCompletionOfTree(*this);
-		}
-
 	private:
 		Thread& operator=(const Thread&);
 
@@ -119,18 +114,18 @@ public:
 
 	static threadID getCurrentID(void);
 	/// \todo these all need to be handled via shared_ptr
-	// for the normal user
+	/// for the normal user
 	static Thread* getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	// for the user/scheduler to wait on it
+	/// for the user/scheduler to wait on it
 	static Thread* getSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	// for the daring user, for the scheduler to get the preferred CPU
+	/// for the daring user, for the scheduler to get the preferred CPU
 	static Thread* getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
-	
+	/// wait on the thread to complete
 	static void waitOnCompletion(Thread& thread);
-
+	/// wait on all threads currently in the tree
 	static void waitOnCompletion(Tree& threads, size_t startingIndex=0);
-
-	static void waitOnCompletionOfTree(Tree& threads);
+	/// wait on the threads in the tree, and any child thread
+	static void waitOnCompletionOfChildren(Tree& threads);
 
 	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
 

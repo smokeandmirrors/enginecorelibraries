@@ -7,6 +7,8 @@ const char* megaString = ""
 
 typedef std::string TestStringType; // String::Immutable
 
+
+
 using namespace designPatterns;
 
 class Agent 
@@ -46,14 +48,12 @@ class Shadows
 
 };
 
+#include <queue>
+
 void onPlay(void)
 {
-	// ClockReal realSingle;
-	// ClockReal realDouble;
-	// ClockRelative relative(realSingle);
-	
-	sandbox::tableRnD();
-	sandbox::verifyUnitTests();
+	// sandbox::tableRnD();
+	// sandbox::verifyUnitTests();
 	sandbox::schedulingRnD();
 	
  	Agent alpha;
@@ -64,4 +64,11 @@ void onPlay(void)
  	alpha.add(*attack);
 	alpha.add(*defense);
 	alpha.remove(*attack);
+
+	std::priority_queue<sint> priqueue;
+	priqueue.push(20);
+	priqueue.push(30);
+	priqueue.push(10);
+	const sint& top = priqueue.top();
+	assert(top != 20);
 }

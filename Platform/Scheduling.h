@@ -3,7 +3,6 @@
 #define SCHEDULING_H
 
 #include <map>
-#include <queue>
 #include <vector>
 
 #include "Concurrency.h"
@@ -24,12 +23,9 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-/**
-\todo Scheduler Todo List:
-1 use events or some other thing to free up the creation of the threads ahead of time?
-2 set ideal processor at job execution time
-*/
+/** \todo set ideal processor at job execution time */
 
+#define unspecifiedPriority 0
 
 namespace concurrency
 {
@@ -44,14 +40,35 @@ class Scheduler
 	class Job;
 	class PendingJobQueue;
 	friend class designPatterns::Singleton<Scheduler>;
+	typedef uint SchedulePriority;
+	
 
 public: 
-	void enqueue(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	void enqueue(std::queue<Executor*>& work);
-	void enqueueAndWait(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	void enqueueAndWait(std::queue<Executor*>& work);
-	void enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	void enqueueAndWaitOnChildren(std::queue<Executor*>& work);
+	class Input
+	{
+	public:
+		Input(Executor& inExecutable, cpuID inPreferredCPU=noCPUpreference, SchedulePriority inPriority=unspecifiedPriority)
+			: executable(&inExecutable)
+			, preferredCPU(inPreferredCPU)
+			, priority(inPriority)
+		{ /* empty */ }
+
+	private:
+		friend class Scheduler;
+		Executor* executable;
+		cpuID preferredCPU;
+		SchedulePriority priority;
+	}; // Scheduler::Input
+
+	typedef std::vector<Scheduler::Input> InputQueue;
+	typedef std::vector<Scheduler::Input>::iterator InputQueueIterator;
+
+	void enqueue(Scheduler::Input& work);
+	void enqueue(Scheduler::InputQueue& work);
+	void enqueueAndWait(Scheduler::Input& work);
+	void enqueueAndWait(Scheduler::InputQueue& work);
+	void enqueueAndWaitOnChildren(Scheduler::Input& work);
+	void enqueueAndWaitOnChildren(Scheduler::InputQueue& work);
 	uint getMaxThreads(void) const;
 	uint getNumberActiveJobs(void) const;
 	uint getNumberPendingJobs(void) const;
@@ -71,7 +88,7 @@ private:
 	void accountForWaitedOnThreadCompletion(Thread::Tree* children);
 	bool getFreeIndex(cpuID& index);
 	bool getFreeIndex(cpuID& available, cpuID idealCPU);
-	void initializeAndTrackJob(Executor& executable, cpuID preferredCPU, Thread::Tree* children);
+	void initializeAndTrackJob(Scheduler::Input& work, Thread::Tree* children);
 	void initializeNumberSystemThreads(void);
 	bool isAnyIndexFree(void) const;	
 	bool isAnyJobPending(void) const;

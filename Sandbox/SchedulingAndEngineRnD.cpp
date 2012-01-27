@@ -79,20 +79,20 @@ void simpleChildrenPre(void)
 {
 	doWork3();
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single.enqueue(*one);
+	Scheduler::single.enqueue(Scheduler::Input(*one));
 }
 
 void simpleChildrenPost(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single.enqueue(*one);
+	Scheduler::single.enqueue(Scheduler::Input(*one));
 	doWork3();
 }
 
 void doWork1Children(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::single.enqueue(*one);
+	Scheduler::single.enqueue(Scheduler::Input(*one));
 	doWork3();
 }
 
@@ -100,8 +100,8 @@ void doWork2Children(void)
 {
 	Executor* one = new Executor(&doWork1Children);
 	Executor* two = new Executor(&doWork1Children);
-	Scheduler::single.enqueue(*one);
-	Scheduler::single.enqueue(*two);
+	Scheduler::single.enqueue(Scheduler::Input(*one));
+	Scheduler::single.enqueue(Scheduler::Input(*two));
 	doWork3();
 }
 
@@ -110,9 +110,9 @@ void doWork3Children(void)
 	Executor* one = new Executor(&doWork2Children);
 	Executor* two = new Executor(&doWork2Children);
 	Executor* three = new Executor(&doWork2Children);
-	Scheduler::single.enqueue(*one);
-	Scheduler::single.enqueue(*two);
-	Scheduler::single.enqueue(*three);
+	Scheduler::single.enqueue(Scheduler::Input(*one));
+	Scheduler::single.enqueue(Scheduler::Input(*two));
+	Scheduler::single.enqueue(Scheduler::Input(*three));
 	doWork3();
 }
 
@@ -431,11 +431,12 @@ protected:
 		{
 			timer.reset();
 			std::queue<Executor*> work;
+
 			{
 				SYNC(m_incompleteMutex)
-					requirements_iter iter = m_incomplete.begin();
+				requirements_iter iter = m_incomplete.begin();
 				requirements_iter sentinel = m_incomplete.end();
-
+				
 				while (iter != sentinel)
 				{
 					(*iter)->getInitialRequiredWork(work);
@@ -443,8 +444,15 @@ protected:
 				}
 			}
 
+			Scheduler::InputQueue workQueue;
+			while (!work.empty())
+			{
+				workQueue.push_back(Scheduler::Input(*work.front()));
+				work.pop();
+			}
+			Scheduler::single.enqueueAndWaitOnChildren(workQueue);
+			
 			frame++;
-			Scheduler::single.enqueueAndWaitOnChildren(work);
 			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
 		}
 	}
@@ -586,7 +594,7 @@ void TestJob::execute(void)
 		std::string name = getFormattedName(m_requirement->getID(), jobNumber, maxJobs);
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
-		concurrency::Scheduler::single.enqueue(*executor);
+		concurrency::Scheduler::single.enqueue(Scheduler::Input(*executor));
 	}
 
 	if (delete_self)
@@ -645,7 +653,7 @@ void sandbox::schedulingRnD(void)
 // 	concurrency::Thread::waitOnCompletion(*runMe);
 
 	concurrency::Executor* executor2 = new concurrency::Executor(&doWork3);
-	concurrency::Scheduler::single.enqueue(*executor2); // enqueueAndWait
+	concurrency::Scheduler::single.enqueue(Scheduler::Input(*executor2)); // enqueueAndWait
 	concurrency::sleep(5000);
 	printf("Waited enqueue\n");
 	// Thread::checkDestruction();
@@ -667,13 +675,13 @@ void sandbox::schedulingRnD(void)
 		}
 		
 		printf("Waiting for 32 threads\n");
-		threads.waitOnCompletion();
+		Thread::waitOnCompletion(threads);
 		printf("Waited for 32 threads\n");
 	}
 	// Thread::checkDestruction();
 
 	Executor* original = new Executor(&doWork3Children);
-	Scheduler::single.enqueueAndWaitOnChildren(*original);
+	Scheduler::single.enqueueAndWaitOnChildren(Scheduler::Input(*original));
 	printf("Nice!  That was awesome!\n");
 	// Thread::checkDestruction();
 

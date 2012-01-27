@@ -1,6 +1,35 @@
 require'Utilities'
 require'ObjectOrientedParadigm'
 
+function overWriteFile(name, output)
+	local myFile = io.open(name, 'w+')
+	myFile:write(output)
+	myFile:flush()
+	myFile:close()
+end
+
+function _G.writeAnnoying()
+	local output = ''
+	-- 1st through 14th 
+	output = '1st - 14th: \n'
+	output = output..'=SUM(PRODUCT(B2,C2) * IF(LT(D2,15), 1, 0)'
+	for i = 3,21 do
+		output = output..', PRODUCT(B'..i..',C'..i..') * IF(LT(D'..i..',15), 1, 0)'
+	end
+	output = output..')\n\n'
+	output = output..'15th - End of Month - Required Carry Over\n'
+	output = output..'=SUM(PRODUCT(B2,C2) * IF(GTE(D2,15), 1, 0)'
+	for i = 3,21 do
+		output = output..', PRODUCT(B'..i..',C'..i..') * IF(GTE(D'..i..',15), 1, 0)'
+	end
+	output = output..',B29,SUM(B23:B26)/2'
+	for i = 2, 21 do
+		output = output..', B'..i..' * IF(LT(D'..i..',15), 1, 0)'
+	end
+	output = output..')\n\n'
+	overWriteFile('MonthlyBudget.txt', output)
+end
+
 function _G.doit()
 	require'UnitTestingFramework'
 	require'UTLibraryFunctions'

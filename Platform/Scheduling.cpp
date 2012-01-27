@@ -1,6 +1,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <queue>
 #if WIN32
 #include <process.h>
 #include <windows.h>
@@ -16,12 +17,10 @@ using namespace signals;
 // #define SCHEDULE_PRINT printState();
 #define SCHEDULE_PRINT 
 
-
 namespace concurrency
 {
 
-inline threadID 
-getInitializedID(const Thread& thread)
+inline threadID getInitializedID(const Thread& thread)
 {
 	threadID id;
 	IF_DEBUG(bool success =) thread.getID(id);
@@ -30,8 +29,7 @@ getInitializedID(const Thread& thread)
 }
 
 #if WIN32
-inline uint 
-getNumHardwareThreads(void)
+inline uint getNumHardwareThreads(void)
 {
 	_SYSTEM_INFO system_info;
 	GetSystemInfo(&system_info);
@@ -44,20 +42,31 @@ getNumHardwareThreads(void)
 class Scheduler::Job : public Receiver
 {	
 public:
-	void 
-	ceaseReception(void)
+	class Compare
+	{
+	public:
+		bool operator()(const Job* left, const Job* right) const
+		{
+			return left->getPriority() < right->getPriority();
+		}
+	}; // PriorityCompare 
+
+	void ceaseReception(void)
 	{
 		m_receiver.ceaseReception();
 	}
 
-	cpuID 
-	getPreferredCPU(void) const
+	inline SchedulePriority getPriority(void) const
+	{
+		return m_priority;
+	}
+
+	cpuID getPreferredCPU(void) const
 	{
 		return m_thread->getPreferredCPU();
 	}
 
-	threadID
-	getThreadID(void) const
+	threadID getThreadID(void) const
 	{
 		threadID id;
 
@@ -73,8 +82,7 @@ public:
 		return id;
 	}
 
-	void
-	reset(Thread* thread)
+	void reset(Thread* newThread, SchedulePriority newPriority)
 	{
 		if (m_thread)
 		{
@@ -82,35 +90,32 @@ public:
 			m_thread->removeReference();
 		}
 
-		m_thread = thread;
+		m_thread = newThread;
 
 		if (m_thread)
 		{
 			m_thread->connect(this, &Job::onComplete);
 			m_thread->addReference();
-		}
+			m_priority = newPriority;
+		}		
 	}
 
-	inline void
-	onComplete(Thread*)
+	inline void onComplete(Thread*)
 	{
 		Scheduler::single.accountForFinish(this);
 	}
 
-	inline void
-	onConnect(Transmitter* transmitter)
+	inline void onConnect(Transmitter* transmitter)
 	{
 		m_receiver.onConnect(transmitter);
 	}
 
-	inline void
-	onDisconnect(Transmitter* transmitter)
+	inline void onDisconnect(Transmitter* transmitter)
 	{
 		m_receiver.onDisconnect(transmitter);
 	}
 
-	inline void
-	onRecycle(void)
+	inline void onRecycle(void)
 	{
 		if (m_thread)
 		{
@@ -120,14 +125,12 @@ public:
 		}
 	}
 
-	inline void
-	start(cpuID& requiredCPU) 
+	inline void start(cpuID& requiredCPU) 
 	{
 		m_thread->execute(requiredCPU);
 	}
 
-	const std::string& 
-	toString(void) const
+	const std::string& toString(void) const
 	{
 		static std::string badThreadMessage("invalid");
 		
@@ -151,34 +154,33 @@ private:
 		}
 	}
 
-	signals::ReceiverMember	
-		m_receiver;
-
-	Thread* 
-		m_thread;
+	signals::ReceiverMember	m_receiver;
+	Thread* m_thread;
+	SchedulePriority m_priority;
 }; // Job 
+
 
 class Scheduler::PendingJobQueue
 {
 public:
 	inline void
-		add(Executor& executable, cpuID preferredCPU, Thread** waitable)
+		add(Scheduler::Input& work, Thread** waitable)
 	{
 		Job* job = getFreeJob();
 		Thread* thread; 
 		
 		if (waitable)
 		{
-			thread = Thread::getSuspended(executable, preferredCPU);
+			thread = Thread::getSuspended(*work.executable, work.preferredCPU);
 			*waitable = thread;
 		}
 		else
 		{
-			thread = Thread::getUninitialized(executable, preferredCPU);
+			thread = Thread::getUninitialized(*work.executable, work.preferredCPU);
 		}
 		
-		job->reset(thread);
-		m_pendingJobs.push_back(job);
+		job->reset(thread, work.priority);
+		m_pendingJobs.push(job);
 	}
 
 	inline bool 
@@ -192,8 +194,7 @@ public:
 	{
 		if (areJobsPending())
 		{
-			Job* nextJob = m_pendingJobs.front();
-			return nextJob->getPreferredCPU();
+			return m_pendingJobs.top()->getPreferredCPU();
 		}
 		else
 		{
@@ -224,8 +225,8 @@ public:
 	{
 		if (areJobsPending())
 		{
-			Job* nextJob = m_pendingJobs.front();
-			m_pendingJobs.pop_front();
+			Job* nextJob = m_pendingJobs.top();
+			m_pendingJobs.pop();
 			return nextJob;
 		}
 		else
@@ -248,8 +249,7 @@ public:
 	}
 
 private:
-	/** \todo make m_pendingJobs a priority queue */
-	std::list<Job*> 
+	std::priority_queue<Job*, std::vector<Job*>, Job::Compare> 
 		m_pendingJobs;
 
 	std::vector<Job*>
@@ -300,7 +300,7 @@ void Scheduler::accountForFinish(Job* finished)
 
 	if (originalWasWaiting)
 	{	
-		finished->reset(NULL);
+		finished->reset(NULL, 0);
 	}
 	
 	m_pendingJobs->recycleJob(finished);
@@ -334,10 +334,17 @@ void Scheduler::accountForWaitedOnThreadCompletion(Thread::Tree* children)
 	}
 }
 
-void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
+void Scheduler::enqueue(Scheduler::Input& work)
+{
+	InputQueue shortcut;
+	shortcut.push_back(work);
+	enqueue(shortcut);
+}
+
+void Scheduler::enqueue(Scheduler::InputQueue& work)
 {
 	SYNC(m_mutex);
-	 
+
 	threadID parentID = Thread::getCurrentID();
 	std::map<threadID, threadID>::iterator originalIDIter = m_originalByChildren.find(parentID);
 
@@ -347,62 +354,81 @@ void Scheduler::enqueue(Executor& executable, cpuID preferredCPU)
 		std::map<threadID, Thread::Tree*>::iterator threadsIter =
 			m_childrenByOriginal.find(originalID);
 		assert(threadsIter != m_childrenByOriginal.end());
+		Thread::Tree* tree = threadsIter->second;
+		InputQueueIterator sentinel(work.end());
 		
-		initializeAndTrackJob(executable, preferredCPU, threadsIter->second);		
+		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
+		{
+			initializeAndTrackJob(*iter, tree);
+		}
 	}
 	else
 	{
-		m_pendingJobs->add(executable, preferredCPU, NULL);
+		InputQueueIterator sentinel(work.end());
+		
+		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
+		{
+			m_pendingJobs->add(*iter, NULL);
+		}
+		
 	}
-	
+
 	startJobs();
 }
 
-void Scheduler::enqueueAndWait(Executor& executable, cpuID preferredCPU)
+void Scheduler::enqueueAndWait(Scheduler::Input& work)
 {
-	Thread* output(NULL);
-	{
-		SYNC(m_mutex);
-		m_pendingJobs->add(executable, preferredCPU, &output);
-		startJobs();
-	}
-	Thread::waitOnCompletion(*output);
+	InputQueue shortcut;
+	shortcut.push_back(work);
+	enqueueAndWait(shortcut);
 }
 
-void Scheduler::enqueueAndWaitOnChildren(Executor& executable, cpuID preferredCPU)
-{	// Thread::Tree* children = new Thread::Tree();
-	Thread::Tree children;
-
+void Scheduler::enqueueAndWait(Scheduler::InputQueue& work)
+{
+	Thread::Tree tree;
+	
 	{
 		SYNC(m_mutex);
-		initializeAndTrackJob(executable, preferredCPU, &children);
-		startJobs();
-	}
-
-	children.waitOnCompletion();
-	accountForWaitedOnThreadCompletion(&children);
-	// delete children;
-}
-
-void Scheduler::enqueueAndWaitOnChildren(std::queue<Executor*>& work)
-{	// Thread::Tree* children = new Thread::Tree();
-	Thread::Tree children;
+		InputQueueIterator sentinel(work.end());
 		
-	{
-		SYNC(m_mutex);
-		
-		while (!work.empty())
+		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
 		{
-			initializeAndTrackJob(*(work.front()), noCPUpreference, &children);
-			work.pop();
+			Thread* output(NULL);
+			m_pendingJobs->add(*iter, &output);
+			tree.push(output);
+		}
+
+		startJobs();
+	}
+	
+	Thread::waitOnCompletion(tree);
+}
+
+void Scheduler::enqueueAndWaitOnChildren(Scheduler::Input& work)
+{
+	InputQueue shortcut;
+	shortcut.push_back(work);
+	enqueueAndWaitOnChildren(shortcut);
+}
+
+void Scheduler::enqueueAndWaitOnChildren(Scheduler::InputQueue& work)
+{	
+	Thread::Tree children; // Thread::Tree* children = new Thread::Tree();
+
+	{
+		SYNC(m_mutex);
+		InputQueueIterator sentinel(work.end());
+		
+		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
+		{
+			initializeAndTrackJob(*iter, &children);
 		}
 
 		startJobs();
 	}
 
-	children.waitOnCompletion();
-	accountForWaitedOnThreadCompletion(&children);
-	// delete children;
+	Thread::waitOnCompletionOfChildren(children);
+	accountForWaitedOnThreadCompletion(&children); // delete children;	
 }
 
 bool Scheduler::getFreeIndex(cpuID& index)
@@ -458,14 +484,12 @@ uint Scheduler::getNumberSystemThreads(void) const
 	return m_numSystemThreads; 
 }
 
-void Scheduler::initializeAndTrackJob(Executor& executable,
-								   cpuID preferredCPU,
-								   Thread::Tree* children)
+void Scheduler::initializeAndTrackJob(Scheduler::Input& work, Thread::Tree* children)
 {
 	const threadID originalID = children->getOriginalID();	
 	// add the job to the pending queue, to initialize the thread
 	Thread* thread(NULL);
-	m_pendingJobs->add(executable, preferredCPU, &thread);
+	m_pendingJobs->add(work, &thread);
 	// get the child thread ID
 	const threadID childID = getInitializedID(*thread);
 	// make sure the current thread isn't already waiting on tree of threads
@@ -548,7 +572,7 @@ void Scheduler::startJobs(void)
 	{
 		cpuID preferred(m_pendingJobs->getNextPreferredCPU());
 		cpuID required;
-		IF_DEBUG(bool success =) getFreeIndex(required, preferred);
+		IF_DEBUG(bool success =)getFreeIndex(required, preferred);
 		assert(success);
 		Job* job = m_pendingJobs->getNextJob();
 		job->start(required);
