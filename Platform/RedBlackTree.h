@@ -11,14 +11,22 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
 namespace containers
 {
-// template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 
-template<typename ELEMENT, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
+template
+<
+	typename ELEMENT, 
+	typename IS_EQUAL=std::equal_to<ELEMENT>, 
+	typename IS_GREATER=std::greater<ELEMENT>, 
+	typename IS_LESS=std::less<ELEMENT>
+>
 class RedBlackTree
 {
 public:
 	static const bool red;
 	static const bool black;
+	static const IS_LESS isLess;
+	static const IS_EQUAL isEqual;
+	static const IS_GREATER isGreater;
 	
 	RedBlackTree(void)
 		: m_root(NULL)
@@ -128,10 +136,10 @@ private:
 			
 		const ELEMENT& currentValue = node->m_value;
 		
-		if (IS_LESS::evaluate(value, currentValue))
+		if (isLess(value, currentValue))
 			node->m_left = insert(node->m_left, value);
 		
-		else if (IS_GREATER::evaluate(value, currentValue))
+		else if (isGreater(value, currentValue))
 			node->m_right = insert(node->m_right, value);
 		
 		if (isRed(node->m_right))
@@ -208,7 +216,7 @@ private:
 	inline Node*
 		remove(Node* node, ELEMENT value)
 	{
-		if (IS_LESS::evaluate(value, node->m_value))
+		if (isLess(value, node->m_value))
 		{
 			if (!isRed(node->m_left) && !isRed(node->m_left->m_left))
 				node = moveRedLeft(node);
@@ -220,7 +228,7 @@ private:
 			if (isRed(node->m_left))
 				node = rotateRight(*node);
 			
-			if (IS_EQUAL::evaluate(value, node->m_value) && !node->m_right)
+			if (isEqual(value, node->m_value) && !node->m_right)
 			{
 				Node::recycle(node);			
 				return NULL;
@@ -229,7 +237,7 @@ private:
 			if (!isRed(node->m_right) && !isRed(node->m_right->m_left))
 				node = moveRedRight(node);
 
-			if (IS_EQUAL::evaluate(value, node->m_value))
+			if (isEqual(value, node->m_value))
 			{
 				node = getMin(node->m_right);
 				node->m_right = removeMin(node->m_right);
@@ -401,7 +409,7 @@ private:
 		if (!root)
 			return true;
 
-		if (IS_LESS::evaluate(max, root->m_value) || IS_GREATER::evaluate(min > root->m_value))
+		if (isLess(max, root->m_value) || isGreater(min > root->m_value))
 			return false;
 
 		return isBST(root->m_left, root->m_value, min)
@@ -483,10 +491,10 @@ bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::has(ELEMENT value) co
 	{
 		do 
 		{
-			if (IS_EQUAL::evaluate(value, node->m_value))
+			if (isEqual(value, node->m_value))
 				return true;
 
-			else if (IS_LESS::evaluate(value, node->m_value))
+			else if (isLess(value, node->m_value))
 				node = node->m_left;
 
 			else 

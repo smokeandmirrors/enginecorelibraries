@@ -13,13 +13,22 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 namespace containers
 {
 
-template<typename KEY, typename VALUE, typename IS_EQUAL=isEqual<KEY>, typename IS_GREATER=isGreater<KEY>, typename IS_LESS=isLess<KEY>>
+template<
+	typename KEY, 
+	typename VALUE, 
+	typename IS_EQUAL=std::equal_to<KEY>, 
+	typename IS_GREATER=std::greater<KEY>, 
+	typename IS_LESS=std::less<KEY>
+>
 class RedBlackMap
 {
 public:
 	static const bool red;
 	static const bool black;
-	
+	static const IS_LESS isLess;
+	static const IS_EQUAL isEqual;
+	static const IS_GREATER isGreater;
+
 	RedBlackMap(void)
 		: m_root(NULL)
 		, m_size(0)
@@ -116,10 +125,10 @@ private:
 		{
 			do 
 			{
-				if (IS_EQUAL::evaluate(key, node->m_key))
+				if (isEqual(key, node->m_key))
 					return node;
 
-				else if (IS_LESS::evaluate(key, node->m_key))
+				else if (isLess(key, node->m_key))
 					node = node->m_left;
 
 				else 
@@ -157,10 +166,10 @@ private:
 			
 		const KEY& currentKey = node->m_key;
 		
-		if (IS_LESS::evaluate(key, currentKey))
+		if (isLess(key, currentKey))
 			node->m_left = insert(node->m_left, key, value);
 		
-		else if (IS_GREATER::evaluate(key, currentKey))
+		else if (isGreater(key, currentKey))
 			node->m_right = insert(node->m_right, key, value);
 		
 		if (isRed(node->m_right))
@@ -237,7 +246,7 @@ private:
 	inline Node*
 		remove(Node* node, const KEY& key)
 	{
-		if (IS_LESS::evaluate(key, node->m_key))
+		if (isLess(key, node->m_key))
 		{
 			if (!isRed(node->m_left) && !isRed(node->m_left->m_left))
 				node = moveRedLeft(node);
@@ -249,7 +258,7 @@ private:
 			if (isRed(node->m_left))
 				node = rotateRight(*node);
 			
-			if (IS_EQUAL::evaluate(key, node->m_key) && !node->m_right)
+			if (isEqual(key, node->m_key) && !node->m_right)
 			{
 				Node::recycle(node);			
 				return NULL;
@@ -258,7 +267,7 @@ private:
 			if (!isRed(node->m_right) && !isRed(node->m_right->m_left))
 				node = moveRedRight(node);
 
-			if (IS_EQUAL::evaluate(key, node->m_key))
+			if (isEqual(key, node->m_key))
 			{
 				node = getMin(node->m_right);
 				node->m_right = removeMin(node->m_right);
@@ -430,7 +439,7 @@ private:
 		if (!root)
 			return true;
 
-		if (IS_LESS::evaluate(max, root->m_key) || IS_GREATER::evaluate(min > root->m_key))
+		if (isLess(max, root->m_key) || isGreater(min > root->m_key))
 			return false;
 
 		return isBST(root->m_left, root->m_key, min)
