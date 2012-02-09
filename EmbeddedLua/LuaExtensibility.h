@@ -43,9 +43,11 @@ namespace lua_library_example
 
 	sint luaopen_example(lua_State* L)
 	{
-		lua_pushglobaltable(L); 
-		registerLibrary(L, example_library, 0, "example");
-		return 1;
+		lua_newtable(L); 
+		lua_setglobal(L, "example"); 
+		lua_getglobal(L, "example"); 
+		luaL_setfuncs(L, example_library, 0); 
+		return 0;
 	}
 }
 
@@ -572,9 +574,11 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_OPENER(NAME) \
 	sint key(lua_State* L) \
 	{ \
-		lua_pushglobaltable(L); \
-		Lua::registerLibrary(L, NAME##_library, 0, #NAME); \
-		return 1; \
+		lua_newtable(L); \
+		lua_setglobal(L, #NAME); \
+		lua_getglobal(L, #NAME); \
+		luaL_setfuncs(L, NAME##_library, 0); \
+		return 0; \
 	} 
 
 /** 
@@ -582,21 +586,12 @@ This method is ideal for static classes or libraries.
 #define DEFINE_LUA_OPENER_CLASS(CLASS, SUPER_CLASS) \
 	sint key(lua_State* L) \
 	{ \
-		lua_pushglobaltable(L); \
-		Lua::registerLibrary(L, CLASS##_library, 0, #CLASS); \
+		lua_newtable(L); \
+		lua_setglobal(L, #CLASS); \
+		lua_getglobal(L, #CLASS); \
+		luaL_setfuncs(L, CLASS##_library, 0); \
 		embeddedLua::declareLuaClass(L, #CLASS, #SUPER_CLASS); \
-		return 1; \
-	} 
-
-/** 
-*/
-#define DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
-	sint key(lua_State* L) \
-	{ \
-		lua_pushglobaltable(L); \
-		Lua::registerLibrary(L, NAME##_library, 0, #NAME); \
-		Lua::nilLoadedStatus(L, #NAME); \
-		return 1; \
+		return 0; \
 	} 
 
 /** 
@@ -846,8 +841,6 @@ via ObjectOrientedParadgim.lua.
 \param CLASS the name of the CLASS being exposed, with no delimiters
 \param SuperClass with no delimiters, the parent class of the LuaExtendable,
 or the same if it has no parent class
-
-calls nilLoadedStatus() in declareLuaClass
 
 \note compile-time directive
 \note highly recommended to follow any form of DEFINE_LUA_LUAEXTENDABLE

@@ -50,16 +50,6 @@ public:
 	to LUA_MULTIRET
 	*/
 	static sint	callProtected(lua_State* L, sint num_args=0, sint num_return_values=-1);
-	/** 
-	sets package.loaded[module] = nil 
-	allows for extending of C declared libraries by %Lua files in packages
-	by the same name using require.
-	This needs to be done because luaL_setfuncs modifies the package.loaded table.
-	*/
-	static void	nilLoadedStatus(lua_State* L, const schar* module);
-	/**
-	*/
-	static void	registerLibrary(lua_State* L, const luaL_Reg* lib, sint numUpValues=0, const schar* libname="_G");
 	/**
 	reports output from the lua_State after a function call
 	\param L the %Lua state in which the function was called
@@ -98,13 +88,6 @@ public:
 	returns the lua_State encapsulated by this class
 	*/
 	lua_State* getState(void) const	{ return L; }
-	/** 
-	sets package.loaded[module] = nil 
-	allows for extending of C declared libraries by %Lua files in packages
-	by the same name using require
-	\param module the name of the (loaded) module
-	*/
-	void nilLoadedStatus(const schar* module) const;
 	/** 
 	Opens %Lua library using the lua_function provided
 	\warning if you loaded a library and altered it, this will reload that library

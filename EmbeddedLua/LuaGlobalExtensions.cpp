@@ -17,8 +17,8 @@ static const luaL_Reg lua_library_Global[] = {
 
 void registerGlobalLibrary(lua_State* L)
 {
-	lua_pushglobaltable(L); 
-	Lua::registerLibrary(L, lua_library_Global);
+	lua_pushglobaltable(L);
+	luaL_setfuncs(L, lua_library_Global, 0);
 }
 
 } // namespace embeddedLua

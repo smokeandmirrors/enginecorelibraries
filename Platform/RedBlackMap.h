@@ -5,7 +5,6 @@
 An implementation of a Left Leaning variant of a Red Black Tree, described here:
 www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
-\todo make STL-like
 */
 
 #include <vector>

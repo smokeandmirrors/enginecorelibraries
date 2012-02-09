@@ -55,32 +55,7 @@ public:
 		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua.doString("print\'Hello!\'");
 	}
-		
-	void nilLoadedStatus()
-	{
-		DECLARE_UNIT_TESTING_LUA_OBJECT
-		lua.require("UnitTestingFramework");
-		lua_State* L = lua.getState();
-		
-		//s: ?
-		lua_getglobal(L, "package");
-		lua_getfield(L, -1, "loaded");
-		//s: package.loaded
-		lua_getfield(L, -1, "UnitTestingFramework");
-		//s: UnitTestingFramework
-		CFIX_ASSERT(lua_istable(L, -1));
-		lua_pop(L, 1);
-		//s: ?
-		lua.nilLoadedStatus("UnitTestingFramework");
-		lua_getglobal(L, "package");
-		lua_getfield(L, -1, "loaded");
-		//s: package.loaded
-		lua_getfield(L, -1, "UnitTestingFramework");
-		//s: UnitTestingFramework
-		CFIX_ASSERT(lua_isnil(L, -1));
-		lua_pop(L, 1);		
-	}
-
+	
 	void callProtected()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT
@@ -107,7 +82,6 @@ CFIXCC_BEGIN_CLASS(LuaClass)
 	CFIXCC_METHOD(luaObjectCreationAndDestruction)
 	CFIXCC_METHOD(luaRequire)
 	CFIXCC_METHOD(doString)
-	CFIXCC_METHOD(nilLoadedStatus)
 	CFIXCC_METHOD(callProtected)
 CFIXCC_END_CLASS()
 #endif//EXTENDED_BY_LUA

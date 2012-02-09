@@ -134,7 +134,6 @@ void completeLuaClassDeclaration(lua_State* L, const schar* derived, const schar
 
 void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 {
-	Lua::nilLoadedStatus(L, derived);
 	Lua::require(L, "ObjectOrientedParadigm"); 
 	// hiding the not found error, since once can declare classes
 	// without any %Lua file support.

@@ -184,23 +184,6 @@ void* Lua::luaAlloc(void* ud, void* ptr, size_t osize, size_t nsize)
 	}
 }
 
-void Lua::nilLoadedStatus(lua_State* L, const schar* module)
-{
-	if (module)
-	{
-		lua_getglobal(L, "package");
-		lua_getfield(L, -1, "loaded");
-		lua_pushnil(L);
-		lua_setfield(L, -2, module);
-		lua_pop(L, 1);
-	}
-}
-
-void Lua::nilLoadedStatus(const schar* module) const
-{
-	nilLoadedStatus(L, module);
-}
-
 bool Lua::openLibrary(lua_function opener) const
 {
 	if (opener)
@@ -230,39 +213,6 @@ void Lua::openStandardLibraries(void)
 	conditionallyOpenStandardLibrary(luaopen_package, "package");
 	conditionallyOpenStandardLibrary(luaopen_string, "string");
 	conditionallyOpenStandardLibrary(luaopen_table, "table");
-}
-
-void Lua::registerLibrary(lua_State* L, const luaL_Reg* lib, sint numUpValues/* =0 */, const schar* libname/* ="_G" */)
-{	
-	assert(numUpValues <= 0);
-	/// \todo handle positive numUpValues
-	//s: ?
-	if (lua_istable(L, -1))
-	{
-		lua_getfield(L, -1, libname);
-	}
-	else
-	{
-		lua_getglobal(L, libname);
-	}
-
-	//s: ? t
-	
-	if (lua_isnil(L, -1))
-	{	//s: t nil
-		lua_pop(L, 1);
-		//s: t
-		lua_newtable(L);
-		//s: t {}
-		lua_setfield(L, -2, libname);
-		//s: t
-		lua_getfield(L, -1, libname);
-	}
-	//s: t t.libname
-	luaL_setfuncs(L, lib, numUpValues);
-	//s: t t.libname
-	lua_pop(L, 1);
-	//s: t
 }
 
 // \note taken and modified from from lua.c 

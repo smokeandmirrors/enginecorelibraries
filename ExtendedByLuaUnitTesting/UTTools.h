@@ -12,8 +12,8 @@ this path will have to be set on a per machine basis
 */
 
 #define UNIT_TESTING_LUA_PACKAGE_PATH \
-	"C:\\Users\\carlos.curran\\Documents\\Smoke and Mirrors\\enginecorelibraries\\LuaFiles\\?.lua;" \
-	"C:\\Users\\carlos.curran\\Documents\\Smoke and Mirrors\\enginecorelibraries\\LuaFiles\\UTLuaFiles\\?.lua;"
+	"C:\\Users\\carlos.curran\\Documents\\enginecorelibraries\\LuaFiles\\?.lua;" \
+	"C:\\Users\\carlos.curran\\Documents\\enginecorelibraries\\LuaFiles\\UTLuaFiles\\?.lua;"
 
 /*
 #define UNIT_TESTING_LUA_PACKAGE_PATH \
