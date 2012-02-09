@@ -52,6 +52,9 @@ class Shadows
 
 /*
 
+/// \todo it might be worth it to have the graph keep search data, rather than searches keeping graph data
+
+
 template
 <
 	typename NODE, 
