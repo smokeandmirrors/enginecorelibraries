@@ -52,3 +52,12 @@ syntax: glob
 BuildSystem/Release/Time.obj
 BuildSystem/Release/Thread.obj
 BuildSystem/Debug/Thread.obj
+Platform/Debug/vc80.pdb
+Platform/Debug/vc80.idb
+Platform/Debug/Time.obj
+Platform/Debug/Thread.obj
+Platform/Debug/Synchronization.obj
+Platform/Debug/Strings.obj
+Platform/Debug/Scheduling.obj
+Platform/Debug/Platform.lib
+Platform/Debug/BuildLog.htm
