@@ -1,13 +1,14 @@
 #pragma once
 #ifndef RED_BLACK_MAP_H
 #define RED_BLACK_MAP_H
+
 /**
 An implementation of a Left Leaning variant of a Red Black Tree, described here:
 www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
-
 */
 
 #include <vector>
+#include <map>
 #include "Platform.h"
 
 namespace containers
@@ -54,6 +55,9 @@ public:
 
 	bool 
 		has(const KEY& key) const;
+
+	bool
+		has(const KEY& key, VALUE&) const;
 	
 	bool
 		isEmpty(void) const;
@@ -531,6 +535,20 @@ template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, t
 bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::has(const KEY& key) const
 {	// check();
 	return find(key) != NULL;
+}
+
+template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::has(const KEY& key, VALUE& ifFound) const
+{	// check();
+	if (Node* value = find(key))
+	{
+		ifFound = value->m_value;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>

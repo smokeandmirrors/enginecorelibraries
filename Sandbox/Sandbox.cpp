@@ -50,11 +50,7 @@ class Shadows
 
 #include <queue>
 
-/*
-
 /// \todo it might be worth it to have the graph keep search data, rather than searches keeping graph data
-
-
 template
 <
 	typename NODE, 
@@ -62,100 +58,119 @@ template
 	typename IS_GOAL, 
 	typename ESTIMATE_COST,
 	typename GET_COST,
-	typename IS_INCLUDED,
-	typename OPEN_LIST, 
-	typename OPEN_LIST_INDEX,
+	typename IS_INCLUDED
 >
 class A_Star
 {
 	class Node;
+	class OpenSet;
 	
+	typedef RedBlackMap<const NODE*, Node*> RecordMap;
+
 public:
 	
 	bool search(const NODE& start, const NODE& goal)
 	{
-		Node n(start);
-		openList.add(start);
-
-		while (!openList.isEmpty())
+		if (isIncluded(start))
 		{
-			const Node current(openList.remove());
-			
-			if (isGoal(current))
-			{
-				return true;
-			}
+			const COST initial = estimateCostToGoal(start);
+			Node* startRecord = new Node(initial, initial, 0, start, NULL, true, true); 
+			openSet.add(*startRecord);
 
-			if (const uint index = current.getNumNeighbors())
+			do 
 			{
-				do
+				const Node& current(openSet.remove());
+
+				if (isGoal(current.node))
 				{
-					--index;
-					Node& neighbor(current.getNeighbor(index));
+					return true;
+				}
 
-					if (isIncluded(neighbor))
+				if (const uint index = current.node.getNumNeighbors())
+				{
+					do
 					{
-						const COST currentPathToNeighbor(current.g + getCostToNeighbor(current.node, neighbor.node));
-						
-						if (!neighbor.isInOpenList())
-						{	
-							neighbor.h = estimateCostToGoal(neighbor.node, goal);
-							neighbor.updatePathStatus(current, currentPathToNeighbor);
-							openList.add(neighbor);
-						}
-						else if (currentPathToNeighbor < neighbor.g)
-						{	
-							neighbor.updatePathStatus(current, currentPathToNeighbor);
-							openList.update(neighbor);
+						--index;
+
+						if (Node* n = isNeighborIncluded(current.node.getNeighbor(index)))
+						{
+							Node& neighbor(*n);
+							const COST startToNeighbor(current.g + getCostToNeighbor(current.node, neighbor.node));
+
+							if (!neighbor.isInOpenSet)
+							{	
+								neighbor.h = estimateCostToGoal(neighbor.node, goal);
+								updatePathRecord(neighbor, current, startToNeighbor);
+								openSet.add(neighbor);
+							}
+							else if (startToNeighbor < neighbor.g)
+							{	
+								updatePathRecord(neighbor, current, startToNeighbor);
+								openSet.update(neighbor);
+							}
 						}
 					}
+					while (index);
 				}
-				while (index);
 			}
+			while (!openSet.isEmpty())
 		}
 
 		return false;
 	}
 
 private:
-	class Node
+	struct Node
 	{	
-	public:
-		const NODE& node;
 		COST h;
 		COST f;
 		COST g;
-		OPEN_LIST_INDEX index;
-		OPEN_LIST_INDEX parent;
-
-		inline Node(const NODE& n) 
-			: node(n)
+		const NODE& node;
+		const NODE* parent;
+		bool isIncluded;
+		bool isInOpenSet;
+		// bool isInClosedList; // unecessary in this version
+		
+		inline Node(COST& new_h, COST& new_f, COST& new_g, const NODE& n, const NODE* parent, bool included, bool inOpenSet) 
+			: h(new_h)
+			, f(new_f)
+			, g(new_g)
+			, node(n)
+			, parent(parent)
+			, isIncluded(included)
+			, isInOpenSet(inOpenSet)
 		{ 
 			// empty  
-		}
-
-		inline Node& getNeighbor(void) const;
-		
-		inline uint getNumNeighbors(void) const;
-		
-		inline bool isInOpenList(void) const;
-		
-		inline void updatePathStatus(Node& current, COST& currentPathToNeighbor)
-		{	// update g & f, update position in path from start
-			g = currentPathToNeighbor;
-			parent = current.index;
-			f = currentPathToNeighbor + h;
-		}
+		}		
 	}; // class A_Star::Node
+
+	inline const Node* isNeighborIncluded(const NODE& node) const
+	{
+		Node* record;
+		
+		if (!recordsByNodes.has(&node, record))
+		{
+			record = new Node(node);
+			record->isIncluded = isIncluded(node);
+		}
+		
+		return record->isIncluded ? record : NULL;
+	}
+
+	inline void updatePathRecord(Node& current, Node& parent, COST& throughParent)
+	{	// update g & f, update position in path from start
+		current.g = throughParent;
+		current.parent = &parent;
+		current.f = throughParent + current.h;
+	}
 
 	IS_GOAL isGoal;
 	IS_INCLUDED isIncluded;
-	OPEN_LIST openList;
 	GET_COST getCostToNeighbor;
 	ESTIMATE_COST estimateCostToGoal;
+	OpenSet openSet;
+	RecordMap recordsByNodes;
 }; // class A_Star
-
-*/
 
 void onPlay(void)
 {
@@ -176,6 +191,7 @@ void onPlay(void)
 	priqueue.push(20);
 	priqueue.push(30);
 	priqueue.push(10);
+	
 	const sint& top = priqueue.top();
 	assert(top != 20);
 }

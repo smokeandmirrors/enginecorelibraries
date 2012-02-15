@@ -14,7 +14,9 @@ Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	NO
 
-\todo move this to the platform library 
+\todo move this to the platform library
+\todo examine the use of global const memory access cost
+\todo move these to template math libs or macros
 
 */
 namespace math
