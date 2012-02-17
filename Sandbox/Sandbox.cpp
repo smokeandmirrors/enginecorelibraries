@@ -1,3 +1,4 @@
+#include "BinaryHeap.h"
 #include "Composition.h"
 #include "Sandbox.h"
 #include "UnitTestVerification.h"
@@ -49,7 +50,7 @@ class Shadows
 };
 
 #include <queue>
-
+/*
 /// \todo it might be worth it to have the graph keep search data, rather than searches keeping graph data
 template
 <
@@ -150,8 +151,15 @@ private:
 		
 		if (!recordsByNodes.has(&node, record))
 		{
-			record = new Node(node);
-			record->isIncluded = isIncluded(node);
+			if (isIncluded(node))
+			{
+
+				record = new Node(node, estimateCostToGoal(,,,,,,,);
+			}
+			else
+			{
+				record = new Node(node);
+			}
 		}
 		
 		return record->isIncluded ? record : NULL;
@@ -171,12 +179,12 @@ private:
 	OpenSet openSet;
 	RecordMap recordsByNodes;
 }; // class A_Star
-
+*/
 void onPlay(void)
 {
 	// sandbox::tableRnD();
 	// sandbox::verifyUnitTests();
-	sandbox::schedulingRnD();
+	// sandbox::schedulingRnD();
 	
  	Agent alpha;
  	Movement* movement = new Movement();
@@ -194,4 +202,32 @@ void onPlay(void)
 	
 	const sint& top = priqueue.top();
 	assert(top != 20);
+
+
+	BinaryHeap<sint> biheap;
+	biheap.push(20);
+	biheap.push(30);
+	biheap.push(10);
+
+	sint mytop = biheap.top();
+
+
+
+	biheap.push(50);
+	
+	for (sint i = 0; i < 10; ++i)
+	{
+		biheap.push(i * 10);
+	}
+	 
+	mytop = biheap.top();
+
+	while (!biheap.isEmpty())
+	{
+		sint nexttop = biheap.top();
+		assert(nexttop >= mytop);
+		mytop = nexttop;
+		biheap.pop();
+	}
+
 }

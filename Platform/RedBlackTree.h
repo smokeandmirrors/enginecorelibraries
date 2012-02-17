@@ -1,13 +1,13 @@
 #pragma once
-#ifndef REDBLACKTREE_H
-#define REDBLACKTREE_H
+#ifndef RED_BLACK_TREE_H
+#define RED_BLACK_TREE_H
 /**
 An implementation of a Left Leaning variant of a Red Black Tree, described here:
 www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 */
 
-#include <vector>
 #include "Platform.h"
+#include <vector>
 
 namespace containers
 {
@@ -558,4 +558,4 @@ void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::removeMin(void)
 
 } // namespace containers
 
-#endif//REDBLACKTREE_H
+#endif//RED_BLACK_TREE_H

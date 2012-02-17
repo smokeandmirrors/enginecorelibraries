@@ -486,6 +486,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BinaryHeap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\RedBlackMap.h"
 				>
 			</File>
