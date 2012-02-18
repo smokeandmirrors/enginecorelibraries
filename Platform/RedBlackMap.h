@@ -24,57 +24,28 @@ template<
 class RedBlackMap
 {
 public:
+	RedBlackMap(void);
+	~RedBlackMap(void);
+
+	VALUE get(const KEY& key) const;
+	VALUE getMax(void) const;
+	VALUE getMin(void) const;
+	uint getSize(void) const;
+	bool has(const KEY& key) const;
+	bool has(const KEY& key, VALUE&) const;
+	bool isEmpty(void) const;
+	void remove(const KEY& key);
+	void removeMax(void);
+	void removeMin(void);
+	void set(const KEY& key, VALUE value);
+
+private:
 	static const bool red;
 	static const bool black;
 	static const IS_LESS isLess;
 	static const IS_EQUAL isEqual;
 	static const IS_GREATER isGreater;
 
-	RedBlackMap(void)
-		: m_root(NULL)
-		, m_size(0)
-		, m_isBeingChecked(false)
-	{ /* empty */ }
-
-	~RedBlackMap(void)
-	{ 
-		Node::recycle(m_root);
-	}
-
-	VALUE
-		get(const KEY& key) const;
-
-	VALUE
-		getMax(void) const;
-
-	VALUE
-		getMin(void) const;
-
-	uint 
-		getSize(void) const;
-
-	bool 
-		has(const KEY& key) const;
-
-	bool
-		has(const KEY& key, VALUE&) const;
-	
-	bool
-		isEmpty(void) const;
-	
-	void
-		remove(const KEY& key);
-
-	void
-		removeMax(void);
-	
-	void
-		removeMin(void);
-
-	void
-		set(const KEY& key, VALUE value);
-
-private:
 	class Node
 	{	
 	public:
@@ -493,6 +464,21 @@ public:
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> const bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::red(true);
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> const bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::black(false);
+
+template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::RedBlackMap()
+: m_root(NULL)
+, m_size(0)
+, m_isBeingChecked(false)
+{ 
+	/* empty */ 
+}
+
+template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::~RedBlackMap()
+{ 
+	Node::recycle(m_root);
+}
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 VALUE RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::get(const KEY& key) const

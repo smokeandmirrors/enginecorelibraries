@@ -180,6 +180,32 @@ private:
 	RecordMap recordsByNodes;
 }; // class A_Star
 */
+
+template<typename NUMBER>
+NUMBER getRand(NUMBER min, NUMBER max) 
+{
+	PREVENT_COMPILE
+}
+
+template<>
+sint getRand(sint min, sint max) 
+{
+	return (rand() % (max - min)) + min;
+}
+
+template<>
+sreal getRand(sreal min, sreal max) 
+{
+	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
+	return v * (max - min) + min;
+}
+
+template<>
+schar getRand(schar min, schar max) 
+{
+	return static_cast<schar>((rand() % (max - min)) + min);
+}
+
 void onPlay(void)
 {
 	// sandbox::tableRnD();
@@ -195,39 +221,67 @@ void onPlay(void)
 	alpha.add(*defense);
 	alpha.remove(*attack);
 
-	std::priority_queue<sint> priqueue;
-	priqueue.push(20);
-	priqueue.push(30);
-	priqueue.push(10);
-	
-	const sint& top = priqueue.top();
-	assert(top != 20);
-
-
-	BinaryHeap<sint> biheap;
-	biheap.push(20);
-	biheap.push(30);
-	biheap.push(10);
-
-	sint mytop = biheap.top();
-
-
-
-	biheap.push(50);
-	
-	for (sint i = 0; i < 10; ++i)
 	{
-		biheap.push(i * 10);
-	}
-	 
-	mytop = biheap.top();
-
-	while (!biheap.isEmpty())
-	{
-		sint nexttop = biheap.top();
-		assert(nexttop >= mytop);
-		mytop = nexttop;
-		biheap.pop();
+		std::priority_queue<sint > priqueue;
+		priqueue.push(20);
+		priqueue.push(30);
+		priqueue.push(10);
+		const sint& top = priqueue.top();
+		assert(top != 20);
+		BinaryHeap<sint, std::greater<sint>> biheap;
+		biheap.push(20);
+		biheap.push(30);
+		biheap.push(10);
+		sint mytop = biheap.top();
+		biheap.push(50);
+		for (sint i = 0; i < 10; ++i)
+		{
+			biheap.push(i * 10);
+		}
+		mytop = biheap.top();
+		while (!biheap.isEmpty())
+		{
+			sint nexttop = biheap.top();
+			assert(nexttop <= mytop);
+			mytop = nexttop;
+			biheap.pop();
+		}
 	}
 
+	{
+		std::priority_queue<sint> priqueue;
+		BinaryHeap<sint, std::greater<sint>> biheap;
+
+		for (sint i = 1; i < 1000; ++i)
+		{
+			sint randi = getRand<sint>(-i, i);
+			biheap.push(randi);
+			priqueue.push(randi);
+
+			assert(biheap.top() == priqueue.top());
+		}
+
+		const sint& shouldbegreatest = biheap.top();
+		const sint& shouldalsobegreatest = priqueue.top();
+
+		for (sint i = 1; i < 1000; ++i)
+		{
+			sint randi = getRand<sint>(-i, i);
+			biheap.update(0, randi);
+			priqueue.pop();
+			priqueue.push(randi);
+
+			assert(biheap.top() == priqueue.top());
+		}
+
+		while (!biheap.isEmpty())
+		{
+			assert(!priqueue.empty());
+			assert(biheap.top() == priqueue.top());
+			biheap.pop();
+			priqueue.pop();
+		}
+
+		assert(priqueue.empty());
+	}
 }

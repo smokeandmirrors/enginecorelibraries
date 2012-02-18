@@ -44,7 +44,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
 		lua.require("User");
-		lua.runConsole();
+		// lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 	return 0;
