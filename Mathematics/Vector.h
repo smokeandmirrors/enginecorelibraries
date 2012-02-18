@@ -54,6 +54,8 @@ template<typename T> class V3;
 typedef V2<float> Vector2;
 typedef V3<float> Vector3;
 
+typedef V2<sint> Pixel;
+
 /** 
 \defgroup Vector_Directions Directions
 \ingroup Mathematics
@@ -107,6 +109,7 @@ public:
 	V2<T>& 		operator+=(const V2<T>& v);
 	// distance to another
 	T			distance(const V2<T>& v) const;
+	T			distanceManhattan(const V2<T>& v) const;
 	T 			distanceSqr(const V2<T>& v) const;
 	bool		isFar(const V2<T>& v, T closest_range) const;
 	bool		isNear(const V2<T>& v, T farthest_range) const;
@@ -380,6 +383,10 @@ template<typename T> inline T V2<T>::distance(const V2<T>& v) const
 	T x_dist = v.x - x;
 	T y_dist = v.y - y;
 	return sqrt(x_dist * x_dist + y_dist * y_dist);
+}
+template<typename T> inline T V2<T>::distanceManhattan(const V2<T>& v) const
+{
+	return v.x - x + v.y - y;
 }
 template<typename T> inline T V2<T>::distanceSqr(const V2<T>& v) const
 {

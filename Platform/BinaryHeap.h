@@ -18,6 +18,7 @@ class BinaryHeap
 public:
 	BinaryHeap(uint reserveSize=0);
 	
+	void deleteElements(void);
 	ELEMENT& get(uint index);
 	uint getSize(void) const;
 	bool isEmpty(void) const;
@@ -45,6 +46,24 @@ BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::BinaryHeap(uint reserveSize/* =0 */)
 : nodes(reserveSize)
 {
 	 /* empty */
+}
+
+
+template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
+void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::deleteElements(void)
+{
+	if (!isEmpty())
+	{
+		uint index(getSize());
+
+		do 
+		{
+			--index;
+			delete nodes[index];
+		} while (index);
+		
+		nodes.resize(0);
+	}
 }
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>

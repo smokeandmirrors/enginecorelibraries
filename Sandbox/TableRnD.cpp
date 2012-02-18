@@ -1,38 +1,14 @@
 #include <map>
 
 #include "Platform.h"
+
+#include "Numbers.h"
 #include "RedBlackTree.h"
 #include "RedBlackMap.h"
 #include "Sandbox.h"
 #include "Strings.h"
 #include "Table.h"
 #include "Time.h"
-
-template<typename NUMBER>
-NUMBER getRand(NUMBER min, NUMBER max) 
-{
-	PREVENT_COMPILE
-}
-
-template<>
-sint getRand(sint min, sint max) 
-{
-	return (rand() % (max - min)) + min;
-}
-
-template<>
-sreal getRand(sreal min, sreal max) 
-{
-	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
-	return v * (max - min) + min;
-}
-
-
-template<>
-schar getRand(schar min, schar max) 
-{
-	return static_cast<schar>((rand() % (max - min)) + min);
-}
 
 using namespace containers;
 

@@ -1,6 +1,9 @@
 #include "BinaryHeap.h"
 #include "Composition.h"
+#include "Numbers.h"
+#include "RedBlackMap.h"
 #include "Sandbox.h"
+#include "Vector.h"
 #include "UnitTestVerification.h"
 
 const char* megaString = ""
@@ -50,31 +53,115 @@ class Shadows
 };
 
 #include <queue>
-/*
+
+class Graph
+{
+public:
+	typedef uint ID;
+	class Node;
+
+	void connect(Node& a, Node& b) const
+	{
+		a.connect(b);
+		b.connect(a);
+	}
+
+	Node& addNode(Node& n)
+	{
+		nodes.push_back(&n);	
+	}
+
+public:
+	class Node
+	{
+		friend class Graph;
+
+	public:
+		typedef uint ID;
+
+		const math::Pixel position;
+
+		Node(const math::Pixel& p, Graph::ID newGraphID)
+		: position(p)
+		, graphID(newGraphID)
+		{ /* empty */ }       
+		
+		inline void connect(const Node& neighbor) { neighbors.push_back(&neighbor); }
+		inline sint getCost(const Node& other) const { return position.distanceManhattan(other.position) + artificialCost; }
+		inline sint getID(void) const { return nodeID; }
+		inline const Node& getNeighbor(uint index) const { assert(index < getNumNeighbors()); return *neighbors[index]; }
+		inline uint getNumNeighbors(void) const { return static_cast<uint>(neighbors.size()); }
+		
+	private:
+		Node& operator=(const Node&);
+
+		Graph::ID graphID;
+		ID nodeID;
+		std::vector<const Node*> neighbors;
+		sint artificialCost;
+	}; // Graph::Node
+
+	std::vector<Node*> nodes;
+}; // Graph
+
+template <typename NUMBER>
+NUMBER getInitialA_StarPathCost(void)
+{
+	return static_cast<NUMBER>(0);
+}
+
+struct GraphEstimate
+{
+	inline sint operator()(const Graph::Node& node, const Graph::Node& goal) const
+	{
+		return node.getCost(goal);
+	}
+};
+
+struct GetCost
+{
+	inline sint operator()(const Graph::Node& node, const Graph::Node& neighbor) const
+	{
+		return node.getCost(neighbor);
+	}
+};
+
+struct IsGoal
+{
+	inline bool operator()(const Graph::Node& node, const Graph::Node& goal) const
+	{
+		return node.getID() == goal.getID();
+	}
+};
+
+struct IsIncluded
+{
+	inline bool operator()(const Graph::Node&) const
+ 	{
+		return true;
+	}
+};
+
 /// \todo it might be worth it to have the graph keep search data, rather than searches keeping graph data
 template
 <
-	typename NODE, 
 	typename COST, // <, +, getInitialA_StarPathCost<COST>;
-	typename IS_GOAL, 
-	typename ESTIMATE_COST,
-	typename GET_COST,
-	typename IS_INCLUDED
+	typename ESTIMATE_COST_TO_GOAL, // COST operator(const NODE&, const NODE&) const
+	typename GET_COST_TO_NEIGHBOR, // COST operator(const NODE&, const NODE&) const
+	typename IS_GOAL, // bool operator(const NODE&, const NODE&) const
+	typename IS_INCLUDED, // bool operator(const NODE&, const NODE&) const
+	typename NODE
 >
 class A_Star
 {
-	class Node;
-	class OpenSet;
-	
-	typedef RedBlackMap<const NODE*, Node*> RecordMap;
-
 public:
-	
+	A_Star() {}
+
 	bool search(const NODE& start, const NODE& goal)
 	{
 		if (isIncluded(start))
 		{
-			const COST initial = estimateCostToGoal(start);
+			const COST initial = estimateCostToGoal(start, goal);
 			Node* startRecord = new Node(initial, initial, 0, start, NULL, true, true); 
 			openSet.add(*startRecord);
 
@@ -82,7 +169,7 @@ public:
 			{
 				const Node& current(openSet.remove());
 
-				if (isGoal(current.node))
+				if (isGoal(current.node, goal))
 				{
 					return true;
 				}
@@ -93,7 +180,7 @@ public:
 					{
 						--index;
 
-						if (Node* n = isNeighborIncluded(current.node.getNeighbor(index)))
+						if (Node* n = isNeighborIncluded(current.node.getNeighbor(index), goal))
 						{
 							Node& neighbor(*n);
 							const COST startToNeighbor(current.g + getCostToNeighbor(current.node, neighbor.node));
@@ -121,6 +208,11 @@ public:
 	}
 
 private:
+	class Node;
+	typedef BinaryHeap<const Node*> OpenSet;
+
+	typedef containers::RedBlackMap<const NODE*, Node*> RecordMap;
+
 	struct Node
 	{	
 		COST h;
@@ -132,6 +224,7 @@ private:
 		bool isInOpenSet;
 		// bool isInClosedList; // unecessary in this version
 		
+		/// constructor for the first start node
 		inline Node(COST& new_h, COST& new_f, COST& new_g, const NODE& n, const NODE* parent, bool included, bool inOpenSet) 
 			: h(new_h)
 			, f(new_f)
@@ -140,12 +233,24 @@ private:
 			, parent(parent)
 			, isIncluded(included)
 			, isInOpenSet(inOpenSet)
-		{ 
-			// empty  
-		}		
-	}; // class A_Star::Node
+		{ /* empty */ }
+		
+		/// constructor for nodes that aren't included in the search
+		inline Node(const NODE& n)
+			: isIncluded(false)
+			, node(n)
+		{ /* empty */ }
+		
+		/// constructor for nodes that are created when a node gets neighbors
+		inline Node(const NODE& n, COST& new_h)
+			: h(new_h)
+			, node(n)
+			, isIncluded(true)
+			, isInOpenSet(true)
+		{ /* empty */ }
+	};// class A_Star::Node
 
-	inline const Node* isNeighborIncluded(const NODE& node) const
+	inline const Node* isNeighborIncluded(const NODE& node, const NODE& goal) const
 	{
 		Node* record;
 		
@@ -154,7 +259,7 @@ private:
 			if (isIncluded(node))
 			{
 
-				record = new Node(node, estimateCostToGoal(,,,,,,,);
+				record = new Node(node, estimateCostToGoal(node, goal));
 			}
 			else
 			{
@@ -172,45 +277,28 @@ private:
 		current.f = throughParent + current.h;
 	}
 
-	IS_GOAL isGoal;
-	IS_INCLUDED isIncluded;
-	GET_COST getCostToNeighbor;
-	ESTIMATE_COST estimateCostToGoal;
+	const ESTIMATE_COST_TO_GOAL estimateCostToGoal;
+	const GET_COST_TO_NEIGHBOR getCostToNeighbor;
+	const IS_GOAL isGoal;
+	const IS_INCLUDED isIncluded;
 	OpenSet openSet;
 	RecordMap recordsByNodes;
 }; // class A_Star
-*/
 
-template<typename NUMBER>
-NUMBER getRand(NUMBER min, NUMBER max) 
-{
-	PREVENT_COMPILE
-}
-
-template<>
-sint getRand(sint min, sint max) 
-{
-	return (rand() % (max - min)) + min;
-}
-
-template<>
-sreal getRand(sreal min, sreal max) 
-{
-	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
-	return v * (max - min) + min;
-}
-
-template<>
-schar getRand(schar min, schar max) 
-{
-	return static_cast<schar>((rand() % (max - min)) + min);
-}
 
 void onPlay(void)
 {
 	// sandbox::tableRnD();
 	// sandbox::verifyUnitTests();
 	// sandbox::schedulingRnD();
+
+	math::Pixel s, e;
+
+	Graph::Node start(s, 0);
+	Graph::Node end(e, 0);
+
+	A_Star<sint, IsGoal, GetCost, IsGoal, IsIncluded, Graph::Node> aStar;
+	aStar.search(start, end);
 	
  	Agent alpha;
  	Movement* movement = new Movement();

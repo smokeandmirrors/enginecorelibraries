@@ -17,8 +17,38 @@ Tested in the field	:	NO
 \todo move this to the platform library
 \todo examine the use of global const memory access cost
 \todo move these to template math libs or macros
-
+\todo fix all this
 */
+
+#include <stdlib.h>
+
+template<typename NUMBER>
+inline NUMBER getRand(NUMBER min, NUMBER max) 
+{
+	PREVENT_COMPILE
+}
+
+template<>
+inline sint getRand(sint min, sint max) 
+{
+	return (rand() % (max - min)) + min;
+}
+
+template<>
+inline sreal getRand(sreal min, sreal max) 
+{
+	const sreal v = getRand<sint>(0, RAND_MAX)*( 1.0f / RAND_MAX); 
+	return v * (max - min) + min;
+}
+
+template<>
+inline schar getRand(schar min, schar max) 
+{
+	return static_cast<schar>((rand() % (max - min)) + min);
+}
+
+
+
 namespace math
 {
 // integers 
