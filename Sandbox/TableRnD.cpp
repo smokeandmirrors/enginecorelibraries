@@ -41,7 +41,7 @@ void sandbox::tableRnD(void)
 	stringToNumber.set("awesome", 10);
 	stringToNumber.set("bitchin", 20);
 	sint bitchin = stringToNumber.get("bitchin");
-		
+	if (bitchin) printf("");	
 	std::map<int, int> numberToNumber;
 	numberToNumber[10] = 100;
 	int index100 = numberToNumber[100];

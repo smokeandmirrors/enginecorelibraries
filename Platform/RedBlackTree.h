@@ -24,9 +24,9 @@ class RedBlackTree
 public:
 	static const bool red;
 	static const bool black;
-	static const IS_LESS isLess;
-	static const IS_EQUAL isEqual;
-	static const IS_GREATER isGreater;
+	IS_LESS isLess;
+	IS_EQUAL isEqual;
+	IS_GREATER isGreater;
 	
 	RedBlackTree(void)
 		: m_root(NULL)

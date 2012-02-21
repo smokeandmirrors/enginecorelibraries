@@ -11,9 +11,8 @@ const char* megaString = ""
 
 typedef std::string TestStringType; // String::Immutable
 
-
-
 using namespace designPatterns;
+using namespace containers;
 
 class Agent 
 	: public Composite<Agent>
@@ -53,6 +52,33 @@ class Shadows
 };
 
 #include <queue>
+
+template <typename TYPE>
+struct IsPointerEqual
+{
+	inline bool operator()(const TYPE* lhs, const TYPE* rhs) const
+	{
+		return lhs == rhs;
+	}
+};
+
+template <typename TYPE>
+struct IsPointerLess
+{
+	inline bool operator()(const TYPE* lhs, const TYPE* rhs) const
+	{
+		return lhs < rhs;
+	}
+};
+
+template <typename TYPE>
+struct IsPointerGreater
+{
+	inline bool operator()(const TYPE* lhs, const TYPE* rhs) const
+	{
+		return lhs > rhs;
+	}
+};
 
 class Graph
 {
@@ -163,18 +189,20 @@ public:
 		{
 			const COST initial = estimateCostToGoal(start, goal);
 			Node* startRecord = new Node(initial, initial, 0, start, NULL, true, true); 
-			openSet.add(*startRecord);
+			openSet.push(startRecord);
 
 			do 
 			{
-				const Node& current(openSet.remove());
+				Node& current(removeFromOpenSet());
+				openSet.pop();
+				current.isInOpenSet = false;
 
 				if (isGoal(current.node, goal))
 				{
 					return true;
 				}
 
-				if (const uint index = current.node.getNumNeighbors())
+				if (uint index = current.node.getNumNeighbors())
 				{
 					do
 					{
@@ -189,7 +217,7 @@ public:
 							{	
 								neighbor.h = estimateCostToGoal(neighbor.node, goal);
 								updatePathRecord(neighbor, current, startToNeighbor);
-								openSet.add(neighbor);
+								openSet.push(&neighbor);
 							}
 							else if (startToNeighbor < neighbor.g)
 							{	
@@ -201,7 +229,7 @@ public:
 					while (index);
 				}
 			}
-			while (!openSet.isEmpty())
+			while (!openSet.isEmpty());
 		}
 
 		return false;
@@ -210,8 +238,8 @@ public:
 private:
 	class Node;
 	typedef BinaryHeap<const Node*> OpenSet;
-
-	typedef containers::RedBlackMap<const NODE*, Node*> RecordMap;
+	// , IsPointerEqual<NODE>, IsPointerLess<NODE>, IsPointerGreater<NODE>
+	typedef containers::RedBlackMap< const NODE*, Node* > RecordMap;
 
 	struct Node
 	{	
@@ -220,12 +248,13 @@ private:
 		COST g;
 		const NODE& node;
 		const NODE* parent;
+		uint openSetIndex;
 		bool isIncluded;
 		bool isInOpenSet;
 		// bool isInClosedList; // unecessary in this version
 		
 		/// constructor for the first start node
-		inline Node(COST& new_h, COST& new_f, COST& new_g, const NODE& n, const NODE* parent, bool included, bool inOpenSet) 
+		inline Node(const COST& new_h, const COST& new_f, const COST& new_g, const NODE& n, const NODE* parent, bool included, bool inOpenSet) 
 			: h(new_h)
 			, f(new_f)
 			, g(new_g)
@@ -237,20 +266,29 @@ private:
 		
 		/// constructor for nodes that aren't included in the search
 		inline Node(const NODE& n)
-			: isIncluded(false)
-			, node(n)
+			: node(n)
+			, isIncluded(false)
 		{ /* empty */ }
 		
 		/// constructor for nodes that are created when a node gets neighbors
-		inline Node(const NODE& n, COST& new_h)
+		inline Node(const NODE& n, const COST& new_h)
 			: h(new_h)
 			, node(n)
 			, isIncluded(true)
 			, isInOpenSet(true)
 		{ /* empty */ }
+
+	private:
+		Node& operator=(const Node&);
 	};// class A_Star::Node
 
-	inline const Node* isNeighborIncluded(const NODE& node, const NODE& goal) const
+	inline void addToOpenSet(Node& node)
+	{
+		node.isInOpenSet = true;
+		openSet.push(&node);
+	}
+
+	inline Node* isNeighborIncluded(const NODE& node, const NODE& goal) 
 	{
 		Node* record;
 		
@@ -258,22 +296,34 @@ private:
 		{
 			if (isIncluded(node))
 			{
-
 				record = new Node(node, estimateCostToGoal(node, goal));
+				addToOpenSet(*record);
 			}
 			else
 			{
 				record = new Node(node);
 			}
+
+			recordsByNodes.set(&node, record);
 		}
 		
 		return record->isIncluded ? record : NULL;
 	}
 
-	inline void updatePathRecord(Node& current, Node& parent, COST& throughParent)
+	A_Star& operator=(const A_Star&);
+
+	inline Node& removeFromOpenSet(void) 
+	{
+		Node& current(*openSet.top());
+		openSet.pop();
+		current.isInOpenSet = false;
+		return current;
+	}
+
+	inline void updatePathRecord(Node& current, Node& parent, const COST& throughParent)
 	{	// update g & f, update position in path from start
 		current.g = throughParent;
-		current.parent = &parent;
+		current.parent = &parent.node;
 		current.f = throughParent + current.h;
 	}
 
@@ -292,12 +342,23 @@ void onPlay(void)
 	// sandbox::verifyUnitTests();
 	// sandbox::schedulingRnD();
 
+	
+
 	math::Pixel s, e;
 
 	Graph::Node start(s, 0);
 	Graph::Node end(e, 0);
 
-	A_Star<sint, IsGoal, GetCost, IsGoal, IsIncluded, Graph::Node> aStar;
+	std::equal_to<const float*> grrr;
+	if (grrr(NULL, NULL))
+	{
+		printf("wtf?");
+	}
+
+	containers::RedBlackMap<const float*, sint> wtf;
+	wtf.set(NULL, 2);
+
+	A_Star<sint, GetCost, GetCost, IsGoal, IsIncluded, Graph::Node> aStar;
 	aStar.search(start, end);
 	
  	Agent alpha;
@@ -351,6 +412,7 @@ void onPlay(void)
 
 		const sint& shouldbegreatest = biheap.top();
 		const sint& shouldalsobegreatest = priqueue.top();
+		assert(shouldbegreatest == shouldalsobegreatest);
 
 		for (sint i = 1; i < 1000; ++i)
 		{

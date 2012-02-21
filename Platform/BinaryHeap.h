@@ -7,6 +7,9 @@
 #include "Platform.h"
 #include <vector>
 
+namespace containers 
+{
+
 template
 <
 	typename ELEMENT,
@@ -25,6 +28,7 @@ public:
 	void pop(void);
 	void push(const ELEMENT& element);
 	const ELEMENT& top(void) const;
+	void update(uint index);
 	void update(uint index, const ELEMENT& newValue);
 
 private:
@@ -171,27 +175,6 @@ const ELEMENT& BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::top(void) const
 }
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
-void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::update(uint index, const ELEMENT& newValue)
-{
-	assert(isValidIndex(index));
-	ELEMENT& element(nodes[index]);
-	element = newValue;
-	
-	uint parentIndex(getParentIndex(index));
-
-	if (isValidIndex(parentIndex)
-	&& predicate(element, nodes[getParentIndex(index)]))
-	{
-		upSwap(element, index, nodes[getParentIndex(index)], parentIndex);
-		up(element, parentIndex);	
-	}
-	else
-	{
-		down(index);
-	}	
-}
-
-template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
 void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::up(const ELEMENT& element, uint elementIndex)
 {
 	while (elementIndex)
@@ -211,6 +194,35 @@ void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::up(const ELEMENT& element, uint 
 }
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
+void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::update(uint index)
+{
+	assert(isValidIndex(index));
+	ELEMENT& element(nodes[index]);
+	
+	uint parentIndex(getParentIndex(index));
+
+	if (isValidIndex(parentIndex)
+		&& predicate(element, nodes[getParentIndex(index)]))
+	{
+		upSwap(element, index, nodes[getParentIndex(index)], parentIndex);
+		up(element, parentIndex);	
+	}
+	else
+	{
+		down(index);
+	}	
+}
+
+template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
+void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::update(uint index, const ELEMENT& newValue)
+{
+	assert(isValidIndex(index));
+	ELEMENT& element(nodes[index]);
+	element = newValue;
+	update(index);
+}
+
+template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
 void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::upSwap(const ELEMENT& element, uint& elementIndex, const ELEMENT& parent, uint parentIndex)
 {
 	ELEMENT parentCopy(parent);
@@ -218,5 +230,7 @@ void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::upSwap(const ELEMENT& element, u
 	nodes[elementIndex] = parentCopy;
 	elementIndex = parentIndex;
 }
+
+} // namespace containers
 
 #endif//BINARY_HEAP_H

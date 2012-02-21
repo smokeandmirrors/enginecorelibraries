@@ -42,9 +42,9 @@ public:
 private:
 	static const bool red;
 	static const bool black;
-	static const IS_LESS isLess;
-	static const IS_EQUAL isEqual;
-	static const IS_GREATER isGreater;
+	IS_LESS isLess;
+	IS_EQUAL isEqual;
+	IS_GREATER isGreater;
 
 	class Node
 	{	
@@ -99,15 +99,20 @@ private:
 		if (Node* node = m_root)
 		{
 			do 
-			{
+			{	
 				if (isEqual(key, node->m_key))
+				{
 					return node;
-
+				}
 				else if (isLess(key, node->m_key))
+				{
 					node = node->m_left;
-
+				}
 				else 
+				{	/// \todo put this debug check everywhere.
+					assert(isGreater(key, node->m_key));				
 					node = node->m_right;
+				}
 
 			} while (node);
 		}
