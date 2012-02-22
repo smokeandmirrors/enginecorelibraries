@@ -61,3 +61,14 @@ Platform/Debug/Strings.obj
 Platform/Debug/Scheduling.obj
 Platform/Debug/Platform.lib
 Platform/Debug/BuildLog.htm
+Platform/Release/Scheduling.obj
+ArtificialIntelligence/ReadMe.txt
+Platform/Release/vc80.pdb
+Platform/Release/vc80.idb
+Platform/Release/Time.obj
+Platform/Release/Thread.obj
+Platform/Release/Synchronization.obj
+Platform/Release/Strings.obj
+Platform/Release/Platform.lib
+Platform/Release/BuildLog.htm
+ArtificialIntelligence/Release/BuildLog.htm
