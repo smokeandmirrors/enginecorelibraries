@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="Sandbox"
-	ProjectGUID="{6EDEDB49-5A48-4365-B25A-9CF7B2D78583}"
-	RootNamespace="Sandbox"
+	Name="ArtificialIntelligence"
+	ProjectGUID="{B8C3C838-9862-4028-8D4F-BF6796D16EA4}"
+	RootNamespace="ArtificialIntelligence"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,11 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG;EXTENDED_BY_LUA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -103,8 +104,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -167,7 +167,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;RELEASE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -229,11 +229,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;"
 				PreprocessorDefinitions="WIN32;_MT;_DEBUG;DEBUG"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="0"
+				RuntimeLibrary="1"
+				BufferSecurityCheck="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -292,7 +293,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER;EXTENDED_BY_LUA"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -354,7 +355,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\ArtificialIntelligence&quot;;&quot;$(SolutionDir)..\Platform&quot;;&quot;$(SolutionDir)..\Sandbox&quot;;&quot;$(SolutionDir)..\EmbeddedLua&quot;;&quot;$(SolutionDir)..\Mathematics&quot;;&quot;$(SolutionDir)..\Lua\Lua&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)..\Platform&quot;"
 				PreprocessorDefinitions="WIN32;_MT;NDEBUG;GOLDMASTER"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="true"
@@ -396,69 +397,21 @@
 	</References>
 	<Files>
 		<Filter
-			Name="TemplateMetaProgramming"
+			Name="DecisionMaking"
 			>
+			<Filter
+				Name="GOAP"
+				>
+			</Filter>
 		</Filter>
 		<Filter
-			Name="Templates"
-			>
-		</Filter>
-		<Filter
-			Name="Compiler Standard"
+			Name="A*"
 			>
 			<File
-				RelativePath=".\CompilerChecks.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CompilerChecks.h"
+				RelativePath=".\A_Star.h"
 				>
 			</File>
 		</Filter>
-		<Filter
-			Name="Unit Test Verification"
-			>
-			<File
-				RelativePath=".\UnitTestVerification.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UnitTestVerification.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Research And Development"
-			>
-			<File
-				RelativePath=".\SchedulingAndEngineRnD.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TableRnD.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Rejected"
-			>
-			<File
-				RelativePath=".\Composition.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Table.h"
-				>
-			</File>
-		</Filter>
-		<File
-			RelativePath=".\Sandbox.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Sandbox.h"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

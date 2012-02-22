@@ -27,6 +27,7 @@ public:
 	RedBlackMap(void);
 	~RedBlackMap(void);
 
+	void deleteElements(void);
 	VALUE get(const KEY& key) const;
 	VALUE getMax(void) const;
 	VALUE getMin(void) const;
@@ -49,6 +50,17 @@ private:
 	class Node
 	{	
 	public:
+		static void deleteAndRecycle(Node* used)
+		{
+			if (used)
+			{
+				Node::deleteAndRecycle(used->m_left);
+				Node::deleteAndRecycle(used->m_right);
+				used->m_value.~VALUE();
+				delete used;
+			}
+		}
+
 		static Node* get(bool color, Node* left, Node* right, const KEY& key, VALUE& value)
 		{
 			return new Node(color, left, right, key, value);
@@ -334,8 +346,7 @@ private:
 	uint	
 		m_size;
 
-	mutable bool 
-		m_isBeingChecked;
+	mutable bool m_isBeingChecked;
 
 // sanity testing
 	inline void 
@@ -483,6 +494,14 @@ template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, t
 RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::~RedBlackMap()
 { 
 	Node::recycle(m_root);
+}
+
+template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
+void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::deleteElements(void)
+{	
+	Node::deleteAndRecycle(m_root);
+	m_root = NULL;
+	m_size = 0;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>

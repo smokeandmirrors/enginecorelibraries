@@ -19,24 +19,22 @@ template
 class BinaryHeap
 {
 public:
-	BinaryHeap(uint reserveSize=0);
+	BinaryHeap();
 	
 	void deleteElements(void);
-	ELEMENT& get(uint index);
 	uint getSize(void) const;
 	bool isEmpty(void) const;
 	void pop(void);
 	void push(const ELEMENT& element);
 	const ELEMENT& top(void) const;
-	void update(uint index);
-	void update(uint index, const ELEMENT& newValue);
-
+	
 private:
 	CONTAINER nodes; 
 	PREDICATE predicate;
 
 	inline void down(const uint elementIndex);
 	inline void downSwap(uint parentIndex, uint childIndex);
+	ELEMENT& get(uint index);
 	inline uint getLeftChildIndex(uint elementIndex) const;
 	inline uint getParentIndex(uint elementIndex) const;
 	inline uint getRightChildIndex(uint elementIndex) const;
@@ -46,8 +44,7 @@ private:
 }; // class BinaryHeap
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
-BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::BinaryHeap(uint reserveSize/* =0 */)
-: nodes(reserveSize)
+BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::BinaryHeap()
 {
 	 /* empty */
 }
@@ -191,35 +188,6 @@ void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::up(const ELEMENT& element, uint 
 			break;
 		}
 	}
-}
-
-template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
-void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::update(uint index)
-{
-	assert(isValidIndex(index));
-	ELEMENT& element(nodes[index]);
-	
-	uint parentIndex(getParentIndex(index));
-
-	if (isValidIndex(parentIndex)
-		&& predicate(element, nodes[getParentIndex(index)]))
-	{
-		upSwap(element, index, nodes[getParentIndex(index)], parentIndex);
-		up(element, parentIndex);	
-	}
-	else
-	{
-		down(index);
-	}	
-}
-
-template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
-void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::update(uint index, const ELEMENT& newValue)
-{
-	assert(isValidIndex(index));
-	ELEMENT& element(nodes[index]);
-	element = newValue;
-	update(index);
 }
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>

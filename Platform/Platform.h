@@ -56,6 +56,37 @@ Tested in the field	:	NO
 #define IF_DEBUG(code) 
 #endif//DEBUG
 
+#if RELEASE
+#define IF_RELEASE(code) code 
+#else
+#define IF_RELEASE(code) 
+#endif//RELEASE
+
+#if GOLD_MASTER
+#define IF_GOLD_MASTER(code) code 
+#else
+#define IF_GOLD_MASTER(code) 
+#endif//GOLD_MASTER
+
+#if !DEBUG
+#define IF_NOT_DEBUG(code) code 
+#else
+#define IF_NOT_DEBUG(code) 
+#endif//DEBUG
+
+#if !RELEASE
+#define IF_NOT_RELEASE(code) code 
+#else
+#define IF_NOT_RELEASE(code) 
+#endif//RELEASE
+
+#if !GOLD_MASTER
+#define IF_NOT_GOLD_MASTER(code) code 
+#else
+#define IF_NOT_GOLD_MASTER(code) 
+#endif//GOLD_MASTER
+
+
 enum BoolEnum
 {
 	BoolEnum_False=0,
