@@ -34,12 +34,12 @@ namespace concurrency
 a class that handles processing concurrent execution
 of threads 
  */
-class Scheduler 
-: public designPatterns::Singleton<Scheduler>
+class Dispatcher 
+: public designPatterns::Singleton<Dispatcher>
 {
 	class Job;
 	class PendingJobQueue;
-	friend class designPatterns::Singleton<Scheduler>;
+	friend class designPatterns::Singleton<Dispatcher>;
 	typedef uint SchedulePriority;
 	
 
@@ -54,21 +54,21 @@ public:
 		{ /* empty */ }
 
 	private:
-		friend class Scheduler;
+		friend class Dispatcher;
 		Executor* executable;
 		cpuID preferredCPU;
 		SchedulePriority priority;
-	}; // Scheduler::Input
+	}; // Dispatcher::Input
 
-	typedef std::vector<Scheduler::Input> InputQueue;
-	typedef std::vector<Scheduler::Input>::iterator InputQueueIterator;
+	typedef std::vector<Dispatcher::Input> InputQueue;
+	typedef std::vector<Dispatcher::Input>::iterator InputQueueIterator;
 
-	void enqueue(Scheduler::Input& work);
-	void enqueue(Scheduler::InputQueue& work);
-	void enqueueAndWait(Scheduler::Input& work);
-	void enqueueAndWait(Scheduler::InputQueue& work);
-	void enqueueAndWaitOnChildren(Scheduler::Input& work);
-	void enqueueAndWaitOnChildren(Scheduler::InputQueue& work);
+	void enqueue(Dispatcher::Input& work);
+	void enqueue(Dispatcher::InputQueue& work);
+	void enqueueAndWait(Dispatcher::Input& work);
+	void enqueueAndWait(Dispatcher::InputQueue& work);
+	void enqueueAndWaitOnChildren(Dispatcher::Input& work);
+	void enqueueAndWaitOnChildren(Dispatcher::InputQueue& work);
 	uint getMaxThreads(void) const;
 	uint getNumberActiveJobs(void) const;
 	uint getNumberPendingJobs(void) const;
@@ -78,17 +78,17 @@ public:
 	const std::string toString(void) const;
 	
 private:
-	Scheduler(void);
-	~Scheduler(void);
-	Scheduler(const Scheduler&);
-	Scheduler operator=(const Scheduler&);
+	Dispatcher(void);
+	~Dispatcher(void);
+	Dispatcher(const Dispatcher&);
+	Dispatcher operator=(const Dispatcher&);
 
 	void accountForFinish(Job* finished);
 	void accountForStartedJob(Job* started, cpuID index);
 	void accountForWaitedOnThreadCompletion(Thread::Tree* children);
 	bool getFreeIndex(cpuID& index);
 	bool getFreeIndex(cpuID& available, cpuID idealCPU);
-	void initializeAndTrackJob(Scheduler::Input& work, Thread::Tree* children);
+	void initializeAndTrackJob(Dispatcher::Input& work, Thread::Tree* children);
 	void initializeNumberSystemThreads(void);
 	bool isAnyIndexFree(void) const;	
 	bool isAnyJobPending(void) const;
@@ -106,6 +106,6 @@ private:
 	signals::ReceiverMember	m_receiver;
 	PendingJobQueue* m_pendingJobs;
 	DECLARE_MUTEX(m_mutex);
-}; // class Scheduler
+}; // class Dispatcher
 } // namespace concurrency
 #endif//SCHEDULING_H

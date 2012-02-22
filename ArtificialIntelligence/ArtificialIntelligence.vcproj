@@ -399,10 +399,22 @@
 		<Filter
 			Name="DecisionMaking"
 			>
-			<Filter
-				Name="GOAP"
+			<File
+				RelativePath=".\AI_Behavior.h"
 				>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\AI_DecisionTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AI_GOAP.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AI_HSFM.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="A*"

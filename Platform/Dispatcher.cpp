@@ -7,7 +7,7 @@
 #include <windows.h>
 #endif//WIN32
 
-#include "Scheduling.h"
+#include "Dispatcher.h"
 #include "Signals.h"
 #include "Synchronization.h"
 #include "Thread.h"
@@ -39,7 +39,7 @@ inline uint getNumHardwareThreads(void)
 #endif//WIN32
 
 /** a wrapper for a Thread that can be added to the scheduler */
-class Scheduler::Job : public Receiver
+class Dispatcher::Job : public Receiver
 {	
 public:
 	class Compare
@@ -102,7 +102,7 @@ public:
 
 	inline void onComplete(Thread*)
 	{
-		Scheduler::single.accountForFinish(this);
+		Dispatcher::single.accountForFinish(this);
 	}
 
 	inline void onConnect(Transmitter* transmitter)
@@ -160,11 +160,11 @@ private:
 }; // Job 
 
 
-class Scheduler::PendingJobQueue
+class Dispatcher::PendingJobQueue
 {
 public:
 	inline void
-		add(Scheduler::Input& work, Thread** waitable)
+		add(Dispatcher::Input& work, Thread** waitable)
 	{
 		Job* job = getFreeJob();
 		Thread* thread; 
@@ -256,7 +256,7 @@ private:
 		m_jobPool;
 }; // class PendingJobQueue 
 
-Scheduler::Scheduler(void)
+Dispatcher::Dispatcher(void)
 : m_numActiveJobs(0)
 {
 	initializeNumberSystemThreads();
@@ -271,12 +271,12 @@ Scheduler::Scheduler(void)
 	m_pendingJobs = new PendingJobQueue();
 }
 
-Scheduler::~Scheduler(void)
+Dispatcher::~Dispatcher(void)
 {
 	delete m_pendingJobs;
 }
 
-void Scheduler::accountForFinish(Job* finished)
+void Dispatcher::accountForFinish(Job* finished)
 {
 	SYNC(m_mutex);
 	sint thread_index = -1;
@@ -309,14 +309,14 @@ void Scheduler::accountForFinish(Job* finished)
 	SCHEDULE_PRINT
 }
 
-void Scheduler::accountForStartedJob(Job* started, cpuID index)
+void Dispatcher::accountForStartedJob(Job* started, cpuID index)
 {
 	m_activeJobs[index] = started;
 	m_numActiveJobs++;
 	SCHEDULE_PRINT
 }
 
-void Scheduler::accountForWaitedOnThreadCompletion(Thread::Tree* children)
+void Dispatcher::accountForWaitedOnThreadCompletion(Thread::Tree* children)
 {
 	SYNC(m_mutex);
 	const threadID originalID = children->getOriginalID();
@@ -334,14 +334,14 @@ void Scheduler::accountForWaitedOnThreadCompletion(Thread::Tree* children)
 	}
 }
 
-void Scheduler::enqueue(Scheduler::Input& work)
+void Dispatcher::enqueue(Dispatcher::Input& work)
 {
 	InputQueue shortcut;
 	shortcut.push_back(work);
 	enqueue(shortcut);
 }
 
-void Scheduler::enqueue(Scheduler::InputQueue& work)
+void Dispatcher::enqueue(Dispatcher::InputQueue& work)
 {
 	SYNC(m_mutex);
 
@@ -376,14 +376,14 @@ void Scheduler::enqueue(Scheduler::InputQueue& work)
 	startJobs();
 }
 
-void Scheduler::enqueueAndWait(Scheduler::Input& work)
+void Dispatcher::enqueueAndWait(Dispatcher::Input& work)
 {
 	InputQueue shortcut;
 	shortcut.push_back(work);
 	enqueueAndWait(shortcut);
 }
 
-void Scheduler::enqueueAndWait(Scheduler::InputQueue& work)
+void Dispatcher::enqueueAndWait(Dispatcher::InputQueue& work)
 {
 	Thread::Tree tree;
 	
@@ -404,14 +404,14 @@ void Scheduler::enqueueAndWait(Scheduler::InputQueue& work)
 	Thread::waitOnCompletion(tree);
 }
 
-void Scheduler::enqueueAndWaitOnChildren(Scheduler::Input& work)
+void Dispatcher::enqueueAndWaitOnChildren(Dispatcher::Input& work)
 {
 	InputQueue shortcut;
 	shortcut.push_back(work);
 	enqueueAndWaitOnChildren(shortcut);
 }
 
-void Scheduler::enqueueAndWaitOnChildren(Scheduler::InputQueue& work)
+void Dispatcher::enqueueAndWaitOnChildren(Dispatcher::InputQueue& work)
 {	
 	Thread::Tree children; // Thread::Tree* children = new Thread::Tree();
 
@@ -431,7 +431,7 @@ void Scheduler::enqueueAndWaitOnChildren(Scheduler::InputQueue& work)
 	accountForWaitedOnThreadCompletion(&children); // delete children;	
 }
 
-bool Scheduler::getFreeIndex(cpuID& index)
+bool Dispatcher::getFreeIndex(cpuID& index)
 {
 	SYNC(m_mutex);
 	for (uint i = 0; i < m_numSystemThreads; i++)
@@ -446,7 +446,7 @@ bool Scheduler::getFreeIndex(cpuID& index)
 	return false;
 }
 
-bool Scheduler::getFreeIndex(cpuID& available, cpuID idealCPU)
+bool Dispatcher::getFreeIndex(cpuID& available, cpuID idealCPU)
 {
 	SYNC(m_mutex);
 	if (idealCPU != noCPUpreference && !m_activeJobs[idealCPU])
@@ -460,31 +460,31 @@ bool Scheduler::getFreeIndex(cpuID& available, cpuID idealCPU)
 	}	
 }
 
-uint Scheduler::getMaxThreads(void) const 
+uint Dispatcher::getMaxThreads(void) const 
 { 
 	SYNC(m_mutex);
 	return m_maxThreads; 
 }
 
-uint Scheduler::getNumberActiveJobs(void) const
+uint Dispatcher::getNumberActiveJobs(void) const
 {
 	SYNC(m_mutex);
 	return m_numActiveJobs;
 }
 
-uint Scheduler::getNumberPendingJobs(void) const
+uint Dispatcher::getNumberPendingJobs(void) const
 {
 	SYNC(m_mutex);
 	return m_pendingJobs->getNumber();
 }
 
-uint Scheduler::getNumberSystemThreads(void) const	
+uint Dispatcher::getNumberSystemThreads(void) const	
 { 
 	SYNC(m_mutex);
 	return m_numSystemThreads; 
 }
 
-void Scheduler::initializeAndTrackJob(Scheduler::Input& work, Thread::Tree* children)
+void Dispatcher::initializeAndTrackJob(Dispatcher::Input& work, Thread::Tree* children)
 {
 	const threadID originalID = children->getOriginalID();	
 	// add the job to the pending queue, to initialize the thread
@@ -504,7 +504,7 @@ void Scheduler::initializeAndTrackJob(Scheduler::Input& work, Thread::Tree* chil
 	assert(isOriginalWaitingOnThread(childID));
 }
 
-void Scheduler::initializeNumberSystemThreads(void)
+void Dispatcher::initializeNumberSystemThreads(void)
 {
 #if WIN32
 	SYSTEM_INFO windows_info;
@@ -515,7 +515,7 @@ void Scheduler::initializeNumberSystemThreads(void)
 #endif//WIN32
 }
 
-bool Scheduler::isAnyIndexFree(void) const
+bool Dispatcher::isAnyIndexFree(void) const
 {
 	for (uint i = 0; i < m_numSystemThreads; i++)
 	{
@@ -528,12 +528,12 @@ bool Scheduler::isAnyIndexFree(void) const
 	return false;
 }
 
-bool Scheduler::isAnyJobPending(void) const
+bool Dispatcher::isAnyJobPending(void) const
 {
 	return m_pendingJobs->getNumber() != 0;
 }
 
-bool Scheduler::isOriginalWaitingOnThread(threadID childID, threadID* originalID) const
+bool Dispatcher::isOriginalWaitingOnThread(threadID childID, threadID* originalID) const
 {
 	std::map<threadID, threadID>::const_iterator originalIDIter = m_originalByChildren.find(childID);
 	
@@ -553,19 +553,19 @@ bool Scheduler::isOriginalWaitingOnThread(threadID childID, threadID* originalID
 }
 
 
-void Scheduler::printState(void) const
+void Dispatcher::printState(void) const
 {
 	SYNC(m_mutex);
 	printf(toString().c_str());
 }
 
-void Scheduler::setMaxThreads(uint max)			
+void Dispatcher::setMaxThreads(uint max)			
 { 
 	SYNC(m_mutex);
 	m_maxThreads = max; 
 }
 
-void Scheduler::startJobs(void)
+void Dispatcher::startJobs(void)
 {
 	SYNC(m_mutex);
 	while (isAnyJobPending() && isAnyIndexFree())
@@ -580,7 +580,7 @@ void Scheduler::startJobs(void)
 	}
 }
 
-const std::string Scheduler::toString(void) const
+const std::string Dispatcher::toString(void) const
 {
 	std::string output;
 	
@@ -640,7 +640,7 @@ const std::string Scheduler::toString(void) const
 	return output;
 }
 
-const std::string Scheduler::toStringActiveJob(Job* job) const
+const std::string Dispatcher::toStringActiveJob(Job* job) const
 {
 	char active_job[256];
 	int index = 256;
@@ -656,7 +656,7 @@ const std::string Scheduler::toStringActiveJob(Job* job) const
 	return output;
 }
 
-const std::string Scheduler::toStringInactiveJob(void) const
+const std::string Dispatcher::toStringInactiveJob(void) const
 {
 	return std::string("    inactive.    ");
 }

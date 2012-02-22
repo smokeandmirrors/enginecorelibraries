@@ -398,11 +398,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Scheduling.cpp"
+				RelativePath=".\Dispatcher.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Scheduling.h"
+				RelativePath=".\Dispatcher.h"
 				>
 			</File>
 			<File

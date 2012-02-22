@@ -19,7 +19,7 @@
 #include "Concurrency.h"
 #include "RedBlackTree.h"
 #include "Sandbox.h"
-#include "Scheduling.h"
+#include "Dispatcher.h"
 #include "Synchronization.h"
 #include "Signals.h"
 #include "Strings.h"
@@ -79,23 +79,23 @@ void simpleChildrenPre(void)
 {
 	doWork3();
 	Executor* one = new Executor(&doWork3);
-	Scheduler::Input inputOne(*one);
-	Scheduler::single.enqueue(inputOne);
+	Dispatcher::Input inputOne(*one);
+	Dispatcher::single.enqueue(inputOne);
 }
 
 void simpleChildrenPost(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::Input inputOne(*one);
-	Scheduler::single.enqueue(inputOne);
+	Dispatcher::Input inputOne(*one);
+	Dispatcher::single.enqueue(inputOne);
 	doWork3();
 }
 
 void doWork1Children(void)
 {
 	Executor* one = new Executor(&doWork3);
-	Scheduler::Input inputOne(*one);
-	Scheduler::single.enqueue(inputOne);
+	Dispatcher::Input inputOne(*one);
+	Dispatcher::single.enqueue(inputOne);
 	doWork3();
 }
 
@@ -103,10 +103,10 @@ void doWork2Children(void)
 {
 	Executor* one = new Executor(&doWork1Children);
 	Executor* two = new Executor(&doWork1Children);
-	Scheduler::Input inputOne(*one);
-	Scheduler::Input inputTwo(*two);
-	Scheduler::single.enqueue(inputOne);
-	Scheduler::single.enqueue(inputTwo);
+	Dispatcher::Input inputOne(*one);
+	Dispatcher::Input inputTwo(*two);
+	Dispatcher::single.enqueue(inputOne);
+	Dispatcher::single.enqueue(inputTwo);
 	doWork3();
 }
 
@@ -115,12 +115,12 @@ void doWork3Children(void)
 	Executor* one = new Executor(&doWork2Children);
 	Executor* two = new Executor(&doWork2Children);
 	Executor* three = new Executor(&doWork2Children);
-	Scheduler::Input inputOne(*one);
-	Scheduler::Input inputTwo(*two);
-	Scheduler::Input inputThree(*three);
-	Scheduler::single.enqueue(inputOne);
-	Scheduler::single.enqueue(inputTwo);
-	Scheduler::single.enqueue(inputThree);
+	Dispatcher::Input inputOne(*one);
+	Dispatcher::Input inputTwo(*two);
+	Dispatcher::Input inputThree(*three);
+	Dispatcher::single.enqueue(inputOne);
+	Dispatcher::single.enqueue(inputTwo);
+	Dispatcher::single.enqueue(inputThree);
 	doWork3();
 }
 
@@ -452,13 +452,13 @@ protected:
 				}
 			}
 
-			Scheduler::InputQueue workQueue;
+			Dispatcher::InputQueue workQueue;
 			while (!work.empty())
 			{
-				workQueue.push_back(Scheduler::Input(*work.front()));
+				workQueue.push_back(Dispatcher::Input(*work.front()));
 				work.pop();
 			}
-			Scheduler::single.enqueueAndWaitOnChildren(workQueue);
+			Dispatcher::single.enqueueAndWaitOnChildren(workQueue);
 			
 			frame++;
 			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
@@ -602,8 +602,8 @@ void TestJob::execute(void)
 		std::string name = getFormattedName(m_requirement->getID(), jobNumber, maxJobs);
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
-		Scheduler::Input input(*executor);
-		concurrency::Scheduler::single.enqueue(input);
+		Dispatcher::Input input(*executor);
+		concurrency::Dispatcher::single.enqueue(input);
 	}
 
 	if (delete_self)
@@ -663,8 +663,8 @@ void sandbox::schedulingRnD(void)
 
 	{
 		concurrency::Executor* executor2 = new concurrency::Executor(&doWork3);
-		Scheduler::Input input(*executor2);
-		concurrency::Scheduler::single.enqueue(input); // enqueueAndWait
+		Dispatcher::Input input(*executor2);
+		concurrency::Dispatcher::single.enqueue(input); // enqueueAndWait
 		concurrency::sleep(5000);
 		printf("Waited enqueue\n");
 	}
@@ -693,8 +693,8 @@ void sandbox::schedulingRnD(void)
 	// Thread::checkDestruction();
 
 	Executor* original = new Executor(&doWork3Children);
-	Scheduler::Input input(*original);
-	Scheduler::single.enqueueAndWaitOnChildren(input);
+	Dispatcher::Input input(*original);
+	Dispatcher::single.enqueueAndWaitOnChildren(input);
 	printf("Nice!  That was awesome!\n");
 	// Thread::checkDestruction();
 
