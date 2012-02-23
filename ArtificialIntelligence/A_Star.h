@@ -10,8 +10,6 @@
 
 /// \todo replace bool with flags
 /// \todo make all the classes private
-/// \todo see how I got rid of the closed list in the original version
-
 
 template<typename A_STAR_NODE>
 class OpenSet;
@@ -52,7 +50,7 @@ struct A_StarRecordGenerator
 			recordsByNodes.set(&node, record);
 		}
 
-		return record->isIncluded && record->isNotInClosedSet ? record : NULL;	
+		return record->isIncluded /*&& record->isNotInClosedSet*/ ? record : NULL;	
 	}
 };
 
@@ -69,7 +67,8 @@ struct A_StarRecordGenerator<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IncludeA
 			recordsByNodes.set(&node, record);
 		}
 
-		return record->isNotInClosedSet ? record : NULL;	
+		// return record->isNotInClosedSet ? record : NULL;	
+		return record;
 	}
 };
 
@@ -142,6 +141,13 @@ template
 >
 class A_Star
 {
+	enum A_StarFlags
+	{
+		A_StarInClosedSet,
+		A_StarIncluded,
+		A_StarInOpenSet,
+	}; // A_StarFlags
+
 public:
 	A_Star(const NODE& start, const NODE& goal)
 	{
@@ -165,8 +171,9 @@ public:
 				path.push_back(&pathNode->node);
 				pathNode = pathNode->parent;
 			} 
-			while (pathNode);
-
+			while (pathNode != startOfPath);
+			
+			path.push_back(&pathNode->node);
 			std::reverse(path.begin(), path.end());
 		}
 	}
@@ -180,9 +187,9 @@ private:
 	struct Record;
 	typedef containers::RedBlackMap< const NODE*, Record* > RecordMap;
 	typedef A_StarRecordGenerator<Record,COST,ESTIMATE_COST_TO_GOAL,NODE,IS_INCLUDED> RecordGenerator;
-	typedef A_StarConnection<A_Star, Record, NODE, COST, OpenSet<Record*>, ESTIMATE_COST_TO_GOAL, SEARCH_TYPE> ConnectionProcess;
+	typedef A_StarConnection<A_Star, Record, NODE, COST, OpenSet<Record*>, ESTIMATE_COST_TO_GOAL, SEARCH_TYPE> Connection;
 
-	friend struct ConnectionProcess;
+	friend struct Connection;
 	
 	struct Record
 	{	
@@ -231,10 +238,12 @@ private:
 	
 	inline void initializeSearch(const NODE& start, const NODE& goal)
 	{
-		if (Record* startNode = RecordGenerator::getActiveRecord(recordsByNodes, start, goal, estimateCostToGoal, isIncluded))
+		startOfPath = RecordGenerator::getActiveRecord(recordsByNodes, start, goal, estimateCostToGoal, isIncluded);
+		
+		if (startOfPath)
 		{
-			startNode->update(NULL, getInitialA_StarPathCost<COST>());
-			addToOpenSet(*startNode);
+			startOfPath->update(NULL, getInitialA_StarPathCost<COST>());
+			addToOpenSet(*startOfPath);			
 		}
 	}
 
@@ -251,8 +260,13 @@ private:
 
 	Record* search(const NODE& goal)
 	{
+		static int iterations(0);
+		iterations = 0;
+
 		while (!openSet.isEmpty())
-		{
+		{	
+			iterations++;
+			printf("\nOpenSet: %5d\n", iterations); openSet.dump();
 			Record& current(removeFromOpenSet());
 
 			if (isGoal(current.node, goal))
@@ -268,7 +282,7 @@ private:
 
 					if (Record* n = RecordGenerator::getActiveRecord(recordsByNodes, current.node.getConnection(index), goal, estimateCostToGoal, isIncluded))
 					{
-						ConnectionProcess::process(*this, current, *n, goal, current.g + getCostToNeighbor(current.node, n->node), openSet, estimateCostToGoal);
+						Connection::process(*this, current, *n, goal, current.g + getCostToNeighbor(current.node, n->node), openSet, estimateCostToGoal);
 					}
 				}
 				while (index);
@@ -284,6 +298,7 @@ private:
 	const IS_INCLUDED isIncluded;
 	OpenSet<Record*> openSet;
 	RecordMap recordsByNodes;
+	Record* startOfPath;
 	Record* endOfPath;
 }; // class A_Star
 
@@ -292,6 +307,14 @@ class OpenSet
 {
 public:
 	OpenSet();
+
+	void dump(void) const 
+	{
+		for (uint i = 0; i < getSize(); i++)
+		{
+			printf("%s COST: %5d\n", nodes[i]->node.toString(), nodes[i]->f);
+		}
+	}
 
 	A_STAR_NODE& get(uint index);
 	uint getSize(void) const;

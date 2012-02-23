@@ -386,7 +386,7 @@ template<typename T> inline T V2<T>::distance(const V2<T>& v) const
 }
 template<typename T> inline T V2<T>::distanceManhattan(const V2<T>& v) const
 {
-	return v.x - x + v.y - y;
+	return abs(v.x - x) + abs(v.y - y);
 }
 template<typename T> inline T V2<T>::distanceSqr(const V2<T>& v) const
 {
