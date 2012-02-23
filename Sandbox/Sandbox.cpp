@@ -197,10 +197,10 @@ void onPlay(void)
 	GRAPH_CONNECT(g, h);
 	GRAPH_CONNECT(h, i);
 		
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath> aStar(nodeg, nodec);
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath, IsIncluded> aStar2(nodeg, nodec);
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar3(nodeg, nodec);
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath, IsIncluded> aStar4(nodeg, nodec);
+	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath> aStar(nodeg, nodec);
+	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath, IsIncluded> aStar2(nodeg, nodec);
+	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar3(nodeg, nodec);
+	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath, IsIncluded> aStar4(nodeg, nodec);
 	assert(aStar.isPathFound());
 	aStar.getPath(path);
 	
@@ -213,7 +213,7 @@ void onPlay(void)
 
 	nodeh.data = 100;
 	path.clear();
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar5(nodeg, nodec);
+	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar5(nodeg, nodec);
 	assert(aStar5.isPathFound());
 	aStar2.getPath(path);
 	printf("finished A*!\n");

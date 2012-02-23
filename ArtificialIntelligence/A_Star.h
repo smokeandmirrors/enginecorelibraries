@@ -8,30 +8,30 @@
 #include "RedBlackMap.h"
 #include <vector>
 
-/// \todo make all the classes private
-
+namespace A_Star
+{
 
 enum NodeStatus
 {
-	A_StarIncluded			= 1 << 0,
-	A_StarInClosedSet		= 1 << 1,
-	A_StarInOpenSet			= 1 << 2,
-	A_StarWasInOpenSet		= 1 << 3,
+	Included		= 1 << 0,
+	InClosedSet		= 1 << 1,
+	InOpenSet		= 1 << 2,
+	WasInOpenSet	= 1 << 3,
 }; // NodeStatus
 
-const Flags<NodeStatus, ushort> AddToOpenSetStatus(A_StarIncluded | A_StarInOpenSet | A_StarWasInOpenSet);
-const ushort IncludedAndClosedMask(A_StarIncluded | A_StarInClosedSet);
+const Flags<NodeStatus, ushort> AddToOpenSetStatus(Included | InOpenSet | WasInOpenSet);
+const ushort IncludedAndClosedMask(Included | InClosedSet);
 
 template<typename A_STAR_NODE>
 class OpenSet;
 
-template <typename NUMBER>
-NUMBER getInitialA_StarPathCost(void)
+template<typename NUMBER>
+NUMBER getInitialCost(void)
 {
 	return static_cast<NUMBER>(0);
 }
 
-template <typename NODE>
+template<typename NODE>
 struct IncludeAll
 {
 	inline bool operator()(const NODE&) const
@@ -40,178 +40,13 @@ struct IncludeAll
 	}
 };
 
-class AStarVariant {};
-class FindFirstPath : public AStarVariant {};
-class FindShortestPath : public AStarVariant {};
+class FindFirstPath {};
 
-template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE, typename IS_INCLUDED>
-struct A_StarRecorder
-{
-	inline static RECORD* record(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IS_INCLUDED& isIncluded)
-	{
-		RECORD* r;
-
-		if (!recordsByNodes.has(&node, r))
-		{
-			if (isIncluded(node))
-			{
-				r = new RECORD(node, estimateCostToGoal(node, goal));
-				recordsByNodes.set(&node, r);
-			}
-			else
-			{
-				r = new RECORD(node);
-				recordsByNodes.set(&node, r);
-			}			
-		}
-
-		return r;
-	}
-};
-
-template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE>
-struct A_StarRecorder<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IncludeAll<NODE> >
-{
-	inline static RECORD* record(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IncludeAll<NODE>&)
-	{
-		RECORD* r;
-
-		if (!recordsByNodes.has(&node, r))
-		{
-			r = new RECORD(node, estimateCostToGoal(node, goal));
-			recordsByNodes.set(&node, r);
-		}
-
-		return r;
-	}
-};
-
-template<typename NODE, typename RECORD, typename IS_INCLUDED, typename SEARCH_TYPE>
-struct A_StarFlagChecker
-{
-	inline static RECORD* check(RECORD* record) 
-	{
-		PREVENT_COMPILE;
-		return record;
-	}
-};
-
-template<typename NODE, typename RECORD, typename IS_INCLUDED>
-struct A_StarFlagChecker<NODE, RECORD, IS_INCLUDED, FindFirstPath>
-{
-	inline static RECORD* check(RECORD* record) 
-	{
-		return record->isIncluded() ? record : NULL;
-	}
-};
-
-template<typename NODE, typename RECORD, typename IS_INCLUDED>
-struct A_StarFlagChecker<NODE, RECORD, IS_INCLUDED, FindShortestPath>
-{
-	inline static RECORD* check(RECORD* record) 
-	{
-		return record->isIncludedAndNotInClosed() ? record : NULL;
-	}
-};
-
-template<typename NODE, typename RECORD>
-struct A_StarFlagChecker<NODE, RECORD, IncludeAll<NODE>, FindFirstPath>
-{
-	inline static RECORD* check(RECORD* record) 
-	{
-		return record;
-	}
-};
-
-template<typename NODE, typename RECORD>
-struct A_StarFlagChecker<NODE, RECORD, IncludeAll<NODE>, FindShortestPath>
-{
-	inline static RECORD* check(RECORD* record) 
-	{
-		return  record->isNotInClosedSet() ? record : NULL;
-	}
-};
-
-template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE, typename IS_INCLUDED, typename SEARCH_TYPE>
-struct A_StarRecordGenerator
-{
-	inline static RECORD* getActiveRecord(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IS_INCLUDED& isIncluded)
-	{
-		return A_StarFlagChecker<NODE, RECORD, IS_INCLUDED, SEARCH_TYPE>::check(
-				A_StarRecorder<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IS_INCLUDED>::record(recordsByNodes, node, goal, estimateCostToGoal, isIncluded)
-			);
-	}
-};
-
-template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL, typename SEARCH_TYPE>
-struct A_StarConnection
-{
-	inline static void process(A_STAR& search, RECORD& current, RECORD& neighbor, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal) 
-	{
-		PREVENT_COMPILE;
-	}
-};
-
-template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
-struct A_StarConnection<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindFirstPath>
-{
-	inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
-	{		
-		if (connection.isNotInOpenSet())
-		{	
-			if (connection.isInClosedSet())
-			{
-				if (g < connection.g)
-				{
-					connection.update(&current, g);
-					openSet.update(connection.openSetIndex);
-				}
-			}
-			else
-			{
-				connection.h = estimateCostToGoal(connection.node, goal);
-				connection.update(&current, g);
-				search.addToOpenSet(connection);
-			}
-		}
-		else if (g < connection.g)
-		{	
-			connection.update(&current, g);
-			openSet.update(connection.openSetIndex);
-		}
-	}
-};
-
-template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
-struct A_StarConnection<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindShortestPath>
-{
-	inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
-	{
-		if (connection.isInClosedSet())
-		{
-			if (g < connection.g)
-			{
-				connection.update(&current, g);
-				search.addToOpenSet(connection);
-			}
-		}
-		else if (connection.isNotInOpenSet())
-		{	
-			connection.h = estimateCostToGoal(connection.node, goal);
-			connection.update(&current, g);
-			search.addToOpenSet(connection);
-		}
-		else if (g < connection.g)
-		{	
-			connection.update(&current, g);
-			openSet.update(connection.openSetIndex);
-		}
-	}
-};
+class FindShortestPath {};
 
 template
 <
-	typename COST, // <, +, getInitialA_StarPathCost<COST>;
+	typename COST, // <, +, getInitialCost<COST>;
 	typename ESTIMATE_COST_TO_GOAL, // COST operator(const NODE&, const NODE&) const
 	typename GET_COST_TO_NEIGHBOR, // COST operator(const NODE&, const NODE&) const
 	typename IS_GOAL, // bool operator(const NODE&, const NODE&) const
@@ -219,16 +54,16 @@ template
 	typename SEARCH_TYPE=FindFirstPath, // must be FindFirstPath or FindShortestPath
 	typename IS_INCLUDED=IncludeAll<NODE> // bool operator(const NODE&, const NODE&) const
 >
-class A_Star
+class Search
 {
 public:
-	A_Star(const NODE& start, const NODE& goal)
+	Search(const NODE& start, const NODE& goal)
 	{
 		initializeSearch(start, goal);
 		endOfPath = search(goal);
 	}
 
-	~A_Star(void)
+	~Search(void)
 	{
 		recordsByNodes.deleteElements();
 	}
@@ -257,10 +92,173 @@ public:
 	}
 	
 private:
+	template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE, typename IS_INCLUDED>
+	struct NodeRecorder
+	{
+		inline static RECORD* record(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IS_INCLUDED& isIncluded)
+		{
+			RECORD* r;
+
+			if (!recordsByNodes.has(&node, r))
+			{
+				if (isIncluded(node))
+				{
+					r = new RECORD(node, estimateCostToGoal(node, goal));
+					recordsByNodes.set(&node, r);
+				}
+				else
+				{
+					r = new RECORD(node);
+					recordsByNodes.set(&node, r);
+				}			
+			}
+
+			return r;
+		}
+	};
+
+	template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE>
+	struct NodeRecorder<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IncludeAll<NODE> >
+	{
+		inline static RECORD* record(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IncludeAll<NODE>&)
+		{
+			RECORD* r;
+
+			if (!recordsByNodes.has(&node, r))
+			{
+				r = new RECORD(node, estimateCostToGoal(node, goal));
+				recordsByNodes.set(&node, r);
+			}
+
+			return r;
+		}
+	};
+
+	template<typename NODE, typename RECORD, typename IS_INCLUDED, typename SEARCH_TYPE>
+	struct StatusEvaluator
+	{
+		inline static RECORD* check(RECORD* record) 
+		{
+			PREVENT_COMPILE;
+			return record;
+		}
+	};
+
+	template<typename NODE, typename RECORD, typename IS_INCLUDED>
+	struct StatusEvaluator<NODE, RECORD, IS_INCLUDED, FindFirstPath>
+	{
+		inline static RECORD* check(RECORD* record) 
+		{
+			return record->isIncluded() ? record : NULL;
+		}
+	};
+
+	template<typename NODE, typename RECORD, typename IS_INCLUDED>
+	struct StatusEvaluator<NODE, RECORD, IS_INCLUDED, FindShortestPath>
+	{
+		inline static RECORD* check(RECORD* record) 
+		{
+			return record->isIncludedAndNotInClosed() ? record : NULL;
+		}
+	};
+
+	template<typename NODE, typename RECORD>
+	struct StatusEvaluator<NODE, RECORD, IncludeAll<NODE>, FindFirstPath>
+	{
+		inline static RECORD* check(RECORD* record) 
+		{
+			return record;
+		}
+	};
+
+	template<typename NODE, typename RECORD>
+	struct StatusEvaluator<NODE, RECORD, IncludeAll<NODE>, FindShortestPath>
+	{
+		inline static RECORD* check(RECORD* record) 
+		{
+			return  record->isNotInClosedSet() ? record : NULL;
+		}
+	};
+
+	template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE, typename IS_INCLUDED, typename SEARCH_TYPE>
+	struct RecordFactoryTemplate
+	{
+		inline static RECORD* getActiveRecord(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IS_INCLUDED& isIncluded)
+		{
+			return StatusEvaluator<NODE, RECORD, IS_INCLUDED, SEARCH_TYPE>::check(NodeRecorder<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IS_INCLUDED>::record(recordsByNodes, node, goal, estimateCostToGoal, isIncluded));
+		}
+	};
+
+	template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL, typename SEARCH_TYPE>
+	struct ConnectionTemplate
+	{
+		inline static void process(A_STAR& search, RECORD& current, RECORD& neighbor, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal) 
+		{
+			PREVENT_COMPILE;
+		}
+	};
+
+	template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
+	struct ConnectionTemplate<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindFirstPath>
+	{
+		inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
+		{		
+			if (connection.isNotInOpenSet())
+			{	
+				if (connection.wasInOpenSet())
+				{
+					if (g < connection.g)
+					{
+						connection.update(&current, g);
+						openSet.update(connection.openSetIndex);
+					}
+				}
+				else
+				{
+					connection.h = estimateCostToGoal(connection.node, goal);
+					connection.update(&current, g);
+					search.addToOpenSet(connection);
+				}
+			}
+			else if (g < connection.g)
+			{	
+				connection.update(&current, g);
+				openSet.update(connection.openSetIndex);
+			}
+		}
+	};
+
+	template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
+	struct ConnectionTemplate<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindShortestPath>
+	{
+		inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
+		{
+			if (connection.isInClosedSet())
+			{
+				if (g < connection.g)
+				{
+					connection.update(&current, g);
+					search.addToOpenSet(connection);
+				}
+			}
+			else if (connection.isNotInOpenSet())
+			{	
+				connection.h = estimateCostToGoal(connection.node, goal);
+				connection.update(&current, g);
+				search.addToOpenSet(connection);
+			}
+			else if (g < connection.g)
+			{	
+				connection.update(&current, g);
+				openSet.update(connection.openSetIndex);
+			}
+		}
+	};
+	
 	struct Record;
 	typedef containers::RedBlackMap< const NODE*, Record* > RecordMap;
-	typedef A_StarRecordGenerator<Record, COST, ESTIMATE_COST_TO_GOAL, NODE, IS_INCLUDED, SEARCH_TYPE> RecordGenerator;
-	typedef A_StarConnection<A_Star, Record, NODE, COST, OpenSet<Record*>, ESTIMATE_COST_TO_GOAL, SEARCH_TYPE> Connection;
+	typedef RecordFactoryTemplate<Record, COST, ESTIMATE_COST_TO_GOAL, NODE, IS_INCLUDED, SEARCH_TYPE> RecordFactory;
+	typedef ConnectionTemplate<Search, Record, NODE, COST, OpenSet<Record*>, ESTIMATE_COST_TO_GOAL, SEARCH_TYPE> Connection;
 
 	friend struct Connection;
 	
@@ -283,37 +281,37 @@ private:
 		inline Record(const NODE& n, const COST& new_h)
 			: h(new_h)
 			, node(n)
-			, status(A_StarIncluded)
+			, status(Included)
 		{ /* empty */ }
 
 		inline bool isInClosedSet(void) const 
 		{
-			return status.isRaised(A_StarInClosedSet);
+			return status.isRaised(InClosedSet);
 		}
 		
 		inline bool isIncluded(void) const
 		{
-			return status.isRaised(A_StarIncluded);
+			return status.isRaised(Included);
 		}
 
 		inline bool isIncludedAndNotInClosed(void) const
 		{
-			return (status() & IncludedAndClosedMask) == A_StarIncluded;
+			return (status() & IncludedAndClosedMask) == Included;
 		}
 
 		inline bool isInOpenSet(void) const 
 		{
-			return status.isRaised(A_StarInOpenSet);
+			return status.isRaised(InOpenSet);
 		}
 
 		inline bool isNotInClosedSet(void) const 
 		{
-			return status.isLowered(A_StarInClosedSet);
+			return status.isLowered(InClosedSet);
 		}
 
 		inline bool isNotInOpenSet(void) const
 		{
-			return status.isLowered(A_StarInOpenSet);
+			return status.isLowered(InOpenSet);
 		}
 
 		inline void onAddToOpenSet(void)
@@ -323,7 +321,7 @@ private:
 
 		inline void onRemoveFromOpenSet(void)
 		{
-			status.lower(A_StarInOpenSet);
+			status.lower(InOpenSet);
 		}
 
 		inline void update(Record* newParent, const COST& new_g)
@@ -331,6 +329,11 @@ private:
 			g = new_g;
 			parent = newParent;
 			f = new_g + h;
+		}
+
+		inline bool wasInOpenSet(void) const
+		{
+			return status.isRaised(WasInOpenSet);
 		}
 		
 	private:
@@ -346,16 +349,16 @@ private:
 	
 	inline void initializeSearch(const NODE& start, const NODE& goal)
 	{
-		startOfPath = RecordGenerator::getActiveRecord(recordsByNodes, start, goal, estimateCostToGoal, isIncluded);
+		startOfPath = RecordFactory::getActiveRecord(recordsByNodes, start, goal, estimateCostToGoal, isIncluded);
 		
 		if (startOfPath)
 		{
-			startOfPath->update(NULL, getInitialA_StarPathCost<COST>());
+			startOfPath->update(NULL, getInitialCost<COST>());
 			addToOpenSet(*startOfPath);			
 		}
 	}
 
-	A_Star& operator=(const A_Star&);
+	Search& operator=(const Search&);
 
 	inline Record& removeFromOpenSet(void) 
 	{
@@ -367,13 +370,8 @@ private:
 
 	Record* search(const NODE& goal)
 	{
-		static int iterations(0);
-		iterations = 0;
-
 		while (!openSet.isEmpty())
 		{	
-			iterations++;
-			printf("\nOpenSet: %5d\n", iterations); openSet.dump();
 			Record& current(removeFromOpenSet());
 
 			if (isGoal(current.node, goal))
@@ -387,7 +385,7 @@ private:
 				{
 					--index;
 
-					if (Record* n = RecordGenerator::getActiveRecord(recordsByNodes, current.node.getConnection(index), goal, estimateCostToGoal, isIncluded))
+					if (Record* n = RecordFactory::getActiveRecord(recordsByNodes, current.node.getConnection(index), goal, estimateCostToGoal, isIncluded))
 					{
 						Connection::process(*this, current, *n, goal, current.g + getCostToNeighbor(current.node, n->node), openSet, estimateCostToGoal);
 					}
@@ -407,97 +405,83 @@ private:
 	RecordMap recordsByNodes;
 	Record* startOfPath;
 	Record* endOfPath;
-}; // class A_Star
+}; // class Search
+
 
 template<typename A_STAR_NODE>
 class OpenSet
 {
 public:
-	OpenSet();
-
-	void dump(void) const 
+	OpenSet(): nodes()
 	{
-		for (uint i = 0; i < getSize(); i++)
+		/* empty */
+	}
+
+	A_STAR_NODE& get(uint index)
+	{
+		return nodes[index];
+	}
+
+	uint getSize(void) const
+	{
+		return static_cast<uint>(nodes.size());
+	}
+
+	bool isEmpty(void) const
+	{
+		return nodes.empty();	
+	}
+
+	void pop(void)
+	{
+		assert(getSize());
+		nodes[0] = nodes[getSize() - 1];
+		nodes.pop_back();
+
+		if (!isEmpty())
 		{
-			String::Mutable buffer;
-			buffer.string += (nodes[i]->node.toString());
-			buffer.string += (" --> ");
-			if (nodes[i]->parent)
-			{
-				buffer.string += (nodes[i]->parent->node.toString());
-			}
-			else
-			{
-				buffer.string += "NULL";
-			}
-			printf("%s  h: %5d  g: %5d  f: %5d\n", buffer.string.c_str(), nodes[i]->h, nodes[i]->g, nodes[i]->f);
+			down(0);
 		}
 	}
 
-	A_STAR_NODE& get(uint index);
-	uint getSize(void) const;
-	bool isEmpty(void) const;
-	void pop(void);
-	void push(const A_STAR_NODE& element);
-	const A_STAR_NODE& top(void) const;
-	void update(uint index);
+	void push(const A_STAR_NODE& element)
+	{
+		const uint elementIndex = getSize();
+		nodes.push_back(element);
+		element->openSetIndex = elementIndex;
+		up(element, elementIndex);
+	}
+
+	const A_STAR_NODE& top(void) const
+	{
+		return nodes.front();
+	}
+
+	void update(uint index)
+	{
+		assert(isValidIndex(index));
+		A_STAR_NODE& element(nodes[index]);
+		uint parentIndex(getParentIndex(index));
+
+		if (isValidIndex(parentIndex)
+		&& element->f < nodes[getParentIndex(index)]->f)
+		{
+			upSwap(element, index, nodes[getParentIndex(index)], parentIndex);
+			up(element, parentIndex);	
+		}
+		else
+		{
+			down(index);
+		}	
+	}
 
 private:
 	std::vector<A_STAR_NODE> nodes; 
 
-	inline void down(const uint elementIndex);
-	inline void downSwap(uint parentIndex, uint childIndex);
-	inline uint getLeftChildIndex(uint elementIndex) const;
-	inline uint getParentIndex(uint elementIndex) const;
-	inline uint getRightChildIndex(uint elementIndex) const;
-	inline bool isValidIndex(const uint index) const { return index < getSize(); }
-	inline void up(const A_STAR_NODE& element, uint index);
-	inline void upSwap(const A_STAR_NODE& element, uint& elementIndex, const A_STAR_NODE& parent, uint parentIndex);
-}; // class OpenSet
-
-template<typename A_STAR_NODE>
-OpenSet<A_STAR_NODE>::OpenSet()
-: nodes()
-{
-	/* empty */
-}
-
-template<typename A_STAR_NODE>
-A_STAR_NODE& OpenSet<A_STAR_NODE>::get(uint index) 
-{
-	return nodes[index];
-}
-
-template<typename A_STAR_NODE>
-uint OpenSet<A_STAR_NODE>::getLeftChildIndex(uint elementIndex) const
-{
-	return elementIndex * 2 + 1;
-}
-
-template<typename A_STAR_NODE>
-uint OpenSet<A_STAR_NODE>::getParentIndex(uint elementIndex) const
-{
-	return (elementIndex - 1) / 2;
-}
-
-template<typename A_STAR_NODE>
-uint OpenSet<A_STAR_NODE>::getRightChildIndex(uint elementIndex) const
-{
-	return elementIndex * 2 + 2;
-}
-
-template<typename A_STAR_NODE>
-uint OpenSet<A_STAR_NODE>::getSize(void) const
-{
-	return static_cast<uint>(nodes.size());
-}
-
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::down(uint index)
-{
-	for (;;)
+	inline void down(uint index)
 	{
-		const uint leftChildIndex = getLeftChildIndex(index);
+		INFINITE_LOOP_BEGIN
+			const uint leftChildIndex = getLeftChildIndex(index);
 		const uint rightChildIndex = getRightChildIndex(index);
 		uint outOfOrderIndex = index;
 
@@ -522,100 +506,67 @@ void OpenSet<A_STAR_NODE>::down(uint index)
 			downSwap(index, outOfOrderIndex);
 			index = outOfOrderIndex;
 		}	
+		INFINITE_LOOP_END
 	}
-}
 
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::downSwap(uint parentIndex, uint childIndex)
-{
-	A_STAR_NODE parentCopy(get(parentIndex));
-	nodes[parentIndex] = get(childIndex);
-	nodes[parentIndex]->openSetIndex = parentIndex;
-	nodes[childIndex] = parentCopy;
-	nodes[childIndex]->openSetIndex = childIndex;
-}
-
-template<typename A_STAR_NODE>
-bool OpenSet<A_STAR_NODE>::isEmpty(void) const
-{
-	return nodes.empty();	
-}
-
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::pop(void) 
-{
-	assert(getSize());
-	nodes[0] = nodes[getSize() - 1];
-	nodes.pop_back();
-
-	if (!isEmpty())
+	inline void downSwap(uint parentIndex, uint childIndex)
 	{
-		down(0);
+		A_STAR_NODE parentCopy(get(parentIndex));
+		nodes[parentIndex] = get(childIndex);
+		nodes[parentIndex]->openSetIndex = parentIndex;
+		nodes[childIndex] = parentCopy;
+		nodes[childIndex]->openSetIndex = childIndex;
 	}
-}
 
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::push(const A_STAR_NODE& element)
-{
-	const uint elementIndex = getSize();
-	nodes.push_back(element);
-	element->openSetIndex = elementIndex;
-	up(element, elementIndex);
-}
-
-template<typename A_STAR_NODE>
-const A_STAR_NODE& OpenSet<A_STAR_NODE>::top(void) const
-{
-	return nodes.front();
-}
-
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::up(const A_STAR_NODE& element, uint elementIndex)
-{
-	while (elementIndex)
+	inline uint getLeftChildIndex(uint elementIndex) const
 	{
-		const uint parentIndex = getParentIndex(elementIndex);
-		const A_STAR_NODE& parent = nodes[parentIndex];
+		return elementIndex * 2 + 1;
+	}
 
-		if (element->f < parent->f)
+	inline uint getParentIndex(uint elementIndex) const
+	{
+		return (elementIndex - 1) / 2;
+	}
+
+	inline uint getRightChildIndex(uint elementIndex) const
+	{
+		return elementIndex * 2 + 2;
+	}
+
+	inline bool isValidIndex(const uint index) const 
+	{ 
+		return index < getSize(); 
+	}
+
+	inline void up(const A_STAR_NODE& element, uint index)
+	{
+		while (index)
 		{
-			upSwap(element, elementIndex, parent, parentIndex);
-		}
-		else
-		{
-			break;
+			const uint parentIndex = getParentIndex(index);
+			const A_STAR_NODE& parent = nodes[parentIndex];
+
+			if (element->f < parent->f)
+			{
+				upSwap(element, index, parent, parentIndex);
+			}
+			else
+			{
+				break;
+			}
 		}
 	}
-}
 
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::update(uint index)
-{
-	assert(isValidIndex(index));
-	A_STAR_NODE& element(nodes[index]);
-	uint parentIndex(getParentIndex(index));
-
-	if (isValidIndex(parentIndex)
-	&& element->f < nodes[getParentIndex(index)]->f)
+	inline void upSwap(const A_STAR_NODE& element, uint& elementIndex, const A_STAR_NODE& parent, uint parentIndex)
 	{
-		upSwap(element, index, nodes[getParentIndex(index)], parentIndex);
-		up(element, parentIndex);	
+		A_STAR_NODE parentCopy(parent);
+		nodes[parentIndex] = element;
+		element->openSetIndex = parentIndex;
+		nodes[elementIndex] = parentCopy;
+		parentCopy->openSetIndex = elementIndex;
+		elementIndex = parentIndex;
 	}
-	else
-	{
-		down(index);
-	}	
-}
+}; // class OpenSet
 
-template<typename A_STAR_NODE>
-void OpenSet<A_STAR_NODE>::upSwap(const A_STAR_NODE& element, uint& elementIndex, const A_STAR_NODE& parent, uint parentIndex)
-{
-	A_STAR_NODE parentCopy(parent);
-	nodes[parentIndex] = element;
-	element->openSetIndex = parentIndex;
-	nodes[elementIndex] = parentCopy;
-	parentCopy->openSetIndex = elementIndex;
-	elementIndex = parentIndex;
-}
+} // namespace A_Star
 
 #endif//A_STAR_H
