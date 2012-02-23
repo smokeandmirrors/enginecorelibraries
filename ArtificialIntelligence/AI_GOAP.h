@@ -8,7 +8,7 @@
 namespace AI
 {
 
-/*
+/* 
  * a general note on ai behavior:
  * instead of planning every last step of of a plan in relationship
  * to the actual condition of the world, a golden plan is done

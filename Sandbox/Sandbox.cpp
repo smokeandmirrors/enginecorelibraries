@@ -87,7 +87,7 @@ public:
 		typedef uint ID;
 
 		const math::Pixel position;
-		const uint data;
+		uint data;
 
 		Node(const math::Pixel& p, uint newData, String::Immutable newName)
 		: position(p)
@@ -98,8 +98,8 @@ public:
 		
 		inline void connect(const Node& neighbor) 
 		{ 
-			for (uint i(0); i < getNumNeighbors(); ++i) 
-				assert(neighbor != getNeighbor(i));
+			for (uint i(0); i < getNumConnections(); ++i) 
+				assert(neighbor != getConnection(i));
 			
 			neighbors.push_back(&neighbor); 
 		}
@@ -116,8 +116,8 @@ public:
 		}
 
 		inline sint getID(void) const { return nodeID; }
-		inline const Node& getNeighbor(uint index) const { assert(index < getNumNeighbors()); return *neighbors[index]; }
-		inline uint getNumNeighbors(void) const { return static_cast<uint>(neighbors.size()); }
+		inline const Node& getConnection(uint index) const { assert(index < getNumConnections()); return *neighbors[index]; }
+		inline uint getNumConnections(void) const { return static_cast<uint>(neighbors.size()); }
 		
 	private:
 		Node& operator=(const Node&);
@@ -192,10 +192,30 @@ void onPlay(void)
 	GRAPH_CONNECT(g, h);
 	GRAPH_CONNECT(h, i);
 		
-	A_Star<sint, GetCost, GetCost, IsGoal, IsIncluded, Graph::Node> aStar(nodeg, nodec);
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath, IsIncluded> aStar(nodeg, nodec);
+	// A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, IsIncluded> aStar(nodeg, nodec);
 	assert(aStar.isPathFound());
 	aStar.getPath(path);
-		
+	// 
+	assert(path[0] == &nodeg);
+	assert(path[1] == &nodeh);
+	assert(path[2] == &nodei);
+	assert(path[3] == &nodef);
+	assert(path[4] == &nodec);
+
+	nodeh.data = 100;
+	path.clear();
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar2(nodeg, nodec);
+	// A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, IsIncluded> aStar(nodeg, nodec);
+	assert(aStar2.isPathFound());
+	aStar2.getPath(path);
+
+	assert(path[0] != &nodeh);
+	assert(path[1] != &nodeh);
+	assert(path[2] != &nodeh);
+	assert(path[3] != &nodeh);
+	assert(path[4] != &nodeh);
+	
  	Agent alpha;
  	Movement* movement = new Movement();
  	Attack* attack = new Attack();

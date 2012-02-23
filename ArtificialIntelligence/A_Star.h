@@ -8,8 +8,127 @@
 #include "RedBlackMap.h"
 #include <vector>
 
+/// \todo replace bool with flags
+/// \todo make all the classes private
+/// \todo see how I got rid of the closed list in the original version
+
+
 template<typename A_STAR_NODE>
 class OpenSet;
+
+template <typename NUMBER>
+NUMBER getInitialA_StarPathCost(void)
+{
+	return static_cast<NUMBER>(0);
+}
+
+template <typename NODE>
+struct IncludeAll
+{
+	inline bool operator()(const NODE&) const
+	{
+		return true;
+	}
+};
+
+template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE, typename IS_INCLUDED>
+struct A_StarRecordGenerator
+{
+	inline static RECORD* getActiveRecord(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IS_INCLUDED& isIncluded)
+	{
+		RECORD* record;
+
+		if (!recordsByNodes.has(&node, record))
+		{
+			if (isIncluded(node))
+			{
+				record = new RECORD(node, estimateCostToGoal(node, goal));
+			}
+			else
+			{
+				record = new RECORD(node);
+			}
+
+			recordsByNodes.set(&node, record);
+		}
+
+		return record->isIncluded && record->isNotInClosedSet ? record : NULL;	
+	}
+};
+
+template<typename RECORD, typename COST, typename ESTIMATE_COST_TO_GOAL, typename NODE>
+struct A_StarRecordGenerator<RECORD, COST, ESTIMATE_COST_TO_GOAL, NODE, IncludeAll<NODE> >
+{
+	inline static RECORD* getActiveRecord(containers::RedBlackMap< const NODE*, RECORD* >& recordsByNodes, const NODE& node, const NODE& goal, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal, const IncludeAll<NODE>&)
+	{
+		RECORD* record;
+
+		if (!recordsByNodes.has(&node, record))
+		{
+			record = new RECORD(node, estimateCostToGoal(node, goal));
+			recordsByNodes.set(&node, record);
+		}
+
+		return record->isNotInClosedSet ? record : NULL;	
+	}
+};
+
+class AStarVariant {};
+class FindFirstPath : public AStarVariant {};
+class FindShortestPath : public AStarVariant {};
+
+template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL, typename SEARCH_TYPE>
+struct A_StarConnection
+{
+	inline static void process(A_STAR& search, RECORD& current, RECORD& neighbor, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal) 
+	{
+		PREVENT_COMPILE;
+	}
+};
+
+template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
+struct A_StarConnection<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindFirstPath>
+{
+	inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
+	{
+		if (!connection.isInOpenSet)
+		{	
+			connection.h = estimateCostToGoal(connection.node, goal);
+			connection.update(&current, g);
+			search.addToOpenSet(connection);
+		}
+		else if (g < connection.g)
+		{	
+			connection.update(&current, g);
+			openSet.update(connection.openSetIndex);
+		}
+	}
+};
+
+template<typename A_STAR, typename RECORD, typename NODE, typename COST, typename OPEN_SET, typename ESTIMATE_COST_TO_GOAL>
+struct A_StarConnection<A_STAR, RECORD, NODE, COST, OPEN_SET, ESTIMATE_COST_TO_GOAL, FindShortestPath>
+{
+	inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
+	{
+		if (!connection.isNotInClosedSet
+		&& g < connection.g)
+		{
+			connection.update(&current, g);
+			search.addToOpenSet(connection);
+		}
+		else if (!connection.isInOpenSet)
+		{	
+			connection.h = estimateCostToGoal(connection.node, goal);
+			connection.update(&current, g);
+			search.addToOpenSet(connection);
+		}
+		else if (g < connection.g)
+		{	
+			connection.update(&current, g);
+			openSet.update(connection.openSetIndex);
+		}
+	}
+};
 
 template
 <
@@ -17,42 +136,74 @@ template
 	typename ESTIMATE_COST_TO_GOAL, // COST operator(const NODE&, const NODE&) const
 	typename GET_COST_TO_NEIGHBOR, // COST operator(const NODE&, const NODE&) const
 	typename IS_GOAL, // bool operator(const NODE&, const NODE&) const
-	typename IS_INCLUDED, // bool operator(const NODE&, const NODE&) const
-	typename NODE // const NODE& getNeighbor(uint index) const, uint getNumNeigbhors(void) const
+	typename NODE, // const NODE& getConnection(uint index) const, uint getNumNeigbhors(void) const
+	typename SEARCH_TYPE, // must be AStarVariant::eFindFirstPath or AStarVariant::eFindShortestPath
+	typename IS_INCLUDED=IncludeAll<NODE> // bool operator(const NODE&, const NODE&) const
 >
 class A_Star
 {
 public:
-	A_Star(const NODE& start, const NODE& goal);
-	~A_Star(void);
-	void getPath(std::vector<const NODE*>& path) const;
-	bool isPathFound(void) const;
+	A_Star(const NODE& start, const NODE& goal)
+	{
+		initializeSearch(start, goal);
+		endOfPath = search(goal);
+	}
+
+	~A_Star(void)
+	{
+		recordsByNodes.deleteElements();
+	}
+
+	void getPath(std::vector<const NODE*>& path) const
+	{
+		if (endOfPath)
+		{	
+			Record* pathNode(endOfPath);
+
+			do 
+			{
+				path.push_back(&pathNode->node);
+				pathNode = pathNode->parent;
+			} 
+			while (pathNode);
+
+			std::reverse(path.begin(), path.end());
+		}
+	}
+	
+	bool isPathFound(void) const
+	{
+		return endOfPath != NULL;
+	}
 	
 private:
-	class Node;
+	struct Record;
+	typedef containers::RedBlackMap< const NODE*, Record* > RecordMap;
+	typedef A_StarRecordGenerator<Record,COST,ESTIMATE_COST_TO_GOAL,NODE,IS_INCLUDED> RecordGenerator;
+	typedef A_StarConnection<A_Star, Record, NODE, COST, OpenSet<Record*>, ESTIMATE_COST_TO_GOAL, SEARCH_TYPE> ConnectionProcess;
 
-	typedef containers::RedBlackMap< const NODE*, Node* > RecordMap;
-
-	struct Node
+	friend struct ConnectionProcess;
+	
+	struct Record
 	{	
 		COST f;
 		COST g;
 		COST h;
 		const NODE& node;
-		Node* parent;
+		Record* parent;
 		mutable uint openSetIndex;
 		bool isIncluded;
-		bool isInOpenSet;// 
-		bool isNotInClosedSet; /// \todo I had a version with no closed set.  find this again.
-		
+		bool isInOpenSet;
+		bool isNotInClosedSet;
+
 		/// constructor for nodes that aren't included in the search
-		inline Node(const NODE& n)
+		inline Record(const NODE& n)
 			: node(n)
 			, isIncluded(false)
 		{ /* empty */ }
-		
+
 		/// constructor for nodes that are created when a node gets neighbors
-		inline Node(const NODE& n, const COST& new_h)
+		inline Record(const NODE& n, const COST& new_h)
 			: h(new_h)
 			, node(n)
 			, isIncluded(true)
@@ -60,91 +211,64 @@ private:
 			, isNotInClosedSet(true)
 		{ /* empty */ }
 
-	private:
-		Node& operator=(const Node&);
-	};// class A_Star::Node
+		inline void update(Record* newParent, const COST& new_g)
+		{	// update g & f, update position in path from start
+			g = new_g;
+			parent = newParent;
+			f = new_g + h;
+		}
 
-	inline void addToOpenSet(Node& node)
+	private:
+		Record& operator=(const Record&);
+	}; // struct Record
+
+	inline void addToOpenSet(Record& node)
 	{
 		node.isInOpenSet = true;
+		node.isNotInClosedSet = true;
 		openSet.push(&node);
 	}
 	
 	inline void initializeSearch(const NODE& start, const NODE& goal)
 	{
-		if (Node* startNode = isNodeIncluded(start, goal))
+		if (Record* startNode = RecordGenerator::getActiveRecord(recordsByNodes, start, goal, estimateCostToGoal, isIncluded))
 		{
-			updatePathRecord(*startNode, NULL, getInitialA_StarPathCost<COST>());
+			startNode->update(NULL, getInitialA_StarPathCost<COST>());
 			addToOpenSet(*startNode);
 		}
 	}
 
-	inline Node* isNodeIncluded(const NODE& node, const NODE& goal) 
-	{
-		Node* record;
-
-		if (!recordsByNodes.has(&node, record))
-		{
-			if (isIncluded(node))
-			{
-				record = new Node(node, estimateCostToGoal(node, goal));
-			}
-			else
-			{
-				record = new Node(node);
-			}
-
-			recordsByNodes.set(&node, record);
-		}
-		
-		return record->isIncluded && record->isNotInClosedSet ? record : NULL;
-	}
-
 	A_Star& operator=(const A_Star&);
 
-	inline Node& removeFromOpenSet(void) 
+	inline Record& removeFromOpenSet(void) 
 	{
-		Node& current(*openSet.top());
+		Record& current(*openSet.top());
 		openSet.pop();
 		current.isInOpenSet = false;
 		current.isNotInClosedSet = false;
 		return current;
 	}
 
-	Node* search(const NODE& goal)
+	Record* search(const NODE& goal)
 	{
 		while (!openSet.isEmpty())
 		{
-			Node& current(removeFromOpenSet());
+			Record& current(removeFromOpenSet());
 
 			if (isGoal(current.node, goal))
 			{
 				return &current;
 			}
 
-			if (uint index = current.node.getNumNeighbors())
+			if (uint index = current.node.getNumConnections())
 			{
 				do
 				{
 					--index;
 
-					if (Node* n = isNodeIncluded(current.node.getNeighbor(index), goal))
+					if (Record* n = RecordGenerator::getActiveRecord(recordsByNodes, current.node.getConnection(index), goal, estimateCostToGoal, isIncluded))
 					{
-						Node& neighbor(*n);
-						const COST startToNeighbor(current.g + getCostToNeighbor(current.node, neighbor.node));
-
-						if (!neighbor.isInOpenSet)
-						{	
-							neighbor.h = estimateCostToGoal(neighbor.node, goal);
-							updatePathRecord(neighbor, &current, startToNeighbor);
-							addToOpenSet(neighbor);
-							neighbor.isInOpenSet = true;
-						}
-						else if (startToNeighbor < neighbor.g)
-						{	
-							updatePathRecord(neighbor, &current, startToNeighbor);
-							openSet.update(neighbor.openSetIndex);
-						}
+						ConnectionProcess::process(*this, current, *n, goal, current.g + getCostToNeighbor(current.node, n->node), openSet, estimateCostToGoal);
 					}
 				}
 				while (index);
@@ -154,20 +278,13 @@ private:
 		return NULL;
 	}
 
-	inline void updatePathRecord(Node& current, Node* parent, const COST& throughParent)
-	{	// update g & f, update position in path from start
-		current.g = throughParent;
-		current.parent = parent;
-		current.f = throughParent + current.h;
-	}
-
 	const ESTIMATE_COST_TO_GOAL estimateCostToGoal;
 	const GET_COST_TO_NEIGHBOR getCostToNeighbor;
 	const IS_GOAL isGoal;
 	const IS_INCLUDED isIncluded;
-	OpenSet<Node*> openSet;
+	OpenSet<Record*> openSet;
 	RecordMap recordsByNodes;
-	Node* endOfPath;
+	Record* endOfPath;
 }; // class A_Star
 
 template<typename A_STAR_NODE>
@@ -176,7 +293,6 @@ class OpenSet
 public:
 	OpenSet();
 
-	void dump(void) const { for (uint i = 0; i < getSize(); ++i) printf("%d ", get(i).f); }
 	A_STAR_NODE& get(uint index);
 	uint getSize(void) const;
 	bool isEmpty(void) const;
@@ -197,49 +313,6 @@ private:
 	inline void up(const A_STAR_NODE& element, uint index);
 	inline void upSwap(const A_STAR_NODE& element, uint& elementIndex, const A_STAR_NODE& parent, uint parentIndex);
 }; // class OpenSet
-
-template<typename COST, typename ESTIMATE_COST_TO_GOAL, typename GET_COST_TO_NEIGHBOR, typename IS_GOAL, typename IS_INCLUDED, typename NODE>
-A_Star<COST, ESTIMATE_COST_TO_GOAL, GET_COST_TO_NEIGHBOR, IS_GOAL, IS_INCLUDED, NODE>::A_Star(const NODE& start, const NODE& goal)
-{
-	initializeSearch(start, goal);
-	endOfPath = search(goal);
-}
-
-template<typename COST, typename ESTIMATE_COST_TO_GOAL, typename GET_COST_TO_NEIGHBOR, typename IS_GOAL, typename IS_INCLUDED, typename NODE>
-A_Star<COST, ESTIMATE_COST_TO_GOAL, GET_COST_TO_NEIGHBOR, IS_GOAL, IS_INCLUDED, NODE>::~A_Star(void)
-{
-	recordsByNodes.deleteElements();
-}
-
-template<typename COST, typename ESTIMATE_COST_TO_GOAL, typename GET_COST_TO_NEIGHBOR, typename IS_GOAL, typename IS_INCLUDED, typename NODE>
-bool A_Star<COST, ESTIMATE_COST_TO_GOAL, GET_COST_TO_NEIGHBOR, IS_GOAL, IS_INCLUDED, NODE>::isPathFound(void) const
-{
-	return endOfPath != NULL;
-}
-
-template<typename COST, typename ESTIMATE_COST_TO_GOAL, typename GET_COST_TO_NEIGHBOR, typename IS_GOAL, typename IS_INCLUDED, typename NODE>
-void A_Star<COST, ESTIMATE_COST_TO_GOAL, GET_COST_TO_NEIGHBOR, IS_GOAL, IS_INCLUDED, NODE>::getPath(std::vector<const NODE*>& path) const
-{
-	if (endOfPath)
-	{	
-		Node* pathNode(endOfPath);
-
-		do 
-		{
-			path.push_back(&pathNode->node);
-			pathNode = pathNode->parent;
-		} 
-		while (pathNode);
-	
-		std::reverse(path.begin(), path.end());
-	}
-}
-
-template <typename NUMBER>
-NUMBER getInitialA_StarPathCost(void)
-{
-	return static_cast<NUMBER>(0);
-}
 
 template<typename A_STAR_NODE>
 OpenSet<A_STAR_NODE>::OpenSet()
