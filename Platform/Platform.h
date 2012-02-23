@@ -86,6 +86,7 @@ Tested in the field	:	NO
 #define IF_NOT_GOLD_MASTER(code) 
 #endif//GOLD_MASTER
 
+#define INFINITE_LOOP for (;;)
 
 enum BoolEnum
 {
@@ -137,6 +138,26 @@ typedef double				dreal;
 
 /**@}*/
 
+template<typename FLAGS, typename STORAGE>
+class Flags
+{
+public:
+	inline Flags(const Flags& f) : flags(f.flags) { /* empty */ }
+	inline Flags(const STORAGE s) : flags(s) { /* empty */ }
+	inline bool	isLowered(const STORAGE mask) const { return !(flags & mask); }
+	inline bool	isRaised(const STORAGE mask) const { return (flags & mask) == mask; }
+	inline void	lower(const STORAGE s) { flags &= s; }
+	inline void	lower(void) { flags = 0; }
+	inline Flags& operator=(const Flags& f) { flags = f.flags; return *this; }
+	inline bool operator==(const Flags& f) const { return flags = f.flags; }
+	inline bool	operator!=(const Flags& f) const { return flags ~ f.flags; }
+	inline STORAGE operator()(void) const { return flags; }
+	inline void raise(const STORAGE s) { flags |= s; }
+	inline void	set(const STORAGE s) { flags = s; }
+	
+private:
+	STORAGE flags;
+};
 
 template<typename T> 
 class isLess

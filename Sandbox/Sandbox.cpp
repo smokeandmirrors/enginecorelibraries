@@ -185,7 +185,7 @@ void onPlay(void)
 	std::vector<const Graph::Node*> path;
 
 	/*O*/NODE_ENTRY(a, -1, 1,12); /*O*/NODE_ENTRY(b,  0, 1, 0); /*X*/NODE_ENTRY(c,  1, 1, 0); 
-	/*O*/NODE_ENTRY(d, -1, 0,10); /*O*/NODE_ENTRY(e,  0, 0,20); /*X*/NODE_ENTRY(f,  1, 0, 4); 
+	/*O*/NODE_ENTRY(d, -1, 0,50); /*O*/NODE_ENTRY(e,  0, 0,50); /*X*/NODE_ENTRY(f,  1, 0, 4); 
 	/*X*/NODE_ENTRY(g, -1,-1, 0); /*X*/NODE_ENTRY(h,  0,-1, 2); /*X*/NODE_ENTRY(i,  1,-1, 2); 
 
 	GRAPH_CONNECT(a, d); GRAPH_CONNECT(a, b);
@@ -197,8 +197,10 @@ void onPlay(void)
 	GRAPH_CONNECT(g, h);
 	GRAPH_CONNECT(h, i);
 		
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath, IsIncluded> aStar(nodeg, nodec);
-	// A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, IsIncluded> aStar(nodeg, nodec);
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath> aStar(nodeg, nodec);
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindFirstPath, IsIncluded> aStar2(nodeg, nodec);
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar3(nodeg, nodec);
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath, IsIncluded> aStar4(nodeg, nodec);
 	assert(aStar.isPathFound());
 	aStar.getPath(path);
 	
@@ -211,17 +213,9 @@ void onPlay(void)
 
 	nodeh.data = 100;
 	path.clear();
-	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar2(nodeg, nodec);
-	// A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, IsIncluded> aStar(nodeg, nodec);
-	assert(aStar2.isPathFound());
+	A_Star<sint, GetCost, GetCost, IsGoal, Graph::Node, FindShortestPath> aStar5(nodeg, nodec);
+	assert(aStar5.isPathFound());
 	aStar2.getPath(path);
-
-	assert(path[0] != &nodeh);
-	assert(path[1] != &nodeh);
-	assert(path[2] != &nodeh);
-	assert(path[3] != &nodeh);
-	assert(path[4] != &nodeh);
-	
 	printf("finished A*!\n");
 
  	Agent alpha;
