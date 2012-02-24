@@ -144,17 +144,18 @@ class Flags
 {
 public:
 	inline Flags(const Flags& f) : flags(f.flags) { /* empty */ }
-	inline Flags(const STORAGE s) : flags(s) { /* empty */ }
-	inline bool	isLowered(const STORAGE mask) const { return !(flags & mask); }
-	inline bool	isRaised(const STORAGE mask) const { return (flags & mask) == mask; }
-	inline void	lower(const STORAGE s) { flags &= s; }
+	inline Flags(const STORAGE mask) : flags(mask) { /* empty */ }
+	inline STORAGE isLowered(const STORAGE mask) const { return !(flags & mask); }
+	inline STORAGE isRaised(const STORAGE mask) const { return flags & mask; }
+	inline void	lower(const STORAGE mask) { flags &= (~mask); }
 	inline void	lower(void) { flags = 0; }
 	inline Flags& operator=(const Flags& f) { flags = f.flags; return *this; }
-	inline bool operator==(const Flags& f) const { return flags = f.flags; }
-	inline bool	operator!=(const Flags& f) const { return flags ~ f.flags; }
+	inline STORAGE operator==(const Flags& f) const { return flags == f.flags; }
+	inline STORAGE operator!=(const Flags& f) const { return flags ^ f.flags; }
 	inline STORAGE operator()(void) const { return flags; }
-	inline void raise(const STORAGE s) { flags |= s; }
-	inline void	set(const STORAGE s) { flags = s; }
+	inline void raise(void) { flags = 0; flags = ~flags; }
+	inline void raise(const STORAGE mask) { flags |= mask; }
+	inline void	set(const STORAGE mask) { flags = mask; }
 	
 private:
 	STORAGE flags;

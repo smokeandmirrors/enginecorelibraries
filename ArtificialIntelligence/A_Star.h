@@ -284,32 +284,32 @@ private:
 			, status(Included)
 		{ /* empty */ }
 
-		inline bool isInClosedSet(void) const 
+		inline ushort isInClosedSet(void) const 
 		{
 			return status.isRaised(InClosedSet);
 		}
 		
-		inline bool isIncluded(void) const
+		inline ushort isIncluded(void) const
 		{
 			return status.isRaised(Included);
 		}
 
-		inline bool isIncludedAndNotInClosed(void) const
+		inline ushort isIncludedAndNotInClosed(void) const
 		{
 			return (status() & IncludedAndClosedMask) == Included;
 		}
 
-		inline bool isInOpenSet(void) const 
+		inline ushort isInOpenSet(void) const 
 		{
 			return status.isRaised(InOpenSet);
 		}
 
-		inline bool isNotInClosedSet(void) const 
+		inline ushort isNotInClosedSet(void) const 
 		{
 			return status.isLowered(InClosedSet);
 		}
 
-		inline bool isNotInOpenSet(void) const
+		inline ushort isNotInOpenSet(void) const
 		{
 			return status.isLowered(InOpenSet);
 		}
@@ -331,7 +331,7 @@ private:
 			f = new_g + h;
 		}
 
-		inline bool wasInOpenSet(void) const
+		inline ushort wasInOpenSet(void) const
 		{
 			return status.isRaised(WasInOpenSet);
 		}
