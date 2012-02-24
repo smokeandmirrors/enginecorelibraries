@@ -114,12 +114,6 @@ void sandbox::tableRnD(void)
 	boolVersion = intVersion;
 
 #if DEVELOP_TABLE
-	RedBlackTree<sint>* outstanding = new RedBlackTree<sint>;
-	RedBlackTree<sint>* awesome;
-
-		
-
-
 	Table< RedBlackTree<sint>* > myarray;
 	myarray.set(0, outstanding);
 	myarray.set(1, outstanding);
@@ -145,7 +139,6 @@ void sandbox::tableRnD(void)
 		printf("MyNumbs: %d\n", *i);
 	}
 
-	std::map<const char*, RedBlackTree<sint>*> numberToTree;
 	awesome = NULL;
 	awesome = numberToTree["awesome"];
 	numberToTree["awesome"] = outstanding;

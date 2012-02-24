@@ -35,7 +35,7 @@ inline uint getNumHardwareThreads(void)
 	GetSystemInfo(&system_info);
 }
 #else
-	PREVENT_COMPILE
+	#error unsupported concurrency platform
 #endif//WIN32
 
 /** a wrapper for a Thread that can be added to the scheduler */
@@ -511,7 +511,7 @@ void Dispatcher::initializeNumberSystemThreads(void)
 	GetSystemInfo(&windows_info);
 	m_numSystemThreads = windows_info.dwNumberOfProcessors;
 #else
-	PREVENT_COMPILE
+	#error unsupported concurrency platform
 #endif//WIN32
 }
 

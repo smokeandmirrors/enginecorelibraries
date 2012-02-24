@@ -27,7 +27,7 @@ typedef uint				threadID;
 typedef void*				threadHandle;
 
 #else
-	PREVENT_COMPILE
+#error unsupported concurrency platform
 #endif//WIN32
 
 #define DECLARE_NOARGS_EXECUTABLE_FUNCTION(name) NOARGS_EXECUTABLE_FUNCTION(name);

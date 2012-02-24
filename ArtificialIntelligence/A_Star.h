@@ -18,11 +18,10 @@ enum NodeStatus
 	Included		= 1 << 0,
 	InClosedSet		= 1 << 1,
 	InOpenSet		= 1 << 2,
-	WasInOpenSet	= 1 << 3,
 }; // NodeStatus
 
-const Flags<NodeStatus, ushort> AddToOpenSetStatus(Included | InOpenSet);
-const ushort IncludedAndClosedMask(Included | InClosedSet);
+const ushort OpenSetMask(Included | InOpenSet);
+const ushort ClosedSetMask(Included | InClosedSet);
 
 template<typename A_STAR_NODE>
 class OpenSet;
@@ -151,7 +150,7 @@ private:
 	{
 		inline static RECORD* check(RECORD* record) 
 		{
-			return record->isIncluded() ? record : NULL;
+			return record->isIncludedAndNotInClosed() ? record : NULL;
 		}
 	};
 
@@ -160,7 +159,7 @@ private:
 	{
 		inline static RECORD* check(RECORD* record) 
 		{
-			return record->isIncludedAndNotInClosed() ? record : NULL;
+			return record->isIncluded() ? record : NULL;
 		}
 	};
 
@@ -169,7 +168,7 @@ private:
 	{
 		inline static RECORD* check(RECORD* record) 
 		{
-			return record;
+			return  record->isNotInClosedSet() ? record : NULL;
 		}
 	};
 
@@ -178,7 +177,7 @@ private:
 	{
 		inline static RECORD* check(RECORD* record) 
 		{
-			return  record->isNotInClosedSet() ? record : NULL;
+			return record;
 		}
 	};
 
@@ -205,19 +204,16 @@ private:
 	{
 		inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
 		{		
-			if (connection.isNotInClosedSet())
-			{
-				if (connection.isNotInOpenSet())
-				{		
-					connection.h = estimateCostToGoal(connection.node, goal);
-					connection.update(&current, g);
-					search.addToOpenSet(connection);
-				}
-				else if (g < connection.g)
-				{	
-					connection.update(&current, g);
-					openSet.update(connection.openSetIndex);
-				}
+			if (connection.isNotInOpenSet())
+			{		
+				connection.h = estimateCostToGoal(connection.node, goal);
+				connection.update(&current, g);
+				search.addToOpenSet(connection);
+			}
+			else if (g < connection.g)
+			{	
+				connection.update(&current, g);
+				openSet.update(connection.openSetIndex);
 			}
 		}
 	};
@@ -290,7 +286,7 @@ private:
 
 		inline ushort isIncludedAndNotInClosed(void) const
 		{
-			return (status() & IncludedAndClosedMask) == Included;
+			return (status() & ClosedSetMask) == Included;
 		}
 
 		inline ushort isInOpenSet(void) const 
@@ -310,19 +306,19 @@ private:
 
 		inline void onAddToOpenSet(void)
 		{
-			status = AddToOpenSetStatus;
+			status.raise(InOpenSet);
 		}
 
 		inline void onRemoveFromOpenSet(void)
 		{
-			status.lower(InOpenSet);
+			status.set(ClosedSetMask);
 		}
 
 		inline void update(Record* newParent, const COST& new_g)
-		{	// update g & f, update position in path from start
+		{	// update f, g, and position in path
+			f = new_g + h;
 			g = new_g;
 			parent = newParent;
-			f = new_g + h;
 		}
 		
 	private:
@@ -359,8 +355,12 @@ private:
 
 	Record* search(const NODE& goal)
 	{
+		static uint iterations;
+		iterations = 0;
+
 		while (!openSet.isEmpty())
 		{	
+			iterations++;
 			Record& current(removeFromOpenSet());
 
 			if (isGoal(current.node, goal))

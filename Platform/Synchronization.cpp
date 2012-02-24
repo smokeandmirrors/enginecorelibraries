@@ -10,7 +10,7 @@ namespace concurrency
 #if WIN32
 typedef CRITICAL_SECTION criticalSection;
 #else
-	PREVENT_COMPILE
+	#error unsupported concurrency platform
 #endif//WIN32
 
 class PlatformMutex 
@@ -41,7 +41,7 @@ public:
 private:
 	criticalSection	m_criticalSection;
 #else
-	PREVENT_COMPILE
+	#error unsupported concurrency platform
 #endif//WIN32
 }; // class PlatformMutex
 

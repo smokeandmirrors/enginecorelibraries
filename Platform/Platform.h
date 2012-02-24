@@ -143,18 +143,31 @@ template<typename FLAGS, typename STORAGE>
 class Flags
 {
 public:
+	
 	inline Flags(const Flags& f) : flags(f.flags) { /* empty */ }
-	inline Flags(const STORAGE mask) : flags(mask) { /* empty */ }
+	
+	inline Flags(const STORAGE mask=0) : flags(mask) { /* empty */ }
+	
 	inline STORAGE isLowered(const STORAGE mask) const { return !(flags & mask); }
+	
 	inline STORAGE isRaised(const STORAGE mask) const { return flags & mask; }
+	
 	inline void	lower(const STORAGE mask) { flags &= (~mask); }
+	
 	inline void	lower(void) { flags = 0; }
+	
 	inline Flags& operator=(const Flags& f) { flags = f.flags; return *this; }
+	
 	inline STORAGE operator==(const Flags& f) const { return flags == f.flags; }
+	
 	inline STORAGE operator!=(const Flags& f) const { return flags ^ f.flags; }
+	
 	inline STORAGE operator()(void) const { return flags; }
+	
 	inline void raise(void) { flags = 0; flags = ~flags; }
+	
 	inline void raise(const STORAGE mask) { flags |= mask; }
+	
 	inline void	set(const STORAGE mask) { flags = mask; }
 	
 private:

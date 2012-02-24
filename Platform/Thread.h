@@ -172,7 +172,7 @@ private:
 		return 0;
 	}
 #else
-	PREVENT_COMPILE
+	#error unsupported concurrency platform
 #endif//WIN32
 
 	Thread(Executor& executable,

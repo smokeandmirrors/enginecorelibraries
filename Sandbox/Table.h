@@ -2,7 +2,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
-#define DEVELOP_TABLE 0
+#define DEVELOP_TABLE 1
 #if DEVELOP_TABLE
 
 #include "Hashing.h"
@@ -519,158 +519,38 @@ private:
 					break;
 				}
 				
-				quickSwap(get(i), get(j));
+				std::swap(get(i), get(j));
 				
 				if (get(i) == v)
 				{
 					++p;
-					quickSwap(get(p), get(i));
+					std::swap(get(p), get(i));
 				}
 
 				if (v == get(j))
 				{
 					--q;
-					quickSwap(get(j), get(q));
+					std::swap(get(j), get(q));
 				}
 			} // for (;;)
 
-			quickSwap(get(i), get(right));
+			std::swap(get(i), get(right));
 			j = i - 1;
 			i = i + 1;
 			
 			for (sint k = left; k < p; k++, j--)
 			{
-				quickSwap(get(k), get(j));
+				std::swap(get(k), get(j));
 			}
 
 			for (sint k = right - 1; k > q; k--, i++)
 			{
-				quickSwap(get(i), get(k));
+				std::swap(get(i), get(k));
 			}
 
 			sortImplementation(left, j, predicate);
 			sortImplementation(i, right, predicate);
 		} // if (left < right)
-
-		/*
-		Quicksort
-		** (based on `Algorithms in MODULA-3', Robert Sedgewick;
-		**  Addison-Wesley, 1993.)
-		** based on ltablib.c
-		while (lo < hi)
-		{	// sort elements t[lo], t[(lo + hi) / 2] and t[hi] 
-			sint i, j;
-			{
-				{
-					const ELEMENT& vlo = get(lo);
-					const ELEMENT& vhi = get(hi);
-					
-					if (predicate(vhi, vlo))
-					{	// a[vhi] < a[vlo]
-						swap(vlo, lo, vhi, hi);
-					}
-				}
-				// there are only two
-				if ((hi-lo) == 1)
-					break; 
-
-				i = (lo + hi) / 2;
-
-				{
-					const ELEMENT& vi = get(i);
-					const ELEMENT& vlo = get(lo);
-					
-					if (predicate(vi, vlo))
-					{	// a[i] < a[lo]
-						swap(vi, i, vlo, lo);
-					}
-					else
-					{
-						const ELEMENT& vhi = get(hi);
-
-						if (predicate(vhi, vi))
-						{	// a[hi] < a[i]
-							swap(vi, i, vhi, hi);
-						}
-					}
-				}
-				// there are only 3
-				if ((hi - lo) == 2)
-					break;
-			}
-			// t[lo] <= Pivot == t[hi - 1] <= t[hi]; sort lo + 1 to hi - 2
-			{	// pivot
-				const ELEMENT& pivot = get(i);
-				const ELEMENT& vhiMinusOne = get(hi - 1);
-				swap(pivot, i, vhiMinusOne, hi - 1);
-				i = lo;
-				j = hi - 1;
-				
-				for (;;) // invariant: t[lo..i] <= Pivot <= t[j..hi]
-				{	// repeat ++i until t[i] >= Pivot
-					for(;;)
-					{
-						++i;
-						const ELEMENT& vi = get(i);
-						
-						if (predicate(vi, pivot))
-						{
-							assert(i < hi); // invalid sort function
-						}
-						else
-						{
-							break;
-						}
-					} // repeat ++i until t[i] >= Pivot
-					// repeat --j until t[j] <= Pivot
-					for(;;)
-					{
-						--j;
-						const ELEMENT& vj = get(j);
-						
-						if (predicate(pivot, vj))
-						{
-							assert(j > lo); // invalid sort function
-						}
-						else
-						{
-							break;
-						}		
-					} // repeat --j until t[j] <= Pivot
-
-					if (j < i)
-					{
-						break;
-					}
-
-					const ELEMENT& vi = get(i);
-					const ELEMENT& vj = get(j);
-					swap(vi, i, vj, j);
-					
-				} // invariant: t[lo..i] <= Pivot <= t[j..hi]	
-			} 
-			// swap pivot (a[u-1]) with a[i]
-			const ELEMENT& pivot = get(i);
-			const ELEMENT& vhiMinusOne = get(hi - 1);
-			swap(pivot, i, vhiMinusOne, hi - 1);			
-			// a[l..i-1] <= a[i] == P <= a[i+1..u] 
-			// adjust so that smaller half is in [j..i] and larger one in [l..u] 
- 			if ((i - lo) < (hi - i))
-			{
-				j = lo;
-				--i;
-				lo = i + 2;
-			}
-			else
-			{
-				j = i + 1;
-				i = hi;
-				hi = j - 2;
-			}
-
-			sortImplementation(j, i, predicate);
-		}
-		*/
 	}
 
 	inline void
@@ -691,14 +571,6 @@ private:
 		const ELEMENT c = loV.value;
 		loV.value = hiV.value;
 		hiV.value = c;
-	}
-
-	inline void
-		quickSwap(ELEMENT& a, ELEMENT& b) 
-	{
-		ELEMENT c(a);
-		a = b;
-		b = c;
 	}
 	// lu_byte lsizenode;
 	uchar 

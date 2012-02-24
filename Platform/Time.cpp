@@ -17,7 +17,7 @@ inline cycle _getCurrentCycle(void)
 	assert(success);
 	return perf_query.QuadPart;
 #else
-	PREVENT_COMPILE
+	#error unsupported precision time platform
 #endif//WIN32	
 } // inline cycle _getCurrentCycle(void)
 
@@ -36,7 +36,7 @@ inline cycle _getSystemHertz(void)
 	assert(success);
 	return static_cast<cycle>(perf_query.QuadPart);
 #else
-	PREVENT_COMPILE
+	#error unsupported precision time platform
 #endif//WIN32	
 } // inline cycle _getSystemHertz(void)
 } // namespace 
