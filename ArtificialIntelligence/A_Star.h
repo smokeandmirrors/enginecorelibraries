@@ -11,6 +11,8 @@
 namespace A_Star
 {
 
+	/// \todo further error review, proper use of flags
+
 enum NodeStatus
 {
 	Included		= 1 << 0,
@@ -19,7 +21,7 @@ enum NodeStatus
 	WasInOpenSet	= 1 << 3,
 }; // NodeStatus
 
-const Flags<NodeStatus, ushort> AddToOpenSetStatus(Included | InOpenSet | WasInOpenSet);
+const Flags<NodeStatus, ushort> AddToOpenSetStatus(Included | InOpenSet);
 const ushort IncludedAndClosedMask(Included | InClosedSet);
 
 template<typename A_STAR_NODE>
@@ -203,27 +205,19 @@ private:
 	{
 		inline static void process(A_STAR& search, RECORD& current, RECORD& connection, const NODE& goal, const COST& g, OPEN_SET& openSet, const ESTIMATE_COST_TO_GOAL& estimateCostToGoal)
 		{		
-			if (connection.isNotInOpenSet())
-			{	
-				if (connection.wasInOpenSet())
-				{
-					if (g < connection.g)
-					{
-						connection.update(&current, g);
-						openSet.update(connection.openSetIndex);
-					}
-				}
-				else
-				{
+			if (connection.isNotInClosedSet())
+			{
+				if (connection.isNotInOpenSet())
+				{		
 					connection.h = estimateCostToGoal(connection.node, goal);
 					connection.update(&current, g);
 					search.addToOpenSet(connection);
 				}
-			}
-			else if (g < connection.g)
-			{	
-				connection.update(&current, g);
-				openSet.update(connection.openSetIndex);
+				else if (g < connection.g)
+				{	
+					connection.update(&current, g);
+					openSet.update(connection.openSetIndex);
+				}
 			}
 		}
 	};
@@ -329,11 +323,6 @@ private:
 			g = new_g;
 			parent = newParent;
 			f = new_g + h;
-		}
-
-		inline ushort wasInOpenSet(void) const
-		{
-			return status.isRaised(WasInOpenSet);
 		}
 		
 	private:
