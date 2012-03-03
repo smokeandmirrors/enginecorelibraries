@@ -137,10 +137,17 @@ private:
 		const ELEMENT& currentValue = node->m_value;
 		
 		if (isLess(value, currentValue))
+		{
 			node->m_left = insert(node->m_left, value);
-		
+		}
 		else if (isGreater(value, currentValue))
+		{
 			node->m_right = insert(node->m_right, value);
+		}
+		else
+		{
+			assert(isEqual(value, currentValue));
+		}
 		
 		if (isRed(node->m_right))
 			node = rotateLeft(*node);
@@ -200,8 +207,8 @@ private:
 
 	inline Node*
 		moveRedRight(Node* node)
-	{	// Assuming that h is red and both h.right and h.right.left
-		// are black, make h.right or one of its children red.
+	{	// Assuming that node is red and both node.right and node.right.left
+		// are black, make node.right or one of its children red.
 		switchColor(*node);
 		
 		if (isRed(node->m_left->m_left))
@@ -492,15 +499,20 @@ bool RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::has(ELEMENT value) co
 		do 
 		{
 			if (isEqual(value, node->m_value))
+			{
 				return true;
-
+			}
 			else if (isLess(value, node->m_value))
+			{
 				node = node->m_left;
-
+			}
 			else 
-				node = node->m_right;
-
-		} while (node);
+			{
+				assert(isGreater(value, node->m_value));
+				node = node->m_right;				
+			}
+		} 
+		while (node);
 	}
 
 	return false;

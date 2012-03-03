@@ -12,6 +12,8 @@
 An implementation of an associative array, explicity based on the
 Lua table as much as possible.
 
+\todo resurrect and use a hash table, get rid of the array part
+
 WARNING: THIS IS A LEARNING EXERCISE, AND IS NOT
 INTENDED FOR DEPLOYMENT
 */

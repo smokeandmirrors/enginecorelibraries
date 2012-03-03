@@ -17,6 +17,21 @@ public:
 	IS_LESS m_isLess;
 };
 
+class A
+{
+	virtual void hello(void) { printf("Hello, I'm A"); }
+};
+
+class B : public A
+{
+	virtual void hello(void) { printf("Hello, I'm B"); }
+};
+
+class C 
+{
+	virtual void hello(void) { printf("Hello, I'm C"); }
+};
+
 
 namespace compilerChecks 
 {
@@ -33,6 +48,18 @@ namespace compilerChecks
 
 		// CompileMe<sint, isEqual<sint>, isGreater<sint>, isLess<sint> > compileMe;
 		CompileMe<sint> compileMe;
+
+		A a;
+		B b;
+		C c;
+
+		A* pba = &b;
+		B* pbb = dynamic_cast<B*>(pba);
+
+		if (pbb)
+		{
+			printf("hmmm");
+		}
 
 		compileMe.doSomething();
 	}

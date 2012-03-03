@@ -78,6 +78,8 @@ code bloat.
 the ObjectOrientedParadigm
 
 \todo replace __index/__newindex functionality with string -> offset map
+
+\todo all these macros need to be re-done in Lua, and probably replaced by something like SWIG
 */
 
 #include <typeinfo>

@@ -11,8 +11,6 @@
 namespace A_Star
 {
 
-	/// \todo further error review, proper use of flags
-
 enum NodeStatus
 {
 	Included		= 1 << 0,

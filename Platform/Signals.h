@@ -64,9 +64,6 @@ class Receiver;
 interface for classes to hide the template nature of the all
 the different Transmitter classes.  This allows for type safe usage
 for clients, but more generic implementation here.
-
-\todo check this for functions that are unnecessarily virtual
-
 */
 class Transmitter
 {

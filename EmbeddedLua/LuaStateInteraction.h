@@ -26,8 +26,6 @@ Unit Tested			:	YES
 Used in development	:	YES
 Used in experiments :	YES
 Tested in the field	:	YES
-
-\todo const values could get different metatables in lua?
 */
 #include "LuaBuild.h"
 #include "LuaExtensibility.h"

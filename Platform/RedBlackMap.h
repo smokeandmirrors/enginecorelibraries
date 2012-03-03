@@ -121,7 +121,7 @@ private:
 					node = node->m_left;
 				}
 				else 
-				{	/// \todo put this debug check everywhere.
+				{	
 					assert(isGreater(key, node->m_key));				
 					node = node->m_right;
 				}
@@ -159,11 +159,18 @@ private:
 		const KEY& currentKey = node->m_key;
 		
 		if (isLess(key, currentKey))
+		{
 			node->m_left = insert(node->m_left, key, value);
-		
+		}
 		else if (isGreater(key, currentKey))
+		{		
 			node->m_right = insert(node->m_right, key, value);
-		
+		}
+		else
+		{
+			assert(isEqual(key, node->m_key)); 
+		}
+
 		if (isRed(node->m_right))
 			node = rotateLeft(*node);
 
@@ -222,8 +229,8 @@ private:
 
 	inline Node*
 		moveRedRight(Node* node)
-	{	// Assuming that h is red and both h.right and h.right.left
-		// are black, make h.right or one of its children red.
+	{	// Assuming that node is red and both node.right and node.right.left
+		// are black, make node.right or one of its children red.
 		switchColor(*node);
 		
 		if (isRed(node->m_left->m_left))
