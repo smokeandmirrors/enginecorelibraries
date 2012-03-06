@@ -250,4 +250,31 @@ private:
 }; // class String
 
 
+template<> 
+struct isLess<std::string>
+{
+	bool operator()(const std::string& a, const std::string& b) const
+	{
+		return String::compare(a.c_str(), b.c_str()) < 0;
+	}
+};
+
+template<> 
+struct isGreater<std::string>
+{
+	bool operator()(const std::string& a, const std::string& b) const
+	{
+		return String::compare(a.c_str(), b.c_str()) > 0;
+	}
+};
+
+template<>
+struct isEqual<std::string>
+{
+	bool operator()(const std::string& a, const std::string& b) const
+	{
+		return String::isEqual(a.c_str(), b.c_str());
+	}
+};
+
 #endif//STRINGS_H

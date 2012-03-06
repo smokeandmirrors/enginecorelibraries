@@ -100,8 +100,7 @@ uint BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::getSize(void) const
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>
 void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::down(uint index)
 {
-	for (;;)
-	{
+	INFINITE_LOOP_BEGIN
 		const uint leftChildIndex = getLeftChildIndex(index);
 		const uint rightChildIndex = getRightChildIndex(index);
 		uint outOfOrderIndex = index;
@@ -127,7 +126,7 @@ void BinaryHeap<ELEMENT, PREDICATE, CONTAINER>::down(uint index)
 			downSwap(index, outOfOrderIndex);
 			index = outOfOrderIndex;
 		}	
-	}
+	INFINITE_LOOP_END
 }
 
 template<typename ELEMENT, typename PREDICATE, typename CONTAINER>

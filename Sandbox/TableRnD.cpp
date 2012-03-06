@@ -12,29 +12,6 @@
 
 using namespace containers;
 
-struct TestUnion
-{
-	TestUnion(bool source)
-	: UnionT(source)
-	{
-	}
-
-	TestUnion(sint source)
-	: UnionT(source)
-	{
-
-	}
-
-	union MyUnion
-	{
-		bool keyBool;
-		sint keyInteger;
-
-		MyUnion(bool source) : keyBool(source) {}
-		MyUnion(sint source) : keyInteger(source) {}
-	} UnionT;
-};
-
 void sandbox::tableRnD(void)
 {
 	RedBlackMap<const schar*, int> stringToNumber;
@@ -66,7 +43,6 @@ void sandbox::tableRnD(void)
 	for (int i = 0; i < 10; i++)
 		printf("%d\n", getRand<sint>(-10, 10));
 
-	// RedBlackTree<sint> rbt;
 	RedBlackTree<sint>* pRbt = new RedBlackTree<sint>();
 	RedBlackTree<sint>& rbt = *pRbt;
 	assert(rbt.isEmpty());
@@ -107,13 +83,16 @@ void sandbox::tableRnD(void)
 	
 	delete pRbt;
 
-
-	TestUnion intVersion(3);
-	TestUnion boolVersion(false);
-
-	boolVersion = intVersion;
-
 #if DEVELOP_TABLE
+	Table<sint> sortMe;
+	sortMe.pushBack(0);
+	sortMe.pushBack(-1);
+	sortMe.pushBack(1);
+	sortMe.pushBack(-2);
+	sortMe.pushBack(2);
+	sortMe.sort<std::less<sint> >();
+	sortMe.sort<std::greater<sint> >();
+	
 	Table< RedBlackTree<sint>* > myarray;
 	myarray.set(0, outstanding);
 	myarray.set(1, outstanding);
@@ -122,6 +101,7 @@ void sandbox::tableRnD(void)
 	myarray.insertAtIndex(outstanding, 10);
 
 	Table<int> mynumbs;
+	mynumbs.pushBack(15);
 	mynumbs.pushBack(30);
 	mynumbs.pushBack(2);
 	mynumbs.set(6, 6);
@@ -131,9 +111,15 @@ void sandbox::tableRnD(void)
 		printf("MyNumbs: %d\n", *i);
 	}
 
+	mynumbs.sort<std::greater<sint>>();
+	printf("Sorted\n");
+	for (Table<int>::Iterator i(mynumbs); i; i++)
+	{
+		printf("MyNumbs: %d\n", *i);
+	}
 
-	mynumbs.sort(isGreater<sint>());
-
+	mynumbs.sort<std::less<sint>>();
+	printf("Sorted\n");
 	for (Table<int>::Iterator i(mynumbs); i; i++)
 	{
 		printf("MyNumbs: %d\n", *i);
@@ -144,31 +130,20 @@ void sandbox::tableRnD(void)
 	numberToTree["awesome"] = outstanding;
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
-
-	String::Argument arg("awesome");
-	String::Immutable imm("awesome");
-	Table< RedBlackTree<sint>* >::Key karg("awesome");
 	
-	if (karg.isValid())
-		printf("Karg is valid");
-	else
-		printf("awesome");
-	
-	Table< RedBlackTree<sint>* >::Key kkarg(arg);
-	Table< RedBlackTree<sint>* >::Key kimm(imm);
-
-	if (kimm.isValid() && kkarg.isValid())
-		printf("awesome");
-
 	Table< RedBlackTree<sint>* > mytable;
 	assert(!mytable.has("awesome"));
 	awesome = NULL;
-	awesome = mytable.get("awesome");
+	awesome = mytable.get(String::Immutable("awesome"));
+	awesome = outstanding;
+	// Key(&mytable);
+	mytable.set(Key(&mytable), awesome);
+	assert(mytable.get(Key(&mytable)) == awesome);
 	mytable.set("awesome", outstanding);
-	assert(mytable.has("awesome"));
-	awesome = mytable.get("awesome");
-	mytable.remove("awesome");
-	assert(!mytable.has("awesome"));
+	assert(mytable.has(String::Immutable("awesome")));
+	awesome = mytable.get(String::Immutable("awesome"));
+	mytable.remove(String::Immutable("awesome"));
+	assert(!mytable.has(String::Immutable("awesome")));
 
 	if (awesome == outstanding)
 		printf("awesome\n");
