@@ -83,6 +83,7 @@ public:
 
 private:
 	template<typename ELEMENT> friend class Table;
+	template<typename ELEMENT> friend class NoArray;
 
 	enum Type
 	{
@@ -155,8 +156,26 @@ class Table
 	class Value;
 
 public:
-	Table(sint reserveArraySize=0, sint reserveHashSize=0); 
-	~Table(void); 
+	Table(sint reserveArraySize=0, sint reserveHashSize=0)
+		: log2HashPartSize(0)
+		, arrayPartSize(0)
+		, hashPart(&dummyNode)
+		, lastFree(NULL)
+		, arrayPart(NULL)
+	{
+		if (reserveArraySize || reserveHashSize)
+			resize(reserveArraySize, reserveHashSize);
+	}
+
+	~Table(void)
+	{
+		if (hashPart != &dummyNode)
+		{
+			delete[] hashPart;
+		}
+
+		delete[] arrayPart;
+	}
 	
 	ELEMENT& get(const Key& key)
 	{	
@@ -664,7 +683,7 @@ private:
 		{
 			return &arrayPart[index];
 		}
-		// how this is never NULL, I don't know
+		
 		Node* n = &hashPart[hashMod(key.code)];
 
 		do 
@@ -833,7 +852,7 @@ private:
 					other = other->next;
 				}
 				// redo the chain with free position in place of main position
-				other->next	 = freePosition;
+				other->next = freePosition;
 				// copy colliding node into free position
 				*freePosition = *mainPosition;
 				// main position is now free
@@ -913,7 +932,7 @@ private:
 				if (oldPosition->value)
 				{	
 					Value* oldValueInNewPosition = setInternal(oldPosition->key);
-					oldValueInNewPosition->element = oldPosition->value.element;				
+					*oldValueInNewPosition = oldPosition->value;
 				}
 			} 
 			while (index);
@@ -1083,32 +1102,8 @@ private:
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Node Table<ELEMENT>::dummyNode(Table<ELEMENT>::createDummyNode());
 
-// LUAI_FUNC Table *luaH_new (lua_State *L, int narray, int lnhash);
-template<typename ELEMENT> 
-Table<ELEMENT>::Table(sint reserveArraySize, sint reserveHashSize)
-: log2HashPartSize(0)
-, arrayPartSize(0)
-, hashPart(&dummyNode)
-, lastFree(NULL)
-, arrayPart(NULL)
-{
-	if (reserveArraySize || reserveHashSize)
-		resize(reserveArraySize, reserveHashSize);
-}
-// LUAI_FUNC void luaH_free (lua_State *L, Table *t);
-template<typename ELEMENT>
-Table<ELEMENT>::~Table(void)
-{
-	if (hashPart != &dummyNode)
-	{
-		delete[] hashPart;
-	}
-
-	delete[] arrayPart;
-}
-								
 } // namespace containers
 
 #endif//DEVELOP_TABLE
 
-#endif//TABLEH_
+#endif//TABLE_H

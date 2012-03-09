@@ -84,6 +84,8 @@ void sandbox::tableRnD(void)
 	delete pRbt;
 
 #if DEVELOP_TABLE
+	if (false)
+	{
 	Table<sint> sortMe;
 	sortMe.pushBack(0);
 	sortMe.pushBack(-1);
@@ -149,8 +151,32 @@ void sandbox::tableRnD(void)
 		printf("awesome\n");
 	else
 		printf("not awesome\n");
+	}
+	// NoArray<sint> hashOnly;
+	Table<sint> hashOnly;
+	
+	for (int i = 0; i < 1000; i++)
+	{
+		std::string myString;
+		char integerString[10];
+		_itoa(i, &integerString[0], 10);
+		myString += integerString;
+		myString += "_wicked";
+		hashOnly.set(myString.c_str(), i + 10);
+		
+		{
+			int count(0);
+			for (Table<sint>::Iterator j(hashOnly); j; j++)
+			{
+				++count;
+			}
 
+			assert ( count == i + 1);
+		}
+	}
 
+	
+	
 #endif DEVELOP_TABLE
 	{
 		std::string really("rel", 3);

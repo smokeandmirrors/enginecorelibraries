@@ -135,8 +135,6 @@ public:
 	std::vector<Node*> nodes;
 }; // Graph
 
-
-
 struct GraphEstimate
 {
 	inline sint operator()(const Graph::Node& node, const Graph::Node& goal) const
@@ -174,7 +172,7 @@ struct IsIncluded
 
 void onPlay(void)
 {
-	sandbox::tableRnD();
+	// sandbox::tableRnD();
 	// sandbox::verifyUnitTests();
 	// sandbox::schedulingRnD();
 	
