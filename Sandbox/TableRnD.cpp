@@ -84,98 +84,177 @@ void sandbox::tableRnD(void)
 	delete pRbt;
 
 #if DEVELOP_TABLE
-	if (false)
-	{
-	Table<sint> sortMe;
-	sortMe.pushBack(0);
-	sortMe.pushBack(-1);
-	sortMe.pushBack(1);
-	sortMe.pushBack(-2);
-	sortMe.pushBack(2);
-	sortMe.sort<std::less<sint> >();
-	sortMe.sort<std::greater<sint> >();
-	
-	Table< RedBlackTree<sint>* > myarray;
-	myarray.set(0, outstanding);
-	myarray.set(1, outstanding);
-	myarray.set(30, outstanding);
-	myarray.pushBack(outstanding);
-	myarray.insertAtIndex(outstanding, 10);
+// 	Table< RedBlackTree<sint>* > myarray;
+// 	myarray.set(0, outstanding);
+// 	myarray.set(1, outstanding);
+// 	myarray.set(30, outstanding);
+// 	myarray.pushBack(outstanding);
+// 	myarray.insertAtIndex(outstanding, 10);
+// 
+// 	Table<int> mynumbs;
+// 	mynumbs.pushBack(15);
+// 	mynumbs.pushBack(30);
+// 	mynumbs.pushBack(2);
+// 	mynumbs.set(6, 6);
+// 	
+// 	for (Table<int>::Iterator i(mynumbs); i; i++)
+// 	{
+// 		printf("MyNumbs: %d\n", *i);
+// 	}
+// 
+// 	mynumbs.sort<std::greater<sint>>();
+// 	printf("Sorted\n");
+// 	for (Table<int>::Iterator i(mynumbs); i; i++)
+// 	{
+// 		printf("MyNumbs: %d\n", *i);
+// 	}
+// 
+// 	mynumbs.sort<std::less<sint>>();
+// 	printf("Sorted\n");
+// 	for (Table<int>::Iterator i(mynumbs); i; i++)
+// 	{
+// 		printf("MyNumbs: %d\n", *i);
+// 	}
+// 
+// 	awesome = NULL;
+// 	awesome = numberToTree["awesome"];
+// 	numberToTree["awesome"] = outstanding;
+// 	awesome = numberToTree["awesome"];
+// 	awesome->insert(5); 
+// 	
+// 	Table< RedBlackTree<sint>* > mytable;
+// 	assert(!mytable.has("awesome"));
+// 	awesome = NULL;
+// 	awesome = mytable.get(String::Immutable("awesome"));
+// 	awesome = outstanding;
+// 	// Key(&mytable);
+// 	mytable.set(Key(&mytable), awesome);
+// 	assert(mytable.get(Key(&mytable)) == awesome);
+// 	mytable.set("awesome", outstanding);
+// 	assert(mytable.has(String::Immutable("awesome")));
+// 	awesome = mytable.get(String::Immutable("awesome"));
+// 	mytable.remove(String::Immutable("awesome"));
+// 	assert(!mytable.has(String::Immutable("awesome")));
+// 
+// 	if (awesome == outstanding)
+// 		printf("awesome\n");
+// 	else
+// 		printf("not awesome\n");
 
-	Table<int> mynumbs;
-	mynumbs.pushBack(15);
-	mynumbs.pushBack(30);
-	mynumbs.pushBack(2);
-	mynumbs.set(6, 6);
-	
-	for (Table<int>::Iterator i(mynumbs); i; i++)
-	{
-		printf("MyNumbs: %d\n", *i);
-	}
-
-	mynumbs.sort<std::greater<sint>>();
-	printf("Sorted\n");
-	for (Table<int>::Iterator i(mynumbs); i; i++)
-	{
-		printf("MyNumbs: %d\n", *i);
-	}
-
-	mynumbs.sort<std::less<sint>>();
-	printf("Sorted\n");
-	for (Table<int>::Iterator i(mynumbs); i; i++)
-	{
-		printf("MyNumbs: %d\n", *i);
-	}
-
-	awesome = NULL;
-	awesome = numberToTree["awesome"];
-	numberToTree["awesome"] = outstanding;
-	awesome = numberToTree["awesome"];
-	awesome->insert(5); 
-	
-	Table< RedBlackTree<sint>* > mytable;
-	assert(!mytable.has("awesome"));
-	awesome = NULL;
-	awesome = mytable.get(String::Immutable("awesome"));
-	awesome = outstanding;
-	// Key(&mytable);
-	mytable.set(Key(&mytable), awesome);
-	assert(mytable.get(Key(&mytable)) == awesome);
-	mytable.set("awesome", outstanding);
-	assert(mytable.has(String::Immutable("awesome")));
-	awesome = mytable.get(String::Immutable("awesome"));
-	mytable.remove(String::Immutable("awesome"));
-	assert(!mytable.has(String::Immutable("awesome")));
-
-	if (awesome == outstanding)
-		printf("awesome\n");
-	else
-		printf("not awesome\n");
-	}
 	// NoArray<sint> hashOnly;
-	Table<sint> hashOnly;
 	
-	for (int i = 0; i < 1000; i++)
 	{
-		std::string myString;
-		char integerString[10];
-		_itoa(i, &integerString[0], 10);
-		myString += integerString;
-		myString += "_wicked";
-		hashOnly.set(myString.c_str(), i + 10);
+		// race!
+		realTime::ClockReal realClock;
+		realTime::Stopwatch tableTime(realClock);
+		realTime::Stopwatch treeTime(realClock);
+		realTime::Stopwatch mapTime(realClock);
+		std::vector<String::Immutable> strings;
 		
-		{
-			int count(0);
-			for (Table<sint>::Iterator j(hashOnly); j; j++)
-			{
-				++count;
-			}
+		RedBlackMap<String::Immutable, sint> tree;
+		Table<sint> table;
+		std::map<String::Immutable, sint> map;
 
-			assert ( count == i + 1);
+		const int numStrings(10000);
+
+		for (int i = 0; i < numStrings; i++)
+		{
+			std::string myString;
+			char integerString[10];
+			_itoa_s(i, &integerString[0], 10, 10);
+			myString += integerString;
+			myString += "_wicked";
+			String::Immutable immutable(myString);
+			strings.push_back(immutable);
+		}
+
+		treeTime.start();
+		for (int i = 0; i < numStrings; i++)
+		{
+			tree.set(strings[i], i);	
+		}
+		treeTime.stop();
+
+		tableTime.start();
+		for (int i = 0; i < numStrings; i++)
+		{
+			table.set(strings[i], i);	
+		}
+		tableTime.stop();
+
+		mapTime.start();
+		for (int i = 0; i < numStrings; i++)
+		{
+			map[ strings[i] ] =  i;	
+		}
+		mapTime.stop();
+
+		millisecond treeInsert = treeTime.milliseconds();
+		millisecond tableInsert = tableTime.milliseconds();
+		millisecond mapInsert = mapTime.milliseconds();
+
+		printf("Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableInsert, treeInsert, mapInsert); 
+		BREAKPOINT(0x0)
+		
+		bool stopme(true);
+		if (stopme)
+		{
+			stopme = false;
 		}
 	}
 
-	
+	/*
+
+	void Table::printHashPart(void) const
+	{
+	printf("HashPart:\n");
+
+	for (uint i = 0; i < getSizeOfHashPart(); i++)
+	{
+	printf("%3d: ", i);
+	hashPart[i].print();
+	printf("\n");
+	}
+
+	printf("\n\n");
+	}
+
+	void Table::Node::print(void) const
+	{
+	printf("K: ");
+
+	if (key.isValid())
+	{
+	printf("%10s", key.originalKeyString.c_str());
+	}
+	else
+	{
+	printf("%10s", "nil");
+	}
+
+	printf(" V: ");
+
+	if (value)
+	{
+	printf("%4d", value);
+	}
+	else
+	{
+	printf(" nil");
+	}
+
+	printf(" ->");
+
+	if (next)
+	{
+	next->print();
+	}
+	else
+	{
+	printf("NULL");
+	}
+	}
+	*/
 	
 #endif DEVELOP_TABLE
 	{

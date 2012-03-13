@@ -467,33 +467,34 @@ private:
 
 	inline void down(uint index)
 	{
-		INFINITE_LOOP_BEGIN
+		FOREVER
+		{
 			const uint leftChildIndex = getLeftChildIndex(index);
-		const uint rightChildIndex = getRightChildIndex(index);
-		uint outOfOrderIndex = index;
+			const uint rightChildIndex = getRightChildIndex(index);
+			uint outOfOrderIndex = index;
 
-		if (isValidIndex(leftChildIndex)
-		&& get(leftChildIndex)->f < get(outOfOrderIndex)->f)
-		{
-			outOfOrderIndex = leftChildIndex;
+			if (isValidIndex(leftChildIndex)
+			&& get(leftChildIndex)->f < get(outOfOrderIndex)->f)
+			{
+				outOfOrderIndex = leftChildIndex;
+			}
+
+			if (isValidIndex(rightChildIndex)
+			&& get(rightChildIndex)->f < get(outOfOrderIndex)->f)
+			{
+				outOfOrderIndex = rightChildIndex;
+			}	
+
+			if (outOfOrderIndex == index)
+			{
+				break;
+			}
+			else
+			{
+				downSwap(index, outOfOrderIndex);
+				index = outOfOrderIndex;
+			}	
 		}
-
-		if (isValidIndex(rightChildIndex)
-		&& get(rightChildIndex)->f < get(outOfOrderIndex)->f)
-		{
-			outOfOrderIndex = rightChildIndex;
-		}	
-
-		if (outOfOrderIndex == index)
-		{
-			break;
-		}
-		else
-		{
-			downSwap(index, outOfOrderIndex);
-			index = outOfOrderIndex;
-		}	
-		INFINITE_LOOP_END
 	}
 
 	inline void downSwap(uint parentIndex, uint childIndex)

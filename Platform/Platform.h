@@ -86,8 +86,10 @@ Tested in the field	:	NO
 #define IF_NOT_GOLD_MASTER(code) 
 #endif//GOLD_MASTER
 
-#define INFINITE_LOOP_BEGIN for (;;) {
-#define INFINITE_LOOP_END }
+#define FOREVER for (;;) 
+
+
+#define BREAKPOINT(ID) __debugbreak();
 
 enum BoolEnum
 {

@@ -41,11 +41,15 @@ class Singleton
 public:
 	/** 
 	the single, static instance of T 
+	
 	\todo I never see this implementation.  I understand the reasoning behind
 	the lazy evaluation methods, buy (at least in C++) they bring up all kinds of 
 	problems.  I thought the problems with a single static instance would
 	be related to multiple instantiation in different libraries or compilation units,
 	but so far, I can't substantiate that either.
+
+	Or was it initialization of start up statics...?
+
 	*/
 	static T single;
 	

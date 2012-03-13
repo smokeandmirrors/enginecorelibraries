@@ -31,7 +31,7 @@ const uchar logBaseTwoArray[256] = {
 };
 
 const sint maxBits(30);
-const sint maxArraySize( 1 << maxBits);
+const sint maxArraySize(1 << maxBits);
 const sint valid(1);
 const sint invalid(0);
 
@@ -329,13 +329,6 @@ private:
 		{
 			/* empty */
 		}
-		
-		Node& operator=(const Node& original)
-		{
-			value = original.value;
-			key = original.key;
-			return *this;
-		}
 	
 		Key key;
 		Node* next;
@@ -567,29 +560,23 @@ private:
 		case Key::string:
 			return findValueWithString(key);
 
-		case Key::pointer:
-		case Key::boolean:
-		case Key::real:
-			{
-				Node* node = getMainPosition(key);
-
-				do 
-				{
-					if (node->key == key)
-					{
-						return &node->value;
-					}
-					else
-					{
-						node = node->next;
-					}
-				} 
-				while (node);
-				break;
-			}
-
 		default:
-			assert(false);
+		{
+			Node* node = getMainPosition(key);
+
+			do 
+			{
+				if (node->key == key)
+				{
+					return &node->value;
+				}
+				else
+				{
+					node = node->next;
+				}
+			} 
+			while (node);
+		} // default
 		} // switch (key.type)
 
 		return NULL;
@@ -598,7 +585,7 @@ private:
 	inline sint findIndex(Key& iter) const
 	{
 		if (!iter)
-		{// first iteration
+		{	// first iteration
 			iter.beginIteration();
 			return -1;
 		}
@@ -607,7 +594,7 @@ private:
 			sint index;
 
 			if (calculateArrayIndex(iter, index)
-				&& index < static_cast<sint>(arrayPartSize))
+			&& index < static_cast<sint>(arrayPartSize))
 			{	// in the array part
 				return index;
 			}
@@ -627,8 +614,7 @@ private:
 					}
 				} 
 				while (n);
-				/*else invalid key, assert?*/
-				assert(false);
+				assert(false);/*else invalid key, assert*/
 				return -2;
 			}
 		}
@@ -753,22 +739,17 @@ private:
 	// static Node *mainposition (const Table *t, const TValue *key)
 	inline Node* getMainPosition(const Key& key) const
 	{
+		assert(key.isValid()); 
+		
 		switch (key.type)
 		{
 		case Key::boolean:
 		case Key::string:
 			return getPositionHashModPowerOf2(key);
 
-		case Key::integer:
-		case Key::real:
-		case Key::pointer:
-			return getPositionHashMod(key); 
-
 		default:
-			assert(false);
-		}
-
-		return &dummyNode;
+			return getPositionHashMod(key); 
+		} // switch (key.type)
 	}
 	// #define sizenode(t)	(twoto((t)->lsizenode))
 	inline uint getSizeOfHashPart(void) const
@@ -971,13 +952,12 @@ private:
 		if (newHashSize)
 		{
 			log2ofSize = logTwoCeil(newHashSize);
-			assert(log2ofSize <= maxBits); // table overflow?
+			assert(log2ofSize <= maxBits); // table overflow
 			newHashSize = twoTo(log2ofSize);
-			hashPart = new Node[newHashSize];
+			hashPart = new Node[newHashSize];// old hash part is deleted in resize()
+#if DEBUG
 			uint index(newHashSize);
-			// initialize new nodes (may not be necessary)
 			Node* newNode = &hashPart[index];
-
 			do 
 			{
 				--index;
@@ -987,10 +967,11 @@ private:
 				assert(!newNode->value);
 			} 
 			while (index);
+#endif//DEBUG
 		}
 		else
 		{
-			hashPart = &dummyNode;
+			hashPart = &dummyNode;// old hash part is deleted in resize()
 			log2ofSize = 0;
 		}
 
@@ -1040,8 +1021,9 @@ private:
 			sint q = right;
 			
 			ELEMENT v = get(right);
-
-			INFINITE_LOOP_BEGIN
+			
+			FOREVER
+			{
 				while (predicate(get(++i), v))
 				{ /* empty */ }
 				
@@ -1071,7 +1053,7 @@ private:
 					--q;
 					std::swap(get(j), get(q));
 				}
-			INFINITE_LOOP_END
+			}
 
 			std::swap(get(i), get(right));
 			j = i - 1;
