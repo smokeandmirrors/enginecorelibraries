@@ -131,8 +131,11 @@ private:
 	}
 
 	inline bool operator==(const Key& other) const
-	{
-		return (type & other.type) && code == other.code;
+	{	/// \todo performance comparison
+		/// switching on the type vs removing (superfluous in the case of non-string types) orginalKeyString compare
+		return (type & other.type) 
+			&& code == other.code
+			&& originalKeyString == other.originalKeyString;
 	}
 
 	inline Key& operator=(const Key& source)
@@ -143,8 +146,9 @@ private:
 		originalKeyString = source.originalKeyString;
 		return *this;
 	}
-
+public:
 	String::Immutable originalKeyString;
+private:
 	Type type;
 	algorithms::hash code;
 }; // Key
@@ -159,10 +163,13 @@ public:
 	Table(sint reserveArraySize=0, sint reserveHashSize=0)
 		: log2HashPartSize(0)
 		, arrayPartSize(0)
-		, hashPart(&dummyNode)
 		, lastFree(NULL)
 		, arrayPart(NULL)
 	{
+		dummyNode.next = NULL;
+		dummyNode.value.invalidate();
+		hashPart = &dummyNode;
+
 		if (reserveArraySize || reserveHashSize)
 			resize(reserveArraySize, reserveHashSize);
 	}
@@ -234,6 +241,20 @@ public:
 			v->invalidate();
 		}
 	}
+	// Table::
+	void printHashPart(void) const
+	{
+		printf("HashPart:\n");
+
+		for (uint i = 0; i < getSizeOfHashPart(); i++)
+		{
+			printf("%3d: ", i);
+			hashPart[i].print();
+			printf("\n");
+		}
+
+		printf("\n\n");
+	}
 
 	void pushBack(const ELEMENT& value)
 	{
@@ -301,13 +322,15 @@ public:
 	public:
 		Iterator(Table& table) : k(table.getIterator()), t(table), v(NULL) { shouldContinue = t.next(k, v); }
 		
+		inline Key& key(void) {return k; }
 		inline operator bool(void) const {	return shouldContinue; }
 		inline bool operator!(void) const { return !shouldContinue; }
 		inline Iterator& operator ++(void) { shouldContinue = t.next(k, v); return *this; }
 		inline Iterator operator ++(int) { shouldContinue = t.next(k, v); return *this; }
 		inline ELEMENT& operator->(void) { return v->element; }	
  		inline ELEMENT& operator*(void) { return v->element; }
-
+		inline ELEMENT& value(void) { return v->element; }
+		
 	private:
 		Iterator(void);
 		Iterator operator=(const Iterator&);
@@ -329,7 +352,42 @@ private:
 		{
 			/* empty */
 		}
-	
+		// Table::Node::
+		void print(void) const
+		{
+			printf("K: ");
+
+			if (key.isValid())
+			{
+				printf("%10s", key.originalKeyString.c_str());
+			}
+			else
+			{
+				printf("%10s", "nil");
+			}
+
+			printf(" V: ");
+
+			if (value)
+			{
+				printf("%4d", value);
+			}
+			else
+			{
+				printf(" nil");
+			}
+
+			printf(" ->");
+
+			if (next)
+			{
+				next->print();
+			}
+			else
+			{
+				printf("NULL");
+			}
+		}
 		Key key;
 		Node* next;
 		Value value;
@@ -469,7 +527,6 @@ private:
 		return 1 << x;
 	}
 
-	static Node dummyNode;
 	// auxiliary search function (which is duplicate code in ltable.c)
 	inline sint binarySearch(uint high, uint low) const
 	{
@@ -703,7 +760,7 @@ private:
 			n = n->next;
 		} 
 		while (n);
-
+		
 		return NULL;
 	}
 	// static Node *getfreepos (Table *t)
@@ -1079,10 +1136,18 @@ private:
 	Node* lastFree;			// Node *lastfree;
 	Node* hashPart;			// Node *node;
 	Value* arrayPart;		// TValue *array;
+	/** 
+	\note can't use a static one, becuase I can't have statically initialized internal strings.
+	\todo fix that
+	*/ 
+	Node dummyNode;
+	
 }; // Table
 
+/* see note above as to why this doesn't work
 template<typename ELEMENT> 
 typename Table<ELEMENT>::Node Table<ELEMENT>::dummyNode(Table<ELEMENT>::createDummyNode());
+*/
 
 } // namespace containers
 

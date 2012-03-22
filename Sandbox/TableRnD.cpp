@@ -1,5 +1,5 @@
 #include <map>
-
+#include <stack>
 #include "Platform.h"
 
 #include "Numbers.h"
@@ -91,16 +91,17 @@ void sandbox::tableRnD(void)
 // 	myarray.pushBack(outstanding);
 // 	myarray.insertAtIndex(outstanding, 10);
 // 
-// 	Table<int> mynumbs;
-// 	mynumbs.pushBack(15);
-// 	mynumbs.pushBack(30);
-// 	mynumbs.pushBack(2);
-// 	mynumbs.set(6, 6);
-// 	
-// 	for (Table<int>::Iterator i(mynumbs); i; i++)
-// 	{
-// 		printf("MyNumbs: %d\n", *i);
-// 	}
+ 	Table<int> mynumbs;
+ 	mynumbs.set("one", 15);
+	mynumbs.set("two", 30);
+	mynumbs.set("three", 2);
+	mynumbs.set("four", 2);
+	mynumbs.set("five", 2);
+	
+ 	for (Table<int>::Iterator i(mynumbs); i; i++)
+ 	{
+ 		printf("MyNumbs: %d\n", *i);
+ 	}
 // 
 // 	mynumbs.sort<std::greater<sint>>();
 // 	printf("Sorted\n");
@@ -155,7 +156,7 @@ void sandbox::tableRnD(void)
 		Table<sint> table;
 		std::map<String::Immutable, sint> map;
 
-		const int numStrings(10000);
+		const int numStrings(1000);
 
 		for (int i = 0; i < numStrings; i++)
 		{
@@ -178,10 +179,53 @@ void sandbox::tableRnD(void)
 		tableTime.start();
 		for (int i = 0; i < numStrings; i++)
 		{
-			table.set(strings[i], i);	
+			table.set(strings[i], i);
+// 			
+// 			if (i == 1911)
+// 				table.printHashPart();
+
+			//if (i == 1911) //  || i == 1910 || i == 1912)
+// 			{	
+// 				// table.printHashPart();
+// 						
+//  				int atBreak(0);
+//  				int tableCount(0);
+// 				int iterationCount(0);
+// 				RedBlackTree<sint> allReady;
+// 
+//  				for (Table<sint>::Iterator iter(table); iter; ++iter)
+//  				{
+// 					iterationCount++;
+//  					if (i == 1911 && iterationCount == 409)
+//  					{
+//  						printf("wtf");
+//  					}
+// 					assert(!allReady.has(*iter));
+// 					allReady.insert(*iter);
+// 					tableCount += *iter;
+//  					//assert(atBreak <= i);
+//  					atBreak++;
+//  				}
+// 			}
 		}
 		tableTime.stop();
-
+	//	printf("Print pairs\n");
+// 		int count(0);
+// 		for (Table<sint>::Iterator iter(table); iter; ++iter)
+// 		{
+// 			count++;
+// 			if (count == 409)
+// 				BREAKPOINT(0x0)
+// 			
+// 			printf("%s %d\n", iter.key().originalKeyString.c_str(), *iter);
+// 			
+// 			if (count > numStrings)
+// 			{
+// 				break;
+// 				BREAKPOINT(0x0)
+// 			}
+// 		}
+// 		BREAKPOINT(0x0)
 		mapTime.start();
 		for (int i = 0; i < numStrings; i++)
 		{
@@ -193,67 +237,42 @@ void sandbox::tableRnD(void)
 		millisecond tableInsert = tableTime.milliseconds();
 		millisecond mapInsert = mapTime.milliseconds();
 
-		printf("Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableInsert, treeInsert, mapInsert); 
-		BREAKPOINT(0x0)
-		
-		bool stopme(true);
-		if (stopme)
+		printf("Insert Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableInsert, treeInsert, mapInsert); 
+		// BREAKPOINT(0x0)
+
+		int mapCount(0);
+		mapTime.reset();
+		mapTime.start();
+		std::map<String::Immutable, sint>::iterator mapSentinel(map.end());
+		for (std::map<String::Immutable, sint>::iterator i(map.begin()); i != mapSentinel; ++i)
 		{
-			stopme = false;
+			mapCount += (*i).second; 
 		}
-	}
+		mapTime.stop();	
+
+		int tableCount(0);
+		tableTime.reset();
+		tableTime.start();
+		for (Table<sint>::Iterator iter(table); iter; ++iter)
+		{
+			tableCount += *iter;
+		}
+		tableTime.stop();
+
+		assert(mapCount == tableCount);
+		millisecond treeIterate = treeTime.milliseconds();
+		millisecond tableIterate = tableTime.milliseconds();
+		millisecond mapIterate = mapTime.milliseconds();
+		printf("Iterate Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableIterate, treeIterate, mapIterate); 
+		BREAKPOINT(0x0)
+
+}
 
 	/*
+	
 
-	void Table::printHashPart(void) const
-	{
-	printf("HashPart:\n");
-
-	for (uint i = 0; i < getSizeOfHashPart(); i++)
-	{
-	printf("%3d: ", i);
-	hashPart[i].print();
-	printf("\n");
-	}
-
-	printf("\n\n");
-	}
-
-	void Table::Node::print(void) const
-	{
-	printf("K: ");
-
-	if (key.isValid())
-	{
-	printf("%10s", key.originalKeyString.c_str());
-	}
-	else
-	{
-	printf("%10s", "nil");
-	}
-
-	printf(" V: ");
-
-	if (value)
-	{
-	printf("%4d", value);
-	}
-	else
-	{
-	printf(" nil");
-	}
-
-	printf(" ->");
-
-	if (next)
-	{
-	next->print();
-	}
-	else
-	{
-	printf("NULL");
-	}
-	}
+	
+	
 	*/
 	
 #endif DEVELOP_TABLE
