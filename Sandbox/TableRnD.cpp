@@ -91,17 +91,17 @@ void sandbox::tableRnD(void)
 // 	myarray.pushBack(outstanding);
 // 	myarray.insertAtIndex(outstanding, 10);
 // 
- 	Table<int> mynumbs;
- 	mynumbs.set("one", 15);
-	mynumbs.set("two", 30);
-	mynumbs.set("three", 2);
-	mynumbs.set("four", 2);
-	mynumbs.set("five", 2);
-	
- 	for (Table<int>::Iterator i(mynumbs); i; i++)
- 	{
- 		printf("MyNumbs: %d\n", *i);
- 	}
+//  	Table<int> mynumbs;
+//  	mynumbs.set("one", 15);
+// 	mynumbs.set("two", 30);
+// 	mynumbs.set("three", 2);
+// 	mynumbs.set("four", 2);
+// 	mynumbs.set("five", 2);
+// 	
+//  	for (Table<int>::Iterator i(mynumbs); i; i++)
+//  	{
+//  		printf("MyNumbs: %d\n", i.value());
+//  	}
 // 
 // 	mynumbs.sort<std::greater<sint>>();
 // 	printf("Sorted\n");
@@ -253,19 +253,59 @@ void sandbox::tableRnD(void)
 		int tableCount(0);
 		tableTime.reset();
 		tableTime.start();
-		for (Table<sint>::Iterator iter(table); iter; ++iter)
-		{
-			tableCount += *iter;
-		}
+ 		for (Table<sint>::Iterator iter(table); iter; ++iter)
+ 		{
+ 			tableCount += iter.value();
+ 		}
 		tableTime.stop();
 
+		Table<sint>::Iterator iter(table);
+		Table<sint>::IteratorConst iterConst(table);
+		Table<sint>::Iterator pp1(table, iter.key());
+		Table<sint>::IteratorConst iterConstpp1(table, iter.key());
+
+		bool switcher(false);
+
+		while (iter)
+		{
+			Table<sint>::Iterator pp(table, iter.key());
+			
+			sint iterValue = iter.value();
+			sint ppValue = pp.value();
+			sint pp1Value = pp1.value();
+			sint iterConstValue = iterConst.value();
+			const sint iterConstValuepp1 = iterConstpp1.value();
+			assert( iterValue == ppValue);
+			assert( iterValue == pp1Value);
+			assert( iterValue == iterConstValue);
+			assert( iterValue == iterConstValuepp1);
+			
+			if (switcher = (!switcher))
+			{
+			++iter;
+			++pp1;
+			++pp;
+			++iterConstpp1;
+			++iterConst;
+			}
+			else
+			{
+				iter++;
+				pp1++;
+				pp++;
+				iterConstpp1++;
+				iterConst++;
+			}
+		}
+
+		assert(!pp1);
+		
 		assert(mapCount == tableCount);
 		millisecond treeIterate = treeTime.milliseconds();
 		millisecond tableIterate = tableTime.milliseconds();
 		millisecond mapIterate = mapTime.milliseconds();
 		printf("Iterate Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableIterate, treeIterate, mapIterate); 
 		BREAKPOINT(0x0)
-
 }
 
 	/*

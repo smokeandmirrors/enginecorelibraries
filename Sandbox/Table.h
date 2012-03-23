@@ -156,8 +156,9 @@ private:
 template<typename ELEMENT>
 class Table 
 {
-	friend class Iterator;
+	// friend class Iterator;
 	class Value;
+	struct IterationData;
 
 public:
 	Table(sint reserveArraySize=0, sint reserveHashSize=0)
@@ -230,7 +231,7 @@ public:
 		Value* v = setWithInteger(position, value);
 		v->validate();
 	}
-
+	//
 	void popBack(void)
 	{
 		sint index = findLowestValidNumericalIndexFollowedByInvalidValue();
@@ -318,29 +319,59 @@ public:
 	
 	class Iterator
 	{
-		friend class Table;
 	public:
-		Iterator(Table& table) : k(table.getIterator()), t(table), v(NULL) { shouldContinue = t.next(k, v); }
+		Iterator(Table& table, const Key& key) : data(table, key) { data.v = &table.hashPart[data.iterationIndex].value; }
+		Iterator(Table& table) : data(table) { data.shouldContinue = table.next(data); }
 		
-		inline Key& key(void) {return k; }
-		inline operator bool(void) const {	return shouldContinue; }
-		inline bool operator!(void) const { return !shouldContinue; }
-		inline Iterator& operator ++(void) { shouldContinue = t.next(k, v); return *this; }
-		inline Iterator operator ++(int) { shouldContinue = t.next(k, v); return *this; }
-		inline ELEMENT& operator->(void) { return v->element; }	
- 		inline ELEMENT& operator*(void) { return v->element; }
-		inline ELEMENT& value(void) { return v->element; }
+		inline const Key& key(void) const {return data.k; }
+		inline operator bool(void) const { return data.shouldContinue; }
+		inline bool operator!(void) const { return !data.shouldContinue; }
+		inline Iterator& operator ++(void) { data.shouldContinue = data.t.next(data); return *this; }
+		inline Iterator operator ++(int) { Iterator temp(*this); ++*this; return temp; }
+		inline ELEMENT& value(void) { return data.v->element; }
 		
 	private:
+		friend class Table;
+		
 		Iterator(void);
-		Iterator operator=(const Iterator&);
-		bool shouldContinue;
- 		Table& t;
-		Value* v;
-		Key k;
-	}; // class Iterator	
+
+		IterationData data;		
+	}; // class Iterator
+
+	class IteratorConst
+	{
+	public:
+		IteratorConst(const Table& table, const Key& key) : data(const_cast<Table&>(table), key) { data.v = &table.hashPart[data.iterationIndex].value; }
+		IteratorConst(const Table& table) : data(const_cast<Table&>(table)) { data.shouldContinue = table.next(data); }
+
+		inline const Key& key(void) const {return data.k; }
+		inline operator bool(void) const { return data.shouldContinue; }
+		inline bool operator!(void) const { return !data.shouldContinue; }
+		inline IteratorConst& operator ++(void) { data.shouldContinue = data.t.next(data); return *this; }
+		inline IteratorConst operator ++(int) { IteratorConst temp(*this); ++*this; return temp; }
+		inline const ELEMENT& value(void) const { return data.v->element; }
+
+	private:
+		friend class Table;
+
+		IteratorConst(void);
+
+		IterationData data;		
+	}; // class IteratorConst	
 
 private:
+	struct IterationData
+	{
+		IterationData(Table& table) : k(table.getIterator()), t(table), v(NULL), iterationIndex(-1) { k.beginIteration(); }
+		IterationData(Table& table, const Key& key) : k(key), t(table) { iterationIndex = table.findIndex(k); k.beginIteration(); }
+
+		Key k;
+		Table& t;
+		Value* v;
+		sint iterationIndex;
+		bool shouldContinue;
+	}; // struct IterationData
+
 	struct Node
 	{
 		Node(void) : next(NULL) 
@@ -641,40 +672,32 @@ private:
 	// static int findindex (lua_State *L, Table *t, StkId key)
 	inline sint findIndex(Key& iter) const
 	{
-		if (!iter)
-		{	// first iteration
-			iter.beginIteration();
-			return -1;
+		sint index;
+
+		if (calculateArrayIndex(iter, index)
+		&& index < static_cast<sint>(arrayPartSize))
+		{	// in the array part
+			return index;
 		}
 		else
-		{	
-			sint index;
+		{	// check for hash part
+			Node* n = getMainPosition(iter);
 
-			if (calculateArrayIndex(iter, index)
-			&& index < static_cast<sint>(arrayPartSize))
-			{	// in the array part
-				return index;
-			}
-			else
-			{	// check for hash part
-				Node* n = getMainPosition(iter);
-
-				do 
+			do 
+			{
+				if (n->key == iter)
 				{
-					if (n->key == iter)
-					{
-						return static_cast<sint>(n - hashPart) + arrayPartSize;
-					}
-					else
-					{
-						n = n->next;
-					}
-				} 
-				while (n);
-				assert(false);/*else invalid key, assert*/
-				return -2;
-			}
+					return static_cast<sint>(n - hashPart) + arrayPartSize;
+				}
+				else
+				{
+					n = n->next;
+				}
+			} 
+			while (n);
 		}
+		assert(false);/*else invalid key, assert*/
+		return -2;
 	}
 	// LUAI_FUNC int luaH_getn (Table *t);
 	inline sint findLowestValidNumericalIndexFollowedByInvalidValue(void) const
@@ -828,17 +851,19 @@ private:
 	{
 		return mainPosition->value || (mainPosition == &dummyNode);
 	}
-	// LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
-	inline bool next(Key& iter, Value*& value) const
+	
+	inline bool next(IterationData& iter) const
 	{
-		sint index = findIndex(iter) + 1;
+		++iter.iterationIndex;
+		assert(iter.iterationIndex >= 0);
+		sint index = iter.iterationIndex;
 
 		for (; index < static_cast<sint>(arrayPartSize); index++)
 		{
 			if (arrayPart[index])
 			{
-				value = &arrayPart[index];
-				iter.original.keyInteger = index;
+				iter.v = &arrayPart[index];
+				iter.k.original.keyInteger = index;
 				return true;
 			}
 		}
@@ -849,14 +874,46 @@ private:
 		{
 			if (hashPart[index].value)
 			{
-				value = &hashPart[index].value;
-				iter = hashPart[index].key;
+				iter.v = &hashPart[index].value;
+				iter.k = hashPart[index].key;
+				iter.iterationIndex = index + arrayPartSize;
 				return true;
 			}
 		}
 
 		return false;
 	}
+
+	// LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
+// 	inline bool next(Key& iter, Value*& value) const
+// 	{
+// 		sint index = findIndex(iter) + 1;
+// 
+// 		for (; index < static_cast<sint>(arrayPartSize); index++)
+// 		{
+// 			if (arrayPart[index])
+// 			{
+// 				value = &arrayPart[index];
+// 				iter.original.keyInteger = index;
+// 				return true;
+// 			}
+// 		}
+// 
+// 		sint sizeHashPart = static_cast<sint>(getSizeOfHashPart());
+// 
+// 		for (index -= arrayPartSize; index < sizeHashPart; index++)
+// 		{
+// 			if (hashPart[index].value)
+// 			{
+// 				value = &hashPart[index].value;
+// 				iter = hashPart[index].key;
+// 				return true;
+// 			}
+// 		}
+// 
+// 		return false;
+// 	}
+
 	// TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key)
 	inline Value* newKey(const Key& key)
 	{	/*
