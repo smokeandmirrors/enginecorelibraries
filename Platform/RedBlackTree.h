@@ -8,6 +8,7 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 
 #include "Platform.h"
 #include <vector>
+#include <queue>
 
 namespace containers
 {
@@ -21,6 +22,14 @@ template
 >
 class RedBlackTree
 {
+	class Node;
+	struct IteratorData
+	{
+		Node* node;
+		Node* right;
+		Node* left;
+	};
+
 public:
 	static const bool red;
 	static const bool black;
@@ -65,6 +74,230 @@ public:
 	
 	void
 		removeMin(void);
+
+	class Node;
+
+	void printNode(Node& node, int level)
+	{
+		for (int i = 0; i<level; i++) printf("\t");
+		printf("%3d\n", node.m_value);
+	}
+
+	void printInOrder(void)
+	{
+		if (m_root)
+			printInOrderImp(*m_root, 0);
+	}
+	
+	void printInOrderImp(Node& node, int level)
+	{	// left, me, right
+
+		if (node.m_left)
+		{
+			printInOrderImp(*node.m_left, level + 1);
+		}
+		
+		printNode(node, level);
+
+		if (node.m_right)
+		{
+			printInOrderImp(*node.m_right, level + 1);
+		}	
+	}
+
+	void printPostOrder(void)
+	{
+		if (m_root)
+			printPostOrderImp(*m_root, 0);
+	}
+
+	void printPostOrderImp(Node& node, int level)
+	{	// left, right, me
+
+		if (node.m_left)
+		{
+			printPostOrderImp(*node.m_left, level + 1);
+		}
+		
+		if (node.m_right)
+		{
+			printPostOrderImp(*node.m_right, level + 1);
+		}	
+
+		printNode(node, level);
+	}
+	
+	void printPreOrder(void)
+	{
+		if (m_root)
+			printPreOrderImp(*m_root, 0);
+	}
+
+	void printPreOrderImp(Node& node, int level)
+	{	// me, left, right
+
+		printNode(node, level);
+		
+		if (node.m_left)
+		{
+			printPreOrderImp(*node.m_left, level + 1);
+		}
+		
+		if (node.m_right)
+		{
+			printPreOrderImp(*node.m_right, level + 1);
+		}	
+	}
+
+	void printBFV(void)
+	{
+		if (m_root)
+		{
+			std::queue<Node*> queue;
+			queue.push(m_root);
+			int numInCurrentLevel(1);
+			int numInNextLevel(0);
+			int numTabs(0);
+
+			do 
+			{
+				Node* node = queue.front();
+				queue.pop();
+				printNode(*node, numTabs);
+				numInCurrentLevel--;
+				
+				if (node->m_left)
+				{
+					queue.push(node->m_left);
+					numInNextLevel++;
+				}
+
+				if (node->m_right)
+				{
+					queue.push(node->m_right);
+					numInNextLevel++;
+				}				
+
+				if (numInCurrentLevel == 0)
+				{
+					numInCurrentLevel = numInNextLevel;
+					numInNextLevel = 0;
+					numTabs++;
+				}
+			} 
+			while (!queue.empty());
+		}
+	}
+	// in-order traversal
+	void iterate(void)
+	{
+		int level(0);
+
+		if (m_root)
+		{
+			Node* current(m_root);
+			Node* previous;
+
+			do 
+			{
+				if (current->m_left)
+				{
+					previous = current->m_left;
+					
+					while (previous->m_right != NULL 
+					&& previous->m_right != current) 
+					{
+						previous = previous->m_right;
+					}
+
+					if (previous->m_right)
+					{
+						previous->m_right = NULL;
+						printNode(*current, level);
+						current = current->m_right;
+					}
+					else
+					{
+						previous->m_right = current;
+						current = current->m_left;
+					}
+				}
+				else
+				{
+					printNode(*current, level);
+					current = current->m_right;
+				}
+			} 
+			while (current);
+		}
+	}
+
+	void iterateWithData(void)
+	{
+		
+		if (m_root)
+		{
+			int level(0);
+			IteratorData current;
+			current.node = m_root;
+			current.left = current.node->m_left;
+			current.right = current.node->m_right;
+
+			IteratorData previous;
+			
+			do 
+			{
+				if (current.left)
+				{
+					previous.node = current.left;
+					if (previous.node)
+					{
+						previous.left = previous.node->m_left;
+						previous.right = previous.node->m_right;
+					}
+
+					while (previous.right != NULL 
+					&& previous.right != current.node) 
+					{
+						previous.right = previous.right->m_right;
+					}
+
+					if (previous.right)
+					{
+						previous.right = NULL;
+						printNode(*current.node, level);
+						current.node = current.node->m_right;
+						if (current.node)
+						{
+							current.left = current.node->m_left;
+							current.right = current.node->m_right;
+						}
+					}
+					else
+					{
+						previous.right = current.node;
+						current.node = current.node->m_left;
+						if (current.node)
+						{
+							current.left = current.node->m_left;
+							current.right = current.node->m_right;
+						}
+					}
+				}
+				else
+				{
+					printNode(*current.node, level);
+					current.node = current.node->m_right;
+					if (current.node)
+					{
+						current.left = current.node->m_left;
+						current.right = current.node->m_right;
+					}
+				}
+			} 
+			while (current.node);
+		}
+	}
 
 private:
 	class Node

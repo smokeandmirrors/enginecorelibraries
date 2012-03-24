@@ -14,6 +14,24 @@ using namespace containers;
 
 void sandbox::tableRnD(void)
 {
+	RedBlackTree<sint> printMe;
+	for (int i= 0; i < 20; i++)
+		printMe.insert(i);
+
+	printf("in:\n");
+	printMe.printInOrder();
+	printf("\npost:\n");
+	printMe.printPostOrder();
+	printf("\npre\n");
+	printMe.printPreOrder();
+	printMe.printBFV();
+	printMe.iterate();
+	
+	printf("WTF??\n");
+	printMe.iterate();
+	printf("I hope this works:\n");
+	printMe.iterateWithData();
+
 	RedBlackMap<const schar*, int> stringToNumber;
 	stringToNumber.set("awesome", 10);
 	stringToNumber.set("bitchin", 20);
@@ -280,7 +298,7 @@ void sandbox::tableRnD(void)
 			assert( iterValue == iterConstValue);
 			assert( iterValue == iterConstValuepp1);
 			
-			if (switcher = (!switcher))
+			if (switcher)
 			{
 			++iter;
 			++pp1;
@@ -296,6 +314,7 @@ void sandbox::tableRnD(void)
 				iterConstpp1++;
 				iterConst++;
 			}
+			switcher = (!switcher);
 		}
 
 		assert(!pp1);
