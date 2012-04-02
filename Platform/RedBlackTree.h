@@ -4,6 +4,10 @@
 /**
 An implementation of a Left Leaning variant of a Red Black Tree, described here:
 www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
+
+This version has no parent pointers, so iteration uses a dynamically allocated
+queue.  For large data sets, a version of the tree with parent pointers would
+be required.
 */
 
 #include "Platform.h"
@@ -23,12 +27,6 @@ template
 class RedBlackTree
 {
 	class Node;
-	struct IteratorData
-	{
-		Node* node;
-		Node* right;
-		Node* left;
-	};
 
 public:
 	static const bool red;
@@ -188,117 +186,7 @@ public:
 			while (!queue.empty());
 		}
 	}
-	// in-order traversal
-	void iterate(void)
-	{
-		int level(0);
-
-		if (m_root)
-		{
-			Node* current(m_root);
-			Node* previous;
-
-			do 
-			{
-				if (current->m_left)
-				{
-					previous = current->m_left;
-					
-					while (previous->m_right != NULL 
-					&& previous->m_right != current) 
-					{
-						previous = previous->m_right;
-					}
-
-					if (previous->m_right)
-					{
-						previous->m_right = NULL;
-						printNode(*current, level);
-						current = current->m_right;
-					}
-					else
-					{
-						previous->m_right = current;
-						current = current->m_left;
-					}
-				}
-				else
-				{
-					printNode(*current, level);
-					current = current->m_right;
-				}
-			} 
-			while (current);
-		}
-	}
-
-	void iterateWithData(void)
-	{
-		
-		if (m_root)
-		{
-			int level(0);
-			IteratorData current;
-			current.node = m_root;
-			current.left = current.node->m_left;
-			current.right = current.node->m_right;
-
-			IteratorData previous;
-			
-			do 
-			{
-				if (current.left)
-				{
-					previous.node = current.left;
-					if (previous.node)
-					{
-						previous.left = previous.node->m_left;
-						previous.right = previous.node->m_right;
-					}
-
-					while (previous.right != NULL 
-					&& previous.right != current.node) 
-					{
-						previous.right = previous.right->m_right;
-					}
-
-					if (previous.right)
-					{
-						previous.right = NULL;
-						printNode(*current.node, level);
-						current.node = current.node->m_right;
-						if (current.node)
-						{
-							current.left = current.node->m_left;
-							current.right = current.node->m_right;
-						}
-					}
-					else
-					{
-						previous.right = current.node;
-						current.node = current.node->m_left;
-						if (current.node)
-						{
-							current.left = current.node->m_left;
-							current.right = current.node->m_right;
-						}
-					}
-				}
-				else
-				{
-					printNode(*current.node, level);
-					current.node = current.node->m_right;
-					if (current.node)
-					{
-						current.left = current.node->m_left;
-						current.right = current.node->m_right;
-					}
-				}
-			} 
-			while (current.node);
-		}
-	}
-
+	
 private:
 	class Node
 	{	

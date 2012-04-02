@@ -22,6 +22,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 
 \todo NULL, assert, warn, error
 \todo global bit packing investigation
+\todo safe bool idiom for container iterators?
 
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0

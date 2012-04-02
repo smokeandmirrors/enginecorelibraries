@@ -7,8 +7,10 @@ An implementation of a Left Leaning variant of a Red Black Tree, described here:
 www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 */
 
-#include <vector>
 #include <map>
+#include <stack>
+#include <vector>
+
 #include "Platform.h"
 
 namespace containers
@@ -23,11 +25,21 @@ template<
 >
 class RedBlackMap
 {
+	class Node;
+
 public:
 	RedBlackMap(void);
 	~RedBlackMap(void);
+	
+	class Iterator;	
+
+	Iterator begin(void)
+	{
+		return Iterator(*this);
+	}
 
 	void deleteElements(void);
+	Iterator end(void);
 	VALUE get(const KEY& key) const;
 	VALUE getMax(void) const;
 	VALUE getMin(void) const;
@@ -40,6 +52,70 @@ public:
 	void removeMin(void);
 	void set(const KEY& key, VALUE value);
 
+	class Iterator 
+	{
+	public:
+		inline operator bool(void) const { return current || (!nodes.empty()); }
+		inline bool operator!(void) const { return !(current || (!nodes.empty())); }
+		
+		inline Iterator& operator ++(void) 
+		{ 
+			FOREVER
+			{
+				if (iteration)
+				{
+					nodes.push(iteration);
+					iteration = iteration->m_left;
+					continue;
+				}
+				else if (!nodes.empty())
+				{
+					iteration = nodes.top();
+					nodes.pop();
+					current = iteration;
+					iteration = iteration->m_right;
+				}
+				else
+				{
+					current = NULL;
+					break;
+				}
+			}
+
+			return *this;
+		}
+		
+		/*inline Iterator operator ++(int) 
+		{ 
+			Iterator temp(*this); ++*this; return temp; 
+		}
+		*/
+		inline VALUE& operator*(void) { return current->m_value; }
+	
+	public: // private:
+		friend class RedBlackMap;		
+
+		Iterator(void);
+		
+		Iterator(RedBlackMap& m) : current(NULL), iteration(m.m_root), map(&m)
+		{
+			++(*this);
+		}
+
+		Iterator& operator=(const Iterator& other)
+		{
+			current = other.current;
+			iteration = other.iteration;
+			map = other.map;
+			nodes = other.nodes;
+		}
+		
+		Node* current;
+		Node* iteration;
+		RedBlackMap* map;
+		std::stack<Node*> nodes;
+	}; // class Iterator
+
 private:
 	static const bool red;
 	static const bool black;
@@ -50,6 +126,10 @@ private:
 	class Node
 	{	
 	public:
+		Node(void) {}
+		~Node(void)
+		{ /* empty */}
+
 		static void deleteAndRecycle(Node* used)
 		{
 			if (used)
@@ -92,6 +172,8 @@ private:
 			m_value;
 	
 	private:
+		
+
 		Node(bool color, Node* left, Node* right, const KEY& key, VALUE& value) //;
 		: m_color(color)
 		, m_left(left)
@@ -100,10 +182,12 @@ private:
 		, m_value(value)
 		{ /* empty */}
 
-		~Node(void)
-		{ /* empty */}
+	
 
 	}; // class Node
+
+	Node
+		theEnd;
 
 	inline Node*
 		find(const KEY& key) const

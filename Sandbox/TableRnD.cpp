@@ -25,12 +25,7 @@ void sandbox::tableRnD(void)
 	printf("\npre\n");
 	printMe.printPreOrder();
 	printMe.printBFV();
-	printMe.iterate();
 	
-	printf("WTF??\n");
-	printMe.iterate();
-	printf("I hope this works:\n");
-	printMe.iterateWithData();
 
 	RedBlackMap<const schar*, int> stringToNumber;
 	stringToNumber.set("awesome", 10);
@@ -267,6 +262,16 @@ void sandbox::tableRnD(void)
 			mapCount += (*i).second; 
 		}
 		mapTime.stop();	
+
+		int treeCount(0);
+		treeTime.reset();
+		treeTime.start();
+		
+		for (RedBlackMap<String::Immutable, sint>::Iterator i(tree.begin()); i; ++i)
+		{
+			treeCount += (*i); 
+		}
+		treeTime.stop();	
 
 		int tableCount(0);
 		tableTime.reset();
