@@ -1,47 +1,60 @@
 require'Utilities'
 
-function checkString()
-	local myString   = "will this work"
-	"or will it not"
-	print(myString)
-end
-
-function go()
-	t = {}
-	for i=6,1,-1 do
-		table.insert(t, i)
-	end
-	--[[
-	table.insert(t, -6)
-	table.insert(t, -8)
-	table.insert(t, 8)
-	table.insert(t, 8)
-	table.insert(t, -6)
-	table.insert(t, -1)
-	table.insert(t, -10)
-	table.insert(t, 4)
-	table.insert(t, -3)
-	table.insert(t, -9)
-	--]]
-	table.sort(t)
-end
-
-function isGlobal()
+function _G.testTable()
 	_G.t = {}
-	local t = _G.t
-	table.insert(t, 30)
-	table.insert(t, 2)
-	_G.t[6] = 6
-	sprint(t)
-	table.sort(t)
-	sprint(t)	
+	
+	for i = 0, 1911 do
+		t[i..'_wicked'] = i
+	end
+	print'Print pairs'
+	for k, v in pairs(t) do
+		print(k..' '..tostring(v))
+	end
+
 end
 
+-- testTable()
+--[[
+function overWriteFile(name, output)
+	local myFile = io.open(name, 'w+')
+	myFile:write(output)
+	myFile:flush()
+	myFile:close()
+end
 
+function _G.writeAnnoying()
+	local output = ''
+	-- 1st through 14th 
+	output = '1st - 14th: \n'
+	output = output..'=SUM(PRODUCT(B2,C2) * IF(LT(D2,15), 1, 0)'
+	for i = 3,21 do
+		output = output..', PRODUCT(B'..i..',C'..i..') * IF(LT(D'..i..',15), 1, 0)'
+	end
+	output = output..')\n\n'
+	output = output..'15th - End of Month\n'
+	output = output..'=SUM(PRODUCT(B2,C2) * IF(GTE(D2,15), 1, 0)'
+	for i = 3,21 do
+		output = output..', PRODUCT(B'..i..',C'..i..') * IF(GTE(D'..i..',15), 1, 0)'
+	end
+	output = output..')\n\nRequired Carry Over\n'
+	output = output..'=SUM(B29,SUM(B23:B26)/2'
+	for i = 2, 21 do
+		output = output..', B'..i..' * IF(LT(D'..i..',15), 1, 0)'
+	end
+	output = output..')\n\n'
+	overWriteFile('MonthlyBudget.txt', output)
+end
 function _G.doit()
 	require'UnitTestingFramework'
 	require'UTLibraryFunctions'
 	UnitTestingFramework.testAll()
+end
+
+function _G.cS()
+	rerequire'CodeWritingSignals'
+	local CWS = CodeWritingSignals
+	local myFile = io.open('MyFile.h', 'w+')
+	CWS.writeToFile(myFile, 10)
 end
 
 function _G.enginetest()
@@ -210,12 +223,6 @@ function cs2n()
 	local ES2N = rerequire'LuaExposeScriptToNative'
 	local myFile = io.open('MyFile.h', 'w+')
 	ES2N.generateHeader(myFile, 10, 10)
-end
-
-function _G.cS()
-	local CWS = rerequire'CodeWritingSignals'
-	local myFile = io.open('MyFile.h', 'w+')
-	CWS.writeToFile(myFile, 5)
 end
 
 function _G.n2s()
@@ -517,4 +524,4 @@ function _G.createLatentFunction(f, condition)
 			end
 		end)
 end
-
+--]]
