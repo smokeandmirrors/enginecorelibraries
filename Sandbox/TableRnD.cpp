@@ -169,7 +169,7 @@ void sandbox::tableRnD(void)
 		Table<sint> table;
 		std::map<String::Immutable, sint> map;
 
-		const int numStrings(1000);
+		const int numStrings(10000);
 
 		for (int i = 0; i < numStrings; i++)
 		{

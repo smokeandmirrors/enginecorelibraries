@@ -16,10 +16,18 @@ using namespace signals;
 
 // #define SCHEDULE_PRINT printState();
 #define SCHEDULE_PRINT 
+// 
+// namespace designPatterns
+// {
+// 	template<> concurrency::Dispatcher* Singleton<concurrency::Dispatcher>::single(NULL);
+// 	static CustomSingletonInitializer<concurrency::Dispatcher> dispatcherInitializer;
+// } // namespace designPatterns
+
+DEFINE_SINGLETON_NS(Dispatcher, concurrency)
 
 namespace concurrency
 {
-
+	
 inline threadID getInitializedID(const Thread& thread)
 {
 	threadID id;
@@ -102,7 +110,7 @@ public:
 
 	inline void onComplete(Thread*)
 	{
-		Dispatcher::single.accountForFinish(this);
+		Dispatcher::single->accountForFinish(this);
 	}
 
 	inline void onConnect(Transmitter* transmitter)

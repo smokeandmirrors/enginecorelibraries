@@ -1,6 +1,8 @@
 #include "Strings.h"
 
 
+DEFINE_SINGLETON(String)
+
 String::String(void)
 : numUsed(0)
 {

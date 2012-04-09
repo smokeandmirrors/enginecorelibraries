@@ -706,7 +706,6 @@ private:
 
 		if (arrayPartSize > 0 && !arrayPart[high - 1])
 		{	// there is a boundary in the array part, binary search for it
-			/// \todo why binary search here, are the arry keys sorted somehow?
 			return binarySearch(high, 0) - 1;
 		}
 		else if (hashPart == &dummyNode)

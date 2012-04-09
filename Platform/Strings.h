@@ -88,19 +88,19 @@ public:
 	public:
 		// inline wrap all the const std::string methods
 		inline Immutable()
-		: internal(&String::single.find(""))
+		: internal(&String::single->find(""))
 		{
 			internal->acquire();
 		}
 		
 		inline Immutable(const schar* s)
-		: internal(&String::single.find(s))
+		: internal(&String::single->find(s))
 		{
 			internal->acquire();
 		}
 
 		inline Immutable(const Argument& s)
-		: internal(&String::single.find(s))
+		: internal(&String::single->find(s))
 		{
 			internal->acquire();
 		}
@@ -182,7 +182,8 @@ public:
 protected:	
 	String(void);
 	~String(void);
-
+	
+	static String* createSingleton(void) { return new String; /* no dependencies */ } 
 
 private:
 	class ImmutableInternal
@@ -210,7 +211,7 @@ private:
 			{	// tell the String singleton
 				// about the fact there are no more references
 				// to this string
-				String::single.notifyDeadString(this);
+				String::single->notifyDeadString(this);
 				delete this;
 			}
 		}

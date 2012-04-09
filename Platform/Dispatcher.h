@@ -76,7 +76,10 @@ public:
 	void printState(void) const;
 	void setMaxThreads(uint max);
 	const std::string toString(void) const;
-	
+
+protected:
+	static Dispatcher* createSingleton(void) { return new Dispatcher; /* no dependencies */ } 
+
 private:
 	Dispatcher(void);
 	~Dispatcher(void);

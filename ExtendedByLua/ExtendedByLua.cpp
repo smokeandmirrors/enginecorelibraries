@@ -28,10 +28,13 @@ are included in the macro below
 
 #if SANDBOX
 #include "Sandbox.h" 
+#include "Dispatcher.h"
 #endif//SANDBOX
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
+	designPatterns::createSingletons();
+
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality
 #endif//SANDBOX	
@@ -47,6 +50,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		// lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
+
+	designPatterns::destroySingletons();
 	return 0;
 }
 

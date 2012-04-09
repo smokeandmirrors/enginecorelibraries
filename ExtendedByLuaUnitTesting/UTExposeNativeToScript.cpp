@@ -11,6 +11,11 @@ using namespace embeddedLua;
 class Zero
 	: public designPatterns::Singleton<Zero>
 {
+	friend class designPatterns::Singleton<Zero>;
+
+protected:
+	static Zero* createSingleton(void) { return new Zero; /* no dependencies */ } 
+
 public:
 	const sint m_0;
 
@@ -18,7 +23,7 @@ public:
 	
 	static void staticReturn0Param0(void) 
 	{
-		CFIXCC_ASSERT_EQUALS(Zero::single.m_0, 0);
+		CFIXCC_ASSERT_EQUALS(Zero::single->m_0, 0);
 	}
 	
 	void constReturn0Param0(void) const 
@@ -31,6 +36,9 @@ public:
 		return staticReturn0Param0();
 	}
 }; // Zero
+
+DEFINE_SINGLETON(Zero)
+
 DECLARE_LUA_CLASS(Zero)
 DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, Zero, Zero)
 	LUA_ENTRY_NAMED("staticReturn0Param0", (nativeStaticReturn0Param0<&Zero::staticReturn0Param0>))
@@ -38,19 +46,25 @@ DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, Zero, Zero)
 	LUA_ENTRY_NAMED("memberReturn0Param0", (nativeMemberReturn0Param0<Zero, &Zero::memberReturn0Param0>))
 END_LUA_CLASS(Zero, Zero)
 
+
+
 class One
 : public designPatterns::Singleton<One>
 {
+	friend class designPatterns::Singleton<One>;
+protected:
+	static One* createSingleton(void) { return new One; /* no dependencies */ } 
+
 public:
 	static One* staticReturn1Param1(const One* param1) 
 	{
 		CFIXCC_ASSERT_EQUALS(param1->m_1, 1);
-		return &One::single;
+		return One::single;
 	}
 
 	static One* staticReturn1Param0(void) 
 	{
-		return &One::single;
+		return One::single;
 	}
 
 	static void staticReturn0Param1(const One* param1)
@@ -93,6 +107,8 @@ public:
 	}
 }; // One
 
+DEFINE_SINGLETON(One)
+
 DECLARE_LUA_CLASS(One)
 DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, One, One)
 	LUA_ENTRY_NAMED("staticReturn1Param1", (nativeStaticReturn1Param1<One*, const One*, &One::staticReturn1Param1>))
@@ -109,33 +125,37 @@ END_LUA_CLASS(One, One)
 class Two 
 	: public designPatterns::Singleton<Two>
 {
+	friend class designPatterns::Singleton<Two>;
+protected:
+	static Two* createSingleton(void) { return new Two; /* no dependencies */ } 
+
 public:	
 	static One* staticReturn2Param2(Two*& return2, const One* param1, const Two* param2) 
 	{
 		CFIXCC_ASSERT_EQUALS(param1->m_1, 1);
 		CFIXCC_ASSERT_EQUALS(param2->m_2, 2);
-		return2 = &Two::single;
-		return &One::single;
+		return2 = &*Two::single;
+		return One::single;
 	}
 
 	static One* staticReturn2Param1(Two*& return2, const One* param1) 
 	{
 		CFIXCC_ASSERT_EQUALS(param1->m_1, 1);
-		return2 = &Two::single;
-		return &One::single;
+		return2 = &*Two::single;
+		return One::single;
 	}
 	
 	static One* staticReturn2Param0(Two*& return2) 
 	{
-		return2 = &Two::single;
-		return &One::single;
+		return2 = &*Two::single;
+		return One::single;
 	}
 
 	static One* staticReturn1Param2(const One* param1, const Two* param2) 
 	{
 		CFIXCC_ASSERT_EQUALS(param1->m_1, 1);
 		CFIXCC_ASSERT_EQUALS(param2->m_2, 2);
-		return &One::single;
+		return One::single;
 	}
 
 	static void staticReturn0Param2(const One* param1, const Two* param2)
@@ -199,6 +219,8 @@ public:
 	}
 }; // Two
 
+DEFINE_SINGLETON(Two)
+
 DECLARE_LUA_CLASS(Two)
 DEFINE_LUA_CLASS_NO_CTOR_NO_DTOR(CLASS, Two, Two)
 END_LUA_CLASS(Two, Two)
@@ -210,6 +232,8 @@ private:
 public:
 	void Test()
 	{
+		designPatterns::createSingletons();
+
 		DECLARE_UNIT_TESTING_LUA_OBJECT
 		lua_State* L = lua.getState();
 		REGISTER_LUA_LIBRARY((&lua), One);
@@ -217,8 +241,8 @@ public:
 		
 		lua.require("UTExposeScriptToNative");
 
-		One* param1 = &One::single;
-		Two* param2 = &Two::single;
+		One* param1 = One::single;
+		Two* param2 = &*Two::single;
 		One* return1;
 		Two* return2;
 		return1 = NULL;
@@ -229,8 +253,8 @@ public:
 		return2 = NULL;
 		callResult = phybridStaticReturn2Param2<One*, Two*, const One*, const Two*, &Two::staticReturn2Param2>(L, "staticReturn2Param2", return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionSuccess, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
 		// error the script function
 		return1 = NULL;
 		return2 = NULL;
@@ -243,59 +267,61 @@ public:
 		return2 = NULL;
 		callResult = phybridStaticReturn2Param2<One*, Two*, const One*, const Two*, &Two::staticReturn2Param2>(L, "UTNotFoundIdentifier", return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionNotFound, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
 		// don't find module 
 		return1 = NULL;
 		return2 = NULL;
 		callResult = phybridStaticReturn2Param2<One*, Two*, const One*, const Two*, &Two::staticReturn2Param2>(L, "staticReturn2Param2", return1, return2, param1, param2, "UTNotFoundIdentifier");
 		CFIXCC_ASSERT_EQUALS(moduleNotFound, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);	
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);	
 
 		// call the script function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "memberReturn2Param2Script", Two::single, return1, return2, param1, param2);
+		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "memberReturn2Param2Script", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionSuccess, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
 		// error the script function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "error", Two::single, return1, return2, param1, param2);
+		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "error", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionError, callResult);	
 		CFIX_ASSERT(!return1);
 		CFIX_ASSERT(!return2);
 		// don't find function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "UTNotFoundIdentifier", Two::single, return1, return2, param1, param2);
+		callResult = phybridMemberReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::memberReturn2Param2>(L, "UTNotFoundIdentifier", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionNotFound, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
 		
 		// call the script function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "constReturn2Param2Script", Two::single, return1, return2, param1, param2);
+		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "constReturn2Param2Script", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionSuccess, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
 		// error the script function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "error", Two::single, return1, return2, param1, param2);
+		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "error", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionError, callResult);	
 		CFIX_ASSERT(!return1);
 		CFIX_ASSERT(!return2);
 		// don't find function
 		return1 = NULL;
 		return2 = NULL;
-		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "UTNotFoundIdentifier", Two::single, return1, return2, param1, param2);
+		callResult = phybridConstReturn2Param2<Two, One*, Two*, const One*, const Two*, &Two::constReturn2Param2>(L, "UTNotFoundIdentifier", *Two::single, return1, return2, param1, param2);
 		CFIXCC_ASSERT_EQUALS(functionNotFound, callResult);	
-		CFIXCC_ASSERT_EQUALS(&One::single, return1);
-		CFIXCC_ASSERT_EQUALS(&Two::single, return2);
+		CFIXCC_ASSERT_EQUALS(One::single, return1);
+		CFIXCC_ASSERT_EQUALS(&*Two::single, return2);
+
+		designPatterns::destroySingletons();
 	}
 };
 

@@ -3,6 +3,18 @@
 #include "Platform.h"
 #include "CompilerChecks.h"
 
+template<typename CLASS>
+class TClass 
+{
+public:
+	CLASS* instance; 
+};
+
+class EClass : public TClass<EClass>
+{
+public: 
+	EClass() { instance = this; }
+};
 
 
 template<typename ELEMENT, typename IS_EQUAL=isEqual<ELEMENT>, typename IS_GREATER=isGreater<ELEMENT>, typename IS_LESS=isLess<ELEMENT>>
@@ -37,6 +49,10 @@ namespace compilerChecks
 {
 	void check(void)
 	{
+		EClass ec;
+		TClass<EClass>* ptc = &ec;
+		assert(ptc != NULL);
+
 		// neat!
 		// int int_version = Math<int>::ZERO_TOLERANCE;
 		// float float_version = Math<float>::ZERO_TOLERANCE;
