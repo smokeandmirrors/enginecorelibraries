@@ -12,35 +12,35 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-#define UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) \
-	sychronized##number
+#include "Platform.h"
 
-#define UNIQUE_SYNCHRONIZATION_PREFIX(sychronized,number) \
-	UNIQUE_SYNCHRONIZATION_CONCAT(sychronized,number) 
+#define UNIQUE_SYNCHRONIZATION_CONCAT(SYNCHRONIZED, NUMBER) \
+	SYNCHRONIZED##NUMBER
 
-#define UNIQUE_SYNCHRONIZATION(sychronized) \
-	UNIQUE_SYNCHRONIZATION_PREFIX(sychronized, __COUNTER__)
+#define UNIQUE_SYNCHRONIZATION_PREFIX(SYNCHRONIZED, NUMBER) \
+	UNIQUE_SYNCHRONIZATION_CONCAT(SYNCHRONIZED, NUMBER) 
 
-/** \todo thread policies */
-#define DECLARE_MUTEX(identifier) \
-	concurrency::Mutex			identifier;
+#define UNIQUE_SYNCHRONIZATION(SYNCHRONIZED) \
+	UNIQUE_SYNCHRONIZATION_PREFIX(SYNCHRONIZED, __COUNTER__)
 
-#define DECLARE_MUTABLE_MUTEX(identifier) \
-	mutable concurrency::Mutex	identifier;
+/** \todo thread policies: at least at the pre-processor level, if single threaded, all of these macros should be defined to an empty statement */
+#define DECLARE_MUTEX(INDENTIFIER) \
+	concurrency::Mutex INDENTIFIER;
 
-#define DECLARE_STATIC_MUTEX(identifier) \
-	static concurrency::Mutex	identifier;
+#define DECLARE_MUTABLE_MUTEX(INDENTIFIER) \
+	mutable concurrency::Mutex INDENTIFIER;
+
+#define DECLARE_STATIC_MUTEX(INDENTIFIER) \
+	static concurrency::Mutex INDENTIFIER;
 
 #define DEFINE_STATIC_MUTEX(SCOPE, INDENTIFIER) \
 	concurrency::Mutex SCOPE##::##INDENTIFIER;
 
-#define SYNC(mutex) \
-	concurrency::Synchronizer	UNIQUE_SYNCHRONIZATION(sychronized)(mutex);
+#define SYNC(MUTEX) \
+	concurrency::SynchronizerMutex	UNIQUE_SYNCHRONIZATION(SYNCHRONIZED)(MUTEX);
 
 namespace concurrency
 {
-
-class PlatformMutex;
 
 class Mutex 
 {
@@ -51,36 +51,76 @@ public:
 	void release(void);
 
 protected:
-	PlatformMutex* m_mutex;
+	class PlatformMutex* mutex;
 }; // class Mutex
 
-class Synchronizer
+class Semaphore
 {
 public:
-	Synchronizer(Mutex& mutex) 
-	: m_mutex(mutex)
+	Semaphore(uint count=2);
+	~Semaphore(void);
+	void acquire(void);
+	void release(void);
+
+protected:
+	class PlatformSemaphore* semaphore;
+}; // class Semaphore
+
+class SynchronizerMutex
+{
+public:
+	SynchronizerMutex(Mutex& m) 
+	: mutex(m)
 	{
-		m_mutex.acquire();
+		mutex.acquire();
 	}
 
-	Synchronizer(const Mutex& mutex)
-	: m_mutex(const_cast<Mutex&>(mutex))
+	SynchronizerMutex(const Mutex& m)
+	: mutex(const_cast<Mutex&>(m))
 	{
-		m_mutex.acquire();
+		mutex.acquire();
 	}
 	
-	~Synchronizer(void)
+	~SynchronizerMutex(void)
 	{
-		m_mutex.release();
+		mutex.release();
 	}
 
 private:
-	Synchronizer(void);
-	Synchronizer(const Synchronizer&);
-	Synchronizer& operator=(const Synchronizer&);
+	SynchronizerMutex(void);
+	SynchronizerMutex(const SynchronizerMutex&);
+	SynchronizerMutex& operator=(const SynchronizerMutex&);
 
-	Mutex& m_mutex;
-}; // class Synchronizer
+	Mutex& mutex;
+}; // class SynchronizerMutex
+
+class SynchronizerSemaphore
+{
+public:
+	SynchronizerSemaphore(Semaphore& s) 
+	: semaphore(s)
+	{
+		semaphore.acquire();
+	}
+
+	SynchronizerSemaphore(const Semaphore& s)
+	: semaphore(const_cast<Semaphore&>(s))
+	{
+		semaphore.acquire();
+	}
+
+	~SynchronizerSemaphore(void)
+	{
+		semaphore.release();
+	}
+
+private:
+	SynchronizerSemaphore(void);
+	SynchronizerSemaphore(const SynchronizerSemaphore&);
+	SynchronizerSemaphore& operator=(const SynchronizerSemaphore&);
+
+	Semaphore& semaphore;
+}; // class SynchronizerSemaphore
 
 } // namespace concurrency
 

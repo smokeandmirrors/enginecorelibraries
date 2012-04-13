@@ -4,6 +4,7 @@
 
 #include "Platform.h"
 #include "Time.h"
+#include <string> /// \todo replace the string implementation here
 
 /**
 <DEVELOPMENT STATUS>
@@ -60,7 +61,10 @@ public:
 	
 	virtual void execute(void)=0;
 
-	virtual const std::string& toString(void) const=0;
+	virtual 
+		const 
+		std::string& 
+		toString(void) const=0;
 }; // class Executable
 
 class Executor

@@ -8,8 +8,7 @@
 
 namespace concurrency
 {
-const millisecond 
-	waitInfinitely = 10000000000.0f;
+const millisecond waitInfinitely = 10000000000;
 
 const cpuID 
 	noCPUpreference(-1);

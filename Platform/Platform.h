@@ -2,7 +2,7 @@
 #ifndef BUILD_H
 #define BUILD_H 1
 /**
-\file Build.h 
+\file Platform.h 
 Defines typdefs, macros for the foundation for programming in
 and building this project.
 
@@ -23,6 +23,7 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \todo NULL, assert, warn, error
 \todo global bit packing investigation
 \todo safe bool idiom for container iterators?
+\todo split off base types, macros, all that stuff, and just include them all in a strict order
 
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0

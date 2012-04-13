@@ -22,7 +22,7 @@ void createSingletons()
 
 	while (initializationList.size() > 0)
 	{
-		size_t originalSize = initializationList.size();
+		IF_DEBUG(size_t originalSize = initializationList.size();)
 		
 		for (size_t i(0); i < initializationList.size(); ++i)
 		{

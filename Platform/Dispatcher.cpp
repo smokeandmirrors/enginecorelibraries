@@ -110,7 +110,7 @@ public:
 
 	inline void onComplete(Thread*)
 	{
-		Dispatcher::single->accountForFinish(this);
+		Dispatcher::single().accountForFinish(this);
 	}
 
 	inline void onConnect(Transmitter* transmitter)

@@ -7,6 +7,7 @@ Defines the entry point for the console application.
 #include <tchar.h>
 
 #include "Platform.h"
+#include "Concurrency.h"
 
 #if EXTENDED_BY_LUA
 #pragma message("This executable is compiling with embedded lua.")
@@ -31,9 +32,37 @@ are included in the macro below
 #include "Dispatcher.h"
 #endif//SANDBOX
 
+ concurrency::Semaphore* allowable;
+ 
+ void theDoFunction(void)
+ {
+ 	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getCurrentID());
+ 	allowable->acquire();
+ 	printf("My name is %10d I'm doing the function!\n", concurrency::Thread::getCurrentID());
+ 	concurrency::sleep(500);
+	printf("My name is %10d I finished the function!\n", concurrency::Thread::getCurrentID());
+	allowable->release();
+ }
+
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
-	designPatterns::createSingletons();
+ 	designPatterns::createSingletons();
+ 
+ 	uint numThreads = 15;
+ 	uint numResources = 10;
+	// concurrency::Semaphore onStack(numResources);
+ 	// allowable = &onStack; 
+	allowable = new concurrency::Semaphore(numResources);
+ 	
+ 	for (uint i = 0; i < numThreads; ++i)
+ 	{
+ 		concurrency::Executor* job = new concurrency::Executor(&theDoFunction);
+ 		concurrency::Thread::getExecuting(*job); // threads delete themselves!
+ 	}
+ 
+ 	concurrency::sleep(10000);
+  
+ 	delete allowable;
 
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality
@@ -50,6 +79,8 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		// lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
+
+	realTime::Clock::single().cycles();
 
 	designPatterns::destroySingletons();
 	return 0;

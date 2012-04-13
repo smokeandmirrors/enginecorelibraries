@@ -279,26 +279,6 @@ inline sint push(lua_State* L, const schar* value)
 	return 1;
 }
 
-/*
-inline sint push(lua_State* L, millicycle value)
-{
-	lua_pushnumber(L, static_cast<lua_Number>(value));
-	return 1;
-}
-
-inline sint push(lua_State* L, millisecond value)
-{
-	lua_pushnumber(L, static_cast<lua_Number>(value));
-	return 1;
-}
-
-inline sint push(lua_State* L, second value)
-{
-	lua_pushnumber(L, static_cast<lua_Number>(value));
-	return 1;
-}
-*/
-
 /**
 \note when pushing a LueExtendable into %Lua, it might not be because the 
 object was created by a call to ObjectOrientedParadigm.new() in %Lua.  In this

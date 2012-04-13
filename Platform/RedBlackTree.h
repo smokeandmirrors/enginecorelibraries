@@ -8,6 +8,15 @@ www.cs.princeton.edu/~rs/talks/LLRB/RedBlack.pdf
 This version has no parent pointers, so iteration uses a dynamically allocated
 queue.  For large data sets, a version of the tree with parent pointers would
 be required.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	DEPLOYMENT, RESEARCH
+Unit Tested			:	NO
+Used in development	:	NO
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 
 #include "Platform.h"

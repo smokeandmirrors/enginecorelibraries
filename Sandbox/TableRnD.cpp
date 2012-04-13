@@ -48,7 +48,7 @@ void sandbox::tableRnD(void)
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
 	
-	srand(static_cast<uint>(realTime::cycles()));
+	srand(static_cast<uint>(realTime::Clock::single().cycles()));
 	
 	for (int i = 0; i < 10; i++)
 		printf("%f\n", getRand<sreal>(-1.0f, 1.0f));
@@ -159,7 +159,7 @@ void sandbox::tableRnD(void)
 	
 	{
 		// race!
-		realTime::ClockReal realClock;
+		realTime::Clock& realClock(realTime::Clock::single());
 		realTime::Stopwatch tableTime(realClock);
 		realTime::Stopwatch treeTime(realClock);
 		realTime::Stopwatch mapTime(realClock);

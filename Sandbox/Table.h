@@ -9,11 +9,17 @@
 #include "Strings.h"
 
 /**
-An implementation of an associative array, explicity based on the
+An implementation of an associative array, explicitly based on the
 Lua table as much as possible.
 
-WARNING: THIS IS A LEARNING EXERCISE, AND IS NOT
-INTENDED FOR DEPLOYMENT
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   DEVELOPMENT
+Purpose				:	RESEARCH
+Unit Tested			:	NO
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
 */
 
 namespace containers
@@ -1192,12 +1198,7 @@ private:
 	Node* lastFree;			// Node *lastfree;
 	Node* hashPart;			// Node *node;
 	Value* arrayPart;		// TValue *array;
-	/** 
-	\note can't use a static one, becuase I can't have statically initialized internal strings.
-	\todo fix that
-	*/ 
 	Node dummyNode;
-	
 }; // Table
 
 /* see note above as to why this doesn't work

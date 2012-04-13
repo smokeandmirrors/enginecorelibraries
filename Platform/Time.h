@@ -15,120 +15,80 @@ Tested in the field	:	NO
 #include <stdio.h>
 
 #include "Platform.h"
+#include "Singleton.h"
 
 #include "math.h"
 
 typedef ulong cycle;
-typedef dreal millicycle;
 typedef dreal millisecond;
 typedef dreal second;
 
 namespace realTime
 {
-/** cycles per second */
-extern const cycle	
-	hertz; 
-/** seconds per cycle */
-extern const second	
-	hertzInverse;
-/** cycles per millisecond */
-extern const millicycle 
-	milliHz;
-/** millisecond per cycle*/
-extern const millisecond 
-	milliHzInverse;
-	
-/** real time in cycles since program initialization */
-cycle cycles(void);
-/** real time in milliseconds since program initialization */
-millisecond milliseconds(void);
-/** real time in seconds since program initialization */
-second seconds(void);
 
-// frame clock, game play/engine clock
-class Clock 
+/** frame clock, game play/engine clock */
+class ClockInterface 
 {
 public:
-	virtual ~Clock(void)=0{/*empty*/}
-	
-	virtual dreal 
-		getRate(void) const=0;
-	
+	virtual ~ClockInterface(void)=0 {/*empty*/}
+	virtual dreal getRate(void) const=0;
 	/** return the last cycle when this object processed real time */
-	virtual cycle
-		getTick(void) const=0;
+	virtual cycle getTick(void) const=0;
+	virtual millisecond milliseconds(void) const=0;
+	virtual second seconds(void) const=0;
+	virtual void setRate(dreal rate)=0;
+	virtual void tick(void)=0;
+}; // ClockInterface
 
-	virtual millisecond 
-		milliseconds(void) const=0;
-	
-	virtual second 
-		seconds(void) const=0;
-	
-	virtual void 
-		setRate(dreal rate)=0;
-
-	virtual void	
-		tick(void)=0;
-}; // Clock
-
-/* todo, this should be a singleton(?) */
-class ClockReal : public Clock 
+// the single, real time clock
+class Clock 
+	: public ClockInterface 
+	, public designPatterns::Singleton<Clock>
 {
 public:
-	ClockReal(void)
-		: m_rate(1.0)
-	{ /* empty */ }
+	static Clock* createSingleton(void) { return new Clock(); }
 
-	ClockReal(const ClockReal& clone)
-		: m_rate(clone.getRate())
-	{ /* empty */ }
+	/** cycles per second */
+	const cycle hertz; 
+	/** seconds per cycle */
+	const second hertzInverse;
+	/** cycles per millisecond */
+	const cycle milliHz;
+	/** millisecond per cycle*/
+	const millisecond milliHzInverse;
+	
+	dreal getRate(void) const { return 1.0; }
 
-	dreal getRate(void) const 
-	{ 
-		return m_rate; 
-	}
+	inline cycle cycles(void) const { return getCurrentCycle() - cycleZero; }
 
-	cycle getTick(void) const 
-	{ 
-		return 0; 
-	}
+	cycle getTick(void) const { assert(false); return 0; /* never do this */ }
 
-	millisecond milliseconds(void) const	
-	{ 
-		return realTime::milliseconds() * m_rate; 
-	}
+	millisecond milliseconds(void) const;
 
-	second seconds(void) const
-	{
-		return realTime::seconds() * m_rate;
-	}
+	void reset(void);
 
-	void setRate(dreal rate)
-	{
-		m_rate = rate;
-	}
+	second seconds(void) const;
 
-	void tick(void)
-	{
-		assert(false); // no need to tick this clock
-	}
+	void setRate(dreal) { assert(false); /* not allowed on the real time clock */ }
+	
+	void tick(void) { assert(false); /* no need to tick this clock */ }
 
 private:
-	ClockReal operator=(const ClockReal &);
+	cycle cycleZero;
+	
+	Clock(void);
 
-	millisecond	m_currentMilliseconds;
-	second		m_currentSeconds;
-	dreal		m_rate;
-}; // class ClockReal
+	cycle getCurrentCycle(void) const;
+}; // class Clock
 
-class ClockFrame : public Clock 
+class ClockFrame : public ClockInterface 
 {
 public:
 	ClockFrame(void)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
-	, m_tick(realTime::cycles())
+	, m_tick(realTime::Clock::single().cycles())
 	{ /* empty */ }
 	
 	ClockFrame(cycle initialTime)
@@ -172,10 +132,10 @@ public:
 
 	void tick(void)
 	{
-		cycle tick = realTime::cycles();
-		dreal delta = m_rate * (tick - m_tick);
-		m_currentMilliseconds += static_cast<millisecond>(delta * realTime::milliHzInverse); 
-		m_currentSeconds += static_cast<second>(delta * realTime::hertzInverse);
+		cycle tick = realTime::Clock::single().cycles();
+		cycle delta = tick - m_tick;
+		m_currentMilliseconds += static_cast<millisecond>(m_rate * (delta * realTime::Clock::single().milliHzInverse)); 
+		m_currentSeconds += m_currentMilliseconds * 1000;
 		m_tick = tick;
 	}
 
@@ -191,7 +151,7 @@ private:
 class ClockRelative : public ClockFrame 
 {
 public:
-	ClockRelative(const Clock& parent)
+	ClockRelative(const ClockInterface& parent)
 		: m_currentMilliseconds(0)
 		, m_currentSeconds(0)
 		, m_rate(parent.getRate())
@@ -215,14 +175,14 @@ public:
 	void tick(void)
 	{
 		cycle tick = m_parent->getTick();
-		millisecond delta = getRate() * (tick - m_tick);
-		m_currentMilliseconds += static_cast<millisecond>(delta * realTime::milliHzInverse); 
-		m_currentSeconds += static_cast<second>(delta * realTime::hertzInverse);
+		cycle delta = tick - m_tick;
+		m_currentMilliseconds += static_cast<millisecond>(getRate() * (delta * realTime::Clock::single().milliHzInverse)); 
+		m_currentSeconds += m_currentMilliseconds * 1000;
 		m_tick = tick;
 	}
 	
 protected:
-	inline const Clock* getParent(void) const
+	inline const ClockInterface* getParent(void) const
 	{
 		return m_parent;
 	}
@@ -234,13 +194,13 @@ private:
 	second		m_currentSeconds;
 	dreal		m_rate;
 	cycle		m_tick;
-	const Clock* m_parent;
+	const ClockInterface* m_parent;
 }; // class ClockRelative
 
 class Stopwatch
 {
 public:
-	Stopwatch(const Clock& reference)
+	Stopwatch(const ClockInterface& reference)
 	: m_reference(reference) 
 	, m_start(0)
 	, m_stop(0)
@@ -304,7 +264,7 @@ private:
 	Stopwatch(const Stopwatch&);
 	Stopwatch operator=(const Stopwatch&);
 	
-	const Clock& m_reference;
+	const ClockInterface& m_reference;
 	millisecond m_start;
 	millisecond m_stop;
 	bool m_active;
@@ -313,7 +273,7 @@ private:
 class Timer 
 {
 public:
-	Timer(const Clock& reference, millisecond maxTime=0.0, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_False)
+	Timer(const ClockInterface& reference, millisecond maxTime=0.0, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_False)
 	: m_stopwatch(reference)
 	, m_autoReset(autoReset == BoolEnum_Unset ? autoReset == BoolEnum_True : false)
 	, m_maxTime(maxTime)
@@ -420,6 +380,11 @@ private:
 	millisecond	m_minTime;
 	millisecond	m_resetTime;
 }; // class Timer
+
+// \todo, remove these (currently needed for unit tests)
+inline cycle cycles(void) { return Clock::single().cycles(); }
+inline millisecond milliseconds(void) { return Clock::single().milliseconds(); }
+inline second seconds(void) { return Clock::single().seconds(); }
 
 } // namespace realTime
 

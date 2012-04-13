@@ -20,14 +20,6 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \endhtmlonly
 \date 3/10/2011
 
-
-\todo fix the initialization of all of this stuff.
-1. create a macro which will create a class for that holds an initialization function
-2. create one static instance of that static initializer class
-3. its constructor will register itself in a list of singleton initialization functions
-4. resource management of the singletons will be through that class only
-
-
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
 Current Phase		:   DEVELOPMENT
@@ -77,7 +69,7 @@ public:
 
 	virtual bool isInitialized(void) const
 	{
-		return T::single != NULL;
+		return T::isInitialized();
 	}
 }; // class CustomSingletonInitializer
 
@@ -90,12 +82,16 @@ class Singleton
 	friend class CustomSingletonInitializer<T>;
 
 public:
-	/** 
-	the single, static instance of T 
-	\todo use the run time generation version, with a macro declared registration functions?
-	*/
-	static T* single;	
-	
+	static inline T& single(void) 
+	{ 
+		return *singleton; 
+	}
+
+	static inline bool isInitialized(void) 
+	{
+		return singleton != NULL;
+	}	
+
 protected:
 	/** empty no args ctor */
 	Singleton(void)
@@ -111,14 +107,14 @@ protected:
 
 	static bool create(void)
 	{
-		single = T::createSingleton();
-		return single != NULL;
+		singleton = T::createSingleton();
+		return singleton != NULL;
 	}
 
 	static void destroy(void)
 	{
-		delete single;
-		single = NULL;
+		delete singleton;
+		singleton = NULL;
 	}
 
 private:
@@ -127,6 +123,11 @@ private:
 	Singleton operator=(const Singleton&);
 	template<typename ANY> 
 	Singleton operator=(const ANY&);
+
+	/** 
+	the single, static instance of T 
+	*/
+	static T* singleton;	
 }; // class Singleton
 
 // static initialization
@@ -137,14 +138,14 @@ private:
 #define DEFINE_SINGLETON_NS(BASE_CLASS, NAMESPACE) \
 namespace designPatterns \
 { \
-	template<> NAMESPACE::BASE_CLASS* Singleton<NAMESPACE::BASE_CLASS>::single(NULL); \
+	template<> NAMESPACE::BASE_CLASS* Singleton<NAMESPACE::BASE_CLASS>::singleton(NULL); \
 	static CustomSingletonInitializer<NAMESPACE::BASE_CLASS> BASE_CLASS##Initializer; \
 } // namespace designPatterns
 
 #define DEFINE_SINGLETON(BASE_CLASS) \
 namespace designPatterns \
 { \
-	template<> BASE_CLASS* Singleton<BASE_CLASS>::single(NULL); \
+	template<> BASE_CLASS* Singleton<BASE_CLASS>::singleton(NULL); \
 	static CustomSingletonInitializer<BASE_CLASS> BASE_CLASS##Initializer; \
 } // namespace designPatterns
 

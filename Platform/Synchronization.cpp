@@ -1,5 +1,6 @@
 #include "Synchronization.h"
 #include <assert.h>
+
 #if WIN32
 #include <process.h>
 #include <windows.h>
@@ -45,26 +46,78 @@ private:
 #endif//WIN32
 }; // class PlatformMutex
 
-Mutex::Mutex(void)
-: m_mutex(new PlatformMutex())
+#if WIN32
+class PlatformSemaphore
 {
-	/* empty */
+public:
+	inline PlatformSemaphore(uint maxCount=2)
+	{
+		assert(maxCount >= 2);
+		semaphore = CreateSemaphore(NULL, maxCount, maxCount, NULL);
+	}
+
+	inline ~PlatformSemaphore(void)
+	{
+		CloseHandle(semaphore);
+	}
+
+	inline void acquire(void)
+	{
+		WaitForSingleObject(semaphore, INFINITE);
+	}
+
+	inline void release(void)
+	{
+		ReleaseSemaphore(semaphore, 1, NULL);
+	}
+
+private:
+	HANDLE semaphore;
+}; // class PlatformMutex
+#else
+	#error unsupported concurrency platform
+#endif//WIN32
+
+Mutex::Mutex(void)
+: mutex(new PlatformMutex())
+{
+	// empty
 }
 
 Mutex::~Mutex(void)
 {
-	delete m_mutex;
+	delete mutex;
 }
 
 void Mutex::acquire(void)
 {
-	m_mutex->acquire();
+	mutex->acquire();
 }
 
 void Mutex::release(void)
 { 
-	m_mutex->release();
+	mutex->release();
 }
 
+Semaphore::Semaphore(uint count)
+: semaphore(new PlatformSemaphore(count))
+{
+	// empty
+}
+
+Semaphore::~Semaphore(void)
+{
+	delete semaphore;
+}
+
+void Semaphore::acquire(void)
+{
+	semaphore->acquire();
+}
+
+void Semaphore::release(void)
+{ 
+	semaphore->release();
+}
 
 } // namespace concurrency

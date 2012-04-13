@@ -60,14 +60,14 @@ inline void doWork(millisecond milliseconds)
 		*i++ = number;
 	}
 
-	millisecond start = realTime::milliseconds();
+	millisecond start = realTime::Clock::single().milliseconds();
 
 	do 
 	{
 		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	while (realTime::milliseconds() - start < milliseconds); // delete[] numbers;
+	while (realTime::Clock::single().milliseconds() - start < milliseconds); // delete[] numbers;
 }
 
 void doWork3(void) { doWork(3000); }
@@ -80,14 +80,14 @@ void simpleChildrenPre(void)
 	doWork3();
 	Executor* one = new Executor(&doWork3);
 	Dispatcher::Input inputOne(*one);
-	Dispatcher::single->enqueue(inputOne);
+	Dispatcher::single().enqueue(inputOne);
 }
 
 void simpleChildrenPost(void)
 {
 	Executor* one = new Executor(&doWork3);
 	Dispatcher::Input inputOne(*one);
-	Dispatcher::single->enqueue(inputOne);
+	Dispatcher::single().enqueue(inputOne);
 	doWork3();
 }
 
@@ -95,7 +95,7 @@ void doWork1Children(void)
 {
 	Executor* one = new Executor(&doWork3);
 	Dispatcher::Input inputOne(*one);
-	Dispatcher::single->enqueue(inputOne);
+	Dispatcher::single().enqueue(inputOne);
 	doWork3();
 }
 
@@ -105,8 +105,8 @@ void doWork2Children(void)
 	Executor* two = new Executor(&doWork1Children);
 	Dispatcher::Input inputOne(*one);
 	Dispatcher::Input inputTwo(*two);
-	Dispatcher::single->enqueue(inputOne);
-	Dispatcher::single->enqueue(inputTwo);
+	Dispatcher::single().enqueue(inputOne);
+	Dispatcher::single().enqueue(inputTwo);
 	doWork3();
 }
 
@@ -118,9 +118,9 @@ void doWork3Children(void)
 	Dispatcher::Input inputOne(*one);
 	Dispatcher::Input inputTwo(*two);
 	Dispatcher::Input inputThree(*three);
-	Dispatcher::single->enqueue(inputOne);
-	Dispatcher::single->enqueue(inputTwo);
-	Dispatcher::single->enqueue(inputThree);
+	Dispatcher::single().enqueue(inputOne);
+	Dispatcher::single().enqueue(inputTwo);
+	Dispatcher::single().enqueue(inputThree);
 	doWork3();
 }
 
@@ -431,8 +431,7 @@ protected:
 	void startFrame(void)
 	{
 		int frame(0);
-		realTime::ClockReal realClock;
-		realTime::Stopwatch timer(realClock);
+		realTime::Stopwatch timer(realTime::Clock::single());
 		timer.start();
 		
 		for(;;)
@@ -458,7 +457,7 @@ protected:
 				workQueue.push_back(Dispatcher::Input(*work.front()));
 				work.pop();
 			}
-			Dispatcher::single->enqueueAndWaitOnChildren(workQueue);
+			Dispatcher::single().enqueueAndWaitOnChildren(workQueue);
 			
 			frame++;
 			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
@@ -603,7 +602,7 @@ void TestJob::execute(void)
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
 		Dispatcher::Input input(*executor);
-		concurrency::Dispatcher::single->enqueue(input);
+		concurrency::Dispatcher::single().enqueue(input);
 	}
 
 	if (delete_self)
@@ -664,7 +663,7 @@ void sandbox::schedulingRnD(void)
 	{
 		concurrency::Executor* executor2 = new concurrency::Executor(&doWork3);
 		Dispatcher::Input input(*executor2);
-		concurrency::Dispatcher::single->enqueue(input); // enqueueAndWait
+		concurrency::Dispatcher::single().enqueue(input); // enqueueAndWait
 		concurrency::sleep(5000);
 		printf("Waited enqueue\n");
 	}
@@ -694,7 +693,7 @@ void sandbox::schedulingRnD(void)
 
 	Executor* original = new Executor(&doWork3Children);
 	Dispatcher::Input input(*original);
-	Dispatcher::single->enqueueAndWaitOnChildren(input);
+	Dispatcher::single().enqueueAndWaitOnChildren(input);
 	printf("Nice!  That was awesome!\n");
 	// Thread::checkDestruction();
 
