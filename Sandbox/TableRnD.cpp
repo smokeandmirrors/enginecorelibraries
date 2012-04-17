@@ -14,6 +14,7 @@ using namespace containers;
 
 void sandbox::tableRnD(void)
 {
+	/*
 	RedBlackTree<sint> printMe;
 	for (int i= 0; i < 20; i++)
 		printMe.insert(i);
@@ -86,16 +87,14 @@ void sandbox::tableRnD(void)
 		assert(rbt.getSize() == sum);
 		assert(rbt.has(randomNumber));
 		
-		/*
 		assert(!rbt.has(-101));
 		assert(!rbt.has(101));
 		assert(rbt.getMax() <= 100);
 		assert(rbt.getMin() >= -100);		
-		*/
 	}
 	
 	delete pRbt;
-
+	*/
 #if DEVELOP_TABLE
 // 	Table< RedBlackTree<sint>* > myarray;
 // 	myarray.set(0, outstanding);
@@ -166,7 +165,8 @@ void sandbox::tableRnD(void)
 		std::vector<String::Immutable> strings;
 		
 		RedBlackMap<String::Immutable, sint> tree;
-		Table<sint> table;
+		Set<sint> table;
+		// Table<sint> table;
 		std::map<String::Immutable, sint> map;
 
 		const int numStrings(10000);
@@ -182,6 +182,19 @@ void sandbox::tableRnD(void)
 			strings.push_back(immutable);
 		}
 
+		// find the delete problem
+		{
+			for (int i = 0; i < numStrings; i++)
+			{
+				tree.set(strings[i], i);
+			}
+
+			for (int j = 0; j < numStrings; j++)
+			{
+				tree.remove(strings[j]);
+			}
+		}
+
 		treeTime.start();
 		for (int i = 0; i < numStrings; i++)
 		{
@@ -193,52 +206,9 @@ void sandbox::tableRnD(void)
 		for (int i = 0; i < numStrings; i++)
 		{
 			table.set(strings[i], i);
-// 			
-// 			if (i == 1911)
-// 				table.printHashPart();
-
-			//if (i == 1911) //  || i == 1910 || i == 1912)
-// 			{	
-// 				// table.printHashPart();
-// 						
-//  				int atBreak(0);
-//  				int tableCount(0);
-// 				int iterationCount(0);
-// 				RedBlackTree<sint> allReady;
-// 
-//  				for (Table<sint>::Iterator iter(table); iter; ++iter)
-//  				{
-// 					iterationCount++;
-//  					if (i == 1911 && iterationCount == 409)
-//  					{
-//  						printf("wtf");
-//  					}
-// 					assert(!allReady.has(*iter));
-// 					allReady.insert(*iter);
-// 					tableCount += *iter;
-//  					//assert(atBreak <= i);
-//  					atBreak++;
-//  				}
-// 			}
 		}
 		tableTime.stop();
-	//	printf("Print pairs\n");
-// 		int count(0);
-// 		for (Table<sint>::Iterator iter(table); iter; ++iter)
-// 		{
-// 			count++;
-// 			if (count == 409)
-// 				BREAKPOINT(0x0)
-// 			
-// 			printf("%s %d\n", iter.key().originalKeyString.c_str(), *iter);
-// 			
-// 			if (count > numStrings)
-// 			{
-// 				break;
-// 				BREAKPOINT(0x0)
-// 			}
-// 		}
-// 		BREAKPOINT(0x0)
+
 		mapTime.start();
 		for (int i = 0; i < numStrings; i++)
 		{
@@ -250,7 +220,7 @@ void sandbox::tableRnD(void)
 		millisecond tableInsert = tableTime.milliseconds();
 		millisecond mapInsert = mapTime.milliseconds();
 
-		printf("Insert Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableInsert, treeInsert, mapInsert); 
+		printf("Insert:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableInsert, treeInsert, mapInsert); 
 		// BREAKPOINT(0x0)
 
 		int mapCount(0);
@@ -276,22 +246,64 @@ void sandbox::tableRnD(void)
 		int tableCount(0);
 		tableTime.reset();
 		tableTime.start();
- 		for (Table<sint>::Iterator iter(table); iter; ++iter)
+ 		for (Set<sint>::Iterator iter(table); iter; ++iter)
  		{
  			tableCount += iter.value();
  		}
 		tableTime.stop();
 
-		Table<sint>::Iterator iter(table);
-		Table<sint>::IteratorConst iterConst(table);
-		Table<sint>::Iterator pp1(table, iter.key());
-		Table<sint>::IteratorConst iterConstpp1(table, iter.key());
+		millisecond treeIterate = treeTime.milliseconds();
+		millisecond tableIterate = tableTime.milliseconds();
+		millisecond mapIterate = mapTime.milliseconds();
+		printf("Iterate:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableIterate, treeIterate, mapIterate); 
+
+		// find performance
+		{	
+			bool treeHas(true);
+			treeTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				treeHas &= tree.has(strings[i]);
+			}
+			treeTime.stop();
+			assert(treeHas);		
+
+			bool tableHas(true);
+			tableTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				tableHas &= table.has(strings[i]);
+			}
+			tableTime.stop();
+			assert(tableHas);		
+		
+			bool mapHas(true);
+			mapTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				mapHas &= map.find(strings[i]) != mapSentinel;
+			}
+			mapTime.stop();
+			assert(mapHas);
+
+			millisecond treeInsert = treeTime.milliseconds();
+			millisecond tableInsert = tableTime.milliseconds();
+			millisecond mapInsert = mapTime.milliseconds();
+
+			printf("Find:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableInsert, treeInsert, mapInsert); 
+		}
+		
+		// \todo handle the empty table
+		Set<sint>::Iterator iter(table);
+		Set<sint>::IteratorConst iterConst(table);
+		Set<sint>::Iterator pp1(table, iter.key());
+		Set<sint>::IteratorConst iterConstpp1(table, iter.key());
 
 		bool switcher(false);
 
 		while (iter)
 		{
-			Table<sint>::Iterator pp(table, iter.key());
+			Set<sint>::Iterator pp(table, iter.key());
 			
 			sint iterValue = iter.value();
 			sint ppValue = pp.value();
@@ -325,16 +337,71 @@ void sandbox::tableRnD(void)
 		assert(!pp1);
 		
 		assert(mapCount == tableCount);
-		millisecond treeIterate = treeTime.milliseconds();
-		millisecond tableIterate = tableTime.milliseconds();
-		millisecond mapIterate = mapTime.milliseconds();
-		printf("Iterate Table: %10.6f\nTree  : %10.6f\nMap  : %10.6f\n\n", tableIterate, treeIterate, mapIterate); 
+
+
+		// delete performance
+		{
+
+			treeTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				tree.remove(strings[i]);	
+			}
+			treeTime.stop();
+
+			tableTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				table.remove(strings[i]);
+			}
+			tableTime.stop();
+
+			mapTime.start();
+			for (int i = 0; i < numStrings; i++)
+			{
+				map.erase(strings[i]);
+			}
+			mapTime.stop();
+
+			millisecond treeInsert = treeTime.milliseconds();
+			millisecond tableInsert = tableTime.milliseconds();
+			millisecond mapInsert = mapTime.milliseconds();
+
+			printf("Delete:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableInsert, treeInsert, mapInsert); 
+		}
+
 		BREAKPOINT(0x0)
 }
 
 	/*
 	
+	// 			
+	// 			if (i == 1911)
+	// 				table.printHashPart();
 
+	//if (i == 1911) //  || i == 1910 || i == 1912)
+	// 			{	
+	// 				// table.printHashPart();
+	// 						
+	//  				int atBreak(0);
+	//  				int tableCount(0);
+	// 				int iterationCount(0);
+	// 				RedBlackTree<sint> allReady;
+	// 
+	//  				for (Table<sint>::Iterator iter(table); iter; ++iter)
+	//  				{
+	// 					iterationCount++;
+	//  					if (i == 1911 && iterationCount == 409)
+	//  					{
+	//  						printf("wtf");
+	//  					}
+	// 					assert(!allReady.has(*iter));
+	// 					allReady.insert(*iter);
+	// 					tableCount += *iter;
+	//  					//assert(atBreak <= i);
+	//  					atBreak++;
+	//  				}
+	// 			}
 	
 	
 	*/

@@ -460,7 +460,7 @@ protected:
 			Dispatcher::single().enqueueAndWaitOnChildren(workQueue);
 			
 			frame++;
-			printf("Frame %5d COMPLETE in %f!\n", frame, timer.milliseconds());
+			printf("Frame %5d COMPLETE in %10.8f!\n", frame, timer.milliseconds());
 		}
 	}
 

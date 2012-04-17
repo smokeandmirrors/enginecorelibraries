@@ -47,7 +47,11 @@ are included in the macro below
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
  	designPatterns::createSingletons();
- 
+
+#if SANDBOX
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
+#endif//SANDBOX	
+
  	uint numThreads = 15;
  	uint numResources = 10;
 	// concurrency::Semaphore onStack(numResources);
@@ -64,9 +68,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
   
  	delete allowable;
 
-#if SANDBOX
-	sandbox::play();// just plays with C/C++ compile/runtime functionality
-#endif//SANDBOX	
 
 #if EXTENDED_BY_LUA 
 	{

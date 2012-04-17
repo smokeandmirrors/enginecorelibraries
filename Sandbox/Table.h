@@ -89,7 +89,7 @@ public:
 
 private:
 	template<typename ELEMENT> friend class Table;
-	template<typename ELEMENT> friend class NoArray;
+	template<typename ELEMENT> friend class Set;
 
 	enum Type
 	{
@@ -1201,10 +1201,649 @@ private:
 	Node dummyNode;
 }; // Table
 
-/* see note above as to why this doesn't work
-template<typename ELEMENT> 
-typename Table<ELEMENT>::Node Table<ELEMENT>::dummyNode(Table<ELEMENT>::createDummyNode());
-*/
+template<typename ELEMENT>
+class Set 
+{
+	// friend class Iterator;
+	class Value;
+	struct IterationData;
+
+public:
+	Set(sint reserveHashSize=0)
+		: log2HashPartSize(0)
+		, lastFree(NULL)
+	{
+		dummyNode.next = NULL;
+		dummyNode.value.invalidate();
+		hashPart = &dummyNode;
+
+		if (reserveHashSize)
+			resize(reserveHashSize);
+
+		numRemoves = 0;
+	}
+
+	~Set(void)
+	{
+		if (hashPart != &dummyNode)
+		{
+			delete[] hashPart;
+		}
+	}
+	
+	ELEMENT& get(const Key& key)
+	{	
+		Value* position = getInternal(key);
+
+		if (!position)
+		{
+			position = newKey(key);
+		}
+
+		return position->element;
+	}
+
+	const ELEMENT& get(const Key& key) const
+	{	
+		return get(key);
+	}
+
+	bool has(const Key& key) const
+	{
+		Value* v = getInternal(key);
+		return v && *v;
+	}
+
+	// Table::
+	void printHashPart(void) const
+	{
+		printf("HashPart:\n");
+
+		for (uint i = 0; i < getSizeOfHashPart(); i++)
+		{
+			printf("%3d: ", i);
+			hashPart[i].print();
+			printf("\n");
+		}
+
+		printf("\n\n");
+	}
+
+	void pushBack(const ELEMENT& value)
+	{
+		sint index = findLowestValidNumericalIndexFollowedByInvalidValue() + 1;
+		Value* v = setWithInteger(index, value);
+		v->validate();
+	}
+
+	void remove(const Key& key)
+	{
+		if (Value* value = getInternal(key))
+		{	// todo work on delete algorithm
+			// todo work on num keys used (since it should never have to be counted?)
+			value->invalidate();
+			resize(getSizeOfHashPart() - 1);
+		}
+	}
+
+	void reserve(sint reserveHashSize=0)
+	{
+		if (reserveHashSize > twoTo(log2HashPartSize))
+		{
+			resize(reserveHashSize);
+		}
+	}
+
+	void set(const Key& key, const ELEMENT& value)
+	{
+		Value& v = *setInternal(key);
+		v.element = value;
+		v.validate();
+	}
+		
+	class Iterator
+	{
+	public:
+		Iterator(Set& table, const Key& key) : data(table, key) { data.v = &table.hashPart[data.iterationIndex].value; }
+		Iterator(Set& table) : data(table) { data.shouldContinue = table.next(data); }
+		
+		inline const Key& key(void) const {return data.k; }
+		inline operator bool(void) const { return data.shouldContinue; }
+		inline bool operator!(void) const { return !data.shouldContinue; }
+		inline Iterator& operator ++(void) { data.shouldContinue = data.t.next(data); return *this; }
+		inline Iterator operator ++(int) { Iterator temp(*this); ++*this; return temp; }
+		inline ELEMENT& value(void) { return data.v->element; }
+		
+	private:
+		friend class Set;
+		
+		Iterator(void);
+
+		IterationData data;		
+	}; // class Iterator
+
+	class IteratorConst
+	{
+	public:
+		IteratorConst(const Set& table, const Key& key) : data(const_cast<Set&>(table), key) { data.v = &table.hashPart[data.iterationIndex].value; }
+		IteratorConst(const Set& table) : data(const_cast<Set&>(table)) { data.shouldContinue = table.next(data); }
+
+		inline const Key& key(void) const {return data.k; }
+		inline operator bool(void) const { return data.shouldContinue; }
+		inline bool operator!(void) const { return !data.shouldContinue; }
+		inline IteratorConst& operator ++(void) { data.shouldContinue = data.t.next(data); return *this; }
+		inline IteratorConst operator ++(int) { IteratorConst temp(*this); ++*this; return temp; }
+		inline const ELEMENT& value(void) const { return data.v->element; }
+
+	private:
+		friend class Set;
+
+		IteratorConst(void);
+
+		IterationData data;		
+	}; // class IteratorConst	
+
+private:
+	struct IterationData
+	{
+		IterationData(Set& table) : k(table.getIterator()), t(table), v(NULL), iterationIndex(-1) { k.beginIteration(); }
+		IterationData(Set& table, const Key& key) : k(key), t(table) { iterationIndex = table.findIndex(k); k.beginIteration(); }
+
+		Key k;
+		Set& t;
+		Value* v;
+		sint iterationIndex;
+		bool shouldContinue;
+	}; // struct IterationData
+
+	int numRemoves;
+
+	struct Node
+	{
+		Node(void) : next(NULL) 
+		{
+			/* empty, should be completely invalid */
+		}
+
+		Node(ELEMENT v, const Key& k) : key(k), next(NULL), value(v)
+		{
+			/* empty */
+		}
+		// Table::Node::
+		void print(void) const
+		{
+			printf("K: ");
+
+			if (key.isValid())
+			{
+				printf("%10s", key.originalKeyString.c_str());
+			}
+			else
+			{
+				printf("%10s", "nil");
+			}
+
+			printf(" V: ");
+
+			if (value)
+			{
+				printf("%4d", value);
+			}
+			else
+			{
+				printf(" nil");
+			}
+
+			printf(" ->");
+
+			if (next)
+			{
+				next->print();
+			}
+			else
+			{
+				printf("NULL");
+			}
+		}
+		Key key;
+		Node* next;
+		Value value;
+	}; // Node
+
+	class Value
+	{
+	public:
+		Value(void) : isValid(invalid)
+		{
+			/* empty */
+		}
+
+		Value(ELEMENT v) : isValid(valid), value(v)
+		{
+			/* empty */
+		}
+		
+		inline void invalidate(void)
+		{
+			isValid = invalid;
+		}
+		
+		inline Value& operator=(const Value& original)
+		{
+			isValid = original.isValid;
+			element = original.element;
+			return *this;
+		}
+		
+		inline bool operator!(void) const
+		{
+			return isValid != valid;
+		}
+		
+		inline operator sint(void) const
+		{
+			return isValid;
+		}
+		
+		inline void validate(void)
+		{
+			isValid = valid;
+		}
+		
+		ELEMENT element;
+	
+	private:
+		sint isValid;
+	}; // Value
+
+	
+	static inline Node createDummyNode(void)
+	{
+		Node node;
+		node.next = NULL;
+		node.value.invalidate();
+		return node;
+	}
+
+	static inline sint logTwoCeil(uint x)
+	{
+		sint l = 0;
+		assert(x > 0);
+		x--;
+
+		while (x >= 256) 
+		{ 
+			l += 8; 
+			x >>= 8; 
+		}
+
+		return l + logBaseTwoArray[x];
+	}
+
+	static inline sint twoTo(sint x)
+	{
+		return 1 << x;
+	}
+
+	// static int numusehash (const Table *t, int *nums, int *pnasize)
+	inline sint countKeysInHash(void) const
+	{
+		sint totaluse = 0;  /* total number of elements */
+		sint i = getSizeOfHashPart();
+
+		while (i--) 
+		{
+			Node *n = &(hashPart[i]);
+
+			if (n->value) 
+			{
+				totaluse++;
+			}
+		}
+
+		return totaluse;
+	}
+	// const TValue *luaH_get (Table *t, const TValue *key);
+	inline Value* getInternal(const Key& key) const
+	{
+		switch (key.type)
+		{
+		case Key::invalid:
+			return NULL;
+
+		case Key::integer:
+			return findValueWithSignedInteger(key);
+
+		case Key::string:
+			return findValueWithString(key);
+
+		default:
+		{
+			Node* node = getMainPosition(key);
+
+			do 
+			{
+				if (node->key == key)
+				{
+					return &node->value;
+				}
+				else
+				{
+					node = node->next;
+				}
+			} 
+			while (node);
+		} // default
+		} // switch (key.type)
+
+		return NULL;
+	} 
+	// static int findindex (lua_State *L, Table *t, StkId key)
+	inline sint findIndex(Key& iter) const
+	{
+		Node* n = getMainPosition(iter);
+
+		do 
+		{
+			if (n->key == iter)
+			{
+				return static_cast<sint>(n - hashPart);
+			}
+			else
+			{
+				n = n->next;
+			}
+		} 
+		while (n);
+
+		assert(false);/*else invalid key, assert*/
+		return -2;		
+	}
+	// const TValue *luaH_getint (Table *t, int key);
+	inline Value* findValueWithSignedInteger(const Key& key) const
+	{	
+		Node* n = &hashPart[hashMod(key.code)];
+
+		do 
+		{
+			if (n->key.type & Key::integer
+				&& n->key.original.keyInteger == key.original.keyInteger)
+			{
+				return &n->value;
+			}
+
+			n = n->next;			
+		} 
+		while (n);
+
+		return NULL;		
+	}
+	// const TValue *luaH_getstr (Table *t, TString *key);	
+	inline Value* findValueWithString(const Key& key) const
+	{	
+		uint index = hashModPowerOf2(key.code);
+		Node* n = &hashPart[index];
+
+		do 
+		{
+			if (n->key.type & Key::string
+			&& n->key.originalKeyString == key.originalKeyString)
+			{
+				return &n->value;
+			}
+
+			n = n->next;
+		} 
+		while (n);
+		
+		return NULL;
+	}
+	// static Node *getfreepos (Table *t)
+	inline Node* getFreePosition(void)
+	{
+		while (lastFree > hashPart)
+		{
+			lastFree--;
+
+			if (!lastFree->value)
+				return lastFree;
+		}	
+		// no free position
+		return NULL;
+	}
+
+	inline Key getIterator(void) const
+	{
+		return Key();
+	}
+	// #define hashboolean(t,p)        hashpow2(t, p)
+	inline Node* getPositionHashMod(const Key& key) const
+	{
+		uint index = hashMod(key.code);
+		return &hashPart[index];
+	}
+	// #define hashpointer(t,p)	hashmod(t, IntPoint(p))
+	inline Node* getPositionHashModPowerOf2(const Key& key) const
+	{
+		uint index = hashModPowerOf2(key.code);
+		return &hashPart[index];
+	}
+	// static Node *mainposition (const Table *t, const TValue *key)
+	inline Node* getMainPosition(const Key& key) const
+	{
+		assert(key.isValid()); 
+		
+		switch (key.type)
+		{
+		case Key::boolean:
+		case Key::string:
+			return getPositionHashModPowerOf2(key);
+
+		default:
+			return getPositionHashMod(key); 
+		} // switch (key.type)
+	}
+	// #define sizenode(t)	(twoto((t)->lsizenode))
+	inline uint getSizeOfHashPart(void) const
+	{
+		return twoTo(log2HashPartSize);
+	}
+	// #define hashmod(t,n)	(gnode(t, ((n) % ((sizenode(t)-1)|1))))
+	inline uint hashMod(const algorithms::hash key) const
+	{	// hashmod
+		return key % ((getSizeOfHashPart() - 1) | 1);
+	}
+	// #define hashpow2(t,n)      (gnode(t, lmod((n), sizenode(t))))
+	inline uint hashModPowerOf2(const algorithms::hash key) const
+	{	
+		return key & (getSizeOfHashPart() - 1);
+	}
+
+	inline bool isMainPositionIsTaken(Node* mainPosition) const
+	{
+		return mainPosition->value || (mainPosition == &dummyNode);
+	}
+	
+	inline bool next(IterationData& iter) const
+	{
+		++iter.iterationIndex;
+		assert(iter.iterationIndex >= 0);
+		sint sizeHashPart = static_cast<sint>(getSizeOfHashPart());
+
+		for (sint index = iter.iterationIndex; index < sizeHashPart; index++)
+		{
+			if (hashPart[index].value)
+			{
+				iter.v = &hashPart[index].value;
+				iter.k = hashPart[index].key;
+				iter.iterationIndex = index;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	// TValue *luaH_newkey (lua_State *L, Table *t, const TValue *key)
+	inline Value* newKey(const Key& key)
+	{	/*
+		** inserts a new key into a hash table; first, check whether key's main 
+		** position is free. If not, check whether colliding node is in its main 
+		** position or not: if it is not, move colliding node to an empty place and 
+		** put new key in its main position; otherwise (colliding node is in its main 
+		** position), new key goes to an empty position. 
+		*/
+		assert(key.isValid()); 
+		Node* mainPosition = getMainPosition(key);
+
+		if (isMainPositionIsTaken(mainPosition))
+		{
+			Node* freePosition = getFreePosition();
+
+			if (!freePosition)
+			{
+				rehash();
+				return setInternal(key);
+			}
+
+			assert(mainPosition != &dummyNode);
+			Node* other = getMainPosition(mainPosition->key);
+
+			if (other != mainPosition)
+			{	// colliding node is out of its main position
+				// move the colliding node into the free position
+				while (other->next != mainPosition)
+				{	// find the previous node
+					other = other->next;
+				}
+				// redo the chain with free position in place of main position
+				other->next = freePosition;
+				// copy colliding node into free position
+				*freePosition = *mainPosition;
+				// main position is now free
+				mainPosition->next = NULL;
+				mainPosition->value.invalidate();
+			}
+			else
+			{	// colling node is in its own main position
+				// new node will go into free position
+				freePosition->next = mainPosition->next;
+				// chain the new position
+				mainPosition->next = freePosition;
+				mainPosition = freePosition;
+			}
+		}
+
+		mainPosition->key = key;
+		assert(!mainPosition->value);
+		return &(mainPosition->value);
+	}
+	// static void rehash (lua_State *L, Table *t, const TValue *ek)
+	inline void rehash(void)
+	{
+		sint totaluse = countKeysInHash() + 1; 
+		/* resize the table to new computed sizes */
+		resize(totaluse);	
+	}
+	// void luaH_resize (lua_State *L, Table *t, int newArraySize, int nhsize);
+	inline void resize(sint newHashSize)
+	{
+		sint oldHashSize = log2HashPartSize;
+		// save the old hash part
+		Node* oldHashPart = hashPart;
+
+		// create a new hash part with appropriate size
+		resizeHash(newHashSize);  
+
+		sint index = twoTo(oldHashSize);
+		// re-insert elements from hash part 
+		if (index > 0)
+		{
+			do 
+			{
+				index--;
+				Node* oldPosition = oldHashPart + index;
+
+				if (oldPosition->value)
+				{	
+					Value* oldValueInNewPosition = setInternal(oldPosition->key);
+					*oldValueInNewPosition = oldPosition->value;
+				}
+			} 
+			while (index);
+		}
+
+		if (oldHashPart != &dummyNode)
+		{
+			delete[] oldHashPart;
+		}
+	}
+	
+	// static void setnodevector (lua_State *L, Table *t, int size)
+	inline void resizeHash(uint newHashSize)
+	{	// old hash part is deleted in resize()
+		sint log2ofSize;
+
+		if (newHashSize)
+		{
+			log2ofSize = logTwoCeil(newHashSize);
+			assert(log2ofSize <= maxBits); // table overflow
+			newHashSize = twoTo(log2ofSize);
+			hashPart = new Node[newHashSize];// old hash part is deleted in resize()
+#if DEBUG
+			uint index(newHashSize);
+			Node* newNode = &hashPart[index];
+			do 
+			{
+				--index;
+				--newNode;
+				assert(newNode->next == NULL);
+				assert(!newNode->key); 
+				assert(!newNode->value);
+			} 
+			while (index);
+#endif//DEBUG
+		}
+		else
+		{
+			hashPart = &dummyNode;// old hash part is deleted in resize()
+			log2ofSize = 0;
+		}
+
+		log2HashPartSize = static_cast<uchar>(log2ofSize);
+		lastFree = &hashPart[newHashSize];
+	}
+	// TValue *luaH_set (lua_State *L, Table *t, const TValue *key);
+	inline Value* setInternal(const Key& key)
+	{
+		if (Value* v = getInternal(key))
+		{
+			return v;
+		}
+		else
+		{
+			return newKey(key);
+		}
+	}
+	// void luaH_setint (lua_State *L, Table *t, int key, TValue *value);
+	inline Value* setWithInteger(const Key& key, const ELEMENT& value)
+	{	// very good optimization candidate? 
+		Value* position = findValueWithSignedInteger(key);
+
+		if (!position)
+		{
+			position = newKey(key);
+		}
+
+		position->element = value;
+		return position;
+	}
+		
+	uchar log2HashPartSize;	// lu_byte lsizenode;
+	Node* lastFree;			// Node *lastfree;
+	Node* hashPart;			// Node *node;
+	Node dummyNode;
+}; // Table
 
 } // namespace containers
 

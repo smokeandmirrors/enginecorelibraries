@@ -193,8 +193,8 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 	assert(startingIndex >= 0);
 	assert(startingIndex < static_cast<sint>(size));
 	
-#define WAIT_ON_MULTIPLE 0
-#if WAIT_ON_MULTIPLE 
+#define WAIT_ON_MULTIPLE 
+#ifdef WAIT_ON_MULTIPLE 
 	size_t numHandles = size - startingIndex;
 	threadHandle* handles = new threadHandle[numHandles];
 	uint numValid(0);
@@ -231,7 +231,7 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 		handles[i] = NULL; // should be unnecessary
 
 	delete[] handles;
-#else // !WAIT_ON_MULTIPLE
+#else // ndef WAIT_ON_MULTIPLE
 	for (size_t index = startingIndex; index < size; index++)
 	{
 		Thread* thread = threads[index];
@@ -241,7 +241,7 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 			waitForCompletion(thread->m_thread, waitInfinitely);
 		}
 	}
-#endif//WAIT_ON_MULTIPLE
+#endif // WAIT_ON_MULTIPLE
 }
 
 void Thread::waitOnCompletionOfChildren(Thread::Tree& threads)

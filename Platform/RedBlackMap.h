@@ -198,31 +198,31 @@ private:
 	Node
 		theEnd;
 
-	inline Node*
-		find(const KEY& key) const
+	inline Node* find(Node* node, const KEY& key) const
 	{
-		if (Node* node = m_root)
-		{
-			do 
+		while (node)
+		{	
+			if (isEqual(key, node->m_key))
+			{
+				return node;
+			}
+			else if (isLess(key, node->m_key))
+			{
+				node = node->m_left;
+			}
+			else 
 			{	
-				if (isEqual(key, node->m_key))
-				{
-					return node;
-				}
-				else if (isLess(key, node->m_key))
-				{
-					node = node->m_left;
-				}
-				else 
-				{	
-					assert(isGreater(key, node->m_key));				
-					node = node->m_right;
-				}
-
-			} while (node);
+				assert(isGreater(key, node->m_key));				
+				node = node->m_right;
+			}
 		}
 
 		return NULL;
+	}
+
+	inline Node* find(const KEY& key) const
+	{
+		return find(m_root, key);
 	}
 
 	inline Node* 
@@ -361,7 +361,9 @@ private:
 
 			if (isEqual(key, node->m_key))
 			{
-				node = getMin(node->m_right);
+				Node* minRight = getMin(node->m_right);
+				node->m_key = minRight->m_key;
+				node->m_value = minRight->m_value;
 				node->m_right = removeMin(node->m_right);
 			}
 			else
@@ -450,17 +452,26 @@ private:
 
 // sanity testing
 	inline void 
-		check(void) const
+		checkUnitTest(void) const
 	{
 		if (!m_isBeingChecked)
 		{
 			m_isBeingChecked = true;
-			bool is_bst = isBST();
-			bool is_234 = is234();
-			bool is_balanced = isBalanced();
-			assert(is_bst);
-			assert(is_234);
-			assert(is_balanced);
+			
+			if (m_size == 0)
+			{
+				assert(m_root == NULL);
+			}
+			else
+			{
+				assert(m_root);
+				bool is_bst = isBST();
+				bool is_234 = is234();
+				bool is_balanced = isBalanced();
+				assert(is_bst);
+				assert(is_234);
+				assert(is_balanced);
+			}
 			m_isBeingChecked = false;
 		}
 	}
@@ -521,7 +532,7 @@ private:
 	inline bool 
 		isBST(void) const
 	{
-		return isBST(m_root, getMax(), getMin());
+		return isBST(m_root, getMax(m_root)->m_key, getMin(m_root)->m_key);
 	}
 
 	inline bool 
@@ -530,7 +541,8 @@ private:
 		if (!root)
 			return true;
 
-		if (isLess(max, root->m_key) || isGreater(min > root->m_key))
+		if (isLess(max, root->m_key) 
+		|| isGreater(min,  root->m_key))
 			return false;
 
 		return isBST(root->m_left, root->m_key, min)
@@ -619,37 +631,37 @@ VALUE RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::get(const KEY& key
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS> 
 VALUE RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::getMax(void) const
-{	// check();
+{	// checkUnitTest();();
 	if (m_root)
 		getMax(m_root);
-	// check();
+	// checkUnitTest();();
 	return m_root ? getMax(m_root)->m_value : NULL;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 VALUE RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::getMin(void) const
-{	// check();
+{	// checkUnitTest();();
 	if (m_root)
 		getMin(m_root);
-	// check();
+	// checkUnitTest();();
 	return m_root ? getMin(m_root)->m_value : NULL;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 uint RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::getSize(void) const
-{	// check();
+{	// checkUnitTest();();
 	return m_size;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::has(const KEY& key) const
-{	// check();
+{	// checkUnitTest();();
 	return find(key) != NULL;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::has(const KEY& key, VALUE& ifFound) const
-{	// check();
+{	// checkUnitTest();();
 	if (Node* value = find(key))
 	{
 		ifFound = value->m_value;
@@ -663,13 +675,13 @@ bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::has(const KEY& key,
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 bool RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::isEmpty(void) const
-{	// check();
+{	// checkUnitTest();();
 	return m_root == NULL;
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::remove(const KEY& key)
-{	// check();
+{	// checkUnitTest();();
 	if (has(key))
 		m_size--;
 
@@ -678,29 +690,29 @@ void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::remove(const KEY& k
 	
 	if (m_root)
 		m_root->m_color = black;
-	// check();
+	// checkUnitTest();();
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::removeMax(void)
-{	// check();
+{	// checkUnitTest();();
 	if (m_root)
 		m_root = removeMax(m_root);
 
 	if (m_root)
 		m_root->m_color = black;
-	// check();
+	// checkUnitTest();();
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
 void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::removeMin(void)
-{	// check();
+{	// checkUnitTest();();
 	if (m_root)
 		m_root = removeMin(m_root);
 
 	if (m_root)
 		m_root->m_color = black;
-	// check();
+	// checkUnitTest();();
 }
 
 template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, typename IS_LESS>
