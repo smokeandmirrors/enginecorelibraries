@@ -174,6 +174,21 @@ struct IsIncluded
 #define NODE_ENTRY(IDx, x, y, cost) math::Pixel p##IDx##( x , y ); Graph::Node node##IDx( p##IDx , cost, #IDx );
 
 // proof of concept for public members exposed to Lua with a hashtable mapping index names to offsets
+struct MyStruct
+{
+	uint a;
+	bool b;
+	MyStruct* c;
+	void method(void) const { printf("MyStruct::method() was called!\n"); }
+};
+
+struct MyChildStruct
+{
+	float d;
+	bool e;
+};
+
+// these classes would go to lua extension
 template <typename CLASS>
 class ClassMemberIndexer
 {
@@ -214,25 +229,11 @@ struct IndexMethodSupporter
 	typename ClassMemberIndexer<CLASS>::assignMemberFromLua assignFunction;
 };
 
-struct MyStruct
-{
-	uint a;
-	bool b;
-	MyStruct* c;
-	void method(void) const { printf("MyStruct::method() was called!\n"); }
-};
-
-struct MyChildStruct
-{
-	float d;
-	bool e;
-};
-
 DECLARE_LUA_CLASS(MyStruct);
 
+// this would get automatically written
 static void populateMyStructSupports(containers::Set< IndexMethodSupporter<MyStruct> >& supports)
 {
-	assert(supports.isEmpty());
 	{
 		IndexMethodSupporter<MyStruct> entry(OFFSET_OF(MyStruct, a), &ClassMemberIndexer<MyStruct>::pushByOffset<uint>, &ClassMemberIndexer<MyStruct>::assignByOffset<uint>);
 		supports.set("a", entry);
@@ -247,19 +248,19 @@ static void populateMyStructSupports(containers::Set< IndexMethodSupporter<MyStr
 	}
 }
 
-class MyStrunctIndexSupport
+class MyStructIndexSupport
 {
 public:
 	static const containers::Set< IndexMethodSupporter<MyStruct> >& get(void)
 	{
-		static MyStrunctIndexSupport singleton;
+		static MyStructIndexSupport singleton;
 		return singleton.supports;
 	}
 
 protected:
 	containers::Set< IndexMethodSupporter<MyStruct> > supports;
 
-	MyStrunctIndexSupport()
+	MyStructIndexSupport()
 	{
 		populateMyStructSupports(supports);
 	}
@@ -267,7 +268,7 @@ protected:
 
 inline bool MyStruct__indexSupport(const MyStruct& t, const char* k, lua_State* L, const char* className) 
 {
-	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStrunctIndexSupport::get());
+	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStructIndexSupport::get());
 	
 	if (supports.has(k))
 	{
@@ -301,7 +302,7 @@ LUA_FUNC(MyStruct__index)
 
 inline bool MyStruct__newindexSupport(MyStruct& t, const char* k, lua_State* L, const char* className) 
 {
-	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStrunctIndexSupport::get());
+	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStructIndexSupport::get());
 
 	if (supports.has(k))
 	{

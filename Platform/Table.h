@@ -1315,6 +1315,11 @@ public:
 		v.validate();
 		++numKeysUsed;
 	}
+
+	void shrink(void)
+	{
+		resize(numKeysUsed);
+	}
 		
 	class Iterator
 	{

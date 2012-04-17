@@ -207,6 +207,7 @@ void sandbox::tableRnD(void)
 		{
 			table.set(strings[i], i);
 		}
+		table.shrink();
 		tableTime.stop();
 
 		mapTime.start();
