@@ -292,7 +292,7 @@ void sandbox::tableRnD(void)
 
 			printf("Find:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableInsert, treeInsert, mapInsert); 
 		}
-		
+
 		// \todo handle the empty table
 		Set<sint>::Iterator iter(table);
 		Set<sint>::IteratorConst iterConst(table);
@@ -337,7 +337,6 @@ void sandbox::tableRnD(void)
 		assert(!pp1);
 		
 		assert(mapCount == tableCount);
-
 
 		// delete performance
 		{

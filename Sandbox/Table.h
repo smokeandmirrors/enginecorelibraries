@@ -141,7 +141,7 @@ private:
 		/// switching on the type vs removing (superfluous in the case of non-string types) orginalKeyString compare
 		return (type & other.type) 
 			&& code == other.code
-			&& originalKeyString == other.originalKeyString;
+			&& (type != string || originalKeyString == other.originalKeyString);
 	}
 
 	inline Key& operator=(const Key& source)
@@ -1220,7 +1220,7 @@ public:
 		if (reserveHashSize)
 			resize(reserveHashSize);
 
-		numRemoves = 0;
+		numKeysUsed = 0;
 	}
 
 	~Set(void)
@@ -1279,10 +1279,14 @@ public:
 	void remove(const Key& key)
 	{
 		if (Value* value = getInternal(key))
-		{	// todo work on delete algorithm
-			// todo work on num keys used (since it should never have to be counted?)
+		{	
 			value->invalidate();
-			resize(getSizeOfHashPart() - 1);
+			--numKeysUsed;
+			
+			if ((numKeysUsed * 2) < getSizeOfHashPart())
+			{
+				resize(numKeysUsed);
+			}
 		}
 	}
 
@@ -1299,6 +1303,7 @@ public:
 		Value& v = *setInternal(key);
 		v.element = value;
 		v.validate();
+		++numKeysUsed;
 	}
 		
 	class Iterator
@@ -1355,8 +1360,6 @@ private:
 		sint iterationIndex;
 		bool shouldContinue;
 	}; // struct IterationData
-
-	int numRemoves;
 
 	struct Node
 	{
@@ -1838,7 +1841,8 @@ private:
 		position->element = value;
 		return position;
 	}
-		
+	
+	uint numKeysUsed;
 	uchar log2HashPartSize;	// lu_byte lsizenode;
 	Node* lastFree;			// Node *lastfree;
 	Node* hashPart;			// Node *node;

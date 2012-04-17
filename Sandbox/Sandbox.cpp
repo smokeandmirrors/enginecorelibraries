@@ -180,41 +180,41 @@ void onPlay(void)
 	//	5,	10,	2
 	// s0,	1,	1
 
-// 	std::vector<const Graph::Node*> path;
-// 
-// 	/*O*/NODE_ENTRY(a, -1, 1,12); /*O*/NODE_ENTRY(b,  0, 1, 0); /*X*/NODE_ENTRY(c,  1, 1, 0); 
-// 	/*O*/NODE_ENTRY(d, -1, 0,50); /*O*/NODE_ENTRY(e,  0, 0,50); /*X*/NODE_ENTRY(f,  1, 0, 4); 
-// 	/*X*/NODE_ENTRY(g, -1,-1, 0); /*X*/NODE_ENTRY(h,  0,-1, 2); /*X*/NODE_ENTRY(i,  1,-1, 2); 
-// 
-// 	GRAPH_CONNECT(a, d); GRAPH_CONNECT(a, b);
-// 	GRAPH_CONNECT(b, e); GRAPH_CONNECT(b, c);
-// 	GRAPH_CONNECT(c, f);
-// 	GRAPH_CONNECT(d, g); GRAPH_CONNECT(d, e);
-// 	GRAPH_CONNECT(e, h); GRAPH_CONNECT(e, f);
-// 	GRAPH_CONNECT(f, i);
-// 	GRAPH_CONNECT(g, h);
-// 	GRAPH_CONNECT(h, i);
-// 		
-// 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath> aStar(nodeg, nodec);
-// 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath, IsIncluded> aStar2(nodeg, nodec);
-// 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar3(nodeg, nodec);
-// 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath, IsIncluded> aStar4(nodeg, nodec);
-// 	assert(aStar.isPathFound());
-// 	aStar.getPath(path);
-// 	
-// 	// 
-// 	assert(path[0] == &nodeg);
-// 	assert(path[1] == &nodeh);
-// 	assert(path[2] == &nodei);
-// 	assert(path[3] == &nodef);
-// 	assert(path[4] == &nodec);
-// 
-// 	nodeh.data = 100;
-// 	path.clear();
-// 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar5(nodeg, nodec);
-// 	assert(aStar5.isPathFound());
-// 	aStar2.getPath(path);
-// 	printf("finished A*!\n");
+ 	std::vector<const Graph::Node*> path;
+ 
+ 	/*O*/NODE_ENTRY(a, -1, 1,12); /*O*/NODE_ENTRY(b,  0, 1, 0); /*X*/NODE_ENTRY(c,  1, 1, 0); 
+ 	/*O*/NODE_ENTRY(d, -1, 0,50); /*O*/NODE_ENTRY(e,  0, 0,50); /*X*/NODE_ENTRY(f,  1, 0, 4); 
+ 	/*X*/NODE_ENTRY(g, -1,-1, 0); /*X*/NODE_ENTRY(h,  0,-1, 2); /*X*/NODE_ENTRY(i,  1,-1, 2); 
+ 
+ 	GRAPH_CONNECT(a, d); GRAPH_CONNECT(a, b);
+ 	GRAPH_CONNECT(b, e); GRAPH_CONNECT(b, c);
+ 	GRAPH_CONNECT(c, f);
+ 	GRAPH_CONNECT(d, g); GRAPH_CONNECT(d, e);
+ 	GRAPH_CONNECT(e, h); GRAPH_CONNECT(e, f);
+ 	GRAPH_CONNECT(f, i);
+ 	GRAPH_CONNECT(g, h);
+ 	GRAPH_CONNECT(h, i);
+ 		
+ 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath> aStar(nodeg, nodec);
+ 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindFirstPath, IsIncluded> aStar2(nodeg, nodec);
+ 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar3(nodeg, nodec);
+ 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath, IsIncluded> aStar4(nodeg, nodec);
+ 	assert(aStar.isPathFound());
+ 	aStar.getPath(path);
+ 	
+ 	// 
+ 	assert(path[0] == &nodeg);
+ 	assert(path[1] == &nodeh);
+ 	assert(path[2] == &nodei);
+ 	assert(path[3] == &nodef);
+ 	assert(path[4] == &nodec);
+ 
+ 	nodeh.data = 100;
+ 	path.clear();
+ 	A_Star::Search<sint, GetCost, GetCost, IsGoal, Graph::Node, A_Star::FindShortestPath> aStar5(nodeg, nodec);
+ 	assert(aStar5.isPathFound());
+ 	aStar2.getPath(path);
+ 	printf("finished A*!\n");
 
  	Agent alpha;
  	Movement* movement = new Movement();

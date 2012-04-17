@@ -90,8 +90,10 @@ Tested in the field	:	NO
 
 #define FOREVER for (;;) 
 
-
 #define BREAKPOINT(ID) __debugbreak();
+
+#define OFFSET_OF(CLASS,MEMBER) int( reinterpret_cast<long>( &(reinterpret_cast<CLASS*>(16)->MEMBER) ) - 16 )
+
 
 enum BoolEnum
 {
