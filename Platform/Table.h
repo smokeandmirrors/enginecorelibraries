@@ -1245,13 +1245,23 @@ public:
 
 	const ELEMENT& get(const Key& key) const
 	{	
-		return get(key);
+		return const_cast<Set<ELEMENT>*>(this)->get(key);
+	}
+
+	uint getSize(void) const
+	{
+		return numKeysUsed;
 	}
 
 	bool has(const Key& key) const
 	{
 		Value* v = getInternal(key);
 		return v && *v;
+	}
+
+	bool isEmpty(void) const
+	{
+		return numKeysUsed == 0;
 	}
 
 	// Table::

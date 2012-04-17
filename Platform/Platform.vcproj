@@ -501,6 +501,10 @@
 				RelativePath=".\RedBlackTree.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Table.h"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
