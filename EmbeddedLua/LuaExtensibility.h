@@ -107,6 +107,94 @@ to %Lua and the %Lua C API.
 @{
 */
 
+
+#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(CLASS, SUPER_CLASS) \
+	static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) \
+	{ 
+
+#define	__newindex_MEMBER2(CLASS, TYPE, MEMBER) \
+		{ \
+			ClassMemberIndexer< CLASS > entry(OFFSET_OF( CLASS , MEMBER ), &ClassMemberIndexer< CLASS >::pushByOffset< TYPE >, &ClassMemberIndexer< CLASS >::assignByOffset< TYPE >); \
+			supports.set( #MEMBER , entry); \
+		}
+
+#define END_LUA_FUNC__index_PUBLIC_MEMBERS2(CLASS, SUPER_CLASS) \
+	} /* static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) */ \
+	\
+class CLASS##IndexSupport \
+{ \
+public: \
+	static const containers::Set< ClassMemberIndexer< CLASS > >& get(void) \
+	{ \
+		static CLASS##IndexSupport singleton; \
+		return singleton.supports; \
+	} \
+private: \
+	containers::Set< ClassMemberIndexer< CLASS > > supports; \
+	CLASS##IndexSupport() \
+	{ \
+		populate##CLASS##Supports(supports); \
+	} \
+}; \
+inline bool CLASS##__indexSupport(const CLASS & t, const char* k, lua_State* L, const char* className) \
+{ \
+	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##IndexSupport::get()); \
+	if (supports.has(k)) \
+	{ \
+		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
+		(*support.pushFunction)(L, t, support.offset); \
+		return true; \
+	} \
+	else if (String::compare(className, #SUPER_CLASS )) \
+	{	/* here would be a recursive call that would be never called */ \
+		return SUPER_CLASS##__indexSupport(t, k, L, #CLASS );  \
+	} \
+	else \
+	{ 	/*  must tell the main calling function if something was pushed */ \
+		return false; \
+	} \
+} \
+LUA_FUNC(CLASS##__index) \
+{ \
+	const schar* k = to<const schar*>(L, -1); \
+	const CLASS t = to<const CLASS &>(L, -2); \
+	if (!CLASS##__indexSupport(t, k, L, #CLASS ))\
+	{ \
+		lua_getglobal(L, "getClass");	/*s: getClass */ \
+		push(L, #CLASS );				/*s: getClass #CLASS */ \
+		lua_call(L, 1, 1);				/*s: CLASS */ \
+		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
+	} \
+	return 1; \
+} \
+inline bool CLASS##__newindexSupport(CLASS& t, const char* k, lua_State* L, const char* className) \
+{ \
+	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##IndexSupport::get()); \
+	if (supports.has(k)) \
+	{ \
+		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
+		(*support.assignFunction)(L, t, support.offset); \
+		return true; \
+	} \
+	else if (String::compare(className, #SUPER_CLASS )) \
+	{	/* here would be a recursive call that would be never called */  \
+		return SUPER_CLASS##__newindexSupport(t, k, L, #CLASS ); \
+	} \
+	else \
+	{ \
+		return false; /* must tell the main calling function if something was pushed */ \
+	} \
+} \
+LUA_FUNC(CLASS##__newindex) \
+{ \
+	const char* k = to<const schar*>(L, -2); \
+	if (!CLASS##__newindexSupport(to< CLASS &>(L, -3), k, L, #CLASS )) \
+	{ \
+		luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
+	} \
+	return 0; \
+}
+
 /** 
 used for an entry in a "getter" function 
 for public members that can be pushed directly into %Lua
@@ -1183,6 +1271,53 @@ behavior is undefined
 
 namespace embeddedLua 
 {
+/**
+\class ClassMemberIndexer
+This class is used to make it easier to expose public class member variables
+to &Lua, so that in &Lua they can be referenced like so:
+
+c = new'MyObject'
+c.memberVariable = 2
+if c.memberVariable then c:doSomething() end
+
+etc.  It is generally used through the use of automatic code
+generation during the build step, so you can largely ignore it.
+*/
+template <typename CLASS>
+class ClassMemberIndexer
+{
+public:
+	typedef void(*pushMemberToLua)(lua_State*, const CLASS&, unsigned long long);
+	typedef void(*assignMemberFromLua)(lua_State*, const CLASS&, unsigned long long);
+
+	template<typename MEMBER>
+	static inline void pushByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
+	{
+		push(L, *reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset));
+	}
+
+	template<typename MEMBER>
+	static inline void assignByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
+	{
+		*reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset) = to<MEMBER>(L, -1);
+	}
+
+	ClassMemberIndexer(void)
+		: offset(0)
+		, pushFunction(NULL)
+		, assignFunction(NULL)
+	{}
+
+	ClassMemberIndexer(unsigned long long o, typename ClassMemberIndexer<CLASS>::pushMemberToLua pusher, typename ClassMemberIndexer<CLASS>::assignMemberFromLua assigner)
+		: offset(o)
+		, pushFunction(pusher)
+		, assignFunction(assigner)
+	{}
+
+	unsigned long long offset;
+	typename ClassMemberIndexer<CLASS>::pushMemberToLua pushFunction;
+	typename ClassMemberIndexer<CLASS>::assignMemberFromLua assignFunction;
+}; // class ClassMemberIndexer
 
 /**
 \interface LuaExtendable
@@ -1192,7 +1327,6 @@ easiest way to expose a class and all of it's methods to %Lua.
 \warning The thread safety of this class is not guaranteed!
 \ingroup LuaExtension
 */
-
 class LuaExtendable 
 {
 public:
@@ -1274,7 +1408,7 @@ LuaExtendable
 template<typename CLASS>
 LUA_FUNC(__gcmetamethodProxy)
 {	// in Lua 5.2 tables can have finalizers 
-	// LuaExtendables will have this method called on the userdat
+	// LuaExtendables will have this method called on the userdata
 	// AND the table
 	if (!isIndexTable(L, -1))
 	{
@@ -1283,7 +1417,6 @@ LUA_FUNC(__gcmetamethodProxy)
 	}
 	return 0;
 }
-
 
 /**
 */

@@ -182,175 +182,54 @@ struct MyStruct
 	void method(void) const { printf("MyStruct::method() was called!\n"); }
 };
 
-struct MyChildStruct
+struct MyChildStruct : public MyStruct
 {
 	float d;
 	bool e;
 };
 
-// these classes would go to lua extension
-template <typename CLASS>
-class ClassMemberIndexer
-{
-public:
-	typedef void(*pushMemberToLua)(lua_State*, const CLASS&, unsigned long long);
-	typedef void(*assignMemberFromLua)(lua_State*, const CLASS&, unsigned long long);
+DECLARE_LUA_CLASS(MyStruct)
 
-	template<typename MEMBER>
-	static inline void pushByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
-	{
-		push(L, *reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset));
-	}
-
-	template<typename MEMBER>
-	static inline void assignByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
-	{
-		*reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset) = to<MEMBER>(L, -1);
-	}
-};
-
-template <typename CLASS>
-struct IndexMethodSupporter
-{
-	IndexMethodSupporter(void)
-		: offset(0)
-		, pushFunction(NULL)
-		, assignFunction(NULL)
-	{}
-
-	IndexMethodSupporter(unsigned long long o, typename ClassMemberIndexer<CLASS>::pushMemberToLua pusher, typename ClassMemberIndexer<CLASS>::assignMemberFromLua assigner)
-		: offset(o)
-		, pushFunction(pusher)
-		, assignFunction(assigner)
-	{}
-
-	unsigned long long offset;
-	typename ClassMemberIndexer<CLASS>::pushMemberToLua pushFunction;
-	typename ClassMemberIndexer<CLASS>::assignMemberFromLua assignFunction;
-};
-
-DECLARE_LUA_CLASS(MyStruct);
-
-// this would get automatically written
-static void populateMyStructSupports(containers::Set< IndexMethodSupporter<MyStruct> >& supports)
-{
-	{
-		IndexMethodSupporter<MyStruct> entry(OFFSET_OF(MyStruct, a), &ClassMemberIndexer<MyStruct>::pushByOffset<uint>, &ClassMemberIndexer<MyStruct>::assignByOffset<uint>);
-		supports.set("a", entry);
-	}
-	{
-		IndexMethodSupporter<MyStruct> entry(OFFSET_OF(MyStruct, b), &ClassMemberIndexer<MyStruct>::pushByOffset<bool>, &ClassMemberIndexer<MyStruct>::assignByOffset<bool>);
-		supports.set("b", entry);
-	}
-	{
-		IndexMethodSupporter<MyStruct> entry(OFFSET_OF(MyStruct, c), &ClassMemberIndexer<MyStruct>::pushByOffset<MyStruct*>, &ClassMemberIndexer<MyStruct>::assignByOffset<MyStruct*>);
-		supports.set("c", entry);
-	}
-}
-
-class MyStructIndexSupport
-{
-public:
-	static const containers::Set< IndexMethodSupporter<MyStruct> >& get(void)
-	{
-		static MyStructIndexSupport singleton;
-		return singleton.supports;
-	}
-
-protected:
-	containers::Set< IndexMethodSupporter<MyStruct> > supports;
-
-	MyStructIndexSupport()
-	{
-		populateMyStructSupports(supports);
-	}
-};
-
-inline bool MyStruct__indexSupport(const MyStruct& t, const char* k, lua_State* L, const char* className) 
-{
-	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStructIndexSupport::get());
-	
-	if (supports.has(k))
-	{
-		const IndexMethodSupporter<MyStruct>& support = supports.get(k);
-		(*support.pushFunction)(L, t, support.offset);
-		return true;
-	}
-	else if (String::compare(className, "MyStruct")) 
-	{	/* here would be a recursive call that would be never called */ 
-		return MyStruct__indexSupport(t, k, L, "MyStruct"); 
-	} 
-	else 
-	{ 	/*  must tell the main calling function if something was pushed */ 
-		return false; 
-	} 
-} 
-
-LUA_FUNC(MyStruct__index) 
-{ 
-	const schar* k = to<const schar*>(L, -1); 
-	const MyStruct t = to<const MyStruct&>(L, -2); 
-	if (!MyStruct__indexSupport(t, k, L, "MyStruct")) 
-	{ 
-		lua_getglobal(L, "getClass");	/*s: getClass */ 
-		push(L, "MyStruct");			/*s: getClass "CLASS" */ 
-		lua_call(L, 1, 1);				/*s: CLASS */ 
-		lua_getfield(L, -1, k);			/*s: CLASS[k] */ 
-	} 
-	return 1; 
-} 
-
-inline bool MyStruct__newindexSupport(MyStruct& t, const char* k, lua_State* L, const char* className) 
-{
-	const containers::Set< IndexMethodSupporter<MyStruct> >& supports(MyStructIndexSupport::get());
-
-	if (supports.has(k))
-	{
-		const IndexMethodSupporter<MyStruct>& support = supports.get(k);
-		(*support.assignFunction)(L, t, support.offset);
-		return true;
-	}
-	else if (String::compare(className, "MyStruct")) 
-	{	/* here would be a recursive call that would be never called */ 
-		return MyStruct__newindexSupport(t, k, L, "MyStruct"); 
-	} 
-	else 
-	{ 
-		return false; /* must tell the main calling function if something was pushed */ 
-	} 
-} 
-
-LUA_FUNC(MyStruct__newindex) 
-{ 
-	const char* k = to<const schar*>(L, -2); 
-	if (!MyStruct__newindexSupport(to<MyStruct&>(L, -3), k, L, "MyStruct")) 
-	{ 
-		luaL_error(L, "ERROR! nonassignable index %s for " "MyStruct" , k); 
-	} 
-	return 0; 
-} 
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(MyStruct, MyStruct)
+	__newindex_MEMBER2(MyStruct, uint, a)
+	__newindex_MEMBER2(MyStruct, bool, b)
+	__newindex_MEMBER2(MyStruct, MyStruct*, c)
+END_LUA_FUNC__index_PUBLIC_MEMBERS2(MyStruct, MyStruct)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, MyStruct, MyStruct)
 	LUA_ENTRY_NAMED("method", (nativeConstReturn0Param0<MyStruct, &MyStruct::method>))
 END_LUA_CLASS(MyStruct, MyStruct)
+
+// expose MyChildStruct to %Lua
+DECLARE_LUA_CLASS(MyChildStruct)
+
+DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(MyChildStruct, MyStruct)
+__newindex_MEMBER2(MyChildStruct, float, d)
+__newindex_MEMBER2(MyChildStruct, bool, e)
+END_LUA_FUNC__index_PUBLIC_MEMBERS2(MyChildStruct, MyStruct)
+
+DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, MyChildStruct, MyStruct)
+END_LUA_CLASS(MyChildStruct, MyStruct)
+
 // end proof of concept
 
 void onPlay(void)
 {
-// #if EXTENDED_BY_LUA 
-// 	{
-// 		embeddedLua::Lua lua;
-// 		lua.setPackagePath(
-// 			"..\\LuaFiles\\?.lua;"  
-// 			"..\\LuaFiles\\UTLuaFiles\\?.lua;");
-// 		registerGlobalLibrary(lua.getState());
-// 		lua.require("Utilities");
-// 		lua.require("ObjectOrientedParadigm");
-// 		REGISTER_LUA_LIBRARY((&lua), MyStruct);
-// 		lua.require("User");
-// 		lua.runConsole();
-// 	}
-// #endif//EXTENDED_BY_LUA	
+ #if EXTENDED_BY_LUA 
+ 	{
+ 		embeddedLua::Lua lua;
+ 		lua.setPackagePath(
+ 			"..\\LuaFiles\\?.lua;"  
+ 			"..\\LuaFiles\\UTLuaFiles\\?.lua;");
+ 		registerGlobalLibrary(lua.getState());
+ 		lua.require("Utilities");
+ 		lua.require("ObjectOrientedParadigm");
+		REGISTER_LUA_LIBRARY((&lua), MyStruct);
+		REGISTER_LUA_LIBRARY((&lua), MyChildStruct);
+		lua.require("User");
+ 		lua.runConsole();
+ 	}
+ #endif//EXTENDED_BY_LUA	
 
 	// sandbox::schedulingRnD();
 	sandbox::tableRnD();
