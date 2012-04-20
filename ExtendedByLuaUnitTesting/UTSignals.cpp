@@ -2,7 +2,7 @@
 #if WITH_UNIT_TESTING	
 #include <cfixcc.h>
 #include "Signals.h"
-
+#include "Singleton.h"
 using namespace signals;
 
 static const sint value1(1);
@@ -207,9 +207,17 @@ private:
 
 class UTSignals : public cfixcc::TestFixture
 {
-private:
-
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+	
 	void SignalsTest1()
 	{
 		Transmitter0 t0;

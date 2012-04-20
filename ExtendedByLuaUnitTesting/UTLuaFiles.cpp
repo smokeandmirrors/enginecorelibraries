@@ -3,12 +3,20 @@
 #include <cfixcc.h>
 
 #include "UTTools.h"
-
+#include "Singleton.h"
 class UTLuaFiles : public cfixcc::TestFixture
 {
-private:
-
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	void LuaUnitTesting()
 	{
 		unit_testing_tools::executeLuaUnitTest("UTLibraryFunctions");

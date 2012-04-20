@@ -13,6 +13,17 @@ using namespace embeddedLua;
 class Classes : public cfixcc::TestFixture
 {
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
+
 	void test_define_lua_class(void);
 	void test_define_lua_LuaExtendable(void); 
 	void test_define_lua_LuaExtendable_by_proxy(void);

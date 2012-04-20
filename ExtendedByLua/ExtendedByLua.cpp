@@ -30,44 +30,43 @@ are included in the macro below
 #if SANDBOX
 #include "Sandbox.h" 
 #include "Dispatcher.h"
-#endif//SANDBOX
-
- concurrency::Semaphore* allowable;
+concurrency::Semaphore* allowable;
  
- void theDoFunction(void)
- {
- 	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getCurrentID());
- 	allowable->acquire();
- 	printf("My name is %10d I'm doing the function!\n", concurrency::Thread::getCurrentID());
- 	concurrency::sleep(500);
+void theDoFunction(void)
+{
+	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getCurrentID());
+	allowable->acquire();
+	printf("My name is %10d I'm doing the function!\n", concurrency::Thread::getCurrentID());
+	concurrency::sleep(500);
 	printf("My name is %10d I finished the function!\n", concurrency::Thread::getCurrentID());
 	allowable->release();
- }
+}
+#endif//SANDBOX
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
  	designPatterns::createSingletons();
 
 #if SANDBOX
-	sandbox::play();// just plays with C/C++ compile/runtime functionality
+ 	sandbox::play();// just plays with C/C++ compile/runtime functionality
+// 
+// 
+//  	uint numThreads = 15;
+//  	uint numResources = 10;
+// 	// concurrency::Semaphore onStack(numResources);
+//  	// allowable = &onStack; 
+// 	allowable = new concurrency::Semaphore(numResources);
+//  	
+//  	for (uint i = 0; i < numThreads; ++i)
+//  	{
+//  		concurrency::Executor* job = new concurrency::Executor(&theDoFunction);
+//  		concurrency::Thread::getExecuting(*job); // threads delete themselves!
+//  	}
+//  
+//  	concurrency::sleep(10000);
+//   
+//  	delete allowable;
 #endif//SANDBOX	
-
- 	uint numThreads = 15;
- 	uint numResources = 10;
-	// concurrency::Semaphore onStack(numResources);
- 	// allowable = &onStack; 
-	allowable = new concurrency::Semaphore(numResources);
- 	
- 	for (uint i = 0; i < numThreads; ++i)
- 	{
- 		concurrency::Executor* job = new concurrency::Executor(&theDoFunction);
- 		concurrency::Thread::getExecuting(*job); // threads delete themselves!
- 	}
- 
- 	concurrency::sleep(10000);
-  
- 	delete allowable;
-
 
 #if EXTENDED_BY_LUA 
 	{
@@ -77,7 +76,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua.require("Utilities");
 		lua.require("ObjectOrientedParadigm");
 		lua.require("User");
-		// lua.runConsole();
+		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
 

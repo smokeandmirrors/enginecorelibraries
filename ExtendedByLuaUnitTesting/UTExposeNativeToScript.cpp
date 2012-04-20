@@ -260,6 +260,16 @@ class UTExposeNativeToScript : public cfixcc::TestFixture
 private:
 
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	void Test()
 	{
 		designPatterns::createSingletons();

@@ -15,11 +15,17 @@ using namespace embeddedLua;
 
 class LuaClass : public cfixcc::TestFixture
 {
-private:
+public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
 
-public:
-	
-public:
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	/**
 	tests: constructors(), openLibrary(), openStandardLibraries()
 	getState(), getName()

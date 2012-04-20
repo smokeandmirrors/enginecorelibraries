@@ -85,6 +85,7 @@ the ObjectOrientedParadigm
 #include <typeinfo>
 #include "LuaBuild.h"
 #include "Strings.h"
+#include "Table.h"
 
 /**
 \defgroup LuaExtension Lua Extension
@@ -108,37 +109,32 @@ to %Lua and the %Lua C API.
 */
 
 
-#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(CLASS, SUPER_CLASS) \
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
 	static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) \
 	{ 
 
-#define	__newindex_MEMBER2(CLASS, TYPE, MEMBER) \
-		{ \
-			ClassMemberIndexer< CLASS > entry(OFFSET_OF( CLASS , MEMBER ), &ClassMemberIndexer< CLASS >::pushByOffset< TYPE >, &ClassMemberIndexer< CLASS >::assignByOffset< TYPE >); \
-			supports.set( #MEMBER , entry); \
-		}
 
-#define END_LUA_FUNC__index_PUBLIC_MEMBERS2(CLASS, SUPER_CLASS) \
+#define END_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
 	} /* static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) */ \
 	\
-class CLASS##IndexSupport \
+class CLASS##LuaIndexer \
 { \
 public: \
 	static const containers::Set< ClassMemberIndexer< CLASS > >& get(void) \
 	{ \
-		static CLASS##IndexSupport singleton; \
+		static CLASS##LuaIndexer singleton; \
 		return singleton.supports; \
 	} \
 private: \
 	containers::Set< ClassMemberIndexer< CLASS > > supports; \
-	CLASS##IndexSupport() \
+	CLASS##LuaIndexer() \
 	{ \
 		populate##CLASS##Supports(supports); \
 	} \
 }; \
-inline bool CLASS##__indexSupport(const CLASS & t, const char* k, lua_State* L, const char* className) \
+inline bool CLASS##LuaIndex(const CLASS & t, const char* k, lua_State* L, const char* className) \
 { \
-	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##IndexSupport::get()); \
+	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
 	if (supports.has(k)) \
 	{ \
 		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
@@ -147,29 +143,16 @@ inline bool CLASS##__indexSupport(const CLASS & t, const char* k, lua_State* L, 
 	} \
 	else if (String::compare(className, #SUPER_CLASS )) \
 	{	/* here would be a recursive call that would be never called */ \
-		return SUPER_CLASS##__indexSupport(t, k, L, #CLASS );  \
+		return SUPER_CLASS##LuaIndex(t, k, L, #CLASS );  \
 	} \
 	else \
 	{ 	/*  must tell the main calling function if something was pushed */ \
 		return false; \
 	} \
 } \
-LUA_FUNC(CLASS##__index) \
+inline bool CLASS##LuaNewIndex(CLASS& t, const char* k, lua_State* L, const char* className) \
 { \
-	const schar* k = to<const schar*>(L, -1); \
-	const CLASS t = to<const CLASS &>(L, -2); \
-	if (!CLASS##__indexSupport(t, k, L, #CLASS ))\
-	{ \
-		lua_getglobal(L, "getClass");	/*s: getClass */ \
-		push(L, #CLASS );				/*s: getClass #CLASS */ \
-		lua_call(L, 1, 1);				/*s: CLASS */ \
-		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
-	} \
-	return 1; \
-} \
-inline bool CLASS##__newindexSupport(CLASS& t, const char* k, lua_State* L, const char* className) \
-{ \
-	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##IndexSupport::get()); \
+	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
 	if (supports.has(k)) \
 	{ \
 		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
@@ -178,47 +161,65 @@ inline bool CLASS##__newindexSupport(CLASS& t, const char* k, lua_State* L, cons
 	} \
 	else if (String::compare(className, #SUPER_CLASS )) \
 	{	/* here would be a recursive call that would be never called */  \
-		return SUPER_CLASS##__newindexSupport(t, k, L, #CLASS ); \
+		return SUPER_CLASS##LuaNewIndex(t, k, L, #CLASS ); \
 	} \
 	else \
 	{ \
 		return false; /* must tell the main calling function if something was pushed */ \
 	} \
+} 
+
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
+LUA_FUNC(CLASS##__index) \
+{ \
+	const schar* k = to<const schar*>(L, -1); \
+	const CLASS t = to<const CLASS &>(L, -2); \
+	if (!CLASS##LuaIndex(t, k, L, #CLASS ))\
+	{ \
+		lua_getglobal(L, "getClass");	/*s: getClass */ \
+		push(L, #CLASS );				/*s: getClass #CLASS */ \
+		lua_call(L, 1, 1);				/*s: CLASS */ \
+		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
+	} \
+	return 1; \
 } \
 LUA_FUNC(CLASS##__newindex) \
 { \
 	const char* k = to<const schar*>(L, -2); \
-	if (!CLASS##__newindexSupport(to< CLASS &>(L, -3), k, L, #CLASS )) \
+	if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
 	{ \
 		luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
 	} \
 	return 0; \
 }
 
-/** 
-used for an entry in a "getter" function 
-for public members that can be pushed directly into %Lua
- 
-\*/
-#define __index_MEMBER(INDEX) \
-	if (!String::compare(k, #INDEX )) { push(L, t.##INDEX##); return true; }	
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS_PROXY(CLASS, SUPER_CLASS) \
+LUA_FUNC(CLASS##__indexSupport) \
+{ \
+	const schar* k = to<const schar*>(L, -1); \
+	const CLASS t = to<const CLASS &>(L, -2); \
+	if (!CLASS##LuaIndex(t, k, L, #CLASS )) \
+	{ \
+		pushFalse(L); \
+		pushNil(L); \
+	} \
+	return 2; \
+} \
+LUA_FUNC(CLASS##__newindexSupport) \
+{ \
+	const char* k = to<const schar*>(L, -2); \
+	if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
+	{ \
+		pushFalse(L); \
+	} \
+	return 1; \
+}
 
-/**
-*/
-#define __index_PROXY_MEMBER(INDEX) \
-	if (!String::compare(k, #INDEX )) { pushTrue(L); push(L, t.##INDEX##); return 2; }
-
-/**
-used for an entry in a "setter" function 
-for public members that can be set directly from %Lua
-*/
-#define __newindex_MEMBER(INDEX, TYPE) \
-	if (!String::compare(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); return true; }	
-
-/**
-*/
-#define __newindex_PROXY_MEMBER(INDEX, TYPE) \
-	if (!String::compare(k, #INDEX)) { t.##INDEX = to<##TYPE##>(L, -1); pushTrue(L); return 1; }
+#define	LUA_PUBLIC_MEMBER_INDEX_ENTRY(CLASS, TYPE, MEMBER) \
+	{ \
+		ClassMemberIndexer< CLASS > entry(OFFSET_OF( CLASS , MEMBER ), &ClassMemberIndexer< CLASS >::pushByOffset< TYPE >, &ClassMemberIndexer< CLASS >::assignByOffset< TYPE >); \
+		supports.set( #MEMBER , entry); \
+	}
 
 /**
 used to end a function list of functions to expose to %Lua
@@ -419,6 +420,7 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS) 
 
 #define DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS_PROXY(CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR_PROXY(CLASS) \
 		LUA_ENTRY_CLASS__isExtendableByProxy \
@@ -492,6 +494,7 @@ or the same if it has no parent class
 /** 
 */
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_##TYPE##__gc_DESTRUCTOR(CLASS) \
 		LUA_ENTRY_CLASS__isnewindexable_FALSE \
@@ -502,6 +505,7 @@ or the same if it has no parent class
 		LUA_ENTRY__newindex(CLASS)
 
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NODTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_CLASS__isnewindexable_FALSE \
 		LUA_ENTRY_CLASS__new_AUTO(CLASS) \
@@ -512,6 +516,7 @@ or the same if it has no parent class
 
 
 #define DEFINE_LUA_CLASS_PUBLIC_MEMBERS_NOCTOR_NODTOR(TYPE, CLASS, SUPER_CLASS) \
+	DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB_PUBLIC_MEMBERS(TYPE, CLASS, SUPER_CLASS) \
 		LUA_ENTRY_CLASS__isnewindexable_FALSE \
 		LUA_ENTRY_CLASS__setmetatable_USERDATA \
@@ -621,32 +626,6 @@ empty for now, but makes things easier
 */
 #define DEFINE_LUA_EXTENDABLE_PUSH_FUNCTION(CLASS) 
 
-/** 
-*/
-#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-	inline bool CLASS##__indexSupport(const CLASS##& t, const char* k, lua_State* L, const char* className) \
-	{
-
-/*
-*/
-#define DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-	inline sint CLASS##__indexSupportImplementation(const CLASS##& t, const char* k, lua_State* L, const char* className) \
-	{
-
-
-/** 
- 
-*/
-#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-	inline bool CLASS##__newindexSupport(##CLASS##& t, const char* k, lua_State* L, const char* className) \
-	{
-
-/** 
- 
-*/
-#define DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-	inline bool CLASS##__newindexImplementation(##CLASS##& t, const char* k, lua_State* L, const char* className) \
-	{
 
 /** 
 Begin a library definition for registration
@@ -984,92 +963,6 @@ or the same if it has no parent class
 		} \
 	} // end namespace embeddedLua
 
-/** 
- 
-*/
-#define END_LUA_FUNC__index_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-		if (String::compare(className, #SUPER_CLASS)) \
-		{	/* here would be a recursive call that would be never called */ \
-			return SUPER_CLASS##__indexSupport(t, k, L, #SUPER_CLASS); \
-		} \
-		else \
-		{ 	/*  must tell the main calling function if something was pushed */ \
-			return false; \
-		} \
-	} \
-	LUA_FUNC(CLASS##__index) \
-	{ \
-		const schar* k = to<const schar*>(L, -1); \
-		const CLASS##& t = to<const CLASS##&>(L, -2); \
-		if (!##CLASS##__indexSupport(t, k, L, #CLASS)) \
-		{ \
-			lua_getglobal(L, "getClass");	/*s: getClass */ \
-			push(L, #CLASS);				/*s: getClass "CLASS" */ \
-			lua_call(L, 1, 1);				/*s: CLASS */ \
-			lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
-		} \
-		return 1; \
-	} 
-
-/**
-*/
-#define END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-		if (String::compare(className, #SUPER_CLASS))\
-		{	/* here would be a recursive call that would be never called */ \
-			return SUPER_CLASS##__indexSupportImplementation(t, k, L, #SUPER_CLASS); \
-		} \
-		else \
-		{ \
-			pushFalse(L);\
-			pushNil(L); \
-			return 2; \
-		} \
-	} \
-	LUA_FUNC(CLASS##__indexSupport) \
-	{ \
-		return CLASS##__indexSupportImplementation(to<const CLASS##&>(L, -2), to<const char*>(L, -1), L, #CLASS); \
-	}
-
-/** 
- 
-*/
-#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS(CLASS, SUPER_CLASS) \
-	if (String::compare(className, #SUPER_CLASS)) \
-	{	/* here would be a recursive call that would be never called */ \
-		return SUPER_CLASS##__newindexSupport(t, k, L, #SUPER_CLASS); \
-	} \
-	else \
-	{ \
-		return false; /* must tell the main calling function if something was pushed */ \
-	} \
-} \
-LUA_FUNC(##CLASS##__newindex) \
-{ \
-	const char* k = to<const schar*>(L, -2); \
-	if (!##CLASS##__newindexSupport(to<CLASS&>(L, -3), k, L, #CLASS )) \
-	{ \
-		luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
-	} \
-	return 0; \
-} 
-
-/**
-*/
-#define END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(CLASS, SUPER_CLASS) \
-		if (String::compare(className, #SUPER_CLASS)) \
-		{	/* here would be a recursive call that would be never called */ \
-			return SUPER_CLASS##__newindexImplementation(t, k, L, #SUPER_CLASS); \
-		} \
-		else \
-		{ \
-			pushFalse(L); \
-			return 1; \
-		} \
-	} \
-	LUA_FUNC(CLASS##__newindexSupport) \
-	{ \
-		return CLASS##__newindexImplementation(to<##CLASS##&>(L, -3), to<const schar*>(L, -2), L, #CLASS); \
-	} 
 
 /** 
 end a library definition for registration
@@ -1293,6 +1186,7 @@ public:
 	template<typename MEMBER>
 	static inline void pushByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
 	{
+		pushTrue(L);
 		push(L, *reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset));
 	}
 
@@ -1300,6 +1194,7 @@ public:
 	static inline void assignByOffset(lua_State* L, const CLASS& object, unsigned long long offset)
 	{
 		*reinterpret_cast<MEMBER*>(reinterpret_cast<unsigned long long>(&object) + offset) = to<MEMBER>(L, -1);
+		pushTrue(L);
 	}
 
 	ClassMemberIndexer(void)

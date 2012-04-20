@@ -8,16 +8,9 @@
 
 namespace embeddedLua
 {
-inline bool 
-	isInstanceBeingRefreshed(lua_State* L);
 
-inline void 
-	setUserdataMetamethod(lua_State* L, const char* method);
-
-sint __newindexEnum(lua_State* L)
-{
-	return luaL_error(L, "attempt to assign a value to an enum!");
-}
+inline bool isInstanceBeingRefreshed(lua_State* L);
+inline void setUserdataMetamethod(lua_State* L, const char* method);
 
 sint __indexProxyPublicMembers(lua_State* L)
 {												//s: ud k
@@ -43,15 +36,6 @@ sint __indexProxyPublicMembers(lua_State* L)
 	return 1;
 }
 
-sint __newindexProxy(lua_State* L) 
-{											//s: ud, k, v 	
-	lua_pushvalue(L, lua_upvalueindex(1));	//s: ud, k, v, proxy
-	lua_replace(L, -4);						//s: proxy k, v
-	lua_rawset(L, -3);						//s: proxy
-	lua_pop(L, 1);							//s: 
-	return 0;
-}
-
 sint __newindexProxyPublicMembers(lua_State* L)
 {												//s: ud k v
 	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k v __newindexSupport
@@ -73,6 +57,20 @@ sint __newindexProxyPublicMembers(lua_State* L)
 		lua_pop(L, 2);							//s:
 	}
 
+	return 0;
+}
+
+sint __newindexEnum(lua_State* L)
+{
+	return luaL_error(L, "attempt to assign a value to an enum!");
+}
+
+sint __newindexProxy(lua_State* L) 
+{												//s: ud, k, v 	
+	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud, k, v, proxy
+	lua_replace(L, -4);							//s: proxy k, v
+	lua_rawset(L, -3);							//s: proxy
+	lua_pop(L, 1);								//s: 
 	return 0;
 }
 

@@ -43,6 +43,16 @@ END_LUA_LIBRARY(UnitTestLibrary)
 class LibraryExtensionUT : public cfixcc::TestFixture
 {
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	void test_staticParam0()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT

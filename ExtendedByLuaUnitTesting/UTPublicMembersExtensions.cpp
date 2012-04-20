@@ -20,16 +20,66 @@ public:
 	sreal three;
 };
 DECLARE_LUA_CLASS(TC);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TC, TC)
-	__index_MEMBER(one)
-	__index_MEMBER(two)
-	__index_MEMBER(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TC, TC)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TC, TC)
-	__newindex_MEMBER(one, sint)
-	__newindex_MEMBER(two, bool)
-	__newindex_MEMBER(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TC, TC)
+
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TC, TC)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TC, sint, one)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TC, bool, two)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TC, sreal, three)
+// END_LUA_PUBLIC_MEMBER_INDEXING(TC, TC)
+} /* static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) */ 
+	
+class TCLuaIndexer 
+{ 
+public: 
+	static const containers::Set< ClassMemberIndexer< TC > >& get(void) 
+	{ 
+		static TCLuaIndexer singleton; 
+		return singleton.supports; 
+	} 
+private: 
+	containers::Set< ClassMemberIndexer< TC > > supports; 
+	TCLuaIndexer() 
+	{ 
+		populateTCSupports(supports); 
+	} 
+}; 
+inline bool TCLuaIndex(const TC & t, const char* k, lua_State* L, const char* className) 
+{ 
+	const containers::Set< ClassMemberIndexer< TC > >& supports( TCLuaIndexer::get()); 
+	if (supports.has(k)) 
+	{ 
+		const ClassMemberIndexer< TC >& support = supports.get(k); 
+		(*support.pushFunction)(L, t, support.offset); 
+		return true; 
+	} 
+	else if (String::compare(className, "TC" )) 
+	{	/* here would be a recursive call that would be never called */ 
+		return TCLuaIndex(t, k, L, "TC" );  
+	} 
+	else 
+	{ 	/*  must tell the main calling function if something was pushed */ 
+		return false; 
+	} 
+} 
+inline bool TCLuaNewIndex(TC& t, const char* k, lua_State* L, const char* className) 
+{ 
+	const containers::Set< ClassMemberIndexer< TC > >& supports( TCLuaIndexer::get()); 
+	if (supports.has(k)) 
+	{ 
+		const ClassMemberIndexer< TC >& support = supports.get(k); 
+		(*support.assignFunction)(L, t, support.offset); 
+		return true; 
+	} 
+	else if (String::compare(className, "TC" )) 
+	{	/* here would be a recursive call that would be never called */  
+		return TCLuaNewIndex(t, k, L, "TC" ); 
+	} 
+	else 
+	{ 
+		return false; /* must tell the main calling function if something was pushed */ 
+	} 
+} 
+
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, TC, TC)
 	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<TC, sint, &TC::method>))
 END_LUA_CLASS(TC, TC)
@@ -43,14 +93,10 @@ public:
 	sint five;
 };
 DECLARE_LUA_CLASS(TCChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCChild, TC)
-	__index_MEMBER(four)
-	__index_MEMBER(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TCChild, TC)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCChild, TC)
-	__newindex_MEMBER(four, TC*)
-	__newindex_MEMBER(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCChild, TC)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TCChild, TC)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCChild, TC*, four)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCChild, sint, five)
+END_LUA_PUBLIC_MEMBER_INDEXING(TCChild, TC)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, TCChild, TC)
 	LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<TCChild, sint, &TCChild::childMethod>))
 END_LUA_CLASS(TCChild, TC)
@@ -64,14 +110,10 @@ public:
 	uint seven;
 };
 DECLARE_LUA_CLASS(TCGrandChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCGrandChild, TCChild)
-	__index_MEMBER(six)
-	__index_MEMBER(seven)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TCGrandChild, TCChild)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCGrandChild, TCChild)
-	__newindex_MEMBER(six, TCChild*)
-	__newindex_MEMBER(seven, uint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCGrandChild, TCChild)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TCGrandChild, TCChild)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCGrandChild, TCChild*, six)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCGrandChild, uint, seven)
+END_LUA_PUBLIC_MEMBER_INDEXING(TCGrandChild, TCChild)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, TCGrandChild, TCChild)
 	LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<TCGrandChild, sint, &TCGrandChild::grandChildMethod>))
 END_LUA_CLASS(TCGrandChild, TCChild)
@@ -87,16 +129,11 @@ public:
 	sreal three;
 };
 DECLARE_LUA_CLASS(ProxyTC);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTC, ProxyTC)
-	__index_PROXY_MEMBER(one)
-	__index_PROXY_MEMBER(two)
-	__index_PROXY_MEMBER(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTC, ProxyTC)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTC, ProxyTC)
-	__newindex_PROXY_MEMBER(one, sint)
-	__newindex_PROXY_MEMBER(two, bool)
-	__newindex_PROXY_MEMBER(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTC, ProxyTC)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTC, ProxyTC)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTC, sint, one)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTC, bool, two)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTC, sreal, three)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTC, ProxyTC)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, ProxyTC, ProxyTC)
 	LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<ProxyTC, sint, &ProxyTC::method>))
 	LUA_ENTRY__indexSupport(ProxyTC)
@@ -112,14 +149,10 @@ public:
 	sint five;
 };
 DECLARE_LUA_CLASS(ProxyTCChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCChild, ProxyTC)
-__index_PROXY_MEMBER(four)
-__index_PROXY_MEMBER(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCChild, ProxyTC)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCChild, ProxyTC)
-__newindex_PROXY_MEMBER(four, ProxyTC*)
-__newindex_PROXY_MEMBER(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCChild, ProxyTC)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCChild, ProxyTC)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCChild, ProxyTC*, four)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCChild, sint, five)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCChild, ProxyTC)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, ProxyTCChild, ProxyTC)
 LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<ProxyTCChild, sint, &ProxyTCChild::childMethod>))
 LUA_ENTRY__indexSupport(ProxyTCChild)
@@ -136,14 +169,10 @@ public:
 };
 //////////////////////////////////////////////////////////////////////////
 DECLARE_LUA_CLASS(ProxyTCGrandChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCGrandChild, ProxyTCChild)
-__index_PROXY_MEMBER(six)
-__index_PROXY_MEMBER(seven)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCGrandChild, ProxyTCChild)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCGrandChild, ProxyTCChild)
-__newindex_PROXY_MEMBER(six, ProxyTCChild*)
-__newindex_PROXY_MEMBER(seven, uint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCGrandChild, ProxyTCChild)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCGrandChild, ProxyTCChild)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCGrandChild, ProxyTCChild*, six)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCGrandChild, uint, seven)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCGrandChild, ProxyTCChild)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, ProxyTCGrandChild, ProxyTCChild)
 LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<ProxyTCGrandChild, sint, &ProxyTCGrandChild::grandChildMethod>))
 LUA_ENTRY__indexSupport(ProxyTCGrandChild)
@@ -164,16 +193,11 @@ public:
 	DEFINE_LUAEXTENDABLE_USERDATA_DEFAULT_FUNCTIONS(TCLE)
 };
 DECLARE_LUA_LUAEXTENDABLE(TCLE);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLE, TCLE)
-__index_MEMBER(one)
-__index_MEMBER(two)
-__index_MEMBER(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TCLE, TCLE)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLE, TCLE)
-__newindex_MEMBER(one, sint)
-__newindex_MEMBER(two, bool)
-__newindex_MEMBER(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLE, TCLE)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TCLE, TCLE)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLE, sint, one)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLE, bool, two)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLE, sreal, three)
+END_LUA_PUBLIC_MEMBER_INDEXING(TCLE, TCLE)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(EXTENDABLE, TCLE, TCLE)
 LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<TCLE, sint, &TCLE::method>))
 END_LUA_CLASS(TCLE, TCLE)
@@ -191,14 +215,10 @@ public:
 	DEFINE_DEFAULT_GETCLASSNAME(TCLEChild)
 };
 DECLARE_LUA_LUAEXTENDABLE(TCLEChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEChild, TCLE)
-__index_MEMBER(four)
-__index_MEMBER(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEChild, TCLE)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEChild, TCLE)
-__newindex_MEMBER(four, TCLE*)
-__newindex_MEMBER(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEChild, TCLE)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TCLEChild, TCLE)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLEChild, TCLE*, four)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLEChild, sint, five)
+END_LUA_PUBLIC_MEMBER_INDEXING(TCLEChild, TCLE)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(EXTENDABLE, TCLEChild, TCLE)
 LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<TCLEChild, sint, &TCLEChild::childMethod>))
 END_LUA_CLASS(TCLEChild, TCLE)
@@ -216,14 +236,10 @@ public:
 	DEFINE_DEFAULT_GETCLASSNAME(TCLEGrandChild)
 };
 DECLARE_LUA_LUAEXTENDABLE(TCLEGrandChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
-__index_MEMBER(six)
-__index_MEMBER(seven)
-END_LUA_FUNC__index_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
-__newindex_MEMBER(six, TCLEChild*)
-__newindex_MEMBER(seven, uint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS(TCLEGrandChild, TCLEChild)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(TCLEGrandChild, TCLEChild)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLEGrandChild, TCLEChild*, six)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(TCLEGrandChild, uint, seven)
+END_LUA_PUBLIC_MEMBER_INDEXING(TCLEGrandChild, TCLEChild)
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(EXTENDABLE, TCLEGrandChild, TCLEChild)
 LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<TCLEGrandChild, sint, &TCLEGrandChild::grandChildMethod>))
 END_LUA_CLASS(TCLEGrandChild, TCLEChild)
@@ -242,16 +258,11 @@ public:
 	DEFINE_LUAEXTENDABLE_PROXY_DEFAULT_FUNCTIONS(ProxyTCLE)
 };
 DECLARE_LUA_LUAEXTENDABLE(ProxyTCLE)
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLE, ProxyTCLE)
-__index_PROXY_MEMBER(one)
-__index_PROXY_MEMBER(two)
-__index_PROXY_MEMBER(three)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLE, ProxyTCLE)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLE, ProxyTCLE)
-__newindex_PROXY_MEMBER(one, sint)
-__newindex_PROXY_MEMBER(two, bool)
-__newindex_PROXY_MEMBER(three, sreal)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLE, ProxyTCLE)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLE, ProxyTCLE)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLE, sint, one)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLE, bool, two)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLE, sreal, three)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLE, ProxyTCLE)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, ProxyTCLE, ProxyTCLE)
 LUA_ENTRY_NAMED("method", (nativeConstReturn1Param0<ProxyTCLE, sint, &ProxyTCLE::method>))
 END_LUA_CLASS(ProxyTCLE, ProxyTCLE)
@@ -268,14 +279,10 @@ public:
 	DEFINE_DEFAULT_GETCLASSNAME(ProxyTCLEChild)
 };
 DECLARE_LUA_LUAEXTENDABLE(ProxyTCLEChild)
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLEChild, ProxyTCLE)
-__index_PROXY_MEMBER(four)
-__index_PROXY_MEMBER(five)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLEChild, ProxyTCLE)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLEChild, ProxyTCLE)
-__newindex_PROXY_MEMBER(four, ProxyTCLE*)
-__newindex_PROXY_MEMBER(five, sint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLEChild, ProxyTCLE)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLEChild, ProxyTCLE)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLEChild, ProxyTCLE*, four)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLEChild, sint, five)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLEChild, ProxyTCLE)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, ProxyTCLEChild, ProxyTCLE)
 LUA_ENTRY_NAMED("childMethod", (nativeConstReturn1Param0<ProxyTCLEChild, sint, &ProxyTCLEChild::childMethod>))
 END_LUA_CLASS(ProxyTCLEChild, ProxyTCLE)
@@ -292,14 +299,10 @@ public:
 	DEFINE_DEFAULT_GETCLASSNAME(ProxyTCLEGrandChild)
 };
 DECLARE_LUA_LUAEXTENDABLE(ProxyTCLEGrandChild);
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLEGrandChild, ProxyTCLEChild)
-__index_PROXY_MEMBER(six)
-__index_PROXY_MEMBER(seven)
-END_LUA_FUNC__index_PUBLIC_MEMBERS_PROXY(ProxyTCLEGrandChild, ProxyTCLEChild)
-DEFINE_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLEGrandChild, ProxyTCLEChild)
-__newindex_PROXY_MEMBER(six, ProxyTCLEChild*)
-__newindex_PROXY_MEMBER(seven, uint)
-END_LUA_FUNC__newindex_PUBLIC_MEMBERS_PROXY(ProxyTCLEGrandChild, ProxyTCLEChild)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLEGrandChild, ProxyTCLEChild)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLEGrandChild, ProxyTCLEChild*, six)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(ProxyTCLEGrandChild, uint, seven)
+END_LUA_PUBLIC_MEMBER_INDEXING(ProxyTCLEGrandChild, ProxyTCLEChild)
 DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(EXTENDABLE, ProxyTCLEGrandChild, ProxyTCLEChild)
 LUA_ENTRY_NAMED("grandChildMethod", (nativeConstReturn1Param0<ProxyTCLEGrandChild, sint, &ProxyTCLEGrandChild::grandChildMethod>))
 END_LUA_CLASS(ProxyTCLEGrandChild, ProxyTCLEChild)
@@ -307,9 +310,17 @@ END_LUA_CLASS(ProxyTCLEGrandChild, ProxyTCLEChild)
 
 class UTPublicMembersExtensions : public cfixcc::TestFixture
 {
-private:
-
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	void LuaPublicMemberTesting()
 	{
 		DECLARE_UNIT_TESTING_LUA_OBJECT

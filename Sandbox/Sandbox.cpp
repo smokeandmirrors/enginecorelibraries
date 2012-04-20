@@ -190,11 +190,11 @@ struct MyChildStruct : public MyStruct
 
 DECLARE_LUA_CLASS(MyStruct)
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(MyStruct, MyStruct)
-	__newindex_MEMBER2(MyStruct, uint, a)
-	__newindex_MEMBER2(MyStruct, bool, b)
-	__newindex_MEMBER2(MyStruct, MyStruct*, c)
-END_LUA_FUNC__index_PUBLIC_MEMBERS2(MyStruct, MyStruct)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(MyStruct, MyStruct)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStruct, uint, a)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStruct, bool, b)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStruct, MyStruct*, c)
+END_LUA_PUBLIC_MEMBER_INDEXING(MyStruct, MyStruct)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, MyStruct, MyStruct)
 	LUA_ENTRY_NAMED("method", (nativeConstReturn0Param0<MyStruct, &MyStruct::method>))
@@ -203,37 +203,76 @@ END_LUA_CLASS(MyStruct, MyStruct)
 // expose MyChildStruct to %Lua
 DECLARE_LUA_CLASS(MyChildStruct)
 
-DEFINE_LUA_FUNC__index_PUBLIC_MEMBERS2(MyChildStruct, MyStruct)
-__newindex_MEMBER2(MyChildStruct, float, d)
-__newindex_MEMBER2(MyChildStruct, bool, e)
-END_LUA_FUNC__index_PUBLIC_MEMBERS2(MyChildStruct, MyStruct)
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(MyChildStruct, MyStruct)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyChildStruct, float, d)
+LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyChildStruct, bool, e)
+END_LUA_PUBLIC_MEMBER_INDEXING(MyChildStruct, MyStruct)
 
 DEFINE_LUA_CLASS_PUBLIC_MEMBERS(CLASS, MyChildStruct, MyStruct)
 END_LUA_CLASS(MyChildStruct, MyStruct)
+
+struct MyStructProxy
+{
+	uint a;
+	bool b;
+	MyStructProxy* c;
+	void method(void) const { printf("MyStructProxy::method() was called!\n"); }
+};
+
+struct MyChildStructProxy : public MyStructProxy
+{
+	float d;
+	bool e;
+};
+
+DECLARE_LUA_CLASS(MyStructProxy)
+
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(MyStructProxy, MyStructProxy)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStructProxy, uint, a)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStructProxy, bool, b)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyStructProxy, MyStructProxy*, c)
+END_LUA_PUBLIC_MEMBER_INDEXING(MyStructProxy, MyStructProxy)
+
+DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, MyStructProxy, MyStructProxy) 
+	LUA_ENTRY_NAMED("method", (nativeConstReturn0Param0<MyStructProxy, &MyStructProxy::method>))
+END_LUA_CLASS(MyStructProxy, MyStructProxy)
+
+// expose MyChildStructProxy to %Lua
+DECLARE_LUA_CLASS(MyChildStructProxy)
+
+DEFINE_LUA_PUBLIC_MEMBER_INDEXING(MyChildStructProxy, MyStructProxy)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyChildStructProxy, float, d)
+	LUA_PUBLIC_MEMBER_INDEX_ENTRY(MyChildStructProxy, bool, e)
+END_LUA_PUBLIC_MEMBER_INDEXING(MyChildStructProxy, MyStructProxy)
+
+DEFINE_LUA_CLASS_BY_PROXY_PUBLIC_MEMBERS(CLASS, MyChildStructProxy, MyStructProxy)
+END_LUA_CLASS(MyChildStructProxy, MyStructProxy)
 
 // end proof of concept
 
 void onPlay(void)
 {
- #if EXTENDED_BY_LUA 
- 	{
- 		embeddedLua::Lua lua;
- 		lua.setPackagePath(
- 			"..\\LuaFiles\\?.lua;"  
- 			"..\\LuaFiles\\UTLuaFiles\\?.lua;");
- 		registerGlobalLibrary(lua.getState());
- 		lua.require("Utilities");
- 		lua.require("ObjectOrientedParadigm");
-		REGISTER_LUA_LIBRARY((&lua), MyStruct);
-		REGISTER_LUA_LIBRARY((&lua), MyChildStruct);
-		lua.require("User");
- 		lua.runConsole();
- 	}
- #endif//EXTENDED_BY_LUA	
+//  #if EXTENDED_BY_LUA 
+//  	{
+//  		embeddedLua::Lua lua;
+//  		lua.setPackagePath(
+//  			"..\\LuaFiles\\?.lua;"  
+//  			"..\\LuaFiles\\UTLuaFiles\\?.lua;");
+//  		registerGlobalLibrary(lua.getState());
+//  		lua.require("Utilities");
+//  		lua.require("ObjectOrientedParadigm");
+// 		REGISTER_LUA_LIBRARY((&lua), MyStruct);
+// 		REGISTER_LUA_LIBRARY((&lua), MyChildStruct);
+// 		REGISTER_LUA_LIBRARY((&lua), MyStructProxy);
+// 		REGISTER_LUA_LIBRARY((&lua), MyChildStructProxy);
+// 		lua.require("User");
+//  		lua.runConsole();
+//  	}
+//  #endif//EXTENDED_BY_LUA	
 
+	sandbox::verifyUnitTests();
 	// sandbox::schedulingRnD();
 	sandbox::tableRnD();
-	// sandbox::verifyUnitTests();
 	
 	//	6,	0, e0
 	//	5,	10,	2

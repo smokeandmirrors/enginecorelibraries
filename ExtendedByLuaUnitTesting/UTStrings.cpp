@@ -1,5 +1,5 @@
 #include <cfixcc.h>
-
+#include "Singleton.h"
 class UTStrings : public cfixcc::TestFixture
 {
 private:
@@ -7,11 +7,14 @@ private:
 public:
 	static void SetUp()
 	{
+		designPatterns::createSingletons();
 	}
 
 	static void TearDown()
-	{
+	{    
+		designPatterns::destroySingletons();
 	}
+
 
 	void Before()
 	{

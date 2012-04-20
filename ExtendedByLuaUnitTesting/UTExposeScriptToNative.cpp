@@ -2,7 +2,7 @@
 #if WITH_UNIT_TESTING
 #include <cfixcc.h>
 #include "UTTools.h"
-
+#include "Singleton.h"
 #if EXTENDED_BY_LUA 
 using namespace embeddedLua; 
 #endif// embeddedLua
@@ -12,6 +12,16 @@ class UTExposeScriptToNative : public cfixcc::TestFixture
 private:
 
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+
 	void Test()
 	{
 #if EXTENDED_BY_LUA 

@@ -7,10 +7,12 @@ private:
 public:
 	static void SetUp()
 	{
+		designPatterns::createSingletons();
 	}
 
 	static void TearDown()
-	{
+	{    
+		designPatterns::destroySingletons();
 	}
 
 	void Before()

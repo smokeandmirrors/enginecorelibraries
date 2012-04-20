@@ -39,9 +39,17 @@ void checkVectorEqual(const Vector3& lhs, const Vector3& rhs)
 
 class UTMath : public cfixcc::TestFixture
 {
-private:
-
 public:
+	static void SetUp()
+	{
+		designPatterns::createSingletons();
+	}
+
+	static void TearDown()
+	{    
+		designPatterns::destroySingletons();
+	}
+	
 	void testNumbers(void);
 	void testVector3(void);
 	void testLuaExtension(void);
