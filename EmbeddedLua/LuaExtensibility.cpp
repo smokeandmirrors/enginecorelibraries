@@ -9,7 +9,6 @@
 namespace embeddedLua
 {
 
-inline bool isInstanceBeingRefreshed(lua_State* L);
 inline void setUserdataMetamethod(lua_State* L, const char* method);
 
 sint __indexProxyPublicMembers(lua_State* L)
@@ -36,6 +35,11 @@ sint __indexProxyPublicMembers(lua_State* L)
 	return 1;
 }
 
+sint __newindexEnum(lua_State* L)
+{
+	return luaL_error(L, "attempt to assign a value to an enum!");
+}
+
 sint __newindexProxyPublicMembers(lua_State* L)
 {												//s: ud k v
 	lua_pushvalue(L, lua_upvalueindex(1));		//s: ud k v __newindexSupport
@@ -58,11 +62,6 @@ sint __newindexProxyPublicMembers(lua_State* L)
 	}
 
 	return 0;
-}
-
-sint __newindexEnum(lua_State* L)
-{
-	return luaL_error(L, "attempt to assign a value to an enum!");
 }
 
 sint __newindexProxy(lua_State* L) 
@@ -152,6 +151,11 @@ void declareLuaClass(lua_State* L, const schar* derived, const schar* super)
 	//s: 
 }
 
+bool embeddedLua::isIndexTable(lua_State* L, sint index)
+{
+	return lua_istable(L, index);
+}
+
 inline bool isInstanceBeingRefreshed(lua_State* L)
 {	//s: userdata class_mt
 	if (lua_getmetatable(L, -2))
@@ -163,11 +167,6 @@ inline bool isInstanceBeingRefreshed(lua_State* L)
 	{
 		return false;
 	}
-}
-
-bool embeddedLua::isIndexTable(lua_State* L, sint index)
-{
-	return lua_istable(L, index);
 }
 
 void printToLua(lua_State* L, const schar* string)

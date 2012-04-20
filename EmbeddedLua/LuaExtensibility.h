@@ -108,119 +108,6 @@ to %Lua and the %Lua C API.
 @{
 */
 
-
-#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
-	static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) \
-	{ 
-
-
-#define END_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
-	} /* static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) */ \
-	\
-class CLASS##LuaIndexer \
-{ \
-public: \
-	static const containers::Set< ClassMemberIndexer< CLASS > >& get(void) \
-	{ \
-		static CLASS##LuaIndexer singleton; \
-		return singleton.supports; \
-	} \
-private: \
-	containers::Set< ClassMemberIndexer< CLASS > > supports; \
-	CLASS##LuaIndexer() \
-	{ \
-		populate##CLASS##Supports(supports); \
-	} \
-}; \
-inline bool CLASS##LuaIndex(const CLASS & t, const char* k, lua_State* L, const char* className) \
-{ \
-	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
-	if (supports.has(k)) \
-	{ \
-		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
-		(*support.pushFunction)(L, t, support.offset); \
-		return true; \
-	} \
-	else if (String::compare(className, #SUPER_CLASS )) \
-	{	/* here would be a recursive call that would be never called */ \
-		return SUPER_CLASS##LuaIndex(t, k, L, #CLASS );  \
-	} \
-	else \
-	{ 	/*  must tell the main calling function if something was pushed */ \
-		return false; \
-	} \
-} \
-inline bool CLASS##LuaNewIndex(CLASS& t, const char* k, lua_State* L, const char* className) \
-{ \
-	const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
-	if (supports.has(k)) \
-	{ \
-		const ClassMemberIndexer< CLASS >& support = supports.get(k); \
-		(*support.assignFunction)(L, t, support.offset); \
-		return true; \
-	} \
-	else if (String::compare(className, #SUPER_CLASS )) \
-	{	/* here would be a recursive call that would be never called */  \
-		return SUPER_CLASS##LuaNewIndex(t, k, L, #CLASS ); \
-	} \
-	else \
-	{ \
-		return false; /* must tell the main calling function if something was pushed */ \
-	} \
-} 
-
-#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
-LUA_FUNC(CLASS##__index) \
-{ \
-	const schar* k = to<const schar*>(L, -1); \
-	const CLASS t = to<const CLASS &>(L, -2); \
-	if (!CLASS##LuaIndex(t, k, L, #CLASS ))\
-	{ \
-		lua_getglobal(L, "getClass");	/*s: getClass */ \
-		push(L, #CLASS );				/*s: getClass #CLASS */ \
-		lua_call(L, 1, 1);				/*s: CLASS */ \
-		lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
-	} \
-	return 1; \
-} \
-LUA_FUNC(CLASS##__newindex) \
-{ \
-	const char* k = to<const schar*>(L, -2); \
-	if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
-	{ \
-		luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
-	} \
-	return 0; \
-}
-
-#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS_PROXY(CLASS, SUPER_CLASS) \
-LUA_FUNC(CLASS##__indexSupport) \
-{ \
-	const schar* k = to<const schar*>(L, -1); \
-	const CLASS t = to<const CLASS &>(L, -2); \
-	if (!CLASS##LuaIndex(t, k, L, #CLASS )) \
-	{ \
-		pushFalse(L); \
-		pushNil(L); \
-	} \
-	return 2; \
-} \
-LUA_FUNC(CLASS##__newindexSupport) \
-{ \
-	const char* k = to<const schar*>(L, -2); \
-	if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
-	{ \
-		pushFalse(L); \
-	} \
-	return 1; \
-}
-
-#define	LUA_PUBLIC_MEMBER_INDEX_ENTRY(CLASS, TYPE, MEMBER) \
-	{ \
-		ClassMemberIndexer< CLASS > entry(OFFSET_OF( CLASS , MEMBER ), &ClassMemberIndexer< CLASS >::pushByOffset< TYPE >, &ClassMemberIndexer< CLASS >::assignByOffset< TYPE >); \
-		supports.set( #MEMBER , entry); \
-	}
-
 /**
 used to end a function list of functions to expose to %Lua
 */
@@ -232,6 +119,8 @@ used to end a function list of functions to expose to %Lua
 */
 #define CLOSE_LUA_NS(NAME) \
 	}; // end namespace lua_library_##name
+
+
 
 /**
 Declares a library around a POD class
@@ -638,6 +527,60 @@ This method is ideal for static classes or libraries.
 	OPEN_LUA_NS(NAME) \
 		OPEN_LUA_LIB(NAME)				
 
+/**
+*/
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
+	static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) \
+	{ 
+
+/**
+*/
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS(CLASS, SUPER_CLASS) \
+	LUA_FUNC(CLASS##__index) \
+	{ \
+		const schar* k = to<const schar*>(L, -1); \
+		const CLASS t = to<const CLASS &>(L, -2); \
+		if (!CLASS##LuaIndex(t, k, L, #CLASS ))\
+		{ \
+			lua_getglobal(L, "getClass");	/*s: getClass */ \
+			push(L, #CLASS );				/*s: getClass #CLASS */ \
+			lua_call(L, 1, 1);				/*s: CLASS */ \
+			lua_getfield(L, -1, k);			/*s: CLASS[k] */ \
+		} \
+		return 1; \
+	} \
+	LUA_FUNC(CLASS##__newindex) \
+	{ \
+		const char* k = to<const schar*>(L, -2); \
+		if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
+		{ \
+			luaL_error(L, "ERROR! nonassignable index %s for " #CLASS , k); \
+		} \
+		return 0; \
+	}
+
+#define DEFINE_LUA_PUBLIC_MEMBER_INDEXING_LUA_FUNCTIONS_PROXY(CLASS, SUPER_CLASS) \
+	LUA_FUNC(CLASS##__indexSupport) \
+	{ \
+		const schar* k = to<const schar*>(L, -1); \
+		const CLASS t = to<const CLASS &>(L, -2); \
+		if (!CLASS##LuaIndex(t, k, L, #CLASS )) \
+		{ \
+			pushFalse(L); \
+			pushNil(L); \
+		} \
+		return 2; \
+	} \
+	LUA_FUNC(CLASS##__newindexSupport) \
+	{ \
+		const char* k = to<const schar*>(L, -2); \
+		if (!CLASS##LuaNewIndex(to< CLASS &>(L, -3), k, L, #CLASS )) \
+		{ \
+			pushFalse(L); \
+		} \
+		return 1; \
+	}
+
 /** 
 */
 #define DEFINE_LUA_OPENER(NAME) \
@@ -988,6 +931,63 @@ the require() function.
 		DEFINE_LUA_OPENER_EXTENSIBLE(NAME) \
 	CLOSE_LUA_NS(NAME)
 
+/**
+*/
+#define END_LUA_PUBLIC_MEMBER_INDEXING(CLASS, SUPER_CLASS) \
+	} /* static void populate##CLASS##Supports(containers::Set< ClassMemberIndexer< CLASS > >& supports) */ \
+	\
+	class CLASS##LuaIndexer \
+	{ \
+	public: \
+		static const containers::Set< ClassMemberIndexer< CLASS > >& get(void) \
+		{ \
+			static CLASS##LuaIndexer singleton; \
+			return singleton.supports; \
+		} \
+	private: \
+		containers::Set< ClassMemberIndexer< CLASS > > supports; \
+		CLASS##LuaIndexer() \
+		{ \
+			populate##CLASS##Supports(supports); \
+		} \
+	}; \
+	inline bool CLASS##LuaIndex(const CLASS & t, const char* k, lua_State* L, const char* className) \
+	{ \
+		const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
+		if (supports.has(k)) \
+		{ \
+			const ClassMemberIndexer< CLASS >& support = supports.get(k); \
+			(*support.pushFunction)(L, t, support.offset); \
+			return true; \
+		} \
+		else if (String::compare(className, #SUPER_CLASS )) \
+		{	/* here would be a recursive call that would be never called */ \
+			return SUPER_CLASS##LuaIndex(t, k, L, #CLASS );  \
+		} \
+		else \
+		{ 	/*  must tell the main calling function if something was pushed */ \
+			return false; \
+		} \
+	} \
+	inline bool CLASS##LuaNewIndex(CLASS& t, const char* k, lua_State* L, const char* className) \
+	{ \
+		const containers::Set< ClassMemberIndexer< CLASS > >& supports( CLASS##LuaIndexer::get()); \
+		if (supports.has(k)) \
+		{ \
+			const ClassMemberIndexer< CLASS >& support = supports.get(k); \
+			(*support.assignFunction)(L, t, support.offset); \
+			return true; \
+		} \
+		else if (String::compare(className, #SUPER_CLASS )) \
+		{	/* here would be a recursive call that would be never called */  \
+			return SUPER_CLASS##LuaNewIndex(t, k, L, #CLASS ); \
+		} \
+		else \
+		{ \
+			return false; /* must tell the main calling function if something was pushed */ \
+		} \
+	} 
+
 /** 
 */
 #define LUA_ENTRY__index(CLASS) \
@@ -1092,6 +1092,16 @@ add a lua method to a definition by the same name
 #define LUA_ENTRY_EXTENDABLE__tostring_AUTO(CLASS) \
 	LUA_ENTRY_NAMED("__tostring", LuaExtendable::__tostring) 
 
+
+/**  
+add a lua method to a definition by a different name 
+\note compile-time directive
+\param name a string delimited name
+\param function a lua_function
+*/
+#define LUA_ENTRY_NAMED(name, function)	\
+	{(name), (function)}, 
+
 /** 
 */
 #define LUA_ENUM(ENUMERATION) \
@@ -1121,14 +1131,13 @@ the number of arguments it has added to the stack.
 #define LUA_FUNC(name) \
 	sint name##(lua_State* L)
 
-/**  
-add a lua method to a definition by a different name 
-\note compile-time directive
-\param name a string delimited name
-\param function a lua_function
+/**
 */
-#define LUA_ENTRY_NAMED(name, function)	\
-	{(name), (function)}, 
+#define	LUA_PUBLIC_MEMBER_INDEX_ENTRY(CLASS, TYPE, MEMBER) \
+	{ \
+		ClassMemberIndexer< CLASS > entry(OFFSET_OF( CLASS , MEMBER ), &ClassMemberIndexer< CLASS >::pushByOffset< TYPE >, &ClassMemberIndexer< CLASS >::assignByOffset< TYPE >); \
+		supports.set( #MEMBER , entry); \
+	}
 
 /** 
 */
