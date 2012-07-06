@@ -101,7 +101,7 @@ public:
 	virtual
 	~Composite(void)=0
 	{
-		std::for_each(m_components.begin(), m_components.end(), DeleteHelper());
+		std::for_each(m_components.begin(), m_components.end(), Composite<OWNER>::deleteFunction);
 	}
 
 	void add(Component<OWNER>& component) 
@@ -118,16 +118,12 @@ public:
 	}
 	
 private:
-	class DeleteHelper
+	static void deleteFunction(Component<OWNER>* object)
 	{
-	public:
-		void operator()(Component<OWNER>* object)
-		{
-			object->detach();
-			delete object;
-		}
-	};
-
+		object->detach();
+		delete object;
+	}
+	
 	components m_components;
 }; // Composite
 

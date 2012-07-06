@@ -250,8 +250,70 @@ END_LUA_CLASS(MyChildStructProxy, MyStructProxy)
 
 // end proof of concept
 
+class A
+{
+public:
+	virtual ~A() {}
+
+	virtual uint m(sreal, const math::Vector3&) 
+	{ 
+		return 3; 
+	}
+};
+
+class AChild : public A
+{
+public:
+	virtual uint m(sreal, const math::Vector3&) 
+	{
+		return 4;
+	}
+};
+
+class CallAdapter
+{
+	// Whatever
+};
+
+typedef uint (A::* mptype)(sreal, const math::Vector3&);
+typedef uint (CallAdapter::* mptype2)(sreal, const math::Vector3&);
+
+enum E1
+{
+  val11 = 1,
+  val12
+};
+
+enum E2
+{
+	val21 = 2,
+	val22
+};
+
+int withE(E1 arg) { return arg; }
+int withE(E2 arg) { return arg; }
+
 void onPlay(void)
 {
+	int e1 = withE(val11);
+	int e2 = withE(val21);
+	
+	
+	math::Vector3 z;
+	z.zero();
+
+	A* a = new AChild(); // A();
+	CallAdapter* callAdapter = (CallAdapter*) a;
+
+	mptype mp = &A::m;
+	mptype2 mp2 = (mptype2) mp;
+
+	int r = (callAdapter->*mp2)(1, z);
+	assert(r == 4);
+
+	delete a;
+
+
 //  #if EXTENDED_BY_LUA 
 //  	{
 //  		embeddedLua::Lua lua;

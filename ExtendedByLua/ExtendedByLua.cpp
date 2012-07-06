@@ -31,7 +31,7 @@ are included in the macro below
 #include "Sandbox.h" 
 #include "Dispatcher.h"
 concurrency::Semaphore* allowable;
- 
+
 void theDoFunction(void)
 {
 	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getCurrentID());
@@ -48,7 +48,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
  	designPatterns::createSingletons();
 
 #if SANDBOX
- 	sandbox::play();// just plays with C/C++ compile/runtime functionality
+	sandbox::play();// just plays with C/C++ compile/runtime functionality
 // 
 // 
 //  	uint numThreads = 15;
@@ -79,8 +79,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 		lua.runConsole();
 	}
 #endif//EXTENDED_BY_LUA
-
-	realTime::Clock::single().cycles();
 
 	designPatterns::destroySingletons();
 	return 0;

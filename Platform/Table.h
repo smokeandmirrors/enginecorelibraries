@@ -141,7 +141,7 @@ private:
 		/// switching on the type vs removing (superfluous in the case of non-string types) orginalKeyString compare
 		return (type & other.type) 
 			&& code == other.code
-			&& (type != string || originalKeyString == other.originalKeyString);
+			&& ((!(type & string)) || originalKeyString == other.originalKeyString);
 	}
 
 	inline Key& operator=(const Key& source)

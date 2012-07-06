@@ -318,11 +318,11 @@ void sandbox::tableRnD(void)
 			
 			if (switcher)
 			{
-			++iter;
-			++pp1;
-			++pp;
-			++iterConstpp1;
-			++iterConst;
+				++iter;
+				++pp1;
+				++pp;
+				++iterConstpp1;
+				++iterConst;
 			}
 			else
 			{

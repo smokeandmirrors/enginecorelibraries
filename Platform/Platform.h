@@ -22,7 +22,6 @@ smokeandmirrorsdevelopment@gmail.com</A>
 
 \todo NULL, assert, warn, error
 \todo global bit packing investigation
-\todo safe bool idiom for container iterators?
 \todo split off base types, macros, all that stuff, and just include them all in a strict order
 
 <DEVELOPMENT STATUS>
@@ -160,7 +159,7 @@ public:
 	
 	inline void	lower(const STORAGE mask) { flags &= (~mask); }
 	
-	inline void	lower(void) { flags = 0; }
+	inline void	lowerAll(void) { flags = 0; }
 	
 	inline Flags& operator=(const Flags& f) { flags = f.flags; return *this; }
 	
@@ -170,7 +169,7 @@ public:
 	
 	inline STORAGE operator()(void) const { return flags; }
 	
-	inline void raise(void) { flags = 0; flags = ~flags; }
+	inline void raiseAll(void) { flags = 0; flags = ~flags; }
 	
 	inline void raise(const STORAGE mask) { flags |= mask; }
 	

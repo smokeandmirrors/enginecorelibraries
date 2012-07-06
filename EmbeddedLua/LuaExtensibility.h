@@ -77,9 +77,7 @@ code bloat.
 \todo document these in terms of the methods required by 
 the ObjectOrientedParadigm
 
-\todo replace __index/__newindex functionality with string -> offset map
-
-\todo all these macros need to be re-done in Lua, and probably replaced by something like SWIG
+\todo all these macros need to be redone with an automatic code parsing and binding generation system
 */
 
 #include <typeinfo>
@@ -347,7 +345,6 @@ or the same if it has no parent class
 		LUA_ENTRY_##TYPE##__tostring_AUTO(CLASS)  
 
 /** 
-\todo these need matching DEFINE LIB defines
 */
 #define DEFINE_LUA_CLASS_NO_DTOR(TYPE, CLASS, SUPER_CLASS) \
 	DEFINE_LUA_CLASS_LIB(TYPE, CLASS, SUPER_CLASS) \
@@ -1255,7 +1252,7 @@ public:
 	work, make sure that your userdata:__isnewindexable() returns true, otherwise
 	make sure userdata:__isnewindexable() returns false in %Lua (and C/C++). This
 	only needs to be true for if userdata[k] = v must work for any non-nil k, and 
-	any v.  Vectors for example, which only allow userdata[x,y,z] = v, return
+	any v.  3D Vectors for example, which only allow userdata[(x|y|z)] = v, return
 	userdata:__isnewindexable() returns false
 
 	\note using the given LuaExtendable definitions will make this a lot easier.
