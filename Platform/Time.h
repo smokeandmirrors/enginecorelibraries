@@ -23,7 +23,7 @@ typedef ulong cycle;
 typedef dreal millisecond;
 typedef dreal second;
 
-namespace realTime
+namespace xronos
 {
 
 /** frame clock, game play/engine clock */
@@ -88,7 +88,7 @@ public:
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
-	, m_tick(realTime::Clock::single().cycles())
+	, m_tick(xronos::Clock::single().cycles())
 	{ /* empty */ }
 	
 	ClockFrame(cycle initialTime)
@@ -132,9 +132,9 @@ public:
 
 	void tick(void)
 	{
-		cycle tick = realTime::Clock::single().cycles();
+		cycle tick = xronos::Clock::single().cycles();
 		cycle delta = tick - m_tick;
-		m_currentMilliseconds += static_cast<millisecond>(m_rate * (delta * realTime::Clock::single().milliHzInverse)); 
+		m_currentMilliseconds += static_cast<millisecond>(m_rate * (delta * xronos::Clock::single().milliHzInverse)); 
 		m_currentSeconds += m_currentMilliseconds * 1000;
 		m_tick = tick;
 	}
@@ -176,7 +176,7 @@ public:
 	{
 		cycle tick = m_parent->getTick();
 		cycle delta = tick - m_tick;
-		m_currentMilliseconds += static_cast<millisecond>(getRate() * (delta * realTime::Clock::single().milliHzInverse)); 
+		m_currentMilliseconds += static_cast<millisecond>(getRate() * (delta * xronos::Clock::single().milliHzInverse)); 
 		m_currentSeconds += m_currentMilliseconds * 1000;
 		m_tick = tick;
 	}
@@ -329,7 +329,7 @@ public:
 	void reset(void)
 	{
 		m_stopwatch.reset();
-		m_resetTime = m_maxTime; /** \todo randomize me */
+		m_resetTime = m_maxTime; // generateRandom(m_minTime, m_maxTime);
 	}
 
 	second seconds(void) const
@@ -386,6 +386,6 @@ inline cycle cycles(void) { return Clock::single().cycles(); }
 inline millisecond milliseconds(void) { return Clock::single().milliseconds(); }
 inline second seconds(void) { return Clock::single().seconds(); }
 
-} // namespace realTime
+} // namespace xronos
 
 #endif//TIME_H

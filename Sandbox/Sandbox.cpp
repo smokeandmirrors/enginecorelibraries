@@ -278,27 +278,8 @@ class CallAdapter
 typedef uint (A::* mptype)(sreal, const math::Vector3&);
 typedef uint (CallAdapter::* mptype2)(sreal, const math::Vector3&);
 
-enum E1
-{
-  val11 = 1,
-  val12
-};
-
-enum E2
-{
-	val21 = 2,
-	val22
-};
-
-int withE(E1 arg) { return arg; }
-int withE(E2 arg) { return arg; }
-
 void onPlay(void)
 {
-	int e1 = withE(val11);
-	int e2 = withE(val21);
-	
-	
 	math::Vector3 z;
 	z.zero();
 
@@ -332,7 +313,7 @@ void onPlay(void)
 //  	}
 //  #endif//EXTENDED_BY_LUA	
 
-	sandbox::verifyUnitTests();
+	// sandbox::verifyUnitTests();
 	// sandbox::schedulingRnD();
 	sandbox::tableRnD();
 	
@@ -418,7 +399,7 @@ void onPlay(void)
 
 		for (sint i = 1; i < 1000; ++i)
 		{
-			sint randi = getRand<sint>(-i, i);
+			sint randi = generateRandom(-i, i);
 			biheap.push(randi);
 			priqueue.push(randi);
 

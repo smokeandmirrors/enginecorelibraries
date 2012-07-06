@@ -49,13 +49,13 @@ void sandbox::tableRnD(void)
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
 	
-	srand(static_cast<uint>(realTime::Clock::single().cycles()));
+	srand(static_cast<uint>(xronos::Clock::single().cycles()));
 	
 	for (int i = 0; i < 10; i++)
-		printf("%f\n", getRand<sreal>(-1.0f, 1.0f));
+		printf("%f\n", generateRandom<sreal>(-1.0f, 1.0f));
 
 	for (int i = 0; i < 10; i++)
-		printf("%d\n", getRand<sint>(-10, 10));
+		printf("%d\n", generateRandom<sint>(-10, 10));
 
 	RedBlackTree<sint>* pRbt = new RedBlackTree<sint>();
 	RedBlackTree<sint>& rbt = *pRbt;
@@ -76,7 +76,7 @@ void sandbox::tableRnD(void)
 	
 	for (sint i = 0; i < 10000; i++)
 	{
-		// randomNumber = getRand<sint>(-100, 100);
+		// randomNumber = generateRandom<sint>(-100, 100);
 		randomNumber = i;
 		numbers.push_back(randomNumber);
 		
@@ -158,10 +158,10 @@ void sandbox::tableRnD(void)
 	
 	{
 		// race!
-		realTime::Clock& realClock(realTime::Clock::single());
-		realTime::Stopwatch tableTime(realClock);
-		realTime::Stopwatch treeTime(realClock);
-		realTime::Stopwatch mapTime(realClock);
+		xronos::Clock& realClock(xronos::Clock::single());
+		xronos::Stopwatch tableTime(realClock);
+		xronos::Stopwatch treeTime(realClock);
+		xronos::Stopwatch mapTime(realClock);
 		std::vector<String::Immutable> strings;
 		
 		RedBlackMap<String::Immutable, sint> tree;
@@ -294,7 +294,14 @@ void sandbox::tableRnD(void)
 			printf("Find:\n%10.6f :Table\n%10.6f :Tree\n%10.6f :Map\n\n", tableInsert, treeInsert, mapInsert); 
 		}
 
-		// \todo handle the empty table
+		Set<int> emptyTable;
+		
+		for (Set<int>::Iterator emptyIterator(emptyTable); emptyIterator; emptyIterator++)
+		{
+			Set<int>::Iterator emptyIteratorCopy(emptyTable, emptyIterator.key());
+			printf("Did this work?\n");
+		}
+
 		Set<sint>::Iterator iter(table);
 		Set<sint>::IteratorConst iterConst(table);
 		Set<sint>::Iterator pp1(table, iter.key());

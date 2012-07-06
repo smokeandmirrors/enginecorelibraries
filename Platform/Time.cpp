@@ -73,7 +73,7 @@ namespace
 #endif//WIN32	
 } // namespace 
 
-realTime::Clock::Clock(void)
+xronos::Clock::Clock(void)
 : hertz(_initilializeFrequency())
 , hertzInverse(static_cast<const second>(static_cast<slong>(1)) / static_cast<const second>(static_cast<slong>((hertz))))
 , milliHz(hertz / 1000)
@@ -83,24 +83,24 @@ realTime::Clock::Clock(void)
 	/* empty */
 }
 
-cycle realTime::Clock::getCurrentCycle(void) const
+cycle xronos::Clock::getCurrentCycle(void) const
 {
 	return _getCycleCPU();
 } 
 
-millisecond realTime::Clock::milliseconds(void) const
+millisecond xronos::Clock::milliseconds(void) const
 {
 	return cycles() * milliHzInverse;
 }
 
-void realTime::Clock::reset(void)
+void xronos::Clock::reset(void)
 { 
 	cycleZero = getCurrentCycle(); 
 }
 
-second realTime::Clock::seconds(void) const
+second xronos::Clock::seconds(void) const
 {
 	return milliseconds() * 1000;
 }
 
-DEFINE_SINGLETON_NS(Clock, realTime)
+DEFINE_SINGLETON_NS(Clock, xronos)

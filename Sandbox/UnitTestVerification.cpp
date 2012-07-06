@@ -282,7 +282,7 @@ sint returnOneParamZero(void)
 	return 7;
 }
 
-using namespace realTime;
+using namespace xronos;
 
 DEFINE_LUA_ENUM(BoolEnum)
 LUA_ENUM(BoolEnum_False)
@@ -290,12 +290,12 @@ LUA_ENUM(BoolEnum_True)
 LUA_ENUM(BoolEnum_Unset)
 END_LUA_ENUM(BoolEnum)
 
-DECLARE_LUA_LIBRARY(realTime)
-DEFINE_LUA_LIBRARY(realTime)
+DECLARE_LUA_LIBRARY(xronos)
+DEFINE_LUA_LIBRARY(xronos)
 LUA_ENTRY_NAMED("cycles", (nativeStaticReturn1Param0<cycle, &cycles>))
 LUA_ENTRY_NAMED("milliseconds", (nativeStaticReturn1Param0<millisecond, &milliseconds>))
 LUA_ENTRY_NAMED("seconds", (nativeStaticReturn1Param0<second, &seconds>))
-END_LUA_LIBRARY(realTime)
+END_LUA_LIBRARY(xronos)
 
 DECLARE_LUA_CLASS(ClockInterface)
 DEFINE_LUA_CLASS_NO_CTOR(CLASS, ClockInterface, ClockInterface)
@@ -650,7 +650,7 @@ void executeLuaUnitTest(char* module, Lua* lua)
 	mbstowcs_s(&convertedChars, wreport, origsize, report, _TRUNCATE);
 	// CFIX_LOG(L"\nLua Unit Test Report: %s", wreport);
 
-	// CFIX_ASSERT(!result);
+	assert(!result);
 
 	delete[] wreport;
 	if (delete_lua)
@@ -696,7 +696,7 @@ void unitTestLua(void)
 	REGISTER_LUA_LIBRARY((&lua), Vector2)
 	REGISTER_LUA_LIBRARY((&lua), Vector3)
 
-	REGISTER_LUA_LIBRARY((&lua), realTime)
+	REGISTER_LUA_LIBRARY((&lua), xronos)
 	REGISTER_LUA_LIBRARY((&lua), ClockInterface)
 	REGISTER_LUA_LIBRARY((&lua), Clock)
 	REGISTER_LUA_LIBRARY((&lua), ClockRelative)

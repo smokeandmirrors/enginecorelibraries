@@ -33,7 +33,7 @@
 using namespace containers;
 using namespace concurrency;
 using namespace designPatterns;
-using namespace realTime;
+using namespace xronos;
 // using namespace std;
 
 void onPlay(void);
@@ -60,14 +60,14 @@ inline void doWork(millisecond milliseconds)
 		*i++ = number;
 	}
 
-	millisecond start = realTime::Clock::single().milliseconds();
+	millisecond start = xronos::Clock::single().milliseconds();
 
 	do 
 	{
 		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	while (realTime::Clock::single().milliseconds() - start < milliseconds); // delete[] numbers;
+	while (xronos::Clock::single().milliseconds() - start < milliseconds); // delete[] numbers;
 }
 
 void doWork3(void) { doWork(3000); }
@@ -431,7 +431,7 @@ protected:
 	void startFrame(void)
 	{
 		int frame(0);
-		realTime::Stopwatch timer(realTime::Clock::single());
+		xronos::Stopwatch timer(xronos::Clock::single());
 		timer.start();
 		
 		for(;;)
