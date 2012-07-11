@@ -109,7 +109,9 @@ class ReceiverBase
 {
 public:
 	ReceiverBase(void)
-	{ /* empty */ }
+	{ 
+		SET_THREAD_SPIN_COUNT(m_mutex, 12);
+	}
 
 	ReceiverBase(const ReceiverBase& receiver)
 	{
@@ -207,7 +209,9 @@ class ReceiverMember
 public:
 	ReceiverMember(void)
 	: m_receiver(NULL)
-	{ /* empty */ }
+	{ 
+		SET_THREAD_SPIN_COUNT(m_mutex, 12);
+	}
 
 	ReceiverMember(const ReceiverMember& receiver)
 	: m_receiver(NULL)

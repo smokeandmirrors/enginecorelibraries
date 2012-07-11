@@ -397,9 +397,8 @@ void Dispatcher::enqueueAndWait(Dispatcher::InputQueue& work)
 	
 	{
 		SYNC(m_mutex);
-		InputQueueIterator sentinel(work.end());
 		
-		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
+		for (InputQueueIterator iter(work.begin()), sentinel(work.end()); iter != sentinel; ++iter)
 		{
 			Thread* output(NULL);
 			m_pendingJobs->add(*iter, &output);

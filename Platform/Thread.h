@@ -34,6 +34,7 @@ public:
 		Tree(void)
 		: rootID(Thread::getCurrentID())
 		{
+			SET_THREAD_SPIN_COUNT(mutex, 4);
 			threads.reserve(20);
 		}
 

@@ -3,7 +3,7 @@
 
 #if WIN32
 #include <process.h>
-#include <windows.h>
+#include <Windows.h>
 #endif//WIN32
 
 namespace concurrency
@@ -18,10 +18,11 @@ class PlatformMutex
 {
 public:
 #if WIN32
-	/** \todo inspect SetCriticalSectionSpinCount */
-	inline PlatformMutex(void)
+	inline PlatformMutex(uint/*spinCount*/=0)
 	{
 		InitializeCriticalSection(&m_criticalSection);
+		// for a more recent compiler version 
+		// InitializeCriticalSectionAndSpinCount(&m_criticalSection, spinCount);
 	}
 
 	inline ~PlatformMutex(void)
@@ -34,11 +35,17 @@ public:
 		EnterCriticalSection(&m_criticalSection);
 	}
 	
+	inline void setSpinCount(uint/*spinCount*/)
+	{
+		// for a more recent compiler version
+		// SetCriticalSectionSpinCount(&m_criticalSection, spinCount);
+	}
+
 	inline void release(void)
 	{
 		LeaveCriticalSection(&m_criticalSection);
 	}
-
+	
 private:
 	criticalSection	m_criticalSection;
 #else
@@ -92,6 +99,11 @@ Mutex::~Mutex(void)
 void Mutex::acquire(void)
 {
 	mutex->acquire();
+}
+
+void Mutex::setSpinCount(uint spinCount)
+{
+	mutex->setSpinCount(spinCount);
 }
 
 void Mutex::release(void)

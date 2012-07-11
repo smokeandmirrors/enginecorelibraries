@@ -36,6 +36,10 @@ Tested in the field	:	NO
 #define DEFINE_STATIC_MUTEX(SCOPE, INDENTIFIER) \
 	concurrency::Mutex SCOPE##::##INDENTIFIER;
 
+#define SET_THREAD_SPIN_COUNT(MUTEX, SPIN_COUNT) \
+	MUTEX.setSpinCount(SPIN_COUNT);
+
+
 #define SYNC(MUTEX) \
 	concurrency::SynchronizerMutex	UNIQUE_SYNCHRONIZATION(SYNCHRONIZED)(MUTEX);
 
@@ -49,6 +53,7 @@ public:
 	~Mutex(void);
 	void acquire(void);
 	void release(void);
+	void setSpinCount(uint spinCount);
 
 protected:
 	class PlatformMutex* mutex;
