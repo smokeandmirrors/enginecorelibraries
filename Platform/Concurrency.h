@@ -52,7 +52,7 @@ extern const cpuID noCPUpreference;
 extern const threadID invalidThreadID;
 
 void sleep(millisecond milliseconds);
-
+/// \todo these all need to be handled via shared_ptr
 class Executable 
 {
 public:

@@ -2,6 +2,8 @@
 #ifndef SCHEDULING_H
 #define SCHEDULING_H
 
+#if 0
+
 #include <map>
 #include <vector>
 
@@ -23,9 +25,6 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-/** \todo set ideal processor at job execution time */
-
-#define unspecifiedPriority 0
 
 namespace concurrency
 {
@@ -40,14 +39,14 @@ class Dispatcher
 	class Job;
 	class PendingJobQueue;
 	friend class designPatterns::Singleton<Dispatcher>;
-	typedef uint SchedulePriority;
+	
 	
 
 public: 
 	class Input
 	{
 	public:
-		Input(Executor& inExecutable, cpuID inPreferredCPU=noCPUpreference, SchedulePriority inPriority=unspecifiedPriority)
+		Input(Executor& inExecutable, cpuID inPreferredCPU=noCPUpreference, ExecutionPriority inPriority=unspecifiedPriority)
 			: executable(&inExecutable)
 			, preferredCPU(inPreferredCPU)
 			, priority(inPriority)
@@ -57,7 +56,7 @@ public:
 		friend class Dispatcher;
 		Executor* executable;
 		cpuID preferredCPU;
-		SchedulePriority priority;
+		ExecutionPriority priority;
 	}; // Dispatcher::Input
 
 	typedef std::vector<Dispatcher::Input> InputQueue;
@@ -111,4 +110,6 @@ private:
 	DECLARE_MUTEX(m_mutex);
 }; // class Dispatcher
 } // namespace concurrency
+#endif 
+
 #endif//SCHEDULING_H

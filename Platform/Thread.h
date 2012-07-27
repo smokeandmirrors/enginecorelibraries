@@ -2,12 +2,14 @@
 #ifndef THREADS_H
 #define THREADS_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
 #include "Concurrency.h"
 #include "Platform.h"
 #include "Signals.h"
+#include "Thread.h"
 
 /**
 <DEVELOPMENT STATUS>
@@ -22,17 +24,112 @@ Tested in the field	:	NO
 namespace concurrency
 {
 
+typedef uint ExecutionPriority;
+extern const ExecutionPriority unspecifiedPriority;
+
 class Thread
 {
+	friend class Tree;
+
+public:
+	class ExecutableQueue
+	{
+		friend class Thread;
+	public:
+		class ExecutableInput
+		{
+		public:
+			ExecutableInput(Executor* new_executable, cpuID new_preferredCPU, ExecutionPriority new_priority)
+				: executable(new_executable)
+				, preferredCPU(new_preferredCPU)
+				, priority(new_priority)
+			{
+				/* empty */
+			}
+
+			Executor* executable;
+			cpuID preferredCPU;
+			ExecutionPriority priority;
+		};
+
+		typedef std::vector<ExecutableInput>::iterator ExecutableQueueIter; 
+
+	void add(Executor& executable, cpuID preferredCPU=noCPUpreference, ExecutionPriority priority=unspecifiedPriority)
+	{
+		inputQueue.push_back(ExecutableInput(&executable, preferredCPU, priority));
+	}
+		
+	private:
+		std::vector<ExecutableInput> inputQueue;
+	};
+	
+	/// \todo these all need to be handled via shared_ptr ? or not
+
+	// these may not be necessary, as the dispatcher clearly needs some attention, too
+	/// for the user/scheduler to wait on it
+	static Thread* createSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	/// for the daring user, for the scheduler to get the preferred CPU
+	static Thread* createUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
+	///
+	static Thread* createExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	
+	
+	// static void execute(ExecutableQueue& executables);
+	static void initializeSystem(void);
+
+
+	static bool isThreadInChildWaitingTree(void); // ?? the new dispatcher might need this?
+	
+	
+	static void shutDownSystem(void);
+	static void waitOnCompletion(ExecutableQueue& executables);
+	static void waitOnCompletionOfChildren(ExecutableQueue& executables);
+	
+
+	/// for the normal user
+	
+	
+	/// get the ID of the executing thread
+	static threadID getThisID(void);
+	
+	
+
+	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
+
+	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
+
+	void addReference(void) const { ++m_referenceCount; }
+
+	void disconnect(signals::Receiver* receiver);
+
+	void execute(cpuID preferredCPU=noCPUpreference); 
+	
+	void executeAndWait(cpuID preferredCPU=noCPUpreference);
+
+	inline bool getID(threadID& id) const;
+
+	cpuID getPreferredCPU(void) const;
+		
+	void removeReference(void) const 
+	{
+		assert(m_referenceCount);
+		--m_referenceCount;
+		if (!m_referenceCount)
+			delete this;
+	}
+
+	const std::string& toString(void) const;
+
 public:
 	class Tree
 	{
+		friend class containers::Table<Thread::Tree*>;
 	public:
 		typedef std::vector<Thread*>::const_iterator ThreadIterConst; 
 		typedef std::vector<Thread*>::iterator ThreadIter; 
 
 		Tree(void)
-		: rootID(Thread::getCurrentID())
+			: rootID(Thread::getThisID())
 		{
 			SET_THREAD_SPIN_COUNT(mutex, 4);
 			threads.reserve(20);
@@ -48,13 +145,13 @@ public:
 				(*iter)->removeReference();
 			}
 		}
-	
+
 		inline ThreadIter begin(void) 
 		{
 			SYNC(mutex);
 			return threads.begin();
 		}
-		
+
 		inline ThreadIterConst begin(void) const
 		{
 			SYNC(mutex);
@@ -109,52 +206,11 @@ public:
 		threadID rootID;
 
 		DECLARE_MUTEX(mutex);
-		
+
 		std::vector<Thread*> threads;
 	}; // class Thread::Tree
-
-	static threadID getCurrentID(void);
-	/// \todo these all need to be handled via shared_ptr
-	/// for the normal user
-	static Thread* getExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	/// for the user/scheduler to wait on it
-	static Thread* getSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	/// for the daring user, for the scheduler to get the preferred CPU
-	static Thread* getUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
-	/// wait on the thread to complete
-	static void waitOnCompletion(Thread& thread);
-	/// wait on all threads currently in the tree
-	static void waitOnCompletion(Tree& threads, size_t startingIndex=0);
-	/// wait on the threads in the tree, and any child thread
-	static void waitOnCompletionOfChildren(Tree& threads);
-
-	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
-
-	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
-
-	void addReference(void) const { ++m_referenceCount; }
-
-	void disconnect(signals::Receiver* receiver);
-
-	void execute(cpuID preferredCPU=noCPUpreference); 
-	
-	void executeAndWait(cpuID preferredCPU=noCPUpreference);
-
-	inline bool getID(threadID& id) const;
-
-	cpuID getPreferredCPU(void) const;
-
-	void removeReference(void) const 
-	{
-		assert(m_referenceCount);
-		--m_referenceCount;
-		if (!m_referenceCount)
-			delete this;
-	}
-
-	const std::string& toString(void) const;
-
 private:
+
 	enum RunningState
 	{
 		completed,		// execution complete 
@@ -170,23 +226,16 @@ private:
 	static uint __stdcall systemExecute(threadHandle thread)
 	{
 		static_cast<Thread*>(thread)->internalExecute();
+		// thread->notifyTreeOfCompletion
 		return 0;
 	}
 #else
 	#error unsupported concurrency platform
 #endif//WIN32
 
-	Thread(Executor& executable,
-	cpuID preferredCPU)
-	: m_executor(&executable)
-	, m_preferredCPU(preferredCPU)
-	, m_thread(NULL)
-	, m_state(Thread::uninitialized)
-	, m_launcherID(invalidThreadID)
-	, m_referenceCount(1)
-	{ /* empty */ }
+	static void registerThread(cpuID id, Thread* thread);
 
-
+	Thread(Executor& executable, cpuID preferredCPU, RunningState initialState);
 	virtual ~Thread(void);
 
 	/** not allowed */
@@ -206,9 +255,14 @@ private:
 	inline bool isHardwareInitialized(void) const;
 
 	inline bool isWaitable(void) const; 
-
-	void updateCPUPreference(cpuID suggestedCPU);
-
+	void setPreferredCPU(cpuID prefeeredCPU);
+	bool updateCPUPreference(cpuID suggestedCPU);
+	/// wait on the thread to complete
+	static void waitOnCompletion(Thread& thread);
+	/// wait on all threads currently in the tree
+	static void waitOnCompletion(Tree& threads, size_t startingIndex=0);
+	/// wait on the threads in the tree, and any child thread
+	static void waitOnCompletionOfChildren(Tree& threads);
 	RunningState m_state;
 
 	Executor* m_executor;
@@ -216,14 +270,12 @@ private:
 	mutable uint m_referenceCount;
 
 	threadID m_id;
-
-	threadID m_launcherID;
-
+	
 	cpuID m_preferredCPU;
 
 	threadHandle m_thread;
 
- 	signals::Transmitter1<Thread*> m_onComplete;
+	signals::Transmitter1<Thread*> m_onComplete;
 
 	DECLARE_MUTEX(m_mutex);
 

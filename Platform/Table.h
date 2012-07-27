@@ -214,6 +214,21 @@ public:
 		return v && *v;
 	}
 
+	bool has(const Key& key, ELEMENT& value) const
+	{
+		Value* v = getInternal(key);
+		
+		if (v && *v)
+		{
+			value = v->element;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	void insertAtIndex(const ELEMENT& value, uint insertIndex)
 	{
 		sint position = static_cast<sint>(insertIndex);

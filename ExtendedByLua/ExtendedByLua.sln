@@ -1,42 +1,19 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLua", "ExtendedByLua.vcproj", "{C81BA5A2-E8C9-4F5F-A9CB-997F07CDD220}"
-	ProjectSection(ProjectDependencies) = postProject
-		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4} = {69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}
-		{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A} = {6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}
-		{6EDEDB49-5A48-4365-B25A-9CF7B2D78583} = {6EDEDB49-5A48-4365-B25A-9CF7B2D78583}
-		{8A0857CB-869F-4727-9FAA-C80E5A183377} = {8A0857CB-869F-4727-9FAA-C80E5A183377}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLua", "ExtendedByLua.vcxproj", "{C81BA5A2-E8C9-4F5F-A9CB-997F07CDD220}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmbeddedLua", "..\EmbeddedLua\EmbeddedLua.vcproj", "{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}"
-	ProjectSection(ProjectDependencies) = postProject
-		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4} = {69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EmbeddedLua", "..\EmbeddedLua\EmbeddedLua.vcxproj", "{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mathematics", "..\Mathematics\Mathematics.vcproj", "{8A0857CB-869F-4727-9FAA-C80E5A183377}"
-	ProjectSection(ProjectDependencies) = postProject
-		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4} = {69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mathematics", "..\Mathematics\Mathematics.vcxproj", "{8A0857CB-869F-4727-9FAA-C80E5A183377}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "..\Sandbox\Sandbox.vcproj", "{6EDEDB49-5A48-4365-B25A-9CF7B2D78583}"
-	ProjectSection(ProjectDependencies) = postProject
-		{8A0857CB-869F-4727-9FAA-C80E5A183377} = {8A0857CB-869F-4727-9FAA-C80E5A183377}
-		{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4} = {69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}
-		{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A} = {6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "..\Sandbox\Sandbox.vcxproj", "{6EDEDB49-5A48-4365-B25A-9CF7B2D78583}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLuaUnitTesting", "..\ExtendedByLuaUnitTesting\ExtendedByLuaUnitTesting.vcproj", "{F7C8BDD2-34F6-477F-A93D-DB038F96AEF1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{6FE6E90C-2FB0-42E2-B408-373ABB25ED8A} = {6FE6E90C-2FB0-42E2-B408-373ABB25ED8A}
-		{6EDEDB49-5A48-4365-B25A-9CF7B2D78583} = {6EDEDB49-5A48-4365-B25A-9CF7B2D78583}
-		{C81BA5A2-E8C9-4F5F-A9CB-997F07CDD220} = {C81BA5A2-E8C9-4F5F-A9CB-997F07CDD220}
-		{8A0857CB-869F-4727-9FAA-C80E5A183377} = {8A0857CB-869F-4727-9FAA-C80E5A183377}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtendedByLuaUnitTesting", "..\ExtendedByLuaUnitTesting\ExtendedByLuaUnitTesting.vcxproj", "{F7C8BDD2-34F6-477F-A93D-DB038F96AEF1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform", "..\Platform\Platform.vcproj", "{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform", "..\Platform\Platform.vcxproj", "{69BC032B-0BB4-4FBA-89F0-A79259AB0CF4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArtificialIntelligence", "..\ArtificialIntelligence\ArtificialIntelligence.vcproj", "{B8C3C838-9862-4028-8D4F-BF6796D16EA4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ArtificialIntelligence", "..\ArtificialIntelligence\ArtificialIntelligence.vcxproj", "{B8C3C838-9862-4028-8D4F-BF6796D16EA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,6 +10,7 @@
 #include "UnitTestVerification.h"
 #include "Table.h"
 #include "LuaExtensionInclusions.h"
+#include "Thread.h"
 
 const char* megaString = ""
 "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz123456789012345678901";
@@ -278,8 +279,65 @@ class CallAdapter
 typedef uint (A::* mptype)(sreal, const math::Vector3&);
 typedef uint (CallAdapter::* mptype2)(sreal, const math::Vector3&);
 
+using namespace concurrency;
+
+sint sintCompareAscending(const void* a, const void* b)	{ return (*(sint*)(a)) - (*(sint*)(b)); }
+sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
+
+inline void doWork(millisecond milliseconds)
+{
+	sint number_size = 1000;
+	sint numbers[1000];// = new sint[number_size];
+	sint* i = numbers;
+
+	for (sint number = 0; number < number_size; number++)
+	{
+		*i++ = number;
+	}
+
+	millisecond start = xronos::Clock::single().milliseconds();
+
+	do 
+	{
+		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
+		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
+	}
+	while (xronos::Clock::single().milliseconds() - start < milliseconds); // delete[] numbers;
+}
+void doWork3(void) { doWork(3000); }
+void doWork10report(void) { doWork(10000); printf("done with 10\n"); }
+
+inline void doWork10SimpleChildThreads3()
+{
+	doWork3();
+
+	for (int i = 0; i < 3; ++i)
+	{
+		Executor* executor = new Executor(&doWork10report);
+		Thread::createExecuting(*executor);
+	}
+
+	printf("finished work and creating!\n");
+}
+
 void onPlay(void)
 {
+	{
+		Executor* executor = new Executor(&doWork10SimpleChildThreads3);
+		concurrency::Thread::ExecutableQueue executables;
+		executables.add(*executor, concurrency::noCPUpreference);
+		Thread::waitOnCompletion(executables);
+		printf("boy, I hope This happens right away!\n");
+	}
+
+	{
+		Executor* executor = new Executor(&doWork10SimpleChildThreads3);
+		concurrency::Thread::ExecutableQueue executables;
+		executables.add(*executor, concurrency::noCPUpreference);
+		Thread::waitOnCompletionOfChildren(executables);
+		printf("boy, I hope this doesn't happen for 10 seconds!\n");
+	}
+
 	math::Vector3 z;
 	z.zero();
 
@@ -420,4 +478,12 @@ void onPlay(void)
 
 		assert(priqueue.empty());
 	}
+}
+
+void sandbox::play()
+{
+	compilerChecks::check();
+	printf("Playing in the sandbox!\n");
+	onPlay();
+	printf("Stopped playing in the sandbox!\n");
 }

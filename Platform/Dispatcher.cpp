@@ -1,3 +1,5 @@
+#if 0
+
 #include <list>
 #include <string>
 #include <vector>
@@ -16,12 +18,6 @@ using namespace signals;
 
 // #define SCHEDULE_PRINT printState();
 #define SCHEDULE_PRINT 
-// 
-// namespace designPatterns
-// {
-// 	template<> concurrency::Dispatcher* Singleton<concurrency::Dispatcher>::single(NULL);
-// 	static CustomSingletonInitializer<concurrency::Dispatcher> dispatcherInitializer;
-// } // namespace designPatterns
 
 DEFINE_SINGLETON_NS(Dispatcher, concurrency)
 
@@ -64,7 +60,7 @@ public:
 		m_receiver.ceaseReception();
 	}
 
-	inline SchedulePriority getPriority(void) const
+	inline ExecutionPriority getPriority(void) const
 	{
 		return m_priority;
 	}
@@ -90,7 +86,7 @@ public:
 		return id;
 	}
 
-	void reset(Thread* newThread, SchedulePriority newPriority)
+	void reset(Thread* newThread, ExecutionPriority newPriority)
 	{
 		if (m_thread)
 		{
@@ -164,7 +160,7 @@ private:
 
 	signals::ReceiverMember	m_receiver;
 	Thread* m_thread;
-	SchedulePriority m_priority;
+	ExecutionPriority m_priority;
 }; // Job 
 
 
@@ -179,12 +175,12 @@ public:
 		
 		if (waitable)
 		{
-			thread = Thread::getSuspended(*work.executable, work.preferredCPU);
+			thread = Thread::createSuspended(*work.executable, work.preferredCPU);
 			*waitable = thread;
 		}
 		else
 		{
-			thread = Thread::getUninitialized(*work.executable, work.preferredCPU);
+			thread = Thread::createUninitialized(*work.executable, work.preferredCPU);
 		}
 		
 		job->reset(thread, work.priority);
@@ -353,9 +349,9 @@ void Dispatcher::enqueue(Dispatcher::InputQueue& work)
 {
 	SYNC(m_mutex);
 
-	threadID parentID = Thread::getCurrentID();
+	threadID parentID = Thread::getThisID();
 	std::map<threadID, threadID>::iterator originalIDIter = m_originalByChildren.find(parentID);
-
+	/// \todo this has to get moved to the ThreadTree class!
 	if (originalIDIter != m_originalByChildren.end())
 	{	// a parent job is waiting on the end of this one
 		threadID originalID = originalIDIter->second;
@@ -668,3 +664,5 @@ const std::string Dispatcher::toStringInactiveJob(void) const
 	return std::string("    inactive.    ");
 }
 } // namespace concurrency
+
+#endif 

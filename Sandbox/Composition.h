@@ -31,6 +31,8 @@ Tested in the field	:	NO
 
 #include "Synchronization.h"
 
+/// \todo activate/deactivate pause/play functions
+
 namespace designPatterns
 {
 

@@ -18,11 +18,10 @@ class PlatformMutex
 {
 public:
 #if WIN32
-	inline PlatformMutex(uint/*spinCount*/=0)
-	{
-		InitializeCriticalSection(&m_criticalSection);
+	inline PlatformMutex(uint spinCount=0)
+	{	// InitializeCriticalSection(&m_criticalSection);
 		// for a more recent compiler version 
-		// InitializeCriticalSectionAndSpinCount(&m_criticalSection, spinCount);
+		InitializeCriticalSectionAndSpinCount(&m_criticalSection, spinCount);
 	}
 
 	inline ~PlatformMutex(void)
@@ -35,10 +34,9 @@ public:
 		EnterCriticalSection(&m_criticalSection);
 	}
 	
-	inline void setSpinCount(uint/*spinCount*/)
-	{
-		// for a more recent compiler version
-		// SetCriticalSectionSpinCount(&m_criticalSection, spinCount);
+	inline void setSpinCount(uint spinCount)
+	{	// for a more recent compiler version
+		SetCriticalSectionSpinCount(&m_criticalSection, spinCount);
 	}
 
 	inline void release(void)

@@ -18,7 +18,7 @@ namespace sandbox
 {
 	void play(void);
 	void tableRnD(void);
-	void schedulingRnD(void);
+	// void schedulingRnD(void);
 } // namespace sandbox
 
 #endif//SANDBOX

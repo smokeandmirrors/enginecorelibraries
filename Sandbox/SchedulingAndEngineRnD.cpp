@@ -1,3 +1,5 @@
+#if 0
+
 #include <list>
 #include <map>
 #include <queue>
@@ -38,13 +40,6 @@ using namespace xronos;
 
 void onPlay(void);
 
-void sandbox::play()
-{
-	compilerChecks::check();
-	printf("Playing in the sandbox!\n");
-	onPlay();
-	printf("Stopped playing in the sandbox!\n");
-}
 
 sint sintCompareAscending(const void* a, const void* b)	{ return (*(sint*)(a)) - (*(sint*)(b)); }
 sint sintCompareDescending(const void* a, const void* b)	{ return (*(sint*)(b)) - (*(sint*)(a)); }
@@ -74,6 +69,20 @@ void doWork3(void) { doWork(3000); }
 void doWork4(void) { doWork(4000); }
 void doWork5(void) { doWork(5000); }
 void doWork10(void) { doWork(10000); }
+void doWork10report(void) { doWork(10000); printf("done with 10\n"); }
+
+inline void doWork10SimpleChildThreads3()
+{
+	doWork3();
+	
+	for (int i = 0; i < 3; ++i)
+	{
+		Executor* executor = new Executor(&doWork10report);
+		Thread::createExecuting(*executor);
+	}
+
+	printf("finished work and creating!\n");
+}
 
 void simpleChildrenPre(void)
 {
@@ -651,8 +660,9 @@ void testEngineLoop(void)
 
 void sandbox::schedulingRnD(void)
 {
-	// 
 	
+
+	/*
 	concurrency::Executor* executor(NULL);
 
 // 	executor = new concurrency::Executor(&doWork3);
@@ -697,7 +707,19 @@ void sandbox::schedulingRnD(void)
 	printf("Nice!  That was awesome!\n");
 	// Thread::checkDestruction();
 
+	Dispatcher::InputQueue inputQueue;
+	for (uint i(0); i < Dispatcher::single().getMaxThreads() * 100; i++)
+	{
+		Executor* work = new Executor(&doWork5);
+		Dispatcher::Input input(*work, i % Dispatcher::single().getMaxThreads());
+		inputQueue.push_back(input);
+	}
 
-	testEngineLoop();
+	Dispatcher::single().enqueueAndWait(inputQueue);
 	// Thread::checkDestruction();
+	*/
+	
+	// testEngineLoop();
 }
+
+#endif

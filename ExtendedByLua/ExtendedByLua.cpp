@@ -29,16 +29,16 @@ are included in the macro below
 
 #if SANDBOX
 #include "Sandbox.h" 
-#include "Dispatcher.h"
+#include "Thread.h"
 concurrency::Semaphore* allowable;
 
 void theDoFunction(void)
 {
-	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getCurrentID());
+	printf("My name is %10d I'm about to acquire!\n", concurrency::Thread::getThisID());
 	allowable->acquire();
-	printf("My name is %10d I'm doing the function!\n", concurrency::Thread::getCurrentID());
+	printf("My name is %10d I'm doing the function!\n", concurrency::Thread::getThisID());
 	concurrency::sleep(500);
-	printf("My name is %10d I finished the function!\n", concurrency::Thread::getCurrentID());
+	printf("My name is %10d I finished the function!\n", concurrency::Thread::getThisID());
 	allowable->release();
 }
 #endif//SANDBOX
@@ -46,7 +46,7 @@ void theDoFunction(void)
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
  	designPatterns::createSingletons();
-
+	concurrency::Thread::initializeSystem();
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality
 // 
@@ -81,6 +81,7 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//EXTENDED_BY_LUA
 
 	designPatterns::destroySingletons();
+	concurrency::Thread::shutDownSystem();
 	return 0;
 }
 
