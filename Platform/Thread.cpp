@@ -12,11 +12,94 @@ namespace concurrency
 {
 const ExecutionPriority unspecifiedPriority = 0;
 
-Thread* mainThread(NULL);
+class WaitingTree
+{	// this class probably proves that I should have a tree pointer?  no...can't although it could help for deregistration
+public:
+	WaitingTree(bool onChildren)
+	: waitOnChildren(onChildren)
+	{
+		/* empty */
+	}
 
-DECLARE_MUTEX(treesByIDsMutex); 
-// containers::Table<Thread::Tree*> treesByIDs; // todo, fix this, we can't have static tables
-containers::RedBlackMap<concurrency::threadID, Thread::Tree*> treesByIDs;
+	bool isWaitedOn(threadID id)
+	{
+		SYNC(mutex);
+		{
+			return waitsByThreadIDs.has(id);
+		}
+	}
+
+	void registerTree(threadID id, Thread::Tree& tree)
+	{
+		SYNC(mutex);
+		waitsByThreadIDs.set(id, &tree);
+	}
+
+	void unregisterTree(threadID id)
+	{
+		SYNC(mutex);
+		waitsByThreadIDs.remove(id);
+	}
+
+	void registerThread(threadID id, Thread* thread)
+	{
+		threadID thisID = Thread::getThisID();
+		Thread::Tree* tree(NULL);
+		{
+			SYNC(mutex);
+			if (waitsByThreadIDs.has(thisID, tree))
+			{	// this thread is waited on
+				if (waitOnChildren)
+				{	// so are the children
+					waitsByThreadIDs.set(id, tree); 
+				}
+			}
+		}
+
+		if (tree)
+		{
+			tree->push(thread);
+		}
+	}
+
+	void unregisterThread(threadID threadID)
+	{
+		SYNC(mutex);
+		waitsByThreadIDs.remove(threadID);
+	}
+
+private:
+	bool waitOnChildren;
+	DECLARE_MUTEX(mutex); 
+	containers::RedBlackMap<concurrency::threadID, Thread::Tree*> waitsByThreadIDs;
+};
+
+WaitingTree singleWait(false);
+WaitingTree childWait(true);
+
+void registerTree(threadID id, Thread::Tree& tree, bool waitOnChildren)
+{
+	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+	waitingTree.registerTree(id, tree);
+}
+
+void unregisterTree(threadID id, bool waitOnChildren)
+{
+	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+	waitingTree.unregisterTree(id);
+}
+
+void registerThread(threadID threadID, Thread* thread)
+{
+	singleWait.registerThread(threadID, thread);
+	childWait.registerThread(threadID, thread);
+}
+
+void unregisterThread(threadID threadID)
+{
+	singleWait.unregisterThread(threadID);
+	childWait.unregisterThread(threadID);
+}
 
 const millisecond waitInfinitely(10000000000);
 const cpuID noCPUpreference(-1);
@@ -36,40 +119,6 @@ inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitF
 uint Thread::m_created(0);
 DEFINE_STATIC_MUTEX(Thread, m_createdMutex)
 #endif//TEST_THREAD_DESTRUCTION	
-
-void Thread::initializeSystem()
-{
-	if (mainThread == NULL)
-	{
-		mainThread = new Thread();
-		registerThread(Thread::getThisID(), mainThread);
-	}
-}
-
-void Thread::registerThread(cpuID id, Thread* thread)
-{
-	Thread::Tree* tree(NULL);
-	{
-		SYNC(treesByIDsMutex);
-		cpuID thisID(Thread::getThisID());
-
-		if (treesByIDs.has(thisID, tree))
-		{	// this thread is waited on			
-			treesByIDs.set(id, tree);
-		}
-	}
-
-	if (tree)
-	{
-		tree->push(thread);
-	}
-}
-
-void Thread::shutDownSystem()
-{	// check to make sure no threads are waiting?
-	delete mainThread;
-	mainThread = NULL;
-}
 
 Thread::Thread(void)
 : m_id(Thread::getThisID())
@@ -108,16 +157,18 @@ Thread::Thread
 
 Thread::~Thread(void)
 {
-	if (this != mainThread)
+	if (m_state == running)
 	{
-		if (m_state == running)
-		{
-			waitOnCompletion(*this);
-		}
-
-		closeHardware();
-		delete m_executor;
+		waitOnCompletion(*this);
 	}
+
+	if (m_state != uninitialized)
+	{
+		unregisterThread(m_id);
+	}
+
+	closeHardware();
+	delete m_executor;
 }
 
 void Thread::closeHardware()
@@ -206,6 +257,16 @@ void Thread::internalExecute(void)
 	removeReference();
 }
 
+bool Thread::isThisWaitedOn(void)
+{
+	return isWaitedOn(getThisID());	
+}
+
+bool Thread::isWaitedOn(threadID id)
+{
+	return childWait.isWaitedOn(id) || singleWait.isWaitedOn(id);
+}
+
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
 	// SYNC(m_mutex);
@@ -257,29 +318,32 @@ bool Thread::updateCPUPreference(cpuID suggestedCPU)
 
 void Thread::waitOnCompletion(ExecutableQueue& executables)
 {
+	cpuID id(Thread::getThisID()); // todo move this to a class ctor
 	Thread::Tree tree;
+	registerTree(id, tree, false);
+
 	size_t previousSize = executables.inputQueue.size();
 	for (size_t i = 0; i < previousSize; ++i)
 	{
-		ExecutableQueue::ExecutableInput& input = executables.inputQueue[i];
+		Thread::ExecutableInput& input = executables.inputQueue[i];
 		tree.push(createExecuting(*input.executable, input.preferredCPU));
 	}	
 	
 	waitOnCompletion(tree, 0);
+	unregisterTree(id, false); // todo move this to a class dtor
 }
 
 void Thread::waitOnCompletionOfChildren(ExecutableQueue& executables)
 {
+	cpuID id(Thread::getThisID());
 	Thread::Tree tree;
-	threadID id(Thread::getThisID());
-	assert(!treesByIDs.has(id));
-	treesByIDs.set(id, &tree);
-	
+	registerTree(id, tree, true);
+		
 	size_t previousSize = executables.inputQueue.size();
 
 	for (size_t i = 0; i < previousSize; ++i)
 	{
-		ExecutableQueue::ExecutableInput& input = executables.inputQueue[i];
+		Thread::ExecutableInput& input = executables.inputQueue[i];
 		tree.push(createExecuting(*input.executable, input.preferredCPU));
 	}	
 	
@@ -294,9 +358,8 @@ void Thread::waitOnCompletionOfChildren(ExecutableQueue& executables)
 	while (previousSize != startingIndex);
 
 	// delete all the thread and executables
-	// remove all the thread id entries from the treesByIDs
-	treesByIDs.remove(id);
-
+	// remove all the thread id entries from the singleWaitTree
+	unregisterTree(id, true);
 }
 
 void Thread::waitOnCompletion(Thread& thread)

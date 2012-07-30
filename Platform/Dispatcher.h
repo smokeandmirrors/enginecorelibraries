@@ -2,8 +2,6 @@
 #ifndef SCHEDULING_H
 #define SCHEDULING_H
 
-#if 0
-
 #include <map>
 #include <vector>
 
@@ -40,34 +38,10 @@ class Dispatcher
 	class PendingJobQueue;
 	friend class designPatterns::Singleton<Dispatcher>;
 	
-	
-
 public: 
-	class Input
-	{
-	public:
-		Input(Executor& inExecutable, cpuID inPreferredCPU=noCPUpreference, ExecutionPriority inPriority=unspecifiedPriority)
-			: executable(&inExecutable)
-			, preferredCPU(inPreferredCPU)
-			, priority(inPriority)
-		{ /* empty */ }
-
-	private:
-		friend class Dispatcher;
-		Executor* executable;
-		cpuID preferredCPU;
-		ExecutionPriority priority;
-	}; // Dispatcher::Input
-
-	typedef std::vector<Dispatcher::Input> InputQueue;
-	typedef std::vector<Dispatcher::Input>::iterator InputQueueIterator;
-
-	void enqueue(Dispatcher::Input& work);
-	void enqueue(Dispatcher::InputQueue& work);
-	void enqueueAndWait(Dispatcher::Input& work);
-	void enqueueAndWait(Dispatcher::InputQueue& work);
-	void enqueueAndWaitOnChildren(Dispatcher::Input& work);
-	void enqueueAndWaitOnChildren(Dispatcher::InputQueue& work);
+	void enqueue(Thread::ExecutableQueue& work);
+	void enqueueAndWait(Thread::ExecutableQueue& work);
+	void enqueueAndWaitOnChildren(Thread::ExecutableQueue& work);
 	uint getMaxThreads(void) const;
 	uint getNumberActiveJobs(void) const;
 	uint getNumberPendingJobs(void) const;
@@ -87,29 +61,23 @@ private:
 
 	void accountForFinish(Job* finished);
 	void accountForStartedJob(Job* started, cpuID index);
-	void accountForWaitedOnThreadCompletion(Thread::Tree* children);
 	bool getFreeIndex(cpuID& index);
 	bool getFreeIndex(cpuID& available, cpuID idealCPU);
-	void initializeAndTrackJob(Dispatcher::Input& work, Thread::Tree* children);
 	void initializeNumberSystemThreads(void);
 	bool isAnyIndexFree(void) const;	
 	bool isAnyJobPending(void) const;
-	bool isOriginalWaitingOnThread(threadID childID, threadID* originalID=NULL) const;
 	void startJobs(void);
 	const std::string toStringActiveJob(Job* job) const;
 	const std::string toStringInactiveJob(void) const;
 	
-	std::map<threadID, threadID> m_originalByChildren;
-	std::map<threadID, Thread::Tree* > m_childrenByOriginal;
 	std::vector<Job*> m_activeJobs;
+	signals::ReceiverMember	m_receiver;
 	uint m_maxThreads;
 	uint m_numActiveJobs;
 	uint m_numSystemThreads;
-	signals::ReceiverMember	m_receiver;
 	PendingJobQueue* m_pendingJobs;
 	DECLARE_MUTEX(m_mutex);
 }; // class Dispatcher
 } // namespace concurrency
-#endif 
 
 #endif//SCHEDULING_H

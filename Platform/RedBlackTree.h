@@ -675,13 +675,15 @@ template<typename ELEMENT, typename IS_EQUAL, typename IS_GREATER, typename IS_L
 void RedBlackTree<ELEMENT, IS_EQUAL, IS_GREATER, IS_LESS>::remove(ELEMENT value)
 {	checkUnitTest();
 	if (has(value))
+	{
 		m_size--;
 
-	if (m_root)
-		m_root = remove(m_root, value);
+		if (m_root)
+			m_root = remove(m_root, value);
 	
-	if (m_root)
-		m_root->m_color = black;
+		if (m_root)
+			m_root->m_color = black;
+	}
 	checkUnitTest();
 }
 

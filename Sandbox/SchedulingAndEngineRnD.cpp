@@ -1,5 +1,3 @@
-#if 0
-
 #include <list>
 #include <map>
 #include <queue>
@@ -86,50 +84,43 @@ inline void doWork10SimpleChildThreads3()
 
 void simpleChildrenPre(void)
 {
-	doWork3();
-	Executor* one = new Executor(&doWork3);
-	Dispatcher::Input inputOne(*one);
-	Dispatcher::single().enqueue(inputOne);
+	Thread::ExecutableQueue queue;
+	queue.add(new Executor(&doWork3));
+	Dispatcher::single().enqueue(queue);
 }
 
 void simpleChildrenPost(void)
 {
-	Executor* one = new Executor(&doWork3);
-	Dispatcher::Input inputOne(*one);
-	Dispatcher::single().enqueue(inputOne);
+	Thread::ExecutableQueue queue;
+	queue.add(new Executor(&doWork3));
+	Dispatcher::single().enqueue(queue);
 	doWork3();
 }
 
 void doWork1Children(void)
 {
-	Executor* one = new Executor(&doWork3);
-	Dispatcher::Input inputOne(*one);
-	Dispatcher::single().enqueue(inputOne);
+	Thread::ExecutableQueue queue;
+	queue.add(new Executor(&doWork3));
+	Dispatcher::single().enqueue(queue);
 	doWork3();
 }
 
 void doWork2Children(void)
 {
-	Executor* one = new Executor(&doWork1Children);
-	Executor* two = new Executor(&doWork1Children);
-	Dispatcher::Input inputOne(*one);
-	Dispatcher::Input inputTwo(*two);
-	Dispatcher::single().enqueue(inputOne);
-	Dispatcher::single().enqueue(inputTwo);
+	Thread::ExecutableQueue queue;
+	queue.add(new Executor(&doWork1Children));
+	queue.add(new Executor(&doWork1Children));
+	Dispatcher::single().enqueue(queue);
 	doWork3();
 }
 
 void doWork3Children(void) 
 {
-	Executor* one = new Executor(&doWork2Children);
-	Executor* two = new Executor(&doWork2Children);
-	Executor* three = new Executor(&doWork2Children);
-	Dispatcher::Input inputOne(*one);
-	Dispatcher::Input inputTwo(*two);
-	Dispatcher::Input inputThree(*three);
-	Dispatcher::single().enqueue(inputOne);
-	Dispatcher::single().enqueue(inputTwo);
-	Dispatcher::single().enqueue(inputThree);
+	Thread::ExecutableQueue queue;
+	queue.add(new Executor(&doWork2Children));
+	queue.add(new Executor(&doWork2Children));
+	queue.add(new Executor(&doWork2Children));
+	Dispatcher::single().enqueue(queue);
 	doWork3();
 }
 
@@ -460,10 +451,10 @@ protected:
 				}
 			}
 
-			Dispatcher::InputQueue workQueue;
+			Thread::ExecutableQueue workQueue;
 			while (!work.empty())
 			{
-				workQueue.push_back(Dispatcher::Input(*work.front()));
+				workQueue.add(work.front());
 				work.pop();
 			}
 			Dispatcher::single().enqueueAndWaitOnChildren(workQueue);
@@ -610,7 +601,8 @@ void TestJob::execute(void)
 		std::string name = getFormattedName(m_requirement->getID(), jobNumber, maxJobs);
 		TestJob* job = new TestJob(m_requirement);
 		concurrency::Executor* executor = new concurrency::Executor(job, name);
-		Dispatcher::Input input(*executor);
+		Thread::ExecutableQueue input;
+		input.add(executor);
 		concurrency::Dispatcher::single().enqueue(input);
 	}
 
@@ -658,9 +650,37 @@ void testEngineLoop(void)
 	loop.stop();
 }
 
+void doWork10report2(void) 
+{ 
+	doWork(1000); 
+	for (int i = 0; i < 10; ++i)
+	{
+		Executor* executor = new Executor(&doWork3);
+		Thread::createExecuting(*executor);
+	}
+	printf("done with doWork10report\n"); 
+}
+
 void sandbox::schedulingRnD(void)
 {
-	
+	{
+		concurrency::Thread::ExecutableQueue executables;
+		for (int i = 0; i < 2; ++i)
+		{
+			Executor* executor = new Executor(&doWork10SimpleChildThreads3);
+			executables.add(executor, concurrency::noCPUpreference);			
+		}
+		Thread::waitOnCompletion(executables);
+		printf("this shouldn't happen for a while either!\n");
+	}
+
+	{
+		Executor* executor = new Executor(&doWork10SimpleChildThreads3);
+		concurrency::Thread::ExecutableQueue executables;
+		executables.add(executor, concurrency::noCPUpreference);
+		Thread::waitOnCompletionOfChildren(executables);
+		printf("boy, I hope this doesn't happen for 10 seconds!\n");
+	}
 
 	/*
 	concurrency::Executor* executor(NULL);
@@ -672,7 +692,7 @@ void sandbox::schedulingRnD(void)
 
 	{
 		concurrency::Executor* executor2 = new concurrency::Executor(&doWork3);
-		Dispatcher::Input input(*executor2);
+		Thread::ExecutableInput input(*executor2);
 		concurrency::Dispatcher::single().enqueue(input); // enqueueAndWait
 		concurrency::sleep(5000);
 		printf("Waited enqueue\n");
@@ -702,16 +722,16 @@ void sandbox::schedulingRnD(void)
 	// Thread::checkDestruction();
 
 	Executor* original = new Executor(&doWork3Children);
-	Dispatcher::Input input(*original);
+	Thread::ExecutableInput input(*original);
 	Dispatcher::single().enqueueAndWaitOnChildren(input);
 	printf("Nice!  That was awesome!\n");
 	// Thread::checkDestruction();
 
-	Dispatcher::InputQueue inputQueue;
+	Thread::ExecutableQueue inputQueue;
 	for (uint i(0); i < Dispatcher::single().getMaxThreads() * 100; i++)
 	{
 		Executor* work = new Executor(&doWork5);
-		Dispatcher::Input input(*work, i % Dispatcher::single().getMaxThreads());
+		Thread::ExecutableInput input(*work, i % Dispatcher::single().getMaxThreads());
 		inputQueue.push_back(input);
 	}
 
@@ -722,4 +742,3 @@ void sandbox::schedulingRnD(void)
 	// testEngineLoop();
 }
 
-#endif

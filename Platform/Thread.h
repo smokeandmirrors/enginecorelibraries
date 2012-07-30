@@ -32,31 +32,34 @@ class Thread
 	friend class Tree;
 
 public:
+	class ExecutableInput
+	{
+	public:
+		ExecutableInput(Executor* new_executable, cpuID new_preferredCPU, ExecutionPriority new_priority)
+			: executable(new_executable)
+			, preferredCPU(new_preferredCPU)
+			, priority(new_priority)
+		{
+			assert(executable != NULL);
+		}
+
+		Executor* executable;
+		cpuID preferredCPU;
+		ExecutionPriority priority;
+	};
+
 	class ExecutableQueue
 	{
 		friend class Thread;
+		friend class Dispatcher;
+
 	public:
-		class ExecutableInput
-		{
-		public:
-			ExecutableInput(Executor* new_executable, cpuID new_preferredCPU, ExecutionPriority new_priority)
-				: executable(new_executable)
-				, preferredCPU(new_preferredCPU)
-				, priority(new_priority)
-			{
-				/* empty */
-			}
-
-			Executor* executable;
-			cpuID preferredCPU;
-			ExecutionPriority priority;
-		};
-
 		typedef std::vector<ExecutableInput>::iterator ExecutableQueueIter; 
 
-	void add(Executor& executable, cpuID preferredCPU=noCPUpreference, ExecutionPriority priority=unspecifiedPriority)
+	void add(Executor* executable, cpuID preferredCPU=noCPUpreference, ExecutionPriority priority=unspecifiedPriority)
 	{
-		inputQueue.push_back(ExecutableInput(&executable, preferredCPU, priority));
+		assert(executable != NULL);
+		inputQueue.push_back(ExecutableInput(executable, preferredCPU, priority));
 	}
 		
 	private:
@@ -78,13 +81,14 @@ public:
 	static void initializeSystem(void);
 
 
-	static bool isThreadInChildWaitingTree(void); // ?? the new dispatcher might need this?
-	
+	static bool isThisWaitedOn(void); // ?? the new dispatcher might need this?
+	static bool isWaitedOn(threadID id);
 	
 	static void shutDownSystem(void);
+	static void waitOnCompletion(void);
 	static void waitOnCompletion(ExecutableQueue& executables);
 	static void waitOnCompletionOfChildren(ExecutableQueue& executables);
-	
+
 
 	/// for the normal user
 	
@@ -123,7 +127,6 @@ public:
 public:
 	class Tree
 	{
-		friend class containers::Table<Thread::Tree*>;
 	public:
 		typedef std::vector<Thread*>::const_iterator ThreadIterConst; 
 		typedef std::vector<Thread*>::iterator ThreadIter; 
@@ -233,10 +236,8 @@ private:
 	#error unsupported concurrency platform
 #endif//WIN32
 
-	static void registerThread(cpuID id, Thread* thread);
-
 	Thread(Executor& executable, cpuID preferredCPU, RunningState initialState);
-	virtual ~Thread(void);
+	~Thread(void);
 
 	/** not allowed */
 	Thread(const Thread&);

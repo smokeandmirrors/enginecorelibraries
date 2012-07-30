@@ -262,6 +262,7 @@ private:
 		else
 		{
 			assert(isEqual(key, node->m_key)); 
+			node->m_value = value;
 		}
 
 		if (isRed(node->m_right))
@@ -683,13 +684,15 @@ template<typename KEY, typename VALUE, typename IS_EQUAL, typename IS_GREATER, t
 void RedBlackMap<KEY, VALUE, IS_EQUAL, IS_GREATER, IS_LESS>::remove(const KEY& key)
 {	// checkUnitTest();();
 	if (has(key))
+	{
 		m_size--;
-
-	if (m_root)
-		m_root = remove(m_root, key);
 	
-	if (m_root)
-		m_root->m_color = black;
+		if (m_root)
+			m_root = remove(m_root, key);
+	
+		if (m_root)
+			m_root->m_color = black;
+	}
 	// checkUnitTest();();
 }
 

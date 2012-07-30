@@ -46,7 +46,6 @@ void theDoFunction(void)
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
  	designPatterns::createSingletons();
-	concurrency::Thread::initializeSystem();
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality
 // 
@@ -81,7 +80,6 @@ sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 #endif//EXTENDED_BY_LUA
 
 	designPatterns::destroySingletons();
-	concurrency::Thread::shutDownSystem();
 	return 0;
 }
 

@@ -1,5 +1,3 @@
-#if 0
-
 #include <list>
 #include <string>
 #include <vector>
@@ -168,7 +166,7 @@ class Dispatcher::PendingJobQueue
 {
 public:
 	inline void
-		add(Dispatcher::Input& work, Thread** waitable)
+		add(Thread::ExecutableInput& work, bool waitable)
 	{
 		Job* job = getFreeJob();
 		Thread* thread; 
@@ -176,7 +174,6 @@ public:
 		if (waitable)
 		{
 			thread = Thread::createSuspended(*work.executable, work.preferredCPU);
-			*waitable = thread;
 		}
 		else
 		{
@@ -298,11 +295,7 @@ void Dispatcher::accountForFinish(Job* finished)
 	m_activeJobs[thread_index] = NULL;
 	m_numActiveJobs--;
 	
-
-	threadID originalID;
-	const bool originalWasWaiting = isOriginalWaitingOnThread(finished->getThreadID(), &originalID);
-
-	if (originalWasWaiting)
+	if (Thread::isWaitedOn(finished->getThreadID()))
 	{	
 		finished->reset(NULL, 0);
 	}
@@ -320,118 +313,58 @@ void Dispatcher::accountForStartedJob(Job* started, cpuID index)
 	SCHEDULE_PRINT
 }
 
-void Dispatcher::accountForWaitedOnThreadCompletion(Thread::Tree* children)
+void Dispatcher::enqueue(Thread::ExecutableQueue& work)
 {
 	SYNC(m_mutex);
-	const threadID originalID = children->getOriginalID();
-
+	bool isWaitedOn(Thread::isThisWaitedOn());
+	for (Thread::ExecutableQueue::ExecutableQueueIter iter(work.inputQueue.begin()), sentinel(work.inputQueue.end()); 
+		iter != sentinel; 
+		++iter)
 	{
-		Thread::Tree::ThreadIterConst sentinel(children->end());
-		for (Thread::Tree::ThreadIterConst iter(children->begin());
-			iter != sentinel;
-			iter++)
-		{
-			m_originalByChildren.erase(getInitializedID(*(*iter)));
-		}
-		
-		m_childrenByOriginal.erase(originalID);
+		m_pendingJobs->add(*iter, isWaitedOn);
 	}
-}
-
-void Dispatcher::enqueue(Dispatcher::Input& work)
-{
-	InputQueue shortcut;
-	shortcut.push_back(work);
-	enqueue(shortcut);
-}
-
-void Dispatcher::enqueue(Dispatcher::InputQueue& work)
-{
-	SYNC(m_mutex);
-
-	threadID parentID = Thread::getThisID();
-	std::map<threadID, threadID>::iterator originalIDIter = m_originalByChildren.find(parentID);
-	/// \todo this has to get moved to the ThreadTree class!
-	if (originalIDIter != m_originalByChildren.end())
-	{	// a parent job is waiting on the end of this one
-		threadID originalID = originalIDIter->second;
-		std::map<threadID, Thread::Tree*>::iterator threadsIter =
-			m_childrenByOriginal.find(originalID);
-		assert(threadsIter != m_childrenByOriginal.end());
-		Thread::Tree* tree = threadsIter->second;
-		InputQueueIterator sentinel(work.end());
-		
-		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
-		{
-			initializeAndTrackJob(*iter, tree);
-		}
-	}
-	else
-	{
-		InputQueueIterator sentinel(work.end());
-		
-		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
-		{
-			m_pendingJobs->add(*iter, NULL);
-		}
-		
-	}
-
+	
 	startJobs();
 }
 
-void Dispatcher::enqueueAndWait(Dispatcher::Input& work)
+void Dispatcher::enqueueAndWait(Thread::ExecutableQueue& work)
 {
-	InputQueue shortcut;
-	shortcut.push_back(work);
-	enqueueAndWait(shortcut);
-}
+	/*Thread::Tree tree;
 
-void Dispatcher::enqueueAndWait(Dispatcher::InputQueue& work)
-{
-	Thread::Tree tree;
-	
 	{
-		SYNC(m_mutex);
-		
-		for (InputQueueIterator iter(work.begin()), sentinel(work.end()); iter != sentinel; ++iter)
-		{
-			Thread* output(NULL);
-			m_pendingJobs->add(*iter, &output);
-			tree.push(output);
-		}
+	SYNC(m_mutex);
 
-		startJobs();
+	for (InputQueueIterator iter(work.begin()), sentinel(work.end()); iter != sentinel; ++iter)
+	{
+	Thread* output(NULL);
+	m_pendingJobs->add(*iter, &output);
+	tree.push(output);
 	}
-	
-	Thread::waitOnCompletion(tree);
+
+	startJobs();
+	}
+
+	Thread::waitOnCompletion(tree);*/
 }
 
-void Dispatcher::enqueueAndWaitOnChildren(Dispatcher::Input& work)
-{
-	InputQueue shortcut;
-	shortcut.push_back(work);
-	enqueueAndWaitOnChildren(shortcut);
-}
-
-void Dispatcher::enqueueAndWaitOnChildren(Dispatcher::InputQueue& work)
+void Dispatcher::enqueueAndWaitOnChildren(Thread::ExecutableQueue& work)
 {	
-	Thread::Tree children; // Thread::Tree* children = new Thread::Tree();
+	//Thread::Tree children; // Thread::Tree* children = new Thread::Tree();
 
-	{
-		SYNC(m_mutex);
-		InputQueueIterator sentinel(work.end());
-		
-		for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
-		{
-			initializeAndTrackJob(*iter, &children);
-		}
+	//{
+	//	SYNC(m_mutex);
+	//	InputQueueIterator sentinel(work.end());
+	//	
+	//	for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
+	//	{
+	//		initializeAndTrackJob(*iter, &children);
+	//	}
 
-		startJobs();
-	}
+	//	startJobs();
+	//}
 
-	Thread::waitOnCompletionOfChildren(children);
-	accountForWaitedOnThreadCompletion(&children); // delete children;	
+	//Thread::waitOnCompletionOfChildren(children);
+	//accountForWaitedOnThreadCompletion(&children); // delete children;	
 }
 
 bool Dispatcher::getFreeIndex(cpuID& index)
@@ -487,26 +420,6 @@ uint Dispatcher::getNumberSystemThreads(void) const
 	return m_numSystemThreads; 
 }
 
-void Dispatcher::initializeAndTrackJob(Dispatcher::Input& work, Thread::Tree* children)
-{
-	const threadID originalID = children->getOriginalID();	
-	// add the job to the pending queue, to initialize the thread
-	Thread* thread(NULL);
-	m_pendingJobs->add(work, &thread);
-	// get the child thread ID
-	const threadID childID = getInitializedID(*thread);
-	// make sure the current thread isn't already waiting on tree of threads
-	assert(m_originalByChildren.find(originalID) == m_originalByChildren.end());
-	// map the children to the parent ID
-	m_childrenByOriginal[originalID] = children;
-	// map the parent ID to the children
-	m_originalByChildren[childID] = originalID;	
-	// store the thread for deletion	
-	children->push(thread);
-	// make the original is waiting on the child now
-	assert(isOriginalWaitingOnThread(childID));
-}
-
 void Dispatcher::initializeNumberSystemThreads(void)
 {
 #if WIN32
@@ -535,26 +448,6 @@ bool Dispatcher::isAnyJobPending(void) const
 {
 	return m_pendingJobs->getNumber() != 0;
 }
-
-bool Dispatcher::isOriginalWaitingOnThread(threadID childID, threadID* originalID) const
-{
-	std::map<threadID, threadID>::const_iterator originalIDIter = m_originalByChildren.find(childID);
-	
-	if (originalIDIter != m_originalByChildren.end())
-	{
-		if (originalID)
-		{
-			*originalID = originalIDIter->second;
-		}
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-
 
 void Dispatcher::printState(void) const
 {
@@ -664,5 +557,3 @@ const std::string Dispatcher::toStringInactiveJob(void) const
 	return std::string("    inactive.    ");
 }
 } // namespace concurrency
-
-#endif 
