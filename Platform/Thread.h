@@ -30,8 +30,10 @@ extern const ExecutionPriority unspecifiedPriority;
 class Thread
 {
 	friend class Tree;
+	friend class Sleeper;
 
 public:
+
 	class ExecutableInput
 	{
 	public:
@@ -71,26 +73,18 @@ public:
 	// these may not be necessary, as the dispatcher clearly needs some attention, too
 	/// for the user/scheduler to wait on it
 	static Thread* createSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	/// for the daring user, for the scheduler to get the preferred CPU
-	static Thread* createUninitialized(Executor& executable, cpuID preferredCPU=noCPUpreference); 
 	///
 	static Thread* createExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
 	
 	
 	// static void execute(ExecutableQueue& executables);
-	static void initializeSystem(void);
-
-
+	
 	static bool isThisWaitedOn(void); // ?? the new dispatcher might need this?
 	static bool isWaitedOn(threadID id);
-	
-	static void shutDownSystem(void);
-	static void waitOnCompletion(void);
+		
 	static void waitOnCompletion(ExecutableQueue& executables);
 	static void waitOnCompletionOfChildren(ExecutableQueue& executables);
 
-
-	/// for the normal user
 	
 	
 	/// get the ID of the executing thread
@@ -132,7 +126,7 @@ public:
 		typedef std::vector<Thread*>::iterator ThreadIter; 
 
 		Tree(void)
-			: rootID(Thread::getThisID())
+			: parent(NULL)
 		{
 			SET_THREAD_SPIN_COUNT(mutex, 4);
 			threads.reserve(20);
@@ -140,10 +134,9 @@ public:
 
 		~Tree()
 		{
-			Thread::Tree::ThreadIter sentinel(threads.end());
-			for (Thread::Tree::ThreadIter iter(threads.begin());
-				iter != sentinel;
-				iter++)
+			for (Thread::Tree::ThreadIter iter(threads.begin()), sentinel(threads.end());
+			iter != sentinel;
+			iter++)
 			{
 				(*iter)->removeReference();
 			}
@@ -172,18 +165,18 @@ public:
 			SYNC(mutex);
 			return threads.end();
 		}
+		
+		inline Thread::Tree* getParent(void) 
+		{
+			return parent;
+		}
 
 		inline size_t getSize(void) const
 		{
 			SYNC(mutex);
 			return threads.size();
 		}
-
-		inline threadID getOriginalID(void) const
-		{
-			return rootID;
-		}
-
+		
 		inline Thread* operator[](size_t index) 
 		{
 			SYNC(mutex);
@@ -203,17 +196,33 @@ public:
 			threads.push_back(thread);
 		}
 
+		inline void setParent(Thread::Tree* parent)
+		{
+			this->parent = parent;
+		}
+
 	private:
 		Thread& operator=(const Thread&);
-
-		threadID rootID;
-
+		Thread::Tree* parent;
+		
 		DECLARE_MUTEX(mutex);
 
 		std::vector<Thread*> threads;
 	}; // class Thread::Tree
-private:
 
+	class Sleeper
+	{
+	public:
+		Sleeper(bool sleepOnFamily);
+		~Sleeper(void);
+
+	private:
+		bool sleepsOnFamily;
+		cpuID id;
+		Tree tree;
+	};
+
+private:
 	enum RunningState
 	{
 		completed,		// execution complete 
@@ -224,6 +233,8 @@ private:
 		resumed,		// hardware resume / start created attempted
 		suspended		// hardware execution paused
 	}; // enum Thread::RunningState
+
+	static void createExecutingThreads(ExecutableQueue& work);
 
 #if WIN32
 	static uint __stdcall systemExecute(threadHandle thread)
@@ -242,7 +253,7 @@ private:
 	/** not allowed */
 	Thread(const Thread&);
 	Thread(void);
-
+	
 	void closeHardware(void);
 
 	void internalExecute(void);

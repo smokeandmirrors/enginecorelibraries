@@ -661,8 +661,33 @@ void doWork10report2(void)
 	printf("done with doWork10report\n"); 
 }
 
+void nested1(void)
+{
+	printf("Nested 1 Start");
+	concurrency::Thread::ExecutableQueue executables;
+	for (int i = 0; i < 3; ++i)
+	{
+		executables.add(new Executor(&doWork3));	
+	}
+	printf("Nested 1 Waiting");
+	Thread::waitOnCompletionOfChildren(executables);
+	doWork3();
+	printf("Nested 1 finished Waiting!\n");
+}
+
+
 void sandbox::schedulingRnD(void)
 {
+
+	testEngineLoop();
+
+	{
+		concurrency::Thread::ExecutableQueue executables;
+		executables.add(new Executor(&nested1));
+		Thread::waitOnCompletionOfChildren(executables);
+		printf("Finished Waiting on a nested!\n");
+	}
+
 	{
 		concurrency::Thread::ExecutableQueue executables;
 		for (int i = 0; i < 2; ++i)
@@ -682,6 +707,7 @@ void sandbox::schedulingRnD(void)
 		printf("boy, I hope this doesn't happen for 10 seconds!\n");
 	}
 
+	BREAKPOINT(0x0);
 	/*
 	concurrency::Executor* executor(NULL);
 
@@ -739,6 +765,6 @@ void sandbox::schedulingRnD(void)
 	// Thread::checkDestruction();
 	*/
 	
-	// testEngineLoop();
+	
 }
 

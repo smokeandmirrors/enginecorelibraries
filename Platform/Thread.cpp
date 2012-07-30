@@ -10,96 +10,149 @@
 
 namespace concurrency
 {
-const ExecutionPriority unspecifiedPriority = 0;
 
-class WaitingTree
-{	// this class probably proves that I should have a tree pointer?  no...can't although it could help for deregistration
-public:
-	WaitingTree(bool onChildren)
-	: waitOnChildren(onChildren)
-	{
-		/* empty */
-	}
-
-	bool isWaitedOn(threadID id)
-	{
-		SYNC(mutex);
+	class WaitingTree
+	{	// this class probably proves that I should have a tree pointer?  no...can't although it could help for deregistration
+	public:
+		WaitingTree(bool onChildren)
+			: waitOnChildren(onChildren)
 		{
-			return waitsByThreadIDs.has(id);
+			/* empty */
 		}
-	}
 
-	void registerTree(threadID id, Thread::Tree& tree)
-	{
-		SYNC(mutex);
-		waitsByThreadIDs.set(id, &tree);
-	}
-
-	void unregisterTree(threadID id)
-	{
-		SYNC(mutex);
-		waitsByThreadIDs.remove(id);
-	}
-
-	void registerThread(threadID id, Thread* thread)
-	{
-		threadID thisID = Thread::getThisID();
-		Thread::Tree* tree(NULL);
+		bool isWaitedOn(threadID id)
 		{
 			SYNC(mutex);
-			if (waitsByThreadIDs.has(thisID, tree))
-			{	// this thread is waited on
-				if (waitOnChildren)
-				{	// so are the children
-					waitsByThreadIDs.set(id, tree); 
+			{
+				return waitsByThreadIDs.has(id);
+			}
+		}
+
+		void registerTree(threadID id, Thread::Tree& tree)
+		{
+			SYNC(mutex);
+			if (waitsByThreadIDs.has(id))
+			{
+				// we are in a wait by a wait call
+				waitsByThreadIDs.set(id, &tree);
+				tree.setParent(&tree);
+			}
+			else
+			{
+				waitsByThreadIDs.set(id, &tree);
+			}
+		}
+
+		void unregisterTree(threadID id)
+		{
+			SYNC(mutex);
+			Thread::Tree* tree;
+			if (waitsByThreadIDs.has(id, tree))
+			{
+				if (tree->getParent() == NULL)
+				{
+					waitsByThreadIDs.remove(id);
+				}
+				else
+				{
+					waitsByThreadIDs.set(id, tree->getParent());
 				}
 			}
 		}
 
-		if (tree)
+		void registerThread(threadID id, Thread* thread)
 		{
-			tree->push(thread);
+			threadID thisID = Thread::getThisID();
+			Thread::Tree* tree(NULL);
+			{
+				SYNC(mutex);
+				if (waitsByThreadIDs.has(thisID, tree))
+				{	// this thread is waited on
+					tree->push(thread);
+
+					if (waitOnChildren)
+					{	// so are the children
+						waitsByThreadIDs.set(id, tree); 
+					}
+				}
+			}
 		}
+
+		void unregisterThread(threadID threadID)
+		{
+			SYNC(mutex);
+			waitsByThreadIDs.remove(threadID);
+		}
+
+	private:
+		bool waitOnChildren;
+		DECLARE_MUTEX(mutex); 
+		containers::RedBlackMap<concurrency::threadID, Thread::Tree*> waitsByThreadIDs;
+	};
+
+	WaitingTree singleWait(false);
+	WaitingTree childWait(true);
+
+	void registerTree(threadID id, Thread::Tree& tree, bool waitOnChildren)
+	{
+		WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+		waitingTree.registerTree(id, tree);
+	}
+
+	void unregisterTree(threadID id, bool waitOnChildren)
+	{
+		WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+		waitingTree.unregisterTree(id);
+	}
+
+	void registerThread(threadID threadID, Thread* thread)
+	{
+		singleWait.registerThread(threadID, thread);
+		childWait.registerThread(threadID, thread);
 	}
 
 	void unregisterThread(threadID threadID)
 	{
-		SYNC(mutex);
-		waitsByThreadIDs.remove(threadID);
+		singleWait.unregisterThread(threadID);
+		childWait.unregisterThread(threadID);
 	}
 
-private:
-	bool waitOnChildren;
-	DECLARE_MUTEX(mutex); 
-	containers::RedBlackMap<concurrency::threadID, Thread::Tree*> waitsByThreadIDs;
-};
 
-WaitingTree singleWait(false);
-WaitingTree childWait(true);
+const ExecutionPriority unspecifiedPriority = 0;
 
-void registerTree(threadID id, Thread::Tree& tree, bool waitOnChildren)
+
+
+
+Thread::Sleeper::Sleeper(bool sleepOnFamily)
+	: sleepsOnFamily(sleepOnFamily)
+	, id(Thread::getThisID())
 {
-	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
-	waitingTree.registerTree(id, tree);
+	registerTree(id, tree, sleepsOnFamily);
 }
 
-void unregisterTree(threadID id, bool waitOnChildren)
+Thread::Sleeper::~Sleeper(void)
 {
-	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
-	waitingTree.unregisterTree(id);
+	if (sleepsOnFamily)
+	{
+		size_t previousSize = tree.getSize();
+		size_t startingIndex = 0;
+
+		do
+		{
+			Thread::waitOnCompletion(tree, startingIndex);
+			startingIndex = previousSize;
+			previousSize = tree.getSize();
+		}
+		while (previousSize != startingIndex);
+	}
+	else
+	{	
+		Thread::waitOnCompletion(tree, 0);
+	}
+
+	unregisterTree(id, sleepsOnFamily);
 }
 
-void registerThread(threadID threadID, Thread* thread)
-{
-	singleWait.registerThread(threadID, thread);
-	childWait.registerThread(threadID, thread);
-}
-
-void unregisterThread(threadID threadID)
-{
-	singleWait.unregisterThread(threadID);
-	childWait.unregisterThread(threadID);
-}
 
 const millisecond waitInfinitely(10000000000);
 const cpuID noCPUpreference(-1);
@@ -208,6 +261,7 @@ void Thread::execute(cpuID preferredCPU)
 	}
 	else
 	{
+		BREAKPOINT(0x0);
 		assert(false);
 	}
 }	
@@ -229,6 +283,16 @@ Thread* Thread::createExecuting(Executor& executable, cpuID preferredCPU)
 	return thread;
 }
 
+void Thread::createExecutingThreads(ExecutableQueue& work)
+{
+	for (ExecutableQueue::ExecutableQueueIter iter(work.inputQueue.begin()), sentinel(work.inputQueue.end()); 
+		iter != sentinel; 
+		++iter)
+	{
+		createExecuting(*iter->executable, iter->preferredCPU);
+	}	
+}
+
 cpuID Thread::getPreferredCPU(void) const
 {
 	return m_preferredCPU;
@@ -236,14 +300,19 @@ cpuID Thread::getPreferredCPU(void) const
 
 Thread* Thread::createSuspended(Executor& executable, cpuID preferredCPU)
 {
-	Thread* thread = new Thread(executable, preferredCPU, Thread::suspended);
-	thread->initializeSuspended(preferredCPU);
-	return thread;
-}
+	Thread* thread(NULL);
 
-Thread* Thread::createUninitialized(Executor& executable, cpuID preferredCPU)
-{
-	return new Thread(executable, preferredCPU, Thread::uninitialized);
+	if (isThisWaitedOn())
+	{
+		thread = new Thread(executable, preferredCPU, Thread::suspended);
+		thread->initializeSuspended(preferredCPU);
+	}
+	else 
+	{
+		thread = new Thread(executable, preferredCPU, Thread::uninitialized);
+	}
+
+	return thread;
 }
 
 void Thread::internalExecute(void)
@@ -316,50 +385,16 @@ bool Thread::updateCPUPreference(cpuID suggestedCPU)
 	}
 }
 
-void Thread::waitOnCompletion(ExecutableQueue& executables)
+void Thread::waitOnCompletion(ExecutableQueue& work)
 {
-	cpuID id(Thread::getThisID()); // todo move this to a class ctor
-	Thread::Tree tree;
-	registerTree(id, tree, false);
-
-	size_t previousSize = executables.inputQueue.size();
-	for (size_t i = 0; i < previousSize; ++i)
-	{
-		Thread::ExecutableInput& input = executables.inputQueue[i];
-		tree.push(createExecuting(*input.executable, input.preferredCPU));
-	}	
-	
-	waitOnCompletion(tree, 0);
-	unregisterTree(id, false); // todo move this to a class dtor
+	Sleeper sleeper(false);
+	createExecutingThreads(work);
 }
 
-void Thread::waitOnCompletionOfChildren(ExecutableQueue& executables)
+void Thread::waitOnCompletionOfChildren(ExecutableQueue& work)
 {
-	cpuID id(Thread::getThisID());
-	Thread::Tree tree;
-	registerTree(id, tree, true);
-		
-	size_t previousSize = executables.inputQueue.size();
-
-	for (size_t i = 0; i < previousSize; ++i)
-	{
-		Thread::ExecutableInput& input = executables.inputQueue[i];
-		tree.push(createExecuting(*input.executable, input.preferredCPU));
-	}	
-	
-	size_t startingIndex = 0;
-
-	do
-	{
-		waitOnCompletion(tree, startingIndex);
-		startingIndex = previousSize;
-		previousSize = tree.getSize();
-	}
-	while (previousSize != startingIndex);
-
-	// delete all the thread and executables
-	// remove all the thread id entries from the singleWaitTree
-	unregisterTree(id, true);
+	Sleeper sleeper(true);
+	createExecutingThreads(work);
 }
 
 void Thread::waitOnCompletion(Thread& thread)
@@ -438,24 +473,35 @@ inline threadHandle createThread(threadable function, bool startSuspended, threa
 	// see safety issues http://msdn.microsoft.com/en-us/library/kdzttdcb.aspx
 	unsigned initflag = startSuspended ? CREATE_SUSPENDED : 0;
 	HANDLE newthread = (HANDLE)(_beginthreadex(NULL, 0, function, args, initflag, &id));
+
+	if (newthread)
+	{
 	/** 
 	\todo the last parameter is CPUid, allow for setting the processor affinity on a per
 	platform basis
 	*/
-	if (CPUid != noCPUpreference)
+		if (CPUid != noCPUpreference)
+		{
+			DWORD result = SetThreadIdealProcessor(newthread, static_cast<uint>(CPUid));
+			if (result == -1)
+			{
+				printf("SetIdeal Failed!\n");
+			}
+			else
+			{
+				printf("SetIdeal worked!  %d to %d\n", result, CPUid);
+			}
+		}
+
+		return newthread;
+	}
+	else
 	{
-		DWORD result = SetThreadIdealProcessor(newthread, static_cast<uint>(CPUid));
-		if (result == -1)
-		{
-			printf("SetIdeal Failed!\n");
-		}
-		else
-		{
-			printf("SetIdeal worked!  %d to %d\n", result, CPUid);
-		}
+		int errorValue;
+		errno_t errorCallStatus = _get_errno(&errorValue);
+		BREAKPOINT(0x0);
 	}
 	
-	return newthread;
 }
 
 inline void	closeThread(threadHandle handle)

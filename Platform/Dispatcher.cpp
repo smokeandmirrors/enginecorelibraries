@@ -166,20 +166,10 @@ class Dispatcher::PendingJobQueue
 {
 public:
 	inline void
-		add(Thread::ExecutableInput& work, bool waitable)
+		add(Thread::ExecutableInput& work)
 	{
 		Job* job = getFreeJob();
-		Thread* thread; 
-		
-		if (waitable)
-		{
-			thread = Thread::createSuspended(*work.executable, work.preferredCPU);
-		}
-		else
-		{
-			thread = Thread::createUninitialized(*work.executable, work.preferredCPU);
-		}
-		
+		Thread* thread = Thread::createSuspended(*work.executable, work.preferredCPU);
 		job->reset(thread, work.priority);
 		m_pendingJobs.push(job);
 	}
@@ -313,58 +303,35 @@ void Dispatcher::accountForStartedJob(Job* started, cpuID index)
 	SCHEDULE_PRINT
 }
 
-void Dispatcher::enqueue(Thread::ExecutableQueue& work)
+void Dispatcher::addAndStartJobs(Thread::ExecutableQueue& work)
 {
 	SYNC(m_mutex);
-	bool isWaitedOn(Thread::isThisWaitedOn());
+
 	for (Thread::ExecutableQueue::ExecutableQueueIter iter(work.inputQueue.begin()), sentinel(work.inputQueue.end()); 
 		iter != sentinel; 
 		++iter)
 	{
-		m_pendingJobs->add(*iter, isWaitedOn);
+		m_pendingJobs->add(*iter);
 	}
-	
+
 	startJobs();
+}
+
+void Dispatcher::enqueue(Thread::ExecutableQueue& work)
+{
+	addAndStartJobs(work);
 }
 
 void Dispatcher::enqueueAndWait(Thread::ExecutableQueue& work)
 {
-	/*Thread::Tree tree;
-
-	{
-	SYNC(m_mutex);
-
-	for (InputQueueIterator iter(work.begin()), sentinel(work.end()); iter != sentinel; ++iter)
-	{
-	Thread* output(NULL);
-	m_pendingJobs->add(*iter, &output);
-	tree.push(output);
-	}
-
-	startJobs();
-	}
-
-	Thread::waitOnCompletion(tree);*/
+	Thread::Sleeper sleeper(false);
+	addAndStartJobs(work);
 }
 
 void Dispatcher::enqueueAndWaitOnChildren(Thread::ExecutableQueue& work)
 {	
-	//Thread::Tree children; // Thread::Tree* children = new Thread::Tree();
-
-	//{
-	//	SYNC(m_mutex);
-	//	InputQueueIterator sentinel(work.end());
-	//	
-	//	for (InputQueueIterator iter(work.begin()); iter != sentinel; ++iter)
-	//	{
-	//		initializeAndTrackJob(*iter, &children);
-	//	}
-
-	//	startJobs();
-	//}
-
-	//Thread::waitOnCompletionOfChildren(children);
-	//accountForWaitedOnThreadCompletion(&children); // delete children;	
+	Thread::Sleeper sleeper(true);
+	addAndStartJobs(work);
 }
 
 bool Dispatcher::getFreeIndex(cpuID& index)

@@ -61,6 +61,7 @@ private:
 
 	void accountForFinish(Job* finished);
 	void accountForStartedJob(Job* started, cpuID index);
+	void addAndStartJobs(Thread::ExecutableQueue& work);
 	bool getFreeIndex(cpuID& index);
 	bool getFreeIndex(cpuID& available, cpuID idealCPU);
 	void initializeNumberSystemThreads(void);
