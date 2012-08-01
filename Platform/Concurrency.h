@@ -25,7 +25,7 @@ namespace concurrency
 
 typedef uint(__stdcall*		threadable)(void*);
 typedef uint				threadID;
-typedef void*				threadHandle;
+typedef void*				Handle;
 
 #else
 #error unsupported concurrency platform

@@ -73,11 +73,15 @@ inline void doWork10SimpleChildThreads3()
 {
 	doWork3();
 	
+
+	Thread::ExecutableQueue queue;
+	
 	for (int i = 0; i < 3; ++i)
 	{
-		Executor* executor = new Executor(&doWork10report);
-		Thread::createExecuting(*executor);
+		queue.add(new Executor(&doWork10report));
 	}
+
+	Thread::execute(queue);
 
 	printf("finished work and creating!\n");
 }
@@ -653,11 +657,14 @@ void testEngineLoop(void)
 void doWork10report2(void) 
 { 
 	doWork(1000); 
+	
+	concurrency::Thread::ExecutableQueue executables;
 	for (int i = 0; i < 10; ++i)
 	{
-		Executor* executor = new Executor(&doWork3);
-		Thread::createExecuting(*executor);
+		executables.add(new Executor(&doWork3));	
 	}
+	Thread::executeAndWaitOnChildren(executables);
+
 	printf("done with doWork10report\n"); 
 }
 
@@ -670,21 +677,48 @@ void nested1(void)
 		executables.add(new Executor(&doWork3));	
 	}
 	printf("Nested 1 Waiting");
-	Thread::waitOnCompletionOfChildren(executables);
+	Thread::executeAndWaitOnChildren(executables);
 	doWork3();
 	printf("Nested 1 finished Waiting!\n");
+}
+
+int nest(10);
+
+void nester(void)
+{
+	if (nest > 0)
+	{
+		nest--;
+		concurrency::Thread::ExecutableQueue executables;
+		for (int i = 0; i < 1; ++i)
+		{
+			executables.add(new Executor(&nester));	
+		}
+		printf("Nested %d Waiting", nest);
+		Thread::executeAndWaitOnChildren(executables);
+	}
+	else
+	{
+		printf("working\n");
+		doWork5();
+	}
 }
 
 
 void sandbox::schedulingRnD(void)
 {
-
-	testEngineLoop();
+	{
+		concurrency::Thread::ExecutableQueue executables;
+		executables.add(new Executor(&nester));
+		Thread::executeAndWaitOnChildren(executables);
+		printf("Finished Waiting on a nester!\n");
+	}
+	
 
 	{
 		concurrency::Thread::ExecutableQueue executables;
 		executables.add(new Executor(&nested1));
-		Thread::waitOnCompletionOfChildren(executables);
+		Thread::executeAndWaitOnChildren(executables);
 		printf("Finished Waiting on a nested!\n");
 	}
 
@@ -695,7 +729,7 @@ void sandbox::schedulingRnD(void)
 			Executor* executor = new Executor(&doWork10SimpleChildThreads3);
 			executables.add(executor, concurrency::noCPUpreference);			
 		}
-		Thread::waitOnCompletion(executables);
+		Thread::executeAndWait(executables);
 		printf("this shouldn't happen for a while either!\n");
 	}
 
@@ -703,11 +737,13 @@ void sandbox::schedulingRnD(void)
 		Executor* executor = new Executor(&doWork10SimpleChildThreads3);
 		concurrency::Thread::ExecutableQueue executables;
 		executables.add(executor, concurrency::noCPUpreference);
-		Thread::waitOnCompletionOfChildren(executables);
+		Thread::executeAndWaitOnChildren(executables);
 		printf("boy, I hope this doesn't happen for 10 seconds!\n");
 	}
 
 	BREAKPOINT(0x0);
+
+	testEngineLoop();
 	/*
 	concurrency::Executor* executor(NULL);
 

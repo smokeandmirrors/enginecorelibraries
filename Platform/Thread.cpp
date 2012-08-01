@@ -10,117 +10,133 @@
 
 namespace concurrency
 {
-
-	class WaitingTree
-	{	// this class probably proves that I should have a tree pointer?  no...can't although it could help for deregistration
-	public:
-		WaitingTree(bool onChildren)
-			: waitOnChildren(onChildren)
-		{
-			/* empty */
-		}
-
-		bool isWaitedOn(threadID id)
-		{
-			SYNC(mutex);
-			{
-				return waitsByThreadIDs.has(id);
-			}
-		}
-
-		void registerTree(threadID id, Thread::Tree& tree)
-		{
-			SYNC(mutex);
-			if (waitsByThreadIDs.has(id))
-			{
-				// we are in a wait by a wait call
-				waitsByThreadIDs.set(id, &tree);
-				tree.setParent(&tree);
-			}
-			else
-			{
-				waitsByThreadIDs.set(id, &tree);
-			}
-		}
-
-		void unregisterTree(threadID id)
-		{
-			SYNC(mutex);
-			Thread::Tree* tree;
-			if (waitsByThreadIDs.has(id, tree))
-			{
-				if (tree->getParent() == NULL)
-				{
-					waitsByThreadIDs.remove(id);
-				}
-				else
-				{
-					waitsByThreadIDs.set(id, tree->getParent());
-				}
-			}
-		}
-
-		void registerThread(threadID id, Thread* thread)
-		{
-			threadID thisID = Thread::getThisID();
-			Thread::Tree* tree(NULL);
-			{
-				SYNC(mutex);
-				if (waitsByThreadIDs.has(thisID, tree))
-				{	// this thread is waited on
-					tree->push(thread);
-
-					if (waitOnChildren)
-					{	// so are the children
-						waitsByThreadIDs.set(id, tree); 
-					}
-				}
-			}
-		}
-
-		void unregisterThread(threadID threadID)
-		{
-			SYNC(mutex);
-			waitsByThreadIDs.remove(threadID);
-		}
-
-	private:
-		bool waitOnChildren;
-		DECLARE_MUTEX(mutex); 
-		containers::RedBlackMap<concurrency::threadID, Thread::Tree*> waitsByThreadIDs;
-	};
-
-	WaitingTree singleWait(false);
-	WaitingTree childWait(true);
-
-	void registerTree(threadID id, Thread::Tree& tree, bool waitOnChildren)
+class WaitingTree
+{	
+public:
+	WaitingTree(bool onChildren)
+		: waitOnChildren(onChildren)
 	{
-		WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
-		waitingTree.registerTree(id, tree);
+		/* empty */
 	}
 
-	void unregisterTree(threadID id, bool waitOnChildren)
+	bool isWaitedOn(threadID id)
 	{
-		WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
-		waitingTree.unregisterTree(id);
+		SYNC(mutex);
+		{
+			return waitsByThreadIDs.has(id);
+		}
+	}
+	
+	void registerHandle(concurrency::Handle handle)
+	{
+		threadID thisID = Thread::getThisID();
+		Thread::Tree* tree(NULL);
+		{
+			SYNC(mutex);
+			if (waitsByThreadIDs.has(thisID, tree))
+			{	// this thread is waited on
+				tree->push(handle);
+			}
+		}
 	}
 
-	void registerThread(threadID threadID, Thread* thread)
+	void registerThread(threadID id, Thread& thread)
 	{
-		singleWait.registerThread(threadID, thread);
-		childWait.registerThread(threadID, thread);
+		threadID thisID = Thread::getThisID();
+		Thread::Tree* tree(NULL);
+		{
+			SYNC(mutex);
+			if (waitsByThreadIDs.has(thisID, tree))
+			{	// this thread is waited on
+				tree->push(thread);
+
+				if (waitOnChildren)
+				{	// so are the children
+					waitsByThreadIDs.set(id, tree); 
+				}
+			}
+		}
+	}
+
+	void registerTree(threadID id, Thread::Tree& tree)
+	{
+		SYNC(mutex);
+		Thread::Tree* parent;
+		if (waitsByThreadIDs.has(id, parent))
+		{	// we are in a wait by a wait call
+			waitsByThreadIDs.set(id, &tree);
+			tree.setParent(parent);
+		}
+		else
+		{
+			waitsByThreadIDs.set(id, &tree);
+		}
 	}
 
 	void unregisterThread(threadID threadID)
 	{
-		singleWait.unregisterThread(threadID);
-		childWait.unregisterThread(threadID);
+		SYNC(mutex);
+		waitsByThreadIDs.remove(threadID);
 	}
+
+	void unregisterTree(threadID id)
+	{
+		SYNC(mutex);
+		Thread::Tree* tree;
+		if (waitsByThreadIDs.has(id, tree))
+		{
+			if (tree->getParent() == NULL)
+			{
+				waitsByThreadIDs.remove(id);
+			}
+			else
+			{
+				waitsByThreadIDs.set(id, tree->getParent());
+			}
+		}
+	}
+
+private:
+	bool waitOnChildren;
+	DECLARE_MUTEX(mutex); 
+	containers::RedBlackMap<concurrency::threadID, Thread::Tree*> waitsByThreadIDs;
+};
+
+WaitingTree singleWait(false);
+WaitingTree childWait(true);
+
+void registerHandle(concurrency::Handle handle)
+{
+	singleWait.registerHandle(handle);
+	childWait.registerHandle(handle);
+}
+
+void registerTree(threadID id, Thread::Tree& tree, bool waitOnChildren)
+{
+	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+	waitingTree.registerTree(id, tree);
+}
+
+void registerThread(threadID threadID, Thread& thread)
+{
+	singleWait.registerThread(threadID, thread);
+	childWait.registerThread(threadID, thread);
+}
+
+void unregisterTree(threadID id, bool waitOnChildren)
+{
+	WaitingTree& waitingTree = waitOnChildren ? childWait : singleWait;
+	waitingTree.unregisterTree(id);
+}
+	
+void unregisterThread(threadID threadID)
+{
+	singleWait.unregisterThread(threadID);
+	childWait.unregisterThread(threadID);
+}
 
 
 const ExecutionPriority unspecifiedPriority = 0;
-
-
 
 
 Thread::Sleeper::Sleeper(bool sleepOnFamily)
@@ -158,15 +174,18 @@ const millisecond waitInfinitely(10000000000);
 const cpuID noCPUpreference(-1);
 const threadID invalidThreadID(0xFFFFFFFF);
 
-inline void closeThread(threadHandle);
-inline threadHandle	createThread(threadable function, bool startSuspended, threadID& id, void* args, cpuID cpuPreference=noCPUpreference);
-inline threadHandle	getCurrentThread(void);
+inline void closeThread(concurrency::Handle);
+inline void closeIdleThreadWaitObject(concurrency::Handle);
+inline Handle createIdleThreadWaitObject(void);
+inline concurrency::Handle	createThread(threadable function, bool startSuspended, threadID& id, void* args, cpuID cpuPreference=noCPUpreference);
+inline concurrency::Handle	getCurrentThread(void);
 inline threadID getCurrentThreadID(void);
 
-inline bool resumeThread(threadHandle);
-inline bool setThreadCPUpreference(threadHandle& handle, cpuID cpuPreference);
-inline bool waitForCompletion(threadHandle& handle, millisecond milliseconds);
-inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds);
+inline bool resumeThread(concurrency::Handle);
+inline void signalWaitObject(concurrency::Handle);
+inline bool setThreadCPUpreference(concurrency::Handle& handle, cpuID cpuPreference);
+inline bool waitForCompletion(concurrency::Handle handle, millisecond milliseconds);
+inline bool waitForCompletion(concurrency::Handle* handles, uint numThreads, bool waitForAll, millisecond milliseconds);
 
 #if TEST_THREAD_DESTRUCTION	
 uint Thread::m_created(0);
@@ -186,24 +205,25 @@ Thread::Thread
 	: m_executor(&executable)
 	, m_preferredCPU(preferredCPU)
 	, m_thread(NULL)
+	, m_event(NULL)
 	, m_state(Thread::uninitialized)
 	, m_referenceCount(1)
 {	
 	switch (initialState)
 	{
+	case Thread::running:
+		initializeHardwareForExecution();
+		break;
+	
 	case Thread::uninitialized:
 		break;
 	
-	case Thread::suspended:
-		initializeSuspended(m_preferredCPU);
+	case Thread::waiting:
+		initializeHardwareForWaiting();
 		break;
-	
-	case Thread::running:
-		execute();
-		break;
-	
+			
 	default:
-			assert(false);
+		assert(false);
 	}
 	/// \todo a start running really must be created
 }
@@ -227,13 +247,16 @@ Thread::~Thread(void)
 void Thread::closeHardware()
 {
 	SYNC(m_mutex);
-	if (m_state == completed
-	|| m_state == suspended
-	|| m_state == resumed)
+	if (m_state == completed)
 	{
 		closeThread(m_thread);
 		m_state	= closed;
 	}
+
+	if (m_event)
+	{
+		closeIdleThreadWaitObject(m_event);
+	}	
 }
 
 void Thread::disconnect(signals::Receiver* receiver)
@@ -249,16 +272,6 @@ void Thread::execute(cpuID preferredCPU)
 	{
 		initializeHardware(preferredCPU, false);
 	}
-	else if (m_state == suspended)
-	{
-		if (updateCPUPreference(preferredCPU))
-		{
-			setThreadCPUpreference(m_thread, m_preferredCPU);
-		}
-
-		m_state = resumed;
-		resumeThread(m_thread);
-	}
 	else
 	{
 		BREAKPOINT(0x0);
@@ -266,10 +279,26 @@ void Thread::execute(cpuID preferredCPU)
 	}
 }	
 
-void Thread::executeAndWait(cpuID suggestedCPU)
+void Thread::execute(ExecutableQueue& executables)
 {
-	execute(suggestedCPU);
-	waitOnCompletion(*this);
+	for (ExecutableQueue::ExecutableQueueIter iter(executables.inputQueue.begin()), sentinel(executables.inputQueue.end()); 
+		iter != sentinel; 
+		++iter)
+	{
+		createExecuting(*iter->executable, iter->preferredCPU);
+	}	
+}
+
+void Thread::executeAndWait(ExecutableQueue& work)
+{
+	Sleeper sleeper(false);
+	execute(work);
+}
+
+void Thread::executeAndWaitOnChildren(ExecutableQueue& work)
+{
+	Sleeper sleeper(true);
+	execute(work);
 }
 
 threadID Thread::getThisID(void)
@@ -283,42 +312,18 @@ Thread* Thread::createExecuting(Executor& executable, cpuID preferredCPU)
 	return thread;
 }
 
-void Thread::createExecutingThreads(ExecutableQueue& work)
-{
-	for (ExecutableQueue::ExecutableQueueIter iter(work.inputQueue.begin()), sentinel(work.inputQueue.end()); 
-		iter != sentinel; 
-		++iter)
-	{
-		createExecuting(*iter->executable, iter->preferredCPU);
-	}	
-}
-
 cpuID Thread::getPreferredCPU(void) const
 {
 	return m_preferredCPU;
 }
 
-Thread* Thread::createSuspended(Executor& executable, cpuID preferredCPU)
+Thread* Thread::create(Executor& executable, cpuID preferredCPU)
 {
-	Thread* thread(NULL);
-
-	if (isThisWaitedOn())
-	{
-		thread = new Thread(executable, preferredCPU, Thread::suspended);
-		thread->initializeSuspended(preferredCPU);
-	}
-	else 
-	{
-		thread = new Thread(executable, preferredCPU, Thread::uninitialized);
-	}
-
-	return thread;
+	return new Thread(executable, preferredCPU, isThisWaitedOn() ? Thread::waiting : Thread::uninitialized);
 }
 
 void Thread::internalExecute(void)
 {
-	assert(getCurrentThreadID() == m_id);
-	assert(isExecutable());	
 	m_state = running;
 	m_executor->execute();
 	m_state = completed;
@@ -338,22 +343,31 @@ bool Thread::isWaitedOn(threadID id)
 
 void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 {
-	// SYNC(m_mutex);
 	updateCPUPreference(preferredCPU);
 	
-	if (!startSuspended)
-		m_state = suspended;
+	if (startSuspended)
+	{
+		initializeHardwareForWaiting();
+	}
+	else
+	{
+		initializeHardwareForExecution();
+	}
+}
 
-	m_thread = concurrency::createThread(Thread::systemExecute, startSuspended, m_id, this, m_preferredCPU);
+void Thread::initializeHardwareForExecution(void)
+{
+	m_thread = concurrency::createThread(Thread::systemExecute, false, m_id, this, m_preferredCPU);
 	
-	registerThread(m_id, this);
+	if (m_event)
+	{
+		signalWaitObject(m_event);
+	}
 
 	if (m_thread)
 	{
-		if (startSuspended)
-		{
-			m_state = suspended;
-		} // else m_state will be handled in the attempt to call execute() 
+		m_state = running;
+		registerThread(m_id, *this);
 	}
 	else
 	{
@@ -361,9 +375,18 @@ void Thread::initializeHardware(cpuID preferredCPU, bool startSuspended)
 	}
 }
 
-void Thread::initializeSuspended(cpuID preferredCPU)
+void Thread::initializeHardwareForWaiting(void)
 {
-	initializeHardware(preferredCPU, true);
+	m_event = concurrency::createIdleThreadWaitObject();
+	
+	if (m_event)
+	{
+		registerHandle(m_event);
+	}	
+	else
+	{
+		m_state = error;
+	}
 }
 
 const std::string& Thread::toString(void) const 
@@ -385,18 +408,6 @@ bool Thread::updateCPUPreference(cpuID suggestedCPU)
 	}
 }
 
-void Thread::waitOnCompletion(ExecutableQueue& work)
-{
-	Sleeper sleeper(false);
-	createExecutingThreads(work);
-}
-
-void Thread::waitOnCompletionOfChildren(ExecutableQueue& work)
-{
-	Sleeper sleeper(true);
-	createExecutingThreads(work);
-}
-
 void Thread::waitOnCompletion(Thread& thread)
 {
 	if (thread.isWaitable())
@@ -415,26 +426,18 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 // #define WAIT_ON_MULTIPLE 
 #ifdef WAIT_ON_MULTIPLE 
 	size_t numHandles = size - startingIndex;
-	threadHandle* handles = new threadHandle[numHandles];
+	concurrency::Handle* handles = new concurrency::Handle[numHandles];
 	uint numValid(0);
 
 	for (size_t index = startingIndex; index < size; index++)
 	{
-		Thread* thread = threads[index];
-
-		if (thread->isWaitable())
-		{
-			handles[numValid] = thread->m_thread;
-			numValid++;
-		}
-		else
-		{
-			assert(false);
-		}
+		handles[numValid] = threads[index];
+		numValid++;
 	}
 
 	for (size_t index = numValid; index < numHandles; index++)
 	{
+		assert(handles[index] == NULL);
 		handles[index] = NULL; // should be unnecessary
 	}
 
@@ -453,12 +456,7 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 #else // ndef WAIT_ON_MULTIPLE
 	for (size_t index = startingIndex; index < size; index++)
 	{
-		Thread* thread = threads[index];
-		
-		if (thread->isWaitable())
-		{
-			waitForCompletion(thread->m_thread, waitInfinitely);
-		}
+		waitForCompletion(threads[index], waitInfinitely);
 	}
 #endif // WAIT_ON_MULTIPLE
 }
@@ -467,7 +465,27 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 
 #define THREAD_RESUME_FAILED (0xFFFFFFFF)
 
-inline threadHandle createThread(threadable function, bool startSuspended, threadID& id, void* args, sint CPUid)
+inline void reportLastError(void);
+
+inline void closeIdleThreadWaitObject(concurrency::Handle handle)
+{
+	if (!CloseHandle(handle))
+	{
+		reportLastError();
+	}
+}
+
+inline Handle createIdleThreadWaitObject(void)
+{
+	Handle handle = CreateEvent(NULL, true, false, NULL);
+	if (!handle)
+	{
+		reportLastError();
+	}
+	return handle;
+}
+
+inline concurrency::Handle createThread(threadable function, bool startSuspended, threadID& id, void* args, sint CPUid)
 {	
 	// see windows docs, _beginthreadex calls CreateThread
 	// see safety issues http://msdn.microsoft.com/en-us/library/kdzttdcb.aspx
@@ -499,12 +517,19 @@ inline threadHandle createThread(threadable function, bool startSuspended, threa
 	{
 		int errorValue;
 		errno_t errorCallStatus = _get_errno(&errorValue);
+		
+		if (!errorCallStatus)
+		{
+			printf("error discovery failed!\n");
+		}
+		
 		BREAKPOINT(0x0);
+		return NULL;
 	}
 	
 }
 
-inline void	closeThread(threadHandle handle)
+inline void	closeThread(concurrency::Handle handle)
 {
 	CloseHandle(handle);
 }
@@ -514,12 +539,43 @@ inline threadID getCurrentThreadID(void)
 	return static_cast<threadID>(GetCurrentThreadId());
 }
 
-inline bool resumeThread(threadHandle handle)
+inline void reportLastError(void)
+{
+	DWORD lastError = GetLastError();
+	LPTSTR buffer(NULL);
+
+	if (!FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL, 
+		0,
+		0,
+		buffer, 
+		0,
+		NULL))
+	{
+		wprintf(L"Format message failed with 0x%x\n", lastError);
+	}
+	else
+	{
+		wprintf(buffer);
+		LocalFree(buffer);
+	}
+}
+
+inline bool resumeThread(concurrency::Handle handle)
 {
 	return ResumeThread(handle) != THREAD_RESUME_FAILED;
 }
 
-inline bool setThreadCPUpreference(threadHandle& handle, cpuID CPUid)
+inline void signalWaitObject(concurrency::Handle handle)
+{
+	if (!SetEvent(handle))
+	{
+		reportLastError();
+	}
+}
+
+inline bool setThreadCPUpreference(concurrency::Handle& handle, cpuID CPUid)
 {
 	if (CPUid != noCPUpreference)
 	{
@@ -549,7 +605,7 @@ void sleep(millisecond milliseconds)
 	Sleep(static_cast<uint>(milliseconds));
 }
 
-inline bool waitForCompletion(threadHandle& handle, millisecond milliseconds)
+inline bool waitForCompletion(concurrency::Handle handle, millisecond milliseconds)
 {
 	bool success(false);
 
@@ -591,7 +647,7 @@ inline bool waitForCompletion(threadHandle& handle, millisecond milliseconds)
 	return success;
 }
 
-inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitForAll, millisecond milliseconds)
+inline bool waitForCompletion(concurrency::Handle* handles, uint numThreads, bool waitForAll, millisecond milliseconds)
 {
 	bool success(false);
 
@@ -609,27 +665,8 @@ inline bool waitForCompletion(threadHandle* handles, uint numThreads, bool waitF
 
 		if (!success)
 		{
-			DWORD lastError = GetLastError();
-			LPTSTR buffer(NULL);
-			
-			if (!FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, 
-				0,
-				0,
-				buffer, 
-				0,
-				NULL))
-			{
-				wprintf(L"Format message failed with 0x%x\n", lastError);
-			}
-			else
-			{
-				wprintf(buffer);
-				LocalFree(buffer);
-			}
+			reportLastError();
 		}
-
 	}
 	
 	return success;

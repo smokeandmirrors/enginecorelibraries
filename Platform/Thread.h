@@ -29,7 +29,6 @@ extern const ExecutionPriority unspecifiedPriority;
 
 class Thread
 {
-	friend class Tree;
 	friend class Sleeper;
 
 public:
@@ -68,102 +67,64 @@ public:
 		std::vector<ExecutableInput> inputQueue;
 	};
 	
-	/// \todo these all need to be handled via shared_ptr ? or not
-
-	// these may not be necessary, as the dispatcher clearly needs some attention, too
-	/// for the user/scheduler to wait on it
-	static Thread* createSuspended(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	///
-	static Thread* createExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
-	
-	
-	// static void execute(ExecutableQueue& executables);
-	
 	static bool isThisWaitedOn(void); // ?? the new dispatcher might need this?
 	static bool isWaitedOn(threadID id);
-		
-	static void waitOnCompletion(ExecutableQueue& executables);
-	static void waitOnCompletionOfChildren(ExecutableQueue& executables);
-
-	
-	
+	static Thread* create(Executor& executable, cpuID preferredCPU=noCPUpreference);
+	static void execute(ExecutableQueue& executables);
+	static void executeAndWait(ExecutableQueue& executables);
+	static void executeAndWaitOnChildren(ExecutableQueue& executables);
 	/// get the ID of the executing thread
 	static threadID getThisID(void);
 	
-	
-
 	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
-
 	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
-
 	void addReference(void) const { ++m_referenceCount; }
-
 	void disconnect(signals::Receiver* receiver);
-
-	void execute(cpuID preferredCPU=noCPUpreference); 
-	
-	void executeAndWait(cpuID preferredCPU=noCPUpreference);
-
+	void execute(cpuID preferredCPU);
 	inline bool getID(threadID& id) const;
-
 	cpuID getPreferredCPU(void) const;
-		
-	void removeReference(void) const 
-	{
-		assert(m_referenceCount);
-		--m_referenceCount;
-		if (!m_referenceCount)
-			delete this;
-	}
-
+	inline bool isHardwareInitialized(void) const;
+	inline bool isWaitable(void) const; 
+	inline void removeReference(void) const;
 	const std::string& toString(void) const;
 
 public:
 	class Tree
 	{
 	public:
-		typedef std::vector<Thread*>::const_iterator ThreadIterConst; 
-		typedef std::vector<Thread*>::iterator ThreadIter; 
+		typedef std::vector<concurrency::Handle> Handles;
+		typedef std::vector<concurrency::Handle>::const_iterator IteratorConst; 
+		typedef std::vector<concurrency::Handle>::iterator Iterator; 
 
 		Tree(void)
 			: parent(NULL)
 		{
 			SET_THREAD_SPIN_COUNT(mutex, 4);
-			threads.reserve(20);
+			handles.reserve(20);
 		}
-
-		~Tree()
-		{
-			for (Thread::Tree::ThreadIter iter(threads.begin()), sentinel(threads.end());
-			iter != sentinel;
-			iter++)
-			{
-				(*iter)->removeReference();
-			}
-		}
-
-		inline ThreadIter begin(void) 
+		
+		inline Tree::Iterator begin(void) 
 		{
 			SYNC(mutex);
-			return threads.begin();
+			return handles.begin();
 		}
 
-		inline ThreadIterConst begin(void) const
+		inline Tree::IteratorConst begin(void) const
 		{
 			SYNC(mutex);
-			return threads.begin();
+			return handles.begin();
 		}
 
-		inline ThreadIter end(void) 
+		inline Tree::Iterator end(void) 
 		{
 			SYNC(mutex);
-			return threads.end();
+			return handles.end();
 		}
 
-		inline ThreadIterConst end(void) const
+		inline Tree::IteratorConst end(void) const
 		{
 			SYNC(mutex);
-			return threads.end();
+			return handles.end();
 		}
 		
 		inline Thread::Tree* getParent(void) 
@@ -174,26 +135,32 @@ public:
 		inline size_t getSize(void) const
 		{
 			SYNC(mutex);
-			return threads.size();
+			return handles.size();
 		}
 		
-		inline Thread* operator[](size_t index) 
+		inline concurrency::Handle operator[](size_t index) 
 		{
 			SYNC(mutex);
-			return threads[index];
+			return handles[index];
 		}
 
-		inline const Thread* operator[](size_t index) const
+		inline const concurrency::Handle operator[](size_t index) const
 		{
 			SYNC(mutex);
-			return threads[index];
+			return handles[index];
 		}
 
-		inline void push(Thread* thread)
+		inline void push(concurrency::Handle handle)
 		{
+			handles.push_back(handle);
+		}
+
+		inline void push(Thread& thread)
+		{
+			assert(thread.isWaitable());
 			SYNC(mutex);
-			thread->addReference();
-			threads.push_back(thread);
+			thread.addReference();
+			handles.push_back(thread.m_thread);
 		}
 
 		inline void setParent(Thread::Tree* parent)
@@ -202,12 +169,10 @@ public:
 		}
 
 	private:
-		Thread& operator=(const Thread&);
-		Thread::Tree* parent;
-		
+		Thread::Tree& operator=(const Thread::Tree&);
+		Thread::Tree* parent;		
 		DECLARE_MUTEX(mutex);
-
-		std::vector<Thread*> threads;
+		Handles handles;
 	}; // class Thread::Tree
 
 	class Sleeper
@@ -228,16 +193,19 @@ private:
 		completed,		// execution complete 
 		closed,			// hardware thread resource returned
 		error,			// hardware initialization failed 
-		uninitialized,	// no hardware thread
 		running,		// hardware thread executing
-		resumed,		// hardware resume / start created attempted
-		suspended		// hardware execution paused
+		uninitialized,	// no hardware initialization
+		waiting,		// waited on, but not executing 
 	}; // enum Thread::RunningState
 
-	static void createExecutingThreads(ExecutableQueue& work);
+	// these may not be necessary, as the dispatcher clearly needs some attention, too
+	/// for the user/scheduler to wait on it
+	///
+	static Thread* createExecuting(Executor& executable, cpuID preferredCPU=noCPUpreference);
+
 
 #if WIN32
-	static uint __stdcall systemExecute(threadHandle thread)
+	static uint __stdcall systemExecute(concurrency::Handle thread)
 	{
 		static_cast<Thread*>(thread)->internalExecute();
 		// thread->notifyTreeOfCompletion
@@ -255,18 +223,10 @@ private:
 	Thread(void);
 	
 	void closeHardware(void);
-
 	void internalExecute(void);
-
 	void initializeHardware(cpuID preferredCPU, bool startSuspended);
-
-	void initializeSuspended(cpuID preferredCPU);
-
-	inline bool isExecutable(void) const;
-
-	inline bool isHardwareInitialized(void) const;
-
-	inline bool isWaitable(void) const; 
+	void initializeHardwareForExecution();
+	void initializeHardwareForWaiting(void);
 	void setPreferredCPU(cpuID prefeeredCPU);
 	bool updateCPUPreference(cpuID suggestedCPU);
 	/// wait on the thread to complete
@@ -285,7 +245,8 @@ private:
 	
 	cpuID m_preferredCPU;
 
-	threadHandle m_thread;
+	concurrency::Handle m_thread;
+	concurrency::Handle m_event;
 
 	signals::Transmitter1<Thread*> m_onComplete;
 
@@ -314,42 +275,42 @@ public:
 #endif//TEST_THREAD_DESTRUCTION
 };
 
-template<class RECEIVER> void 
-Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
+template<class RECEIVER> 
+void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
 {
 	m_onComplete.connect(receiver, function);
 }
 
-template<class RECEIVER> void 
-Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+template<class RECEIVER> 
+void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
 {
 	m_onComplete.connect(receiver, function);
 }
 
-inline bool 
-Thread::getID(threadID& id) const
+inline bool Thread::getID(threadID& id) const
 {
 	id = m_id;
 	return isHardwareInitialized();
 }
 
-inline bool
-Thread::isExecutable(void) const
-{
-	return m_state == resumed || m_state == suspended;
+inline bool Thread::isHardwareInitialized(void) const
+{	// todo clean this up in a static flag
+	return !(m_state == error || m_state == uninitialized || m_state == closed);
 }
 
-inline bool 
-Thread::isHardwareInitialized(void) const
-{
-	return !(m_state == error || m_state == uninitialized);
-}
-
-inline bool 
-Thread::isWaitable(void) const 
+inline bool Thread::isWaitable(void) const 
 { 
 	return isHardwareInitialized(); 
 }
+
+inline void Thread::removeReference(void) const 
+{
+	assert(m_referenceCount);
+	--m_referenceCount;
+	if (!m_referenceCount)
+		delete this;
+}
+
 } // concurrency
 
 #endif//THREADS_H

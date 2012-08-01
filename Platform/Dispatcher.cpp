@@ -129,7 +129,8 @@ public:
 
 	inline void start(cpuID& requiredCPU) 
 	{
-		m_thread->execute(requiredCPU);
+		m_thread->execute(requiredCPU); 
+		// \todo FIX THE THREAD CREATE PROBLEM here release the mutex
 	}
 
 	const std::string& toString(void) const
@@ -169,7 +170,7 @@ public:
 		add(Thread::ExecutableInput& work)
 	{
 		Job* job = getFreeJob();
-		Thread* thread = Thread::createSuspended(*work.executable, work.preferredCPU);
+		Thread* thread = Thread::create(*work.executable, work.preferredCPU);
 		job->reset(thread, work.priority);
 		m_pendingJobs.push(job);
 	}
