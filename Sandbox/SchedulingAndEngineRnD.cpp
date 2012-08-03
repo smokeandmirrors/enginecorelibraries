@@ -339,6 +339,12 @@ public:
 		return m_isRunning;
 	}
 
+	void markJobComplete()
+	{
+		SYNC(m_numJobsComplete);
+		++m_numJobsCompleteThisFrame;
+	}
+
 	void noticeComplete(FrameRequirement* requirement)
 	{
 		SYNC(m_mutex);
@@ -442,6 +448,7 @@ protected:
 		{
 			timer.reset();
 			std::queue<Executor*> work;
+			m_numJobsCompleteThisFrame = 0;
 
 			{
 				SYNC(m_incompleteMutex)
@@ -464,11 +471,14 @@ protected:
 			Dispatcher::single().enqueueAndWaitOnChildren(workQueue);
 			
 			frame++;
-			printf("Frame %5d COMPLETE in %10.8f!\n", frame, timer.milliseconds());
+			printf("Frame %5d COMPLETE in %10.8f NUM JOBS: %d!\n", frame, timer.milliseconds(), m_numJobsCompleteThisFrame);
 		}
 	}
 
 private:
+	int	m_numJobsCompleteThisFrame;
+	DECLARE_MUTEX(m_numJobsComplete);
+
 	requirements					m_completed;
 	DECLARE_MUTEX(m_completeMutex);
 	ulong							m_frameNumber;
@@ -481,6 +491,11 @@ private:
 	signals::ReceiverMember	
 		m_receiver;
 }; // class EngineLoop
+
+EngineLoop loop;
+
+
+
 
 class TestRequirement;
 
@@ -522,7 +537,6 @@ public:
 	{
 		// time adjustment testing
 		m_workTime *= 0.1f;
-		m_childJobs *= static_cast<sint>(0.1f);
 		m_originalJob = new TestJob(this);
 	}
 
@@ -610,6 +624,8 @@ void TestJob::execute(void)
 		concurrency::Dispatcher::single().enqueue(input);
 	}
 
+	loop.markJobComplete();
+
 	if (delete_self)
 	{
 		delete this;
@@ -621,34 +637,32 @@ TestJob::TestJob(TestRequirement* requirement)
 , m_name(frameReqName(requirement->getID()))
 { /* empty */ }
 
-
+	
 
 void testEngineLoop(void)
 {
-	EngineLoop loop;	
-
 	TestRequirement physics_sych(8, eFR_PhysicsSync, 5);
-	loop.addFrameRequirement(&physics_sych);
-	TestRequirement physics_asych(4, eFR_PhysicsAsync, 10);
-	loop.addFrameRequirement(&physics_asych);
-	TestRequirement rendering(6, eFR_Rendering, 40);
-	loop.addFrameRequirement(&rendering);
-	TestRequirement lighting(4, eFR_Lighting, 30);
-	loop.addFrameRequirement(&lighting);
-	TestRequirement animation(3, eFR_Animation, 20);
-	loop.addFrameRequirement(&animation);
-	TestRequirement audio(2, eFR_Audio, 40);
-	loop.addFrameRequirement(&audio);
-	TestRequirement events(1, eFR_Events, 5);
-	loop.addFrameRequirement(&events);
-	TestRequirement gameplay(1, eFR_Gameplay, 5);
-	loop.addFrameRequirement(&gameplay);
-	TestRequirement ai(1, eFR_AI, 30);
-	loop.addFrameRequirement(&ai);
-	TestRequirement garbage_collection(2, eFR_GarbageCollection, 2);
-	loop.addFrameRequirement(&garbage_collection);
-	TestRequirement networking(2, eFR_Networking, 4);
-	loop.addFrameRequirement(&networking);
+ 	loop.addFrameRequirement(&physics_sych);
+ 	TestRequirement physics_asych(4, eFR_PhysicsAsync, 10);
+ 	loop.addFrameRequirement(&physics_asych);
+ 	TestRequirement rendering(6, eFR_Rendering, 40);
+ 	loop.addFrameRequirement(&rendering);
+ 	TestRequirement lighting(4, eFR_Lighting, 30);
+ 	loop.addFrameRequirement(&lighting);
+ 	TestRequirement animation(3, eFR_Animation, 20);
+ 	loop.addFrameRequirement(&animation);
+ 	TestRequirement audio(2, eFR_Audio, 40);
+ 	loop.addFrameRequirement(&audio);
+ 	TestRequirement events(1, eFR_Events, 5);
+ 	loop.addFrameRequirement(&events);
+ 	TestRequirement gameplay(1, eFR_Gameplay, 5);
+ 	loop.addFrameRequirement(&gameplay);
+ 	TestRequirement ai(1, eFR_AI, 30);
+ 	loop.addFrameRequirement(&ai);
+ 	TestRequirement garbage_collection(2, eFR_GarbageCollection, 2);
+ 	loop.addFrameRequirement(&garbage_collection);
+ 	TestRequirement networking(2, eFR_Networking, 4);
+ 	loop.addFrameRequirement(&networking);
 
 	loop.start();
 	loop.stop();
@@ -707,6 +721,7 @@ void nester(void)
 
 void sandbox::schedulingRnD(void)
 {
+	/*
 	{
 		concurrency::Thread::ExecutableQueue executables;
 		executables.add(new Executor(&nester));
@@ -740,9 +755,7 @@ void sandbox::schedulingRnD(void)
 		Thread::executeAndWaitOnChildren(executables);
 		printf("boy, I hope this doesn't happen for 10 seconds!\n");
 	}
-
-	BREAKPOINT(0x0);
-
+	*/
 	testEngineLoop();
 	/*
 	concurrency::Executor* executor(NULL);

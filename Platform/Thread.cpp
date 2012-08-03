@@ -423,7 +423,7 @@ void Thread::waitOnCompletion(Tree& threads, size_t startingIndex)
 	assert(startingIndex >= 0);
 	assert(startingIndex < static_cast<sint>(size));
 	
-// #define WAIT_ON_MULTIPLE 
+#define WAIT_ON_MULTIPLE 
 #ifdef WAIT_ON_MULTIPLE 
 	size_t numHandles = size - startingIndex;
 	concurrency::Handle* handles = new concurrency::Handle[numHandles];
@@ -500,15 +500,7 @@ inline concurrency::Handle createThread(threadable function, bool startSuspended
 	*/
 		if (CPUid != noCPUpreference)
 		{
-			DWORD result = SetThreadIdealProcessor(newthread, static_cast<uint>(CPUid));
-			if (result == -1)
-			{
-				printf("SetIdeal Failed!\n");
-			}
-			else
-			{
-				printf("SetIdeal worked!  %d to %d\n", result, CPUid);
-			}
+			setThreadCPUpreference(newthread, CPUid);
 		}
 
 		return newthread;
@@ -545,7 +537,7 @@ inline void reportLastError(void)
 	LPTSTR buffer(NULL);
 
 	if (!FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS,
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL, 
 		0,
 		0,
@@ -579,22 +571,22 @@ inline bool setThreadCPUpreference(concurrency::Handle& handle, cpuID CPUid)
 {
 	if (CPUid != noCPUpreference)
 	{
-		if (CPUid > 10)
-		{
-			printf("SetIdeal on ELEVEN!  %d\n", CPUid);
-		}
-
-		DWORD result = SetThreadIdealProcessor(handle, static_cast<uint>(CPUid));
-		if (result == -1)
-		{
-			printf("SetIdeal Failed!  %d\n", CPUid);
-			return false;
-		}
-		else
-		{
-			printf("SetIdeal worked!  %d to %d\n", result, CPUid);
-			return true;
-		}
+// 		if (CPUid > 10)
+// 		{
+// 			printf("SetIdeal on ELEVEN!  %d\n", CPUid);
+// 		}
+//		SetThreadIdealProcessor(handle, static_cast<uint>(CPUid));
+//		DWORD result = SetThreadIdealProcessor(handle, static_cast<uint>(CPUid));
+// 		if (result == -1)
+// 		{
+// 			printf("SetIdeal Failed!  %d\n", CPUid);
+// 			return false;
+// 		}
+// 		else
+// 		{
+// 			printf("SetIdeal worked!  %d to %d\n", result, CPUid);
+// 			return true;
+// 		}
 	}
 
 	return false;
