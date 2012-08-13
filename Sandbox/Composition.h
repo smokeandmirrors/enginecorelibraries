@@ -31,21 +31,80 @@ Tested in the field	:	NO
 
 #include "Synchronization.h"
 
-/// \todo activate/deactivate pause/play functions
+/// \todo activate/deactivate pause/play is/active functions
+/// \todo composite grained functionality
+/// \todo component grained functionality
 
 namespace designPatterns
 {
 
+class RunTimeType
+{
+public:
+	template<typename SOURCE, typename TARGET>
+	static TARGET* dynamicCast(SOURCE* object)
+	{
+		return object->getRunTimeType().IS_A(TARGET::runTimeType) ? static_cast<TARGET*>(object) : NULL;
+	}
+
+	RunTimeType(const RunTimeType* const parentClassNullIfThisIsBase, const RunTimeType* const* nullTerminatedInterfaceArray)
+		: super(parentClassNullIfThisIsBase)
+		, interfaces(nullTerminatedInterfaceArray)
+	{
+		/* empty */
+	}
+
+	bool IS_A(const RunTimeType& otherType) const
+	{
+		const RunTimeType* thisType(this);
+
+		do 
+		{
+			if (thisType == &otherType)
+			{
+				return true;
+			}
+			else if (interfaces)
+			{
+				const RunTimeType* const* interface = &interfaces[0];
+				do 
+				{
+					if (*interface == &otherType)
+						return true;
+				}
+				while(*++interface);
+			}
+
+			thisType = thisType->super;
+		} 
+		while (thisType);
+
+		return false;
+	}
+
+	bool IS_EXACTLY(const RunTimeType& type) const 
+	{ 
+		return this == &type; 
+	}
+		
+private:
+	RunTimeType(const RunTimeType&);
+	RunTimeType operator=(const RunTimeType&);
+
+	const RunTimeType* const* interfaces; // = { *, *, *, *, NULL}
+	const RunTimeType* const super;
+};
+
 typedef uint Component_GUID;
 
-template<typename OWNER>
+template<typename COMPOSITE>
 class Component
 {
-	template<typename OWNER> friend class Composite;
+	template<typename COMPOSITE> friend class Composite;
 
 public:
 	Component(void)
-	: m_owner(NULL)
+	: composite(NULL)
 	{
 		/* empty */
 	}
@@ -54,11 +113,13 @@ public:
 	{
 		/* empty */
 	}
-
-	const OWNER* getOwner(void) const
+	
+	const COMPOSITE* getComposite(void) const
 	{
-		return m_owner;
+		return composite;
 	}
+
+	virtual const RunTimeType& getRunTimeType(void) const=0;
 
 protected:
 	virtual void onAttachTo(void)
@@ -72,61 +133,75 @@ protected:
 	}
 
 private:
-	void attach(OWNER* owner)
+	void attach(COMPOSITE* c)
 	{
-		assert(owner);
-		assert(!m_owner);
-		m_owner = owner;
+		assert(c);
+		assert(!composite);
+		composite = c;
 		onAttachTo();
 	}
 
 	void detach(void)
 	{
-		assert(m_owner);
+		assert(composite);
 		onDetach();
-		m_owner = NULL;
+		composite = NULL;
 	}
 
-	OWNER* m_owner;
+	COMPOSITE* composite;
 }; // Component
 
-template<typename OWNER>
+template<typename COMPOSITE>
 class Composite // interface/base/member
 {
-	typedef std::list< Component<OWNER>* > 
-		components;
+	typedef std::list< Component<COMPOSITE>* > 
+		Components;
 	
-	typedef typename std::list< Component<OWNER>* >::iterator 
-		components_iter;
+	typedef typename std::list< Component<COMPOSITE>* >::iterator 
+		ComponentsIter;
 	
+	typedef typename std::list< Component<COMPOSITE>* >::const_iterator
+		ComponentsIterConst;
 public:
 	virtual
 	~Composite(void)=0
 	{
-		std::for_each(m_components.begin(), m_components.end(), Composite<OWNER>::deleteFunction);
+		std::for_each(components.begin(), components.end(), Composite<COMPOSITE>::deleteFunction);
 	}
 
-	void add(Component<OWNER>& component) 
+	void add(Component<COMPOSITE>& component) 
 	{
-		component.attach(static_cast<OWNER*>(this));
-		m_components.push_back(&component);
+		component.attach(static_cast<COMPOSITE*>(this));
+		components.push_back(&component);
 	}
-	
-	void remove(Component<OWNER>& component)
+
+	template<typename COMPONENT>
+	bool has(void) const
+	{
+		for (ComponentsIterConst iter(components.begin()), sentinel(components.end()); iter != sentinel; ++iter)
+		{
+			if ((*iter)->getRunTimeType().IS_A(COMPONENT::runTimeType))
+				return true;
+		}
+
+		return false;
+	}
+
+	void remove(Component<COMPOSITE>& component)
 	{	
-		assert(component.getOwner() == this);
+		assert(component.getComposite() == this);
 		component.detach();
-		m_components.erase(std::find(m_components.begin(), m_components.end(), &component));
+		components.erase(std::find(components.begin(), components.end(), &component));
 	}
 	
 private:
-	static void deleteFunction(Component<OWNER>* object)
+	static void deleteFunction(Component<COMPOSITE>* object)
 	{
 		object->detach();
 		delete object;
 	}
-	
-	components m_components;
+
+	Components components;
 }; // Composite
 
 } // namespace designPatterns

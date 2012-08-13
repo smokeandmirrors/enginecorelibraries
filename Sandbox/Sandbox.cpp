@@ -24,8 +24,6 @@ using namespace embeddedLua;
 class Agent 
 	: public Composite<Agent>
 {
-public:
-
 };
 
 class VisualFX
@@ -37,26 +35,76 @@ class VisualFX
 class Movement
 	: public Component<Agent>
 {
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
+const designPatterns::RunTimeType Movement::runTimeType(NULL, NULL);
 
 class Attack
 	: public Component<Agent>
 {
 public:
-
+	static const designPatterns::RunTimeType runTimeType;
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
+const designPatterns::RunTimeType Attack::runTimeType(NULL, NULL);
 
 class Defense
 	: public Component<Agent>
 {
-
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
+const designPatterns::RunTimeType Defense::runTimeType(NULL, NULL);
+
+class Damageable
+{
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	virtual ~Damageable(void)=0 {}
+};
+const designPatterns::RunTimeType Damageable::runTimeType(NULL, NULL);
+
+class Healable
+{
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	virtual ~Healable(void)=0 {}
+};
+const designPatterns::RunTimeType Healable::runTimeType(NULL, NULL);
+
+class Patchable
+{
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	virtual ~Patchable(void)=0 {}
+};
+const designPatterns::RunTimeType Patchable::runTimeType(NULL, NULL);
+
+class ActiveCover
+	: public Defense
+	, public Damageable
+	, public Healable
+{
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
+private:
+	static const RunTimeType* const interfaces[];
+};
+const designPatterns::RunTimeType* const ActiveCover::interfaces[] = {&Healable::runTimeType, &Damageable::runTimeType, NULL};
+const designPatterns::RunTimeType ActiveCover::runTimeType(&Defense::runTimeType, ActiveCover::interfaces);
 
 class Shadows
 	: public Component<VisualFX>
 {
-
+public:
+	static const designPatterns::RunTimeType runTimeType;
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
+const designPatterns::RunTimeType Shadows::runTimeType(NULL, NULL);
 
 #include <queue>
 
@@ -282,7 +330,29 @@ typedef uint (CallAdapter::* mptype2)(sreal, const math::Vector3&);
 
 void onPlay(void)
 {
+
+	Agent alpha;
+	Movement* movement = new Movement();
+	Attack* attack = new Attack();
+	Defense* defense = new ActiveCover;
 	
+	{
+		Agent beta;
+		Defense* defense = new ActiveCover;
+		beta.add(*defense);
+		assert(!beta.has<Attack>());
+	}
+	
+	alpha.add(*movement);
+	alpha.add(*attack);
+	alpha.add(*defense);
+	alpha.remove(*attack);
+	assert(!alpha.has<Attack>());
+	assert(alpha.has<Movement>());
+	assert(alpha.has<Damageable>());
+	assert(alpha.has<ActiveCover>());
+	assert(alpha.has<Healable>());
+	assert(!alpha.has<Patchable>());
 
 	math::Vector3 z;
 	z.zero();
@@ -361,14 +431,6 @@ void onPlay(void)
  	aStar2.getPath(path);
  	printf("finished A*!\n");
 
- 	Agent alpha;
- 	Movement* movement = new Movement();
- 	Attack* attack = new Attack();
- 	Defense* defense = new Defense;
- 	alpha.add(*movement);
- 	alpha.add(*attack);
-	alpha.add(*defense);
-	alpha.remove(*attack);
 
 	{
 		std::priority_queue<sint > priqueue;
