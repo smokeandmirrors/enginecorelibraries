@@ -3,6 +3,7 @@
 #include "BinaryHeap.h"
 #include "A_Star.h"
 #include "Composition.h"
+#include "HierarchicalFiniteStateMachine.h"
 #include "Numbers.h"
 #include "RedBlackMap.h"
 #include "Strings.h"
@@ -20,6 +21,7 @@ typedef std::string TestStringType; // String::Immutable
 using namespace designPatterns;
 using namespace containers;
 using namespace embeddedLua;
+using namespace HFSM;
 
 class Agent 
 	: public Composite<Agent>
@@ -327,11 +329,129 @@ class CallAdapter
 typedef uint (A::* mptype)(sreal, const math::Vector3&);
 typedef uint (CallAdapter::* mptype2)(sreal, const math::Vector3&);
 
+typedef UpdateManager<Attack> UpdateManager_Attack;
+typedef UpdateManager<Agent> UpdateManager_Agent;
+DEFINE_SINGLETON(UpdateManager_Attack);
+DEFINE_SINGLETON(UpdateManager_Agent);
+
+template<typename T>
+class BaseClass
+{
+public:
+	~BaseClass(void) { printf("base destructor called\n"); }
+};
+
+class ChildClass
+	: public BaseClass<ChildClass>
+{
+public:
+	~ChildClass(void) { printf("child destructor called\n"); }
+};
+
+void proveThePoint(void)
+{
+	ChildClass* c1 = new ChildClass();
+	BaseClass<ChildClass>* c2 = new ChildClass();
+	delete c2;
+	delete c1;
+	printf("done\n");
+}
 
 void onPlay(void)
 {
-
 	Agent alpha;
+	
+	{
+		Agent gamma;
+
+		HFSM::Traversal<Agent> alpha(&gamma);
+
+		HFSM::TransitionFX<Agent>* transitionFX1 = new TransitionFX<Agent>;
+		HFSM::TransitionFX<Agent>* transitionFX2 = new TransitionFX<Agent>;
+		HFSM::TransitionFX<Agent>* transitionFX3 = new TransitionFX<Agent>;
+
+		HFSM::ConditionTrue<Agent>* condition1 = new ConditionTrue<Agent>("condition 1");
+		HFSM::ConditionTrue<Agent>* condition2 = new ConditionTrue<Agent>("condition 2");
+		HFSM::ConditionTrue<Agent>* condition3 = new ConditionTrue<Agent>("condition 3");
+		HFSM::ConditionTrue<Agent>* condition4 = new ConditionTrue<Agent>("condition 4");
+		HFSM::ConditionTrue<Agent>* condition5 = new ConditionTrue<Agent>("condition 5");
+		HFSM::ConditionTrue<Agent>* condition6 = new ConditionTrue<Agent>("condition 6");
+		HFSM::ConditionTrue<Agent>* condition7 = new ConditionTrue<Agent>("condition 7");
+
+		HFSM::StateMachine<Agent>* stateMachine1 = new StateMachine<Agent>("state/machine 0/x");
+		
+		HFSM::ActionState<Agent>* state1 = new ActionState<Agent>("state 1");
+		HFSM::ActionState<Agent>* state2 = new ActionState<Agent>("state 2");
+		HFSM::StateMachine<Agent>* stateMachine2 = new StateMachine<Agent>("state/machine 3/1");
+		
+		HFSM::ActionState<Agent>* state4 = new ActionState<Agent>("state 4");
+		HFSM::ActionState<Agent>* state5 = new ActionState<Agent>("state 5");
+		HFSM::StateMachine<Agent>* stateMachine3 = new StateMachine<Agent>("state/machine 6/2");		
+		
+		HFSM::ActionState<Agent>* state7 = new ActionState<Agent>("state 7");
+		HFSM::ActionState<Agent>* state8 = new ActionState<Agent>("state 8");
+		HFSM::ActionState<Agent>* state9 = new ActionState<Agent>("state 9");
+		
+		{
+			HFSM::StateKey key1 = stateMachine1->add(*state1);
+			HFSM::StateKey key2 = stateMachine1->add(*state2);
+			HFSM::StateKey key3 = stateMachine1->add(*stateMachine2);
+			stateMachine1->connect(key1, *condition1, key2, transitionFX1);
+			stateMachine1->connect(key2, *condition2, key3, transitionFX2);
+		}
+		
+		{
+			HFSM::StateKey key4 = stateMachine2->add(*state4);
+			HFSM::StateKey key5 = stateMachine2->add(*state5);
+			HFSM::StateKey key6 = stateMachine2->add(*stateMachine3);
+			stateMachine2->connect(key4, *condition3, key5, transitionFX1);
+			stateMachine2->connect(key5, *condition4, key6, transitionFX2);
+		}
+
+		{
+			HFSM::StateKey key7 = stateMachine3->add(*state7);
+			HFSM::StateKey key8 = stateMachine3->add(*state8);
+			HFSM::StateKey key9 = stateMachine3->add(*state9);
+			stateMachine3->connect(key7, *condition5, key8, transitionFX1);
+			stateMachine3->connect(key8, *condition6, key9, transitionFX2);
+			stateMachine3->connect(key9, *condition7, key7, transitionFX3);
+		}
+
+		alpha.start(stateMachine1);
+		
+		for (int i = 0; i < 12; ++i)
+		{
+			alpha.act();
+		}
+
+		alpha.stop();	
+
+		{
+			delete transitionFX1;
+			delete transitionFX2;
+			delete transitionFX3;
+			delete condition1;
+			delete condition2;
+			delete condition3;
+			delete condition4;
+			delete condition5;
+			delete condition6;
+			delete condition7;
+			delete stateMachine1;
+			delete stateMachine2;
+			delete stateMachine3;
+			delete state1;
+			delete state2;
+			delete state4;
+			delete state5;
+			delete state7;
+			delete state8;
+			delete state9;
+		}
+
+		BREAKPOINT(0x0);
+	}
+	
 	Movement* movement = new Movement();
 	Attack* attack = new Attack();
 	Defense* defense = new ActiveCover;
@@ -341,18 +461,37 @@ void onPlay(void)
 		Defense* defense = new ActiveCover;
 		beta.add(*defense);
 		assert(!beta.has<Attack>());
+		assert(beta.get<Defense>() != NULL);
+		assert(beta.get<ActiveCover>() != NULL);
+		assert(beta.getOrCreate<Attack>() != NULL);
+		assert(beta.has<Attack>());
+		assert(beta.get<Attack>()->isActive());
+		assert(beta.isActive<Attack>());
+		beta.get<Attack>()->deactivate();
+		assert(!beta.get<Attack>()->isActive());
+
 	}
 	
 	alpha.add(*movement);
 	alpha.add(*attack);
 	alpha.add(*defense);
-	alpha.remove(*attack);
+	alpha.remove<Attack>();
 	assert(!alpha.has<Attack>());
 	assert(alpha.has<Movement>());
 	assert(alpha.has<Damageable>());
 	assert(alpha.has<ActiveCover>());
 	assert(alpha.has<Healable>());
 	assert(!alpha.has<Patchable>());
+	
+	{
+		UpdateManager<Attack>::single().add(attack);
+		UpdateManager<Attack>::single().update();
+	}
+
+	{
+		UpdateManager<Agent>::single().add(&alpha);
+		UpdateManager<Agent>::single().update();
+	}
 
 	math::Vector3 z;
 	z.zero();

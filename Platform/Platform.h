@@ -179,6 +179,12 @@ private:
 	STORAGE flags;
 };
 
+template<typename T>
+static void deleteObject(T* object)
+{
+	delete object;
+}
+
 template<typename T> 
 class isLess
 {

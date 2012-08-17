@@ -381,6 +381,13 @@ private:
 	millisecond	m_resetTime;
 }; // class Timer
 
+class Throttler
+{
+public:
+protected:
+private:
+}; // class Throttler
+
 // \todo, remove these (currently needed for unit tests)
 inline cycle cycles(void) { return Clock::single().cycles(); }
 inline millisecond milliseconds(void) { return Clock::single().milliseconds(); }

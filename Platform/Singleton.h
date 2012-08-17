@@ -99,12 +99,6 @@ protected:
 		/* empty */
 	} // Singleton(void)
 
-	/** empty dtor */
-	virtual ~Singleton(void) 
-	{ 
-		/* empty */ 
-	} // virtual ~Singleton(void) 
-
 	static bool create(void)
 	{
 		singleton = T::createSingleton();
@@ -134,6 +128,8 @@ private:
 // template<typename T> T* Singleton<T>::single(NULL); 
 // template<typename T> CustomSingletonInitializer<T> Singleton<T>::initializer;
 } // namespace designPatterns
+
+// for template singletons, typedef the namespace first
 
 #define DEFINE_SINGLETON_NS(BASE_CLASS, NAMESPACE) \
 namespace designPatterns \

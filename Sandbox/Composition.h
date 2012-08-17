@@ -14,6 +14,9 @@ smokeandmirrorsdevelopment@gmail.com</A>
 \endhtmlonly
 \date 4/15/2011
 
+
+THIS FUNCTIONALITY IS NOT THREAD SAFE!
+
 <DEVELOPMENT STATUS>
 Current Draft		:	0.0
 Current Phase		:   DEVELOPMENT
@@ -28,12 +31,10 @@ Tested in the field	:	NO
 
 #include <algorithm>
 #include <list>
+#include <vector>
 
 #include "Synchronization.h"
-
-/// \todo activate/deactivate pause/play is/active functions
-/// \todo composite grained functionality
-/// \todo component grained functionality
+#include "Singleton.h"
 
 namespace designPatterns
 {
@@ -72,7 +73,7 @@ public:
 					if (*interface == &otherType)
 						return true;
 				}
-				while(*++interface);
+				while (*++interface);
 			}
 
 			thisType = thisType->super;
@@ -95,34 +96,83 @@ private:
 	const RunTimeType* const super;
 };
 
-typedef uint Component_GUID;
-
 template<typename COMPOSITE>
 class Component
 {
 	template<typename COMPOSITE> friend class Composite;
-
+	// make a singleton for class based component grain management?
 public:
 	Component(void)
 	: composite(NULL)
+	, thisIsActive(false)
 	{
 		/* empty */
 	}
 	
 	virtual ~Component(void)
 	{
-		/* empty */
+		assert(!isActive());
+		assert(!isAttached());
 	}
-	
-	const COMPOSITE* getComposite(void) const
+
+	inline void activate(void)
+	{	
+		assert(isAttached());
+		if (!thisIsActive)
+		{
+			thisIsActive = true;
+			onActivate();
+		}
+	}
+
+	inline void deactivate(void)
+	{
+		if (thisIsActive)
+		{
+			thisIsActive = false;
+			onDeactivate();
+		}
+	}
+
+	inline const COMPOSITE* getComposite(void) const
 	{
 		return composite;
 	}
 
+	inline int getID(void) const
+	{
+		return ID:
+	}
+
 	virtual const RunTimeType& getRunTimeType(void) const=0;
 
+	inline bool isActive(void) const
+	{
+		return thisIsActive;
+	}
+
+	inline bool isAttached(void) const
+	{
+		return composite != NULL;
+	}
+
+	virtual void update(void)
+	{
+		/* empty */
+	}
+
 protected:
-	virtual void onAttachTo(void)
+	virtual void onActivate(void)
+	{
+		/* empty */
+	}
+
+	virtual void onAttach(void)
+	{
+		/* empty */
+	}
+
+	virtual void onDeactivate(void)
 	{
 		/* empty */
 	}
@@ -133,76 +183,226 @@ protected:
 	}
 
 private:
-	void attach(COMPOSITE* c)
+	inline void attach(COMPOSITE* c)
 	{
 		assert(c);
 		assert(!composite);
 		composite = c;
-		onAttachTo();
+		onAttach();
+		activate();
 	}
-
-	void detach(void)
+	
+	inline void detach(void)
 	{
 		assert(composite);
+		deactivate();
 		onDetach();
 		composite = NULL;
 	}
 
 	COMPOSITE* composite;
+	int ID;
+	bool thisIsActive;
 }; // Component
 
 template<typename COMPOSITE>
 class Composite // interface/base/member
 {
-	typedef std::list< Component<COMPOSITE>* > 
-		Components;
-	
-	typedef typename std::list< Component<COMPOSITE>* >::iterator 
-		ComponentsIter;
-	
-	typedef typename std::list< Component<COMPOSITE>* >::const_iterator
-		ComponentsIterConst;
+	typedef std::list< Component<COMPOSITE>* > Components;
+	typedef typename std::list< Component<COMPOSITE>* >::iterator ComponentsIter;
+	typedef typename std::list< Component<COMPOSITE>* >::const_iterator ComponentsIterConst;
+
 public:
-	virtual
-	~Composite(void)=0
+	~Composite(void)
 	{
-		std::for_each(components.begin(), components.end(), Composite<COMPOSITE>::deleteFunction);
+		std::for_each(components.begin(), components.end(), &Composite<COMPOSITE>::detachAndDelete);
 	}
 
-	void add(Component<COMPOSITE>& component) 
+	template<typename COMPONENT>
+	void activate(void)
 	{
-		component.attach(static_cast<COMPOSITE*>(this));
-		components.push_back(&component);
+		if (COMPONENT* component = find<COMPONENT>())
+		{
+			component->activate();
+		}
+	}
+	
+	template<typename COMPONENT>
+	void activateUnchecked(void)
+	{
+		assert(has<COMPONENT>());
+		find<COMPONENT>()->activate();
+	}
+
+	void add(Component<COMPOSITE>& component)
+	{
+		if (!(has(component.getRunTimeType()) || component.isAttached()))
+		{
+			insert(component);
+		}
+	}
+
+	void addUnchecked(Component<COMPOSITE>& component) 
+	{
+		assert(!(has(component.getRunTimeType()) || component.isAttached()));
+		insert(component);
+	}
+	
+	template<typename COMPONENT>
+	void deactivate(void)
+	{
+		if (COMPONENT* component = find<COMPONENT>())
+		{
+			component->activate();
+		}
+	}
+
+	template<typename COMPONENT>
+	COMPONENT* get(void) const
+	{
+		return find<COMPONENT>();
+	}
+
+	inline int getID(void) const
+	{
+		return ID;
+	}
+
+	template<typename COMPONENT>
+	COMPONENT* getOrCreate(void)
+	{
+		COMPONENT* component(find<COMPONENT>());
+		
+		if (!component)
+		{
+			component = new COMPONENT;
+			insert(*component);
+		}
+
+		return component;
+	}
+
+	bool has(const RunTimeType& componentType) const
+	{
+		return find(componentType) != NULL;
 	}
 
 	template<typename COMPONENT>
 	bool has(void) const
 	{
-		for (ComponentsIterConst iter(components.begin()), sentinel(components.end()); iter != sentinel; ++iter)
+		return find(COMPONENT::runTimeType) != NULL;
+	}
+
+	template<typename COMPONENT>
+	bool isActive(void) const
+	{
+		COMPONENT* component = find<COMPONENT>();
+		return component && component->isActive();
+	}	
+
+	template<typename COMPONENT>
+	void remove(bool destroy=false)
+	{
+		for (ComponentsIter iter(components.begin()), sentinel(components.end()); iter != sentinel; ++iter)
 		{
 			if ((*iter)->getRunTimeType().IS_A(COMPONENT::runTimeType))
-				return true;
+			{
+				(*iter)->detach();
+				
+				if (destroy)
+				{
+					delete (*iter);
+				}
+
+				components.erase(iter);
+				break;
+			}
+		}
+	}
+
+	void update(void)
+	{
+		std::for_each(components.begin(), components.end(), &Composite<COMPOSITE>::callUpdate);
+	}
+		
+private:
+	static void detachAndDelete(Component<COMPOSITE>* component)
+	{
+		component->detach();
+		delete component;
+	}
+
+	static void callUpdate(Component<COMPOSITE>* component)
+	{
+		component->update();
+	}
+
+	Component<COMPOSITE>* find(const RunTimeType& componentType) const
+	{
+		for (ComponentsIterConst iter(components.begin()), sentinel(components.end()); iter != sentinel; ++iter)
+		{
+			if ((*iter)->getRunTimeType().IS_A(componentType))
+			{
+				return *iter;
+			}
 		}
 
-		return false;
+		return NULL;
 	}
 
-	void remove(Component<COMPOSITE>& component)
-	{	
-		assert(component.getComposite() == this);
-		component.detach();
-		components.erase(std::find(components.begin(), components.end(), &component));
-	}
-	
-private:
-	static void deleteFunction(Component<COMPOSITE>* object)
+	template<typename COMPONENT>
+	COMPONENT* find(void) const
 	{
-		object->detach();
-		delete object;
+		return static_cast<COMPONENT*>(find(COMPONENT::runTimeType));
+	}
+
+	inline void insert(Component<COMPOSITE>& component) 
+	{
+		component.attach(static_cast<COMPOSITE*>(this));
+		components.push_back(&component);
 	}
 
 	Components components;
+	Components updateComponents;
+	int ID;
 }; // Composite
+
+template<typename UPDATER>
+class UpdateManager
+	: public Singleton< UpdateManager<UPDATER> >
+{
+	friend class designPatterns::Singleton< UpdateManager<UPDATER> >;
+
+public:
+	void add(UPDATER* updater)
+	{
+		updaters.push_back(updater);
+	}
+
+	void remove(UPDATER* updater)
+	{
+		updaters.remove(updaters.find(updater));
+	}
+
+	void update(void)
+	{
+		std::for_each(updaters.begin(), updaters.end(), &UpdateManager<UPDATER>::callUpdate);
+	}
+
+protected:
+	static void callUpdate(UPDATER* updater)
+	{
+		updater->update();
+	}
+
+	static UpdateManager<UPDATER>* createSingleton(void) 
+	{ 
+		return new UpdateManager<UPDATER>; 
+	}
+
+private:
+	std::vector<UPDATER*> updaters;
+}; // UpdateManager
 
 } // namespace designPatterns
 
