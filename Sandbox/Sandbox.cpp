@@ -357,10 +357,139 @@ void proveThePoint(void)
 	printf("done\n");
 }
 
+class TrackerOfEntryDatum
+	: public HFSM::PersistentDatum
+{
+public:
+	TrackerOfEntryDatum(void)
+		: numTimesActed(0)
+		, numTimesEntered(0)
+		, numTimesExited(0)
+		, numTimesIsSatisfied(0)
+		, numTimesUpdated(0)
+	{ /* empty */ }
+
+	~TrackerOfEntryDatum(void) 
+	{ 
+		/* empty */ 
+		printf("TrackerOfEntryDatum deleted!\n");
+	}
+
+	int numTimesActed;
+	int numTimesEntered;
+	int numTimesExited;
+	int numTimesIsSatisfied;
+	int numTimesUpdated;
+};
+
+class ActTracker 
+	: public HFSM::ActionState<Agent>
+{
+public:
+	ActTracker(const char* n)
+		: HFSM::ActionState<Agent>(n)
+	{
+
+	}
+
+	virtual void act(Traversal<Agent>& , PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times act: %d\n", ++tracker->numTimesActed);
+	}
+
+	virtual PersistentDatum* getPersistentDatum(void) const
+	{
+		return new TrackerOfEntryDatum();
+	}
+
+	virtual void recyclePersistentDatum(PersistentDatum* datum)
+	{
+		delete datum;
+	}
+
+protected:
+	virtual void onEnter(Traversal<Agent>& , PersistentDatum* datum) 
+	{ 
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times onEnter: %d\n", ++tracker->numTimesEntered);
+	}
+
+	virtual void onExit(Traversal<Agent>& , PersistentDatum* datum) 
+	{ 
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times onExit: %d\n", ++tracker->numTimesExited);
+	}
+};
+
+class TimesEvaluated
+	: public HFSM::Condition<Agent>
+{
+public:
+	TimesEvaluated(int numTimesToEvaluate=0)
+		: requiredEvaluations(numTimesToEvaluate)
+	{
+		/* empty */
+	}
+
+	virtual PersistentDatum* getPersistentDatum(void) const
+	{
+		return new TrackerOfEntryDatum();
+	}
+
+	void recyclePersistentDatum(PersistentDatum* datum)
+	{
+		delete datum;
+	}
+
+protected:
+	virtual bool isSatisfied(Agent* /*agent*/, PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times isSatisfied: %d\n", ++tracker->numTimesIsSatisfied);
+		return tracker->numTimesIsSatisfied >= requiredEvaluations;
+	}
+
+	virtual void update(Agent* /*agent*/, PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times update: %d\n", ++tracker->numTimesUpdated);
+	}
+
+private:
+	int requiredEvaluations;
+};
+
 void onPlay(void)
 {
 	Agent alpha;
 	
+	{
+		Agent deltaAgent;
+		HFSM::Traversal<Agent> delta(&deltaAgent);
+
+		TimesEvaluated evaluateTwice(2);
+		TimesEvaluated evaluateThrice(3);
+
+		ActTracker actTrackerOne("one");
+		ActTracker actTrackerTwo("two");
+
+		StateMachine<Agent> machine;
+		StateKey key1(machine.add(actTrackerOne));
+		StateKey key2(machine.add(actTrackerOne));
+		machine.connect(key1, evaluateTwice, key2);
+		machine.connect(key2, evaluateThrice, key1);
+
+		delta.start(machine);
+
+		for (int i = 0; i < 10; ++i)
+		{
+			delta.act();
+		}
+	}
+
+
+
 	{
 		Agent gamma;
 
@@ -417,7 +546,7 @@ void onPlay(void)
 			stateMachine3->connect(key9, *condition7, key7, transitionFX3);
 		}
 
-		alpha.start(stateMachine1);
+		alpha.start(*stateMachine1);
 		
 		for (int i = 0; i < 12; ++i)
 		{

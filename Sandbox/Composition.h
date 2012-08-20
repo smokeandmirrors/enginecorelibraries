@@ -322,7 +322,7 @@ public:
 
 	void update(void)
 	{
-		std::for_each(components.begin(), components.end(), &Composite<COMPOSITE>::callUpdate);
+		std::for_each(updateComponents.begin(), updateComponents.end(), &Composite<COMPOSITE>::callUpdate);
 	}
 		
 private:
