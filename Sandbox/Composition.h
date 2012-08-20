@@ -60,26 +60,30 @@ public:
 		const RunTimeType* thisType(this);
 
 		do 
-		{
+		{	// check the class hierarchy
 			if (thisType == &otherType)
 			{
 				return true;
 			}
-			else if (interfaces)
+			assert(interfaces);
+			// check the interface implementation
+			const RunTimeType* const* interface = &interfaces[0];
+			while (*interface)
 			{
-				const RunTimeType* const* interface = &interfaces[0];
-				do 
+				if (*interface == &otherType)
 				{
-					if (*interface == &otherType)
-						return true;
+					return true;
 				}
-				while (*++interface);
+				else
+				{
+					*++interface;
+				}
 			}
-
+			// check the next class
 			thisType = thisType->super;
 		} 
 		while (thisType);
-
+		// IS-A test is falls
 		return false;
 	}
 

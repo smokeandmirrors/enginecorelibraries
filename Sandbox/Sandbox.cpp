@@ -34,70 +34,78 @@ class VisualFX
 
 };
 
+#define DEFINE_BASE_RUN_TIME_TYPE(CLASS_NAME, ...) \
+	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
+	const designPatterns::RunTimeType CLASS_NAME::runTimeType(NULL, CLASS_NAME::interfaces);
+
+#define DEFINE_DERIVED_RUN_TIME_TYPE(CLASS_NAME, SUPER_CLASS_NAME, ...) \
+	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
+	const designPatterns::RunTimeType CLASS_NAME::runTimeType(& SUPER_CLASS_NAME::runTimeType, CLASS_NAME::interfaces);
+
+#define DECLARE_RUN_TIME_TYPE \
+	public: \
+	static const designPatterns::RunTimeType runTimeType; \
+	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; } \
+	private: \
+	static const RunTimeType* const interfaces[];
+	
 class Movement
 	: public Component<Agent>
 {
 public:
-	static const designPatterns::RunTimeType runTimeType;
-	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
+	DECLARE_RUN_TIME_TYPE
 };
-const designPatterns::RunTimeType Movement::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Movement, NULL);
 
 class Attack
 	: public Component<Agent>
 {
+	DECLARE_RUN_TIME_TYPE
 public:
-	static const designPatterns::RunTimeType runTimeType;
-	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
-const designPatterns::RunTimeType Attack::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Attack, NULL);
 
 class Defense
 	: public Component<Agent>
 {
+	DECLARE_RUN_TIME_TYPE
 public:
-	static const designPatterns::RunTimeType runTimeType;
-	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
 };
-const designPatterns::RunTimeType Defense::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Defense, NULL);
 
 class Damageable
 {
+	DECLARE_RUN_TIME_TYPE
 public:
-	static const designPatterns::RunTimeType runTimeType;
 	virtual ~Damageable(void)=0 {}
 };
-const designPatterns::RunTimeType Damageable::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Damageable, NULL);
 
 class Healable
 {
+	DECLARE_RUN_TIME_TYPE
 public:
-	static const designPatterns::RunTimeType runTimeType;
 	virtual ~Healable(void)=0 {}
 };
-const designPatterns::RunTimeType Healable::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Healable, NULL);
 
 class Patchable
 {
+	DECLARE_RUN_TIME_TYPE
 public:
-	static const designPatterns::RunTimeType runTimeType;
 	virtual ~Patchable(void)=0 {}
 };
-const designPatterns::RunTimeType Patchable::runTimeType(NULL, NULL);
+DEFINE_BASE_RUN_TIME_TYPE(Patchable, NULL);
 
 class ActiveCover
 	: public Defense
 	, public Damageable
 	, public Healable
 {
-public:
-	static const designPatterns::RunTimeType runTimeType;
-	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; }
-private:
-	static const RunTimeType* const interfaces[];
+	DECLARE_RUN_TIME_TYPE;
 };
-const designPatterns::RunTimeType* const ActiveCover::interfaces[] = {&Healable::runTimeType, &Damageable::runTimeType, NULL};
-const designPatterns::RunTimeType ActiveCover::runTimeType(&Defense::runTimeType, ActiveCover::interfaces);
+
+DEFINE_DERIVED_RUN_TIME_TYPE(ActiveCover, Defense, &Healable::runTimeType, &Damageable::runTimeType, NULL);
 
 class Shadows
 	: public Component<VisualFX>
@@ -578,12 +586,22 @@ void onPlay(void)
 			delete state9;
 		}
 
-		BREAKPOINT(0x0);
+		// BREAKPOINT(0x0);
 	}
 	
 	Movement* movement = new Movement();
 	Attack* attack = new Attack();
 	Defense* defense = new ActiveCover;
+	alpha.add(*movement);
+	alpha.add(*attack);
+	alpha.add(*defense);
+	alpha.remove<Attack>();
+	assert(!alpha.has<Attack>());
+	assert(alpha.has<Movement>());
+	assert(alpha.has<Damageable>());
+	assert(alpha.has<ActiveCover>());
+	assert(alpha.has<Healable>());
+	assert(!alpha.has<Patchable>());
 	
 	{
 		Agent beta;
@@ -600,18 +618,7 @@ void onPlay(void)
 		assert(!beta.get<Attack>()->isActive());
 
 	}
-	
-	alpha.add(*movement);
-	alpha.add(*attack);
-	alpha.add(*defense);
-	alpha.remove<Attack>();
-	assert(!alpha.has<Attack>());
-	assert(alpha.has<Movement>());
-	assert(alpha.has<Damageable>());
-	assert(alpha.has<ActiveCover>());
-	assert(alpha.has<Healable>());
-	assert(!alpha.has<Patchable>());
-	
+
 	{
 		UpdateManager<Attack>::single().add(attack);
 		UpdateManager<Attack>::single().update();
