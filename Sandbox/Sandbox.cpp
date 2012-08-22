@@ -22,6 +22,7 @@ using namespace designPatterns;
 using namespace containers;
 using namespace embeddedLua;
 using namespace HFSM;
+using namespace xronos;
 
 class Agent 
 	: public Composite<Agent>
@@ -57,11 +58,34 @@ public:
 };
 DEFINE_BASE_RUN_TIME_TYPE(Movement, NULL);
 
+
+typedef enum AttackInhibition
+{
+
+}; // AttackInhibition
+
+class AttackInhibitor
+{
+public:
+	virtual ~AttackInhibitor(void) { /*empty*/ }
+	
+	virtual bool isAttackAllowed(Agent& agent, AttackInhibition& reason)=0;
+	virtual void reset(AttackInhibition reason) { /*empty*/ };
+	virtual void update(Agent& agent, bool attackIsAllowed) { /*empty*/ };
+}; // AttackInhibitor
+
 class Attack
 	: public Component<Agent>
 {
 	DECLARE_RUN_TIME_TYPE
 public:
+	void update(Agent& update);
+	{
+
+	}
+
+private:
+	std::vector<AttackInhibitor*> m_inhibitors;
 };
 DEFINE_BASE_RUN_TIME_TYPE(Attack, NULL);
 
@@ -470,6 +494,53 @@ private:
 
 void onPlay(void)
 {
+	// time sand boxing
+	{
+		Clock clock;
+		
+		RelativeClock<Clock> clockReletive(clock);
+		clockReletive.setRate(2.0);
+
+		Stopwatch<Clock> stopwatch(clock);
+		Stopwatch<RelativeClock<Clock>> stopwatchReletive(clockReletive);
+
+		Timer<Clock> timer(clock);
+		Timer<RelativeClock<Clock>> timerRelative(clockReletive);
+		
+		timer.set(10000, 10000);
+		timerRelative.set(20000, 20000);
+
+		stopwatch.start();
+		stopwatchReletive.start();
+
+		timer.start();
+		timerRelative.start();
+
+
+		for (int i = 0; i < 10; ++i)
+		{
+			concurrency::sleep(1000);
+			clock.tick();
+			clockReletive.tick();
+			/*
+			printf("clockAbsolute seconds: %f\n", clock.seconds());
+			printf("clockReletive seconds: %f\n", clockReletive.seconds());
+			printf("timerAbsolute seconds: %f\n", timer.seconds());
+			printf("timerReletive seconds: %f\n", timerRelative.seconds());
+			printf("stopwatchAbsolute seconds: %f\n", stopwatch.seconds());
+			printf("stopwatchRelative seconds: %f\n", stopwatchReletive.seconds());
+			*/
+		}
+
+		printf("clockAbsolute seconds: %f\n", clock.seconds());
+		printf("clockReletive seconds: %f\n", clockReletive.seconds());
+		printf("timerAbsolute seconds: %f\n", timer.seconds());
+		printf("timerReletive seconds: %f\n", timerRelative.seconds());
+		printf("stopwatchAbsolute seconds: %f\n", stopwatch.seconds());
+		printf("stopwatchRelative seconds: %f\n", stopwatchReletive.seconds());
+	}
+
+
 	Agent alpha;
 	
 	{

@@ -11,6 +11,7 @@
 #include "Time.h"
 
 using namespace containers;
+using namespace xronos;
 
 void sandbox::tableRnD(void)
 {
@@ -58,7 +59,7 @@ void sandbox::tableRnD(void)
 	awesome = numberToTree["awesome"];
 	awesome->insert(5); 
 	
-	srand(static_cast<uint>(xronos::Clock::single().cycles()));
+	srand(static_cast<uint>(xronos::SystemClock::single().cycles()));
 	
 	for (int i = 0; i < 10; i++)
 		printf("%f\n", generateRandom<sreal>(-1.0f, 1.0f));
@@ -167,10 +168,10 @@ void sandbox::tableRnD(void)
 	
 	{
 		// race!
-		xronos::Clock& realClock(xronos::Clock::single());
-		xronos::Stopwatch tableTime(realClock);
-		xronos::Stopwatch treeTime(realClock);
-		xronos::Stopwatch mapTime(realClock);
+		xronos::SystemClock& realClock(xronos::SystemClock::single());
+		xronos::Stopwatch<SystemClock> tableTime(realClock);
+		xronos::Stopwatch<SystemClock> treeTime(realClock);
+		xronos::Stopwatch<SystemClock> mapTime(realClock);
 		std::vector<String::Immutable> strings;
 		
 		RedBlackMap<String::Immutable, sint> tree;

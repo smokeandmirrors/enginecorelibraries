@@ -26,7 +26,7 @@ typedef dreal second;
 namespace xronos
 {
 
-/** frame clock, game play/engine clock */
+	/** \todo why would I ever refer to these polymorphically? */
 class ClockInterface 
 {
 public:
@@ -41,12 +41,11 @@ public:
 }; // ClockInterface
 
 // the single, real time clock
-class Clock 
-	: public ClockInterface 
-	, public designPatterns::Singleton<Clock>
+class SystemClock 
+	: public designPatterns::Singleton<SystemClock>
 {
 public:
-	static Clock* createSingleton(void) { return new Clock(); }
+	static SystemClock* createSingleton(void) { return new SystemClock(); }
 
 	/** cycles per second */
 	const cycle hertz; 
@@ -58,47 +57,37 @@ public:
 	const millisecond milliHzInverse;
 	
 	dreal getRate(void) const { return 1.0; }
-
 	inline cycle cycles(void) const { return getCurrentCycle() - cycleZero; }
-
-	cycle getTick(void) const { assert(false); return 0; /* never do this */ }
-
 	millisecond milliseconds(void) const;
-
 	void reset(void);
-
 	second seconds(void) const;
-
-	void setRate(dreal) { assert(false); /* not allowed on the real time clock */ }
 	
-	void tick(void) { assert(false); /* no need to tick this clock */ }
-
 private:
 	cycle cycleZero;
 	
-	Clock(void);
+	SystemClock(void);
 
 	cycle getCurrentCycle(void) const;
-}; // class Clock
+}; // class SystemClock
 
-class ClockFrame : public ClockInterface 
+class Clock
 {
 public:
-	ClockFrame(void)
+	Clock(void)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
-	, m_tick(xronos::Clock::single().cycles())
+	, m_tick(xronos::SystemClock::single().cycles())
 	{ /* empty */ }
 	
-	ClockFrame(cycle initialTime)
+	Clock(cycle initialTime)
 	: m_currentMilliseconds(0)
 	, m_currentSeconds(0)
 	, m_rate(1.0)
 	, m_tick(initialTime)
 	{ /* empty */ }
 	
-	ClockFrame(const ClockFrame& clone)
+	Clock(const Clock& clone)
 	: m_currentMilliseconds(clone.milliseconds())
 	, m_currentSeconds(clone.seconds())
 	, m_rate(clone.getRate())
@@ -132,34 +121,35 @@ public:
 
 	void tick(void)
 	{
-		cycle tick = xronos::Clock::single().cycles();
+		cycle tick = xronos::SystemClock::single().cycles();
 		cycle delta = tick - m_tick;
-		m_currentMilliseconds += static_cast<millisecond>(m_rate * (delta * xronos::Clock::single().milliHzInverse)); 
-		m_currentSeconds += m_currentMilliseconds * 1000;
+		m_currentMilliseconds += static_cast<millisecond>(m_rate * (delta * xronos::SystemClock::single().milliHzInverse)); 
+		m_currentSeconds = m_currentMilliseconds * 0.001;
 		m_tick = tick;
 	}
 
 private:
-	ClockFrame operator=(const ClockFrame &);
+	Clock operator=(const Clock &);
 
 	millisecond	m_currentMilliseconds;
 	second		m_currentSeconds;
 	dreal		m_rate;
 	cycle		m_tick;
-}; // class ClockFrame
+}; // class Clock
 
-class ClockRelative : public ClockFrame 
+template<typename PARENT>
+class RelativeClock
 {
 public:
-	ClockRelative(const ClockInterface& parent)
+	RelativeClock(const PARENT& parent)
 		: m_currentMilliseconds(0)
 		, m_currentSeconds(0)
 		, m_rate(parent.getRate())
 		, m_tick(parent.getTick())
-		, m_parent(&parent)
+		, m_parent(parent)
 	{ /* empty */ }
 
-	ClockRelative(const ClockRelative& clone)
+	RelativeClock(const RelativeClock& clone)
 		: m_currentMilliseconds(clone.milliseconds())
 		, m_currentSeconds(clone.seconds())
 		, m_rate(clone.getRate())
@@ -169,38 +159,54 @@ public:
 
 	dreal getRate(void) const 
 	{ 
-		return m_parent->getRate() * m_rate; 
+		return m_parent.getRate() * m_rate; 
+	}
+
+	millisecond milliseconds(void) const	
+	{ 
+		return m_currentMilliseconds; 
+	}
+
+	second seconds(void) const
+	{
+		return m_currentSeconds;
+	}
+
+	void setRate(dreal rate)
+	{
+		m_rate = rate;
 	}
 
 	void tick(void)
 	{
-		cycle tick = m_parent->getTick();
+		cycle tick = m_parent.getTick();
 		cycle delta = tick - m_tick;
-		m_currentMilliseconds += static_cast<millisecond>(getRate() * (delta * xronos::Clock::single().milliHzInverse)); 
-		m_currentSeconds += m_currentMilliseconds * 1000;
+		m_currentMilliseconds += static_cast<millisecond>(getRate() * (delta * xronos::SystemClock::single().milliHzInverse)); 
+		m_currentSeconds = m_currentMilliseconds * 0.001;
 		m_tick = tick;
 	}
 	
 protected:
-	inline const ClockInterface* getParent(void) const
+	inline const PARENT& getParent(void) const
 	{
 		return m_parent;
 	}
 
 private:
-	ClockRelative operator=(const ClockRelative &);
+	RelativeClock operator=(const RelativeClock &);
 
 	millisecond	m_currentMilliseconds;
 	second		m_currentSeconds;
 	dreal		m_rate;
 	cycle		m_tick;
-	const ClockInterface* m_parent;
-}; // class ClockRelative
+	const PARENT& m_parent;
+}; // class RelativeClock
 
+template<typename CLOCK>
 class Stopwatch
 {
 public:
-	Stopwatch(const ClockInterface& reference)
+	Stopwatch(const CLOCK& reference)
 	: m_reference(reference) 
 	, m_start(0)
 	, m_stop(0)
@@ -225,6 +231,12 @@ public:
 		{
 			return m_stop - m_start;
 		}
+	}
+
+	void reset(void)
+	{
+		m_start = m_reference.milliseconds();
+		m_stop = m_start;
 	}
 
 	second seconds(void) const
@@ -252,28 +264,23 @@ public:
 			m_active = false;
 		}
 	}
-
-	void reset(void)
-	{
-		m_start = m_reference.milliseconds();
-		m_stop = m_start;
-	}
-	
+		
 private:
 	Stopwatch(void);
 	Stopwatch(const Stopwatch&);
 	Stopwatch operator=(const Stopwatch&);
 	
-	const ClockInterface& m_reference;
+	const CLOCK& m_reference;
 	millisecond m_start;
 	millisecond m_stop;
 	bool m_active;
 }; // class Stopwatch
 
+template<typename CLOCK>
 class Timer 
 {
 public:
-	Timer(const ClockInterface& reference, millisecond maxTime=0.0, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_False)
+	Timer(const CLOCK& reference, millisecond maxTime=0.0, millisecond minTime=-1.0, BoolEnum autoReset=BoolEnum_False)
 	: m_stopwatch(reference)
 	, m_autoReset(autoReset == BoolEnum_Unset ? autoReset == BoolEnum_True : false)
 	, m_maxTime(maxTime)
@@ -293,7 +300,7 @@ public:
 		{
 			bool timeRemains = _getMillisecondsPassed() < m_resetTime;
 
-			if (m_autoReset == BoolEnum_True)
+			if (m_autoReset && !timeRemains)
 			{
 				reset();
 			}
@@ -310,7 +317,7 @@ public:
 		{
 			bool timeIsUp = _getMillisecondsPassed() >= m_resetTime;
 			
-			if (m_autoReset)
+			if (timeIsUp && m_autoReset)
 			{
 				reset();
 			}
@@ -374,7 +381,7 @@ private:
 	Timer(const Timer& relative_parent);
 	Timer operator=(const Timer&);
 	
-	Stopwatch	m_stopwatch;
+	Stopwatch<CLOCK> m_stopwatch;
 	bool		m_autoReset;
 	millisecond	m_maxTime;
 	millisecond	m_minTime;
@@ -389,9 +396,9 @@ private:
 }; // class Throttler
 
 // \todo, remove these (currently needed for unit tests)
-inline cycle cycles(void) { return Clock::single().cycles(); }
-inline millisecond milliseconds(void) { return Clock::single().milliseconds(); }
-inline second seconds(void) { return Clock::single().seconds(); }
+inline cycle cycles(void) { return SystemClock::single().cycles(); }
+inline millisecond milliseconds(void) { return SystemClock::single().milliseconds(); }
+inline second seconds(void) { return SystemClock::single().seconds(); }
 
 } // namespace xronos
 

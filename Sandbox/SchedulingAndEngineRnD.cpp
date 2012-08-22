@@ -53,14 +53,14 @@ inline void doWork(millisecond milliseconds)
 		*i++ = number;
 	}
 
-	millisecond start = xronos::Clock::single().milliseconds();
+	millisecond start = xronos::SystemClock::single().milliseconds();
 
 	do 
 	{
 		qsort(numbers, number_size, sizeof(uint), &sintCompareAscending);	
 		qsort(numbers, number_size, sizeof(uint), &sintCompareDescending);	
 	}
-	while (xronos::Clock::single().milliseconds() - start < milliseconds); // delete[] numbers;
+	while (xronos::SystemClock::single().milliseconds() - start < milliseconds); // delete[] numbers;
 }
 
 void doWork3(void) { doWork(3000); }
@@ -441,7 +441,7 @@ protected:
 	void startFrame(void)
 	{
 		int frame(0);
-		xronos::Stopwatch timer(xronos::Clock::single());
+		xronos::Stopwatch<SystemClock> timer(xronos::SystemClock::single());
 		timer.start();
 		
 		for(;;)

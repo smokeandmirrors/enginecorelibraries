@@ -73,7 +73,7 @@ namespace
 #endif//WIN32	
 } // namespace 
 
-xronos::Clock::Clock(void)
+xronos::SystemClock::SystemClock(void)
 : hertz(_initilializeFrequency())
 , hertzInverse(static_cast<const second>(static_cast<slong>(1)) / static_cast<const second>(static_cast<slong>((hertz))))
 , milliHz(hertz / 1000)
@@ -83,24 +83,24 @@ xronos::Clock::Clock(void)
 	/* empty */
 }
 
-cycle xronos::Clock::getCurrentCycle(void) const
+cycle xronos::SystemClock::getCurrentCycle(void) const
 {
 	return _getCycleCPU();
 } 
 
-millisecond xronos::Clock::milliseconds(void) const
+millisecond xronos::SystemClock::milliseconds(void) const
 {
 	return cycles() * milliHzInverse;
 }
 
-void xronos::Clock::reset(void)
+void xronos::SystemClock::reset(void)
 { 
 	cycleZero = getCurrentCycle(); 
 }
 
-second xronos::Clock::seconds(void) const
+second xronos::SystemClock::seconds(void) const
 {
 	return milliseconds() * 1000;
 }
 
-DEFINE_SINGLETON_NS(Clock, xronos)
+DEFINE_SINGLETON_NS(SystemClock, xronos)

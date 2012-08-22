@@ -45,9 +45,6 @@ void theDoFunction(void)
 
 sint _tmain(sint /* argc */, _TCHAR* /* argv[] */)
 {
-	designPatterns::createSingletons();
-	designPatterns::destroySingletons();
-
  	designPatterns::createSingletons();
 #if SANDBOX
 	sandbox::play();// just plays with C/C++ compile/runtime functionality

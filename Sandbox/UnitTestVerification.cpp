@@ -290,6 +290,7 @@ LUA_ENUM(BoolEnum_True)
 LUA_ENUM(BoolEnum_Unset)
 END_LUA_ENUM(BoolEnum)
 
+/*
 DECLARE_LUA_LIBRARY(xronos)
 DEFINE_LUA_LIBRARY(xronos)
 LUA_ENTRY_NAMED("cycles", (nativeStaticReturn1Param0<cycle, &cycles>))
@@ -342,7 +343,7 @@ LUA_ENTRY_NAMED("reset", (nativeMemberReturn0Param0<Timer, &Timer::reset>))
 LUA_ENTRY_NAMED("milliseconds", (nativeConstReturn1Param0<Timer, millisecond, &Timer::milliseconds>))
 LUA_ENTRY_NAMED("seconds", (nativeConstReturn1Param0<Timer, second, &Timer::seconds>))
 END_LUA_CLASS(Timer, Timer)
-
+*/
 
 
 
@@ -695,7 +696,7 @@ void unitTestLua(void)
 
 	REGISTER_LUA_LIBRARY((&lua), Vector2)
 	REGISTER_LUA_LIBRARY((&lua), Vector3)
-
+/*
 	REGISTER_LUA_LIBRARY((&lua), xronos)
 	REGISTER_LUA_LIBRARY((&lua), ClockInterface)
 	REGISTER_LUA_LIBRARY((&lua), Clock)
@@ -710,7 +711,7 @@ void unitTestLua(void)
 	REGISTER_LUA_LIBRARY((&lua), AllPublicLE)
 	REGISTER_LUA_LIBRARY((&lua), AllPublicChildLE)
 	REGISTER_LUA_LIBRARY((&lua), AllPublicGrandChildLE)
-
+*/
 	lua_State* L = lua.getState();
 	sreal return2(4);
 	return2 = 4;
