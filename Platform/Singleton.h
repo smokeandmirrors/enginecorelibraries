@@ -35,23 +35,23 @@ Tested in the field	:	NO
 namespace designPatterns
 {
 
-extern class SingletonInitializer* singletonInitializers;
+extern class SingletonController* singletonInitializers;
 
-class SingletonInitializer
+class SingletonController
 {
 public:
-	virtual ~SingletonInitializer(void) {};
+	virtual ~SingletonController(void) {};
 	virtual bool create(void) const=0;
 	virtual void destroy(void) const=0;
 	virtual bool isInitialized(void) const=0;
-	SingletonInitializer* next;
-}; // class SingletonInitializer
+	SingletonController* next;
+}; // class SingletonController
 
 template<typename T>
-class CustomSingletonInitializer : public SingletonInitializer
+class CustomSingletonController : public SingletonController
 {
 public:
-	CustomSingletonInitializer()
+	CustomSingletonController()
 	{
 		next = singletonInitializers;
 		singletonInitializers = this;
@@ -71,7 +71,7 @@ public:
 	{
 		return T::isInitialized();
 	}
-}; // class CustomSingletonInitializer
+}; // class CustomSingletonController
 
 void createSingletons();
 void destroySingletons();
@@ -79,7 +79,7 @@ void destroySingletons();
 template<typename T>
 class Singleton
 {
-	friend class CustomSingletonInitializer<T>;
+	friend class CustomSingletonController<T>;
 
 public:
 	static inline T& single(void) 
@@ -126,7 +126,7 @@ private:
 
 // static initialization
 // template<typename T> T* Singleton<T>::single(NULL); 
-// template<typename T> CustomSingletonInitializer<T> Singleton<T>::initializer;
+// template<typename T> CustomSingletonController<T> Singleton<T>::initializer;
 } // namespace designPatterns
 
 // for template singletons, typedef the namespace first
@@ -135,14 +135,14 @@ private:
 namespace designPatterns \
 { \
 	template<> NAMESPACE::BASE_CLASS* Singleton<NAMESPACE::BASE_CLASS>::singleton(NULL); \
-	static CustomSingletonInitializer<NAMESPACE::BASE_CLASS> BASE_CLASS##Initializer; \
+	static CustomSingletonController<NAMESPACE::BASE_CLASS> BASE_CLASS##Initializer; \
 } // namespace designPatterns
 
 #define DEFINE_SINGLETON(BASE_CLASS) \
 namespace designPatterns \
 { \
 	template<> BASE_CLASS* Singleton<BASE_CLASS>::singleton(NULL); \
-	static CustomSingletonInitializer<BASE_CLASS> BASE_CLASS##Initializer; \
+	static CustomSingletonController<BASE_CLASS> BASE_CLASS##Initializer; \
 } // namespace designPatterns
 
 

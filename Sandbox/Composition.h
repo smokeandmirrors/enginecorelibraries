@@ -36,25 +36,38 @@ Tested in the field	:	NO
 #include "Synchronization.h"
 #include "Singleton.h"
 
+#define DEFINE_BASE_RUN_TIME_TYPE(CLASS_NAME, ...) \
+	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
+	const designPatterns::RunTimeType CLASS_NAME::runTimeType(NULL, CLASS_NAME::interfaces);
+
+#define DEFINE_DERIVED_RUN_TIME_TYPE(CLASS_NAME, SUPER_CLASS_NAME, ...) \
+	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
+	const designPatterns::RunTimeType CLASS_NAME::runTimeType(& SUPER_CLASS_NAME::runTimeType, CLASS_NAME::interfaces);
+
+#define DECLARE_RUN_TIME_TYPE \
+	public: \
+		static const designPatterns::RunTimeType runTimeType; \
+		const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; } \
+	private: \
+		static const RunTimeType* const interfaces[];
+
 namespace designPatterns
 {
+
+typedef const class RunTimeType* const* Interfaces;
 
 class RunTimeType
 {
 public:
-	template<typename SOURCE, typename TARGET>
-	static TARGET* dynamicCast(SOURCE* object)
-	{
-		return object->getRunTimeType().IS_A(TARGET::runTimeType) ? static_cast<TARGET*>(object) : NULL;
-	}
-
-	RunTimeType(const RunTimeType* const parentClassNullIfThisIsBase, const RunTimeType* const* nullTerminatedInterfaceArray)
+	
+	RunTimeType(const RunTimeType* const parentClassNullIfThisIsBase, Interfaces nullTerminatedInterfaceArray)
 		: super(parentClassNullIfThisIsBase)
 		, interfaces(nullTerminatedInterfaceArray)
 	{
 		/* empty */
 	}
-
+	
+	/** operates on classes and interfaces of the type and the hierarchy */
 	bool IS_A(const RunTimeType& otherType) const
 	{
 		const RunTimeType* thisType(this);
@@ -67,7 +80,7 @@ public:
 			}
 			assert(interfaces);
 			// check the interface implementation
-			const RunTimeType* const* interface = &interfaces[0];
+			Interfaces interface = &interfaces[0];
 			while (*interface)
 			{
 				if (*interface == &otherType)
@@ -87,16 +100,17 @@ public:
 		return false;
 	}
 
+	/** operates on the class of the type only */
 	bool IS_EXACTLY(const RunTimeType& type) const 
 	{ 
 		return this == &type; 
 	}
-		
+
 private:
 	RunTimeType(const RunTimeType&);
 	RunTimeType operator=(const RunTimeType&);
 
-	const RunTimeType* const* interfaces; // = { *, *, *, *, NULL}
+	Interfaces interfaces; // = { *, *, *, *, NULL}
 	const RunTimeType* const super;
 };
 
@@ -158,6 +172,11 @@ public:
 	inline bool isAttached(void) const
 	{
 		return composite != NULL;
+	}
+
+	virtual bool isUpdatedByComposite(void) const
+	{
+		return false;
 	}
 
 	virtual void update(void)
@@ -338,7 +357,10 @@ private:
 
 	static void callUpdate(Component<COMPOSITE>* component)
 	{
-		component->update();
+		if (component->isActive())
+		{
+			component->update();
+		}
 	}
 
 	Component<COMPOSITE>* find(const RunTimeType& componentType) const
@@ -364,6 +386,11 @@ private:
 	{
 		component.attach(static_cast<COMPOSITE*>(this));
 		components.push_back(&component);
+		
+		if (component.isUpdatedByComposite())
+		{
+			updateComponents.push_back(&component);
+		}
 	}
 
 	Components components;

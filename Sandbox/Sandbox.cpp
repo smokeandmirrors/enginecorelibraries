@@ -4,6 +4,7 @@
 #include "A_Star.h"
 #include "Composition.h"
 #include "HierarchicalFiniteStateMachine.h"
+#include "HierarchicalFiniteStateMachine2.h"
 #include "Numbers.h"
 #include "RedBlackMap.h"
 #include "Strings.h"
@@ -22,6 +23,7 @@ using namespace designPatterns;
 using namespace containers;
 using namespace embeddedLua;
 using namespace HFSM;
+using namespace HFSM2;
 using namespace xronos;
 
 class Agent 
@@ -35,20 +37,6 @@ class VisualFX
 
 };
 
-#define DEFINE_BASE_RUN_TIME_TYPE(CLASS_NAME, ...) \
-	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
-	const designPatterns::RunTimeType CLASS_NAME::runTimeType(NULL, CLASS_NAME::interfaces);
-
-#define DEFINE_DERIVED_RUN_TIME_TYPE(CLASS_NAME, SUPER_CLASS_NAME, ...) \
-	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
-	const designPatterns::RunTimeType CLASS_NAME::runTimeType(& SUPER_CLASS_NAME::runTimeType, CLASS_NAME::interfaces);
-
-#define DECLARE_RUN_TIME_TYPE \
-	public: \
-	static const designPatterns::RunTimeType runTimeType; \
-	const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; } \
-	private: \
-	static const RunTimeType* const interfaces[];
 	
 class Movement
 	: public Component<Agent>
@@ -64,28 +52,33 @@ typedef enum AttackInhibition
 
 }; // AttackInhibition
 
-class AttackInhibitor
+class AttackImplementation
 {
 public:
-	virtual ~AttackInhibitor(void) { /*empty*/ }
+	virtual ~AttackImplementation(void) { /*empty*/ }
 	
 	virtual bool isAttackAllowed(Agent& agent, AttackInhibition& reason)=0;
-	virtual void reset(AttackInhibition reason) { /*empty*/ };
-	virtual void update(Agent& agent, bool attackIsAllowed) { /*empty*/ };
-}; // AttackInhibitor
+	virtual void reset(AttackInhibition) { /*empty*/ }
+	virtual void updateAttack(Agent&, bool) { /*empty*/ }
+}; // AttackImplementation
 
 class Attack
 	: public Component<Agent>
 {
 	DECLARE_RUN_TIME_TYPE
 public:
-	void update(Agent& update);
+	void update(void)
 	{
+		// for each m_inhibitor...
+		//	isAttackAllowed()
+		// else reset
 
+		// for each m_inhibitor
+			// update
 	}
 
 private:
-	std::vector<AttackInhibitor*> m_inhibitors;
+	std::vector<AttackImplementation*> m_inhibitors;
 };
 DEFINE_BASE_RUN_TIME_TYPE(Attack, NULL);
 
@@ -387,113 +380,85 @@ void proveThePoint(void)
 	delete c2;
 	delete c1;
 	printf("done\n");
+
+	std::set<int> mySet;
 }
 
-class TrackerOfEntryDatum
-	: public HFSM::PersistentDatum
+/*
+
+template<typename COMPARATOR>
+float CalculateComparedDiameterSquared(const bfx::AreaHandle& area, COMPARATOR comparator, float initial) 
 {
-public:
-	TrackerOfEntryDatum(void)
-		: numTimesActed(0)
-		, numTimesEntered(0)
-		, numTimesExited(0)
-		, numTimesIsSatisfied(0)
-		, numTimesUpdated(0)
-	{ /* empty */ }
+const int numEdges(area.GetNumEdges());
+float current(initial);
 
-	~TrackerOfEntryDatum(void) 
-	{ 
-		/* empty */ 
-		printf("TrackerOfEntryDatum deleted!\n");
-	}
-
-	int numTimesActed;
-	int numTimesEntered;
-	int numTimesExited;
-	int numTimesIsSatisfied;
-	int numTimesUpdated;
-};
-
-class ActTracker 
-	: public HFSM::ActionState<Agent>
+if (numEdges == 3)
+{	// for any triangle the radius is just the length of the longest side
+for (int i(0); i < 3; ++i)
 {
-public:
-	ActTracker(const char* n)
-		: HFSM::ActionState<Agent>(n)
-	{
-
-	}
-
-	virtual void act(Traversal<Agent>& , PersistentDatum* datum)
-	{
-		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
-		printf("Num times act: %d\n", ++tracker->numTimesActed);
-	}
-
-	virtual PersistentDatum* getPersistentDatum(void) const
-	{
-		return new TrackerOfEntryDatum();
-	}
-
-	virtual void recyclePersistentDatum(PersistentDatum* datum)
-	{
-		delete datum;
-	}
-
-protected:
-	virtual void onEnter(Traversal<Agent>& , PersistentDatum* datum) 
-	{ 
-		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
-		printf("Num times onEnter: %d\n", ++tracker->numTimesEntered);
-	}
-
-	virtual void onExit(Traversal<Agent>& , PersistentDatum* datum) 
-	{ 
-		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
-		printf("Num times onExit: %d\n", ++tracker->numTimesExited);
-	}
-};
-
-class TimesEvaluated
-	: public HFSM::Condition<Agent>
+const float candidate(LenSq(area.GetEdgeStartPos(i) - area.GetEdgeStartPos((i+1) % 3)));
+if (comparator(candidate, current))
 {
-public:
-	TimesEvaluated(int numTimesToEvaluate=0)
-		: requiredEvaluations(numTimesToEvaluate)
-	{
-		/* empty */
-	}
+current = candidate;
+}
+}
+}
+else
+{	// handle the zero index case separately, since the inner loop sentinel is different
+for (int j(2), j_sentinel(numEdges - 1); j < j_sentinel; ++j)
+{
+const float candidate(LenSq(area.GetEdgeStartPos(0) - area.GetEdgeStartPos(j)));
+if (comparator(candidate, current))
+{
+current = candidate;
+}
+} 
+// handle the other indices with the normal inner loop sentinel
+for (int i(1), i_sentinel(numEdges - 2), j_sentinel(numEdges); i < i_sentinel; ++i)
+{
+for (int j(i + 2); j < j_sentinel; ++j)
+{
+const float candidate(LenSq(area.GetEdgeStartPos(i) - area.GetEdgeStartPos(j)));
+if (comparator(candidate, current))
+{
+current = candidate;
+}
+} 
+} 
+}	
 
-	virtual PersistentDatum* getPersistentDatum(void) const
-	{
-		return new TrackerOfEntryDatum();
-	}
+return current;
+}
 
-	void recyclePersistentDatum(PersistentDatum* datum)
-	{
-		delete datum;
-	}
+float PlannerUtils::CalculateMaxDiameterSquared(const bfx::AreaHandle& area) 
+{
+return CalculateComparedDiameterSquared(area, Greater<float>(), -1.0);
+}
 
-protected:
-	virtual bool isSatisfied(Agent* /*agent*/, PersistentDatum* datum)
-	{
-		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
-		printf("Num times isSatisfied: %d\n", ++tracker->numTimesIsSatisfied);
-		return tracker->numTimesIsSatisfied >= requiredEvaluations;
-	}
+float PlannerUtils::CalculateMinDiameterSquared(const bfx::AreaHandle& area) 
+{
+return CalculateComparedDiameterSquared(area, Less<float>(), FLT_MAX);
+}
 
-	virtual void update(Agent* /*agent*/, PersistentDatum* datum)
-	{
-		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
-		printf("Num times update: %d\n", ++tracker->numTimesUpdated);
-	}
+*/
 
-private:
-	int requiredEvaluations;
-};
+void testHFSM2(void)
+{
+	HFSM2::test();
+}
 
 void onPlay(void)
 {
+	testHFSM2();
+
+	/*
+	for (int i = 4; i < 10; ++i)
+	{
+		printIndices(i);
+	}
+	BREAKPOINT(0x0);
+	*/
+
 	// time sand boxing
 	{
 		Clock clock;
@@ -542,123 +507,6 @@ void onPlay(void)
 
 
 	Agent alpha;
-	
-	{
-		Agent deltaAgent;
-		HFSM::Traversal<Agent> delta(&deltaAgent);
-
-		TimesEvaluated evaluateTwice(2);
-		TimesEvaluated evaluateThrice(3);
-
-		ActTracker actTrackerOne("one");
-		ActTracker actTrackerTwo("two");
-
-		StateMachine<Agent> machine;
-		StateKey key1(machine.add(actTrackerOne));
-		StateKey key2(machine.add(actTrackerOne));
-		machine.connect(key1, evaluateTwice, key2);
-		machine.connect(key2, evaluateThrice, key1);
-
-		delta.start(machine);
-
-		for (int i = 0; i < 10; ++i)
-		{
-			delta.act();
-		}
-	}
-
-
-
-	{
-		Agent gamma;
-
-		HFSM::Traversal<Agent> alpha(&gamma);
-
-		HFSM::TransitionFX<Agent>* transitionFX1 = new TransitionFX<Agent>;
-		HFSM::TransitionFX<Agent>* transitionFX2 = new TransitionFX<Agent>;
-		HFSM::TransitionFX<Agent>* transitionFX3 = new TransitionFX<Agent>;
-
-		HFSM::ConditionTrue<Agent>* condition1 = new ConditionTrue<Agent>("condition 1");
-		HFSM::ConditionTrue<Agent>* condition2 = new ConditionTrue<Agent>("condition 2");
-		HFSM::ConditionTrue<Agent>* condition3 = new ConditionTrue<Agent>("condition 3");
-		HFSM::ConditionTrue<Agent>* condition4 = new ConditionTrue<Agent>("condition 4");
-		HFSM::ConditionTrue<Agent>* condition5 = new ConditionTrue<Agent>("condition 5");
-		HFSM::ConditionTrue<Agent>* condition6 = new ConditionTrue<Agent>("condition 6");
-		HFSM::ConditionTrue<Agent>* condition7 = new ConditionTrue<Agent>("condition 7");
-
-		HFSM::StateMachine<Agent>* stateMachine1 = new StateMachine<Agent>("state/machine 0/x");
-		
-		HFSM::ActionState<Agent>* state1 = new ActionState<Agent>("state 1");
-		HFSM::ActionState<Agent>* state2 = new ActionState<Agent>("state 2");
-		HFSM::StateMachine<Agent>* stateMachine2 = new StateMachine<Agent>("state/machine 3/1");
-		
-		HFSM::ActionState<Agent>* state4 = new ActionState<Agent>("state 4");
-		HFSM::ActionState<Agent>* state5 = new ActionState<Agent>("state 5");
-		HFSM::StateMachine<Agent>* stateMachine3 = new StateMachine<Agent>("state/machine 6/2");		
-		
-		HFSM::ActionState<Agent>* state7 = new ActionState<Agent>("state 7");
-		HFSM::ActionState<Agent>* state8 = new ActionState<Agent>("state 8");
-		HFSM::ActionState<Agent>* state9 = new ActionState<Agent>("state 9");
-		
-		{
-			HFSM::StateKey key1 = stateMachine1->add(*state1);
-			HFSM::StateKey key2 = stateMachine1->add(*state2);
-			HFSM::StateKey key3 = stateMachine1->add(*stateMachine2);
-			stateMachine1->connect(key1, *condition1, key2, transitionFX1);
-			stateMachine1->connect(key2, *condition2, key3, transitionFX2);
-		}
-		
-		{
-			HFSM::StateKey key4 = stateMachine2->add(*state4);
-			HFSM::StateKey key5 = stateMachine2->add(*state5);
-			HFSM::StateKey key6 = stateMachine2->add(*stateMachine3);
-			stateMachine2->connect(key4, *condition3, key5, transitionFX1);
-			stateMachine2->connect(key5, *condition4, key6, transitionFX2);
-		}
-
-		{
-			HFSM::StateKey key7 = stateMachine3->add(*state7);
-			HFSM::StateKey key8 = stateMachine3->add(*state8);
-			HFSM::StateKey key9 = stateMachine3->add(*state9);
-			stateMachine3->connect(key7, *condition5, key8, transitionFX1);
-			stateMachine3->connect(key8, *condition6, key9, transitionFX2);
-			stateMachine3->connect(key9, *condition7, key7, transitionFX3);
-		}
-
-		alpha.start(*stateMachine1);
-		
-		for (int i = 0; i < 12; ++i)
-		{
-			alpha.act();
-		}
-
-		alpha.stop();	
-
-		{
-			delete transitionFX1;
-			delete transitionFX2;
-			delete transitionFX3;
-			delete condition1;
-			delete condition2;
-			delete condition3;
-			delete condition4;
-			delete condition5;
-			delete condition6;
-			delete condition7;
-			delete stateMachine1;
-			delete stateMachine2;
-			delete stateMachine3;
-			delete state1;
-			delete state2;
-			delete state4;
-			delete state5;
-			delete state7;
-			delete state8;
-			delete state9;
-		}
-
-		// BREAKPOINT(0x0);
-	}
 	
 	Movement* movement = new Movement();
 	Attack* attack = new Attack();
@@ -841,3 +689,247 @@ void sandbox::play()
 	onPlay();
 	printf("Stopped playing in the sandbox!\n");
 }
+
+/*
+
+
+class TrackerOfEntryDatum
+: public HFSM::PersistentDatum
+{
+public:
+TrackerOfEntryDatum(void)
+: numTimesActed(0)
+, numTimesEntered(0)
+, numTimesExited(0)
+, numTimesIsSatisfied(0)
+, numTimesUpdated(0)
+{ }
+
+~TrackerOfEntryDatum(void) 
+{ 
+	
+	printf("TrackerOfEntryDatum deleted!\n");
+}
+
+int numTimesActed;
+int numTimesEntered;
+int numTimesExited;
+int numTimesIsSatisfied;
+int numTimesUpdated;
+};
+
+class ActTracker 
+	: public HFSM::ActionState<Agent>
+{
+public:
+	ActTracker(const char* n)
+		: HFSM::ActionState<Agent>(n)
+	{
+
+	}
+
+	virtual void act(Traversal<Agent>& , PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times act: %d\n", ++tracker->numTimesActed);
+	}
+
+	virtual PersistentDatum* getPersistentDatum(void) const
+	{
+		return new TrackerOfEntryDatum();
+	}
+
+	virtual void recyclePersistentDatum(PersistentDatum* datum)
+	{
+		delete datum;
+	}
+
+protected:
+	virtual void onEnter(Traversal<Agent>& , PersistentDatum* datum) 
+	{ 
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times onEnter: %d\n", ++tracker->numTimesEntered);
+	}
+
+	virtual void onExit(Traversal<Agent>& , PersistentDatum* datum) 
+	{ 
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times onExit: %d\n", ++tracker->numTimesExited);
+	}
+};
+
+class TimesEvaluated
+	: public HFSM::Condition<Agent>
+{
+public:
+	TimesEvaluated(int numTimesToEvaluate=0)
+		: requiredEvaluations(numTimesToEvaluate)
+	{
+		
+	}
+
+	virtual PersistentDatum* getPersistentDatum(void) const
+	{
+		return new TrackerOfEntryDatum();
+	}
+
+	void recyclePersistentDatum(PersistentDatum* datum)
+	{
+		delete datum;
+	}
+
+protected:
+	virtual bool isSatisfied(Agent* , PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times isSatisfied: %d\n", ++tracker->numTimesIsSatisfied);
+		return tracker->numTimesIsSatisfied >= requiredEvaluations;
+	}
+
+	virtual void update(Agent*, PersistentDatum* datum)
+	{
+		TrackerOfEntryDatum* tracker(static_cast<TrackerOfEntryDatum*>(datum));
+		printf("Num times update: %d\n", ++tracker->numTimesUpdated);
+	}
+
+private:
+	int requiredEvaluations;
+};
+
+void printIndices(const int numEdges)
+{
+	printf("Num Edges: %d\n", numEdges);
+	// handle the zero index case separately, since the inner loop sentinel is different
+	for (int j(2), j_sentinel(numEdges - 1); j < j_sentinel; ++j)
+	{
+		printf("0 : %d\n", j);
+	}
+	// handle the other indices with the normal inner loop sentinel
+	for (int i(1), i_sentinel(numEdges - 2), j_sentinel(numEdges); i < i_sentinel; ++i)
+	{
+		for (int j(i + 2); j < j_sentinel; ++j)
+		{
+			printf("%d : %d\n", i, j);
+		} // j loop
+	} // i loop 
+
+	printf("\n");
+}
+
+{
+Agent deltaAgent;
+HFSM::Traversal<Agent> delta(&deltaAgent);
+
+TimesEvaluated evaluateTwice(2);
+TimesEvaluated evaluateThrice(3);
+
+ActTracker actTrackerOne("one");
+ActTracker actTrackerTwo("two");
+
+StateMachine<Agent> machine;
+StateKey key1(machine.add(actTrackerOne));
+StateKey key2(machine.add(actTrackerOne));
+machine.connect(key1, evaluateTwice, key2);
+machine.connect(key2, evaluateThrice, key1);
+
+delta.start(machine);
+
+for (int i = 0; i < 10; ++i)
+{
+delta.act();
+}
+}
+
+
+
+{
+Agent gamma;
+
+HFSM::Traversal<Agent> alpha(&gamma);
+
+HFSM::TransitionFX<Agent>* transitionFX1 = new TransitionFX<Agent>;
+HFSM::TransitionFX<Agent>* transitionFX2 = new TransitionFX<Agent>;
+HFSM::TransitionFX<Agent>* transitionFX3 = new TransitionFX<Agent>;
+
+HFSM::ConditionTrue<Agent>* condition1 = new ConditionTrue<Agent>("condition 1");
+HFSM::ConditionTrue<Agent>* condition2 = new ConditionTrue<Agent>("condition 2");
+HFSM::ConditionTrue<Agent>* condition3 = new ConditionTrue<Agent>("condition 3");
+HFSM::ConditionTrue<Agent>* condition4 = new ConditionTrue<Agent>("condition 4");
+HFSM::ConditionTrue<Agent>* condition5 = new ConditionTrue<Agent>("condition 5");
+HFSM::ConditionTrue<Agent>* condition6 = new ConditionTrue<Agent>("condition 6");
+HFSM::ConditionTrue<Agent>* condition7 = new ConditionTrue<Agent>("condition 7");
+
+HFSM::StateMachine<Agent>* stateMachine1 = new StateMachine<Agent>("state/machine 0/x");
+
+HFSM::ActionState<Agent>* state1 = new ActionState<Agent>("state 1");
+HFSM::ActionState<Agent>* state2 = new ActionState<Agent>("state 2");
+HFSM::StateMachine<Agent>* stateMachine2 = new StateMachine<Agent>("state/machine 3/1");
+
+HFSM::ActionState<Agent>* state4 = new ActionState<Agent>("state 4");
+HFSM::ActionState<Agent>* state5 = new ActionState<Agent>("state 5");
+HFSM::StateMachine<Agent>* stateMachine3 = new StateMachine<Agent>("state/machine 6/2");		
+
+HFSM::ActionState<Agent>* state7 = new ActionState<Agent>("state 7");
+HFSM::ActionState<Agent>* state8 = new ActionState<Agent>("state 8");
+HFSM::ActionState<Agent>* state9 = new ActionState<Agent>("state 9");
+
+{
+HFSM::StateKey key1 = stateMachine1->add(*state1);
+HFSM::StateKey key2 = stateMachine1->add(*state2);
+HFSM::StateKey key3 = stateMachine1->add(*stateMachine2);
+stateMachine1->connect(key1, *condition1, key2, transitionFX1);
+stateMachine1->connect(key2, *condition2, key3, transitionFX2);
+}
+
+{
+HFSM::StateKey key4 = stateMachine2->add(*state4);
+HFSM::StateKey key5 = stateMachine2->add(*state5);
+HFSM::StateKey key6 = stateMachine2->add(*stateMachine3);
+stateMachine2->connect(key4, *condition3, key5, transitionFX1);
+stateMachine2->connect(key5, *condition4, key6, transitionFX2);
+}
+
+{
+HFSM::StateKey key7 = stateMachine3->add(*state7);
+HFSM::StateKey key8 = stateMachine3->add(*state8);
+HFSM::StateKey key9 = stateMachine3->add(*state9);
+stateMachine3->connect(key7, *condition5, key8, transitionFX1);
+stateMachine3->connect(key8, *condition6, key9, transitionFX2);
+stateMachine3->connect(key9, *condition7, key7, transitionFX3);
+}
+
+alpha.start(*stateMachine1);
+
+for (int i = 0; i < 12; ++i)
+{
+alpha.act();
+}
+
+alpha.stop();	
+
+{
+delete transitionFX1;
+delete transitionFX2;
+delete transitionFX3;
+delete condition1;
+delete condition2;
+delete condition3;
+delete condition4;
+delete condition5;
+delete condition6;
+delete condition7;
+delete stateMachine1;
+delete stateMachine2;
+delete stateMachine3;
+delete state1;
+delete state2;
+delete state4;
+delete state5;
+delete state7;
+delete state8;
+delete state9;
+}
+
+// BREAKPOINT(0x0);
+}
+*/

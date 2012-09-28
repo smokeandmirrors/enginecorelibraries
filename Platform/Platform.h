@@ -166,6 +166,8 @@ public:
 	inline STORAGE operator==(const Flags& f) const { return flags == f.flags; }
 	
 	inline STORAGE operator!=(const Flags& f) const { return flags ^ f.flags; }
+
+	inline STORAGE operator|(const Flags& f) const { return flags | f.flags; }
 	
 	inline STORAGE operator()(void) const { return flags; }
 	

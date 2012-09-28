@@ -23,6 +23,27 @@ typedef ulong cycle;
 typedef dreal millisecond;
 typedef dreal second;
 
+class Second;
+class Millisecond;
+
+/** \todo finish and use these! */
+class Millisecond
+{
+	inline Millisecond(void);
+	inline Millisecond(const Millisecond&);
+	inline Millisecond(const Second&);
+	inline Millisecond& operator=(const Millisecond&);
+
+private:
+	millisecond value;
+}; // class Millisecond
+
+class Second
+{
+private:
+	second value;
+}; // class Second
+
 namespace xronos
 {
 

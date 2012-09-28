@@ -25,7 +25,7 @@ namespace
 		return perf_query.QuadPart;
 	}
 
-	inline cycle _initilializeFrequency(void)
+	inline cycle _initilializeFrequency(dreal* returnMinFactor=NULL)
 	{
 		cycle osFrequency(0);
 		IF_DEBUG(cycle osFrequencyPrevious(0);)
@@ -35,12 +35,13 @@ namespace
 		cycle osTicks2;
 		dreal minFactor = 1e20;
 
-		for (uint i = 0; i < 10; i++)
+		for (uint i = 0; i < 100; i++)
 		{
 			cpuTicks1 = _getCycleCPU();
 			osTicks1 = _getCycleOS();
 			// spin
-			volatile int x(1); for (int j(0); j < 5000; j++) x += x * x;
+			volatile int x(1); for (int j(0); j < 50000; j++) x += x * x;
+			--x;
 			cpuTicks2 = _getCycleCPU();
 			osTicks2 = _getCycleOS();
 
@@ -64,6 +65,11 @@ namespace
 				minFactor = factor;
 			}
 		}
+
+		if (returnMinFactor)
+		{
+			*returnMinFactor = minFactor;
+		}
 		
 		return static_cast<cycle>(static_cast<cycle>(osFrequency) * minFactor);
 	} // inline cycle _initilializeFrequency(void)
@@ -81,6 +87,14 @@ xronos::SystemClock::SystemClock(void)
 , cycleZero(getCurrentCycle())
 {
 	/* empty */
+
+	dreal factor1, factor2, factor3, factor4, factor5;
+	cycle frequency1 = _initilializeFrequency(&factor1);
+	cycle frequency2 = _initilializeFrequency(&factor2);
+	cycle frequency3 = _initilializeFrequency(&factor3);
+	cycle frequency4 = _initilializeFrequency(&factor4);
+	cycle frequency5 = _initilializeFrequency(&factor5);
+	// assert(frequency1 == frequency2 == frequency3 == frequency4 == frequency5);
 }
 
 cycle xronos::SystemClock::getCurrentCycle(void) const

@@ -4,13 +4,13 @@
 namespace designPatterns
 {
 
-SingletonInitializer* singletonInitializers(NULL);
+SingletonController* singletonInitializers(NULL);
 
 void createSingletons()
 {
-	SingletonInitializer* initializer(singletonInitializers);
+	SingletonController* initializer(singletonInitializers);
 
-	std::vector<SingletonInitializer*> initializationList;
+	std::vector<SingletonController*> initializationList;
 
 	while (initializer)
 	{	
@@ -44,7 +44,7 @@ void createSingletons()
 
 void destroySingletons()
 {
-	SingletonInitializer* initializer(singletonInitializers);
+	SingletonController* initializer(singletonInitializers);
 
 	while (initializer)
 	{
