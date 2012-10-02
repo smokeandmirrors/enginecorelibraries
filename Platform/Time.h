@@ -26,20 +26,46 @@ typedef dreal second;
 class Second;
 class Millisecond;
 
+// class CustomNumber<T>;
+// Second CustomNumber<second>, specialize some conversion
+
+template<typename TYPE>
+class Unit
+{
+public:
+
+
+private:
+	TYPE value;
+}; // template<typename VALUE> class Value
+
+
 /** \todo finish and use these! */
 class Millisecond
 {
-	inline Millisecond(void);
-	inline Millisecond(const Millisecond&);
-	inline Millisecond(const Second&);
-	inline Millisecond& operator=(const Millisecond&);
+	friend class Second;
 
+public:
+	inline Millisecond(const Second&);
+	inline Millisecond(const millisecond&);
+	
+	inline Millisecond operator+(const Millisecond&) const;
+	inline Millisecond operator++();
+	inline Millisecond operator++(int);
+	inline Millisecond& operator+=(const Millisecond&);
+	
 private:
 	millisecond value;
 }; // class Millisecond
 
 class Second
 {
+	friend class Millisecond;
+
+public:
+	inline Second(const Millisecond&);
+	inline Second(const second&);
+
 private:
 	second value;
 }; // class Second
@@ -422,5 +448,43 @@ inline millisecond milliseconds(void) { return SystemClock::single().millisecond
 inline second seconds(void) { return SystemClock::single().seconds(); }
 
 } // namespace xronos
+
+Millisecond::Millisecond(const millisecond& source)
+	: value(source)
+{
+	/* empty */
+}
+
+Millisecond::Millisecond(const Second& source)
+	: value(source.value * 0.001)
+{
+	/* empty */
+}
+
+Millisecond Millisecond::operator+(const Millisecond& other) const
+{
+	return Millisecond(value + other.value);
+}
+
+Millisecond Millisecond::operator++()
+{
+	++value;
+	return value;
+}
+
+Millisecond Millisecond::operator++(int)
+{
+	millisecond suffix(value);
+	++value;
+	return Millisecond(suffix);
+}
+
+Millisecond& Millisecond::operator+=(const Millisecond& other)
+{
+	value += other.value;
+	return *this;
+}
+
+
 
 #endif//TIME_H

@@ -31,27 +31,143 @@ class TraversalEntry;
 
 void test(void);
 
-template<typename AGENT>
-class ActionState
-{	// \todo debug logging
-	// friend class StateMachine<AGENT>;
-	friend class StateMachine<AGENT>;
+struct EmptyStruct 
+{
+	bool operator==(const EmptyStruct&) const { return true; }
+	bool operator!=(const EmptyStruct&) const { return false; }
+}; // struct EmptyStruct 
+
+template<typename OBJECT>
+class Factory
+{
+	typedef std::vector<OBJECT*> Objects;
 
 public:
-	ActionState(const char* n)
-		: name(n)
+	static void destroyObjects(void)
 	{
-		/* empty */
+		for (Objects::iterator i(objects.begin()), sentinel(objects.end())
+			; i != sentinel
+			; ++i)
+		{
+			delete *i;
+		}
 	}
 
-	virtual ~ActionState(void)
+	static OBJECT* getAuthorCopy(void)
 	{
-		/* empty */
+		int objectIndex(0);
+
+		if (!OBJECT::hasAuthoringTimeState())
+		{
+			if (objects.empty())
+			{
+				objects.push_back(new OBJECT);
+			}
+		}
+		else
+		{
+			OBJECT candidate;
+
+			if (!has(candidate, objectIndex))
+			{
+				objectIndex = objects.size();
+				objects.push_back(new OBJECT);
+			}
+		}			
+
+		return objects[objectIndex];
+	}
+	
+	template<typename CONSTRUCTION_ARGS>
+	static OBJECT* getAuthorCopy(const CONSTRUCTION_ARGS& args)
+	{
+		int objectIndex(0);
+
+		if (!OBJECT::hasAuthoringTimeState())
+		{
+			if (objects.empty())
+			{
+				objects.push_back(new OBJECT(args));
+			}
+		}
+		else
+		{
+			OBJECT candidate(args);
+			
+			if (!has(candidate, objectIndex))
+			{
+				objectIndex = objects.size();
+				objects.push_back(new OBJECT(args));
+			}
+		}			
+		
+		return objects[objectIndex];
 	}
 
-	virtual void act(Traversal<AGENT>& /*agent*/) 
+	static OBJECT* getRunTimeCopy(OBJECT& object)
 	{
-		printf("acting on %s\n", name);
+		/**
+		Does the state have run-time state?
+		Return a new copy, every time.
+
+		Does the state have author-time state?
+		Return a single copy on a per author-time basis.
+
+		Return a single copy.
+
+		The get run time copy will make a new GetRunTimeCopy for each state, every time.  (Unless the while tree is stateless. At run time.)
+		*/
+		if (object.hasRunTimeState())
+		{
+			return new OBJECT(object);
+		}
+		else
+		{
+			return &object;
+		}
+	}
+
+	static void recycle(OBJECT& object)
+	{
+		if (object.hasRunTimeState())
+		{
+			delete &object;
+		}
+	}
+
+protected:
+	static int has(const OBJECT& object, int& objectIndex)
+	{
+		objectIndex = -1;
+
+		for (int i(0), sentinel(objects.size()); i < sentinel; ++i)
+		{
+			if (*objects[i] == object)
+			{
+				objectIndex = i;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+private:
+	static Objects objects;
+};
+
+template<typename OBJECT> 
+std::vector<OBJECT*> Factory<OBJECT>::objects;
+
+template<typename AGENT>
+class ActionState
+{	
+public:
+	friend class Factory< ActionState<AGENT>>;
+
+	virtual void act(Traversal<AGENT>& agent) 
+	{
+		printf("act! "); agent.printState();
 	}
 
 	virtual Depth calculateDepth(void) const
@@ -61,13 +177,13 @@ public:
 	
 	void enter(Traversal<AGENT>& agent) 
 	{	
-		printf("entering %s\n", name);
+		printf("enter! "); agent.printState();
 		onEnter(agent); 
 	}
 
 	void exit(Traversal<AGENT>& agent)
 	{	
-		printf("exiting %s\n", name);
+		printf("exit! "); agent.printState();
 		onExit(agent);
 	}
 
@@ -81,7 +197,33 @@ public:
 		return isCompletable(agent) && false;
 	}
 
+	bool operator==(const ActionState<AGENT>& other)
+	{
+		return this == &other;
+	}
+
 protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+	
+	ActionState(int newID=-1)
+		: id(newID)
+	{
+		/* empty */
+	}
+
+	virtual ~ActionState(void)
+	{
+		/* empty */
+	}
+
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
 	virtual void onEnter(Traversal<AGENT>& /*agent*/) 
 	{ 
 		/* empty */ 
@@ -92,17 +234,35 @@ protected:
 		/* empty */ 
 	}
 
-	const char* name;
+	int id;
 }; // class ActionState
 
 template<typename AGENT>
 class Condition
 {
 	friend class StateMachine<AGENT>;
+	friend class Factory< Condition<AGENT>>;
 
 public:
-	Condition(const char* n=NULL)
-		: name(n)
+	bool operator()(AGENT* agent)
+	{
+		// printf("isSatisfied() %s\n", name);
+		return isSatisfied(agent);
+	}
+
+	bool operator==(const Condition<AGENT>& other)
+	{
+		return this == &other;
+	}
+
+protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+
+	Condition(int newID=-1)
+		: id(newID)
 	{
 
 	}
@@ -111,31 +271,48 @@ public:
 	{
 		/* empty */
 	}
-
-	bool operator()(AGENT* agent)
-	{
-		printf("isSatisfied() %s\n", name);
-		return isSatisfied(agent);
-	}
 	
-protected:
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
 	virtual bool isSatisfied(AGENT* /*agent*/)=0;
 
-	const char* name;
+	int id;
 }; // Condition
 
 template<typename AGENT>
 class ConditionFalse
 	: public Condition<AGENT>
 {
-public:
-	ConditionFalse(const char* n=NULL)
-		: Condition(n)
-	{
 
+	friend class Factory< ConditionFalse<AGENT> >;
+
+public:
+	
+	bool operator==(const ConditionFalse<AGENT>& other)
+	{
+		return this == &other;
 	}
 
 protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+
+	ConditionFalse(int newID=-1)
+		: Condition(newID)
+	{
+
+	}
+	
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
 	bool isSatisfied(AGENT*) { return false; };
 }; // ConditionFalse
 
@@ -143,14 +320,33 @@ template<typename AGENT>
 class ConditionTrue
 	: public Condition<AGENT>
 {
-public:
-	ConditionTrue(const char* n=NULL)
-		: Condition(n)
-	{
 
+	friend class Factory< ConditionTrue<AGENT> >;
+
+public:
+
+	bool operator==(const ConditionTrue<AGENT>& other)
+	{
+		return this == &other;
 	}
 
 protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+
+	ConditionTrue(int newID=-1)
+		: Condition(newID)
+	{
+
+	}
+	
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
 	bool isSatisfied(AGENT*) { return true; };
 }; // ConditionTrue
 
@@ -158,25 +354,15 @@ template<typename AGENT>
 class StateMachine 
 	: public ActionState<AGENT>
 {
-protected:
+
 	template<typename AGENT> class State;
+	friend class Factory< StateMachine<AGENT>>;
 
 public:
-	StateMachine(const char* n=NULL)
-		: ActionState<AGENT>(n)
-	{
-		/* empty */
-	}
-
-	~StateMachine(void)
-	{
-		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
-	}
-
 	virtual void act(Traversal<AGENT>& traversal)
 	{
 		traversal.incrementDepth();
-		printf("acting on %s\n", name);
+		// printf("acting on %s\n", name);
 		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
 		assert(current);
 		ConnectionKey causeKey(evaluateConditions(traversal, current));
@@ -189,7 +375,7 @@ public:
 		{	// a condition is satisfied
 			Connection<AGENT>& connection(current->connections[causeKey]);
 			exitPreviousState(traversal, *current);
-			causeTransitionFX(connection, *current, traversal.agent);
+			causeTransitionFX(connection, *current, &traversal.agent);
 			enterNextState(traversal, causeKey, connection);
 		}	
 	}
@@ -227,6 +413,11 @@ public:
 		assert(fromState != NULL);
 		assert(states[to] != NULL);
 		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
+	}
+
+	bool operator==(const StateMachine<AGENT>& other)
+	{
+		return this == &other;
 	}
 
 protected:
@@ -272,6 +463,22 @@ protected:
 		State<AGENT>& operator=(const State<AGENT>&);
 	}; // class ActionTuple
 	
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+
+	StateMachine(int newID=-1)
+		: ActionState<AGENT>(newID)
+	{
+		/* empty */
+	}
+
+	~StateMachine(void)
+	{
+		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
+	}
+
 	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
 	{
 		if (connection.fx)
@@ -309,7 +516,7 @@ protected:
 		{
 			Connection<AGENT>& connection(connections[connectionKey]);
 
-			if (connection.condition(traversal.agent))
+			if (connection.condition(&traversal.agent))
 			{
 				return connectionKey;
 			}
@@ -343,6 +550,11 @@ protected:
 		assert(key >= 0);
 		return states[key];
 	}
+	
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
 
 	virtual void onEnter(Traversal<AGENT>& traversal)
 	{	
@@ -361,15 +573,58 @@ private:
 }; // class StateMachine
 
 template<typename AGENT>
+class TransitionFX
+{
+	friend class Factory< TransitionFX<AGENT>>;
+
+public:
+	virtual void effect(AGENT* /*agent*/, ActionState<AGENT>& /*master*/, ActionState<AGENT>& /*from*/, ActionState<AGENT>& /*to*/) 
+	{
+		/* empty */
+		printf("effecting on transition!\n");
+	}
+
+	bool operator==(const TransitionFX<AGENT>& other)
+	{
+		return this == &other;
+	}
+
+protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+	
+	TransitionFX(int newID=-1)
+		: id(newID)
+	{
+		/* empty */
+	}
+
+	virtual ~TransitionFX(void)
+	{
+		/* empty */
+	}
+		
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
+private:
+	int id;
+}; // TransistionFX
+
+template<typename AGENT>
 class Traversal
 {	
 	friend class ActionState<AGENT>;
 	friend class StateMachine<AGENT>;
 	// keeps the agent, current path through the tree (and the required state?)
 public:
-	AGENT* agent;
+	AGENT& agent;
 
-	Traversal(AGENT* traveller)
+	Traversal(AGENT& traveller)
 		: agent(traveller)
 		, currentDepth(-1)
 		, stateMachine(NULL)
@@ -425,7 +680,19 @@ public:
 		}
 	}
 
-protected:	
+	void printState(void) const
+	{
+		if (currentDepth >= 0)
+		{
+			printf("Depth: %2d, State: %2d, Value: %2d\n", currentDepth, traversal[currentDepth].state, (currentDepth * 3) + traversal[currentDepth].state + 1);
+		}
+		else
+		{
+			printf("Not Traversing anywhere!\n");
+		}
+	}
+
+public: // protected:	
 	void enter(ConnectionKey cause, StateKey state)
 	{
 		++currentDepth;
@@ -455,7 +722,7 @@ protected:
 		return depth >= 0 
 			&& depth < static_cast<Depth>(traversal.size()); 
 	}
-			
+				
 	void setMaxDepth(Depth depth)
 	{
 		traversal.resize(depth);
@@ -471,30 +738,12 @@ protected:
 	}
 		
 private:
+	Traversal<AGENT>& operator=(const Traversal<AGENT>&);
+
 	std::vector<TraversalEntry> traversal;
 	Depth currentDepth;
 	StateMachine<AGENT>* stateMachine;
 }; // Traversal
-
-template<typename AGENT>
-class TransitionFX
-{
-public:
-	TransitionFX(void)
-	{
-		/* empty */
-	}
-
-	virtual ~TransitionFX(void)
-	{
-		/* empty */
-	}
-
-	virtual void effect(AGENT* /*agent*/, ActionState<AGENT>& /*master*/, ActionState<AGENT>& /*from*/, ActionState<AGENT>& /*to*/) 
-	{
-		/* empty */printf("effecting on transition!\n");
-	}
-}; // TransistionFX
 
 class TraversalEntry 
 {
