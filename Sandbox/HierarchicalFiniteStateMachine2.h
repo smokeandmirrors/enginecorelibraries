@@ -247,7 +247,6 @@ protected:
 template<typename AGENT>
 class Condition
 {
-	friend class StateMachine<AGENT>;
 	friend class Factory< Condition<AGENT>>;
 
 public:
