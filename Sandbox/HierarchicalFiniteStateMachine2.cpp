@@ -14,35 +14,56 @@ class Agent
 #define AUTHOR_TIME_DEFAULTS
 #define PURE_CLASS_DEFAULTS
 
-class RunTimeAuthorTime
+class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
 public:
+	
 protected:
-private:
-}; // class RunTimeAuthorTime
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
 
-class AuthorTime
-	: public HFSM2::ActionState<Agent>
-{
-public:
-protected:
 private:
-}; // class AuthorTime
+}; // class RunTimeAuthorTimeState
 
-class RunTime
+class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
 public:
 protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return true;
+	}
+
 private:
-}; // class RunTime
+}; // class AuthorTimeState
+
+class RunTimeState
+	: public HFSM2::ActionState<Agent>
+{
+public:
+protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return false;
+	}
+
+private:
+}; // class RunTimeState
 
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
 public:
 protected:
+	static bool hasAuthoringTimeState(void)
+	{
+		return false;
+	}
+
 private:
 }; // class PureState
 
@@ -51,7 +72,7 @@ void HFSM2::test(void)
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
 
-	TransitionFX<Agent>* transitionFX1 = Factory< TransitionFX<Agent>>::getAuthorCopy<int>(1); // ("transition fx");
+	TransitionFX<Agent>* transitionFX1 = Factory< TransitionFX<Agent>>::getAuthorCopy(); // ("transition fx");
 	TransitionFX<Agent>* transitionFX2 = transitionFX1;
 	// TransitionFX<Agent>* transitionFX3 = transitionFX1;
 
@@ -65,7 +86,7 @@ void HFSM2::test(void)
 
 	StateMachine<Agent>* stateMachine1 = Factory< StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 0/x");
 
-	ActionState<Agent>* state1 = Factory< ActionState<Agent>>::getAuthorCopy(); // ("state");
+	PureState* state1 = Factory<PureState>::getAuthorCopy(); // ("state");
 	ActionState<Agent>* state2 = state1;
 	StateMachine<Agent>* stateMachine2 = Factory< StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 3/1");
 
