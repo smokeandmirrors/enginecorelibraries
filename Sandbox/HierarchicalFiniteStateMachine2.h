@@ -104,7 +104,7 @@ public:
 		return objects[objectIndex];
 	}
 
-	static OBJECT* getRunTimeCopy(OBJECT& object)
+	static OBJECT* getRunTimeCopy(const OBJECT& object)
 	{
 		/**
 		Does the state have run-time state?
@@ -119,11 +119,11 @@ public:
 		*/
 		if (object.hasRunTimeState())
 		{
-			return new OBJECT(object);
+			return object.duplicate();
 		}
 		else
 		{
-			return &object;
+			return const_cast<OBJECT*>(&object);
 		}
 	}
 
@@ -174,7 +174,7 @@ public:
 	{
 		return 0;
 	}
-	
+
 	void enter(Traversal<AGENT>& agent) 
 	{	
 		printf("enter! "); agent.printState();
@@ -185,6 +185,11 @@ public:
 	{	
 		printf("exit! "); agent.printState();
 		onExit(agent);
+	}
+
+	virtual ActionState<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<ActionState<Agent>>::getRunTimeCopy(*this);
 	}
 
 	virtual bool isCompletable(Traversal<AGENT>& /*agent*/) const
@@ -202,14 +207,18 @@ public:
 		return this == &other;
 	}
 
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
 protected:
 	static bool hasAuthoringTimeState(void)
 	{
 		return true;
 	}
 	
-	ActionState(int newID=-1)
-		: id(newID)
+	ActionState(void)
 	{
 		/* empty */
 	}
@@ -219,9 +228,9 @@ protected:
 		/* empty */
 	}
 
-	virtual bool hasRunTimeState(void) const
+	virtual ActionState<AGENT>* duplicate(void) const
 	{
-		return false;
+		return new ActionState<AGENT>;
 	}
 
 	virtual void onEnter(Traversal<AGENT>& /*agent*/) 
@@ -233,8 +242,6 @@ protected:
 	{ 
 		/* empty */ 
 	}
-
-	int id;
 }; // class ActionState
 
 template<typename AGENT>
@@ -244,6 +251,11 @@ class Condition
 	friend class Factory< Condition<AGENT>>;
 
 public:
+	virtual Condition<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<Condition<Agent>>::getRunTimeCopy(*this);
+	}
+
 	bool operator()(AGENT* agent)
 	{
 		// printf("isSatisfied() %s\n", name);
@@ -261,25 +273,27 @@ protected:
 		return true;
 	}
 
-	Condition(int newID=-1)
-		: id(newID)
+	Condition(void)
 	{
-
+		/* empty */
 	}
 
 	virtual ~Condition(void) 
 	{
 		/* empty */
 	}
-	
+
+	virtual Condition<AGENT>* duplicate(void) const
+	{
+		return const_cast< Condition<AGENT>* >(this);
+	}
+
 	virtual bool hasRunTimeState(void) const
 	{
 		return false;
 	}
 
 	virtual bool isSatisfied(AGENT* /*agent*/)=0;
-
-	int id;
 }; // Condition
 
 template<typename AGENT>
@@ -290,7 +304,11 @@ class ConditionFalse
 	friend class Factory< ConditionFalse<AGENT> >;
 
 public:
-	
+	virtual ConditionFalse<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<ConditionFalse<Agent>>::getRunTimeCopy(*this);
+	}
+
 	bool operator==(const ConditionFalse<AGENT>& other)
 	{
 		return this == &other;
@@ -302,12 +320,16 @@ protected:
 		return true;
 	}
 
-	ConditionFalse(int newID=-1)
-		: Condition(newID)
+	ConditionFalse(void)
 	{
-
+		/* empty */
 	}
-	
+
+	virtual ConditionFalse<AGENT>* duplicate(void) const
+	{
+		return const_cast< ConditionFalse<AGENT>* >(this);
+	}
+
 	virtual bool hasRunTimeState(void) const
 	{
 		return false;
@@ -320,10 +342,13 @@ template<typename AGENT>
 class ConditionTrue
 	: public Condition<AGENT>
 {
-
 	friend class Factory< ConditionTrue<AGENT> >;
 
 public:
+	virtual ConditionTrue<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<ConditionTrue<Agent>>::getRunTimeCopy(*this);
+	}
 
 	bool operator==(const ConditionTrue<AGENT>& other)
 	{
@@ -336,12 +361,16 @@ protected:
 		return true;
 	}
 
-	ConditionTrue(int newID=-1)
-		: Condition(newID)
+	ConditionTrue(void)
 	{
-
+		/* empty */
 	}
-	
+
+	virtual ConditionTrue<AGENT>* duplicate(void) const
+	{
+		return const_cast< ConditionTrue<AGENT>* >(this);
+	}
+
 	virtual bool hasRunTimeState(void) const
 	{
 		return false;
@@ -350,11 +379,13 @@ protected:
 	bool isSatisfied(AGENT*) { return true; };
 }; // ConditionTrue
 
+/**
+never derive from me
+*/
 template<typename AGENT>
 class StateMachine 
 	: public ActionState<AGENT>
 {
-
 	template<typename AGENT> class State;
 	friend class Factory< StateMachine<AGENT>>;
 
@@ -415,6 +446,28 @@ public:
 		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
 	}
 
+	virtual StateMachine<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<StateMachine<Agent>>::getRunTimeCopy(*this);
+	}
+
+	virtual bool hasRunTimeState(void) const
+	{
+		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), sentinel(states.end())
+			; i != sentinel
+			; ++i)
+		{
+			const State<AGENT>& state(*(*i));
+
+			if (state.state.hasRunTimeState())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	bool operator==(const StateMachine<AGENT>& other)
 	{
 		return this == &other;
@@ -467,18 +520,7 @@ protected:
 	{
 		return true;
 	}
-
-	StateMachine(int newID=-1)
-		: ActionState<AGENT>(newID)
-	{
-		/* empty */
-	}
-
-	~StateMachine(void)
-	{
-		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
-	}
-
+	
 	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
 	{
 		if (connection.fx)
@@ -487,6 +529,42 @@ protected:
 			ActionState<AGENT>& nextAction(getState(connection.next)->state);
 			connection.fx->effect(agent, *this, current.state, nextAction);
 		}
+	}
+
+	virtual StateMachine<AGENT>* duplicate(void) const
+	{
+		StateMachine<AGENT>& master(*(new StateMachine<AGENT>));
+		
+		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), i_sentinel(states.end())
+			; i != i_sentinel
+			; ++i)
+		{
+			ActionState<AGENT>* actionState((*i)->state.getRunTimeCopy());
+			assert(actionState);
+			master.add(*actionState);
+		}
+
+		for (StateKey from(0), sentinel(states.size())
+			; from < sentinel
+			; ++from)
+		{
+			const State<AGENT>& state(*states[from]);
+			
+			for (std::vector< Connection<AGENT> >::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
+				; j != j_sentinel
+				; ++j)
+			{
+				const Connection<AGENT>& connection(*j);
+				Condition<AGENT>* duplicateCause(connection.condition.getRunTimeCopy());
+				assert(duplicateCause);
+				Condition<AGENT>& cause(*duplicateCause); 
+				TransitionFX<AGENT>* fx(connection.fx ? connection.fx->getRunTimeCopy() : NULL);
+				const StateKey to(connection.next);
+				master.connect(from, cause, to, fx);
+			}
+		}
+
+		return &master;
 	}
 
 	void enterCurrent(Traversal<AGENT>& traversal)
@@ -551,11 +629,6 @@ protected:
 		return states[key];
 	}
 	
-	virtual bool hasRunTimeState(void) const
-	{
-		return false;
-	}
-
 	virtual void onEnter(Traversal<AGENT>& traversal)
 	{	
 		traversal.enter(InitialCauseKey, 0);
@@ -569,6 +642,17 @@ protected:
 	}
 	
 private:
+	StateMachine()
+		: ActionState()
+	{
+		/* empty */
+	}
+
+	~StateMachine(void)
+	{
+		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
+	}
+
 	std::vector< State<AGENT>* > states;
 }; // class StateMachine
 
@@ -584,11 +668,16 @@ public:
 		printf("effecting on transition!\n");
 	}
 
+	virtual TransitionFX<AGENT>* getRunTimeCopy(void) const
+	{
+		return Factory<TransitionFX<Agent>>::getRunTimeCopy(*this);
+	}
+
 	bool operator==(const TransitionFX<AGENT>& other)
 	{
 		return this == &other;
 	}
-
+		
 protected:
 	static bool hasAuthoringTimeState(void)
 	{
@@ -605,7 +694,12 @@ protected:
 	{
 		/* empty */
 	}
-		
+
+	virtual TransitionFX<AGENT>* duplicate(void) const
+	{
+		return const_cast< TransitionFX<AGENT>* >(this);
+	}
+
 	virtual bool hasRunTimeState(void) const
 	{
 		return false;

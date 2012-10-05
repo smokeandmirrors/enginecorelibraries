@@ -9,69 +9,45 @@ class Agent
 {
 };
 
-class ActTracker 
-	: public ActionState<Agent>
+#define RUN_TIME_AUTHOR_TIME_DEFAULTS
+#define RUN_TIME_DEFAULTS
+#define AUTHOR_TIME_DEFAULTS
+#define PURE_CLASS_DEFAULTS
+
+class RunTimeAuthorTime
+	: public HFSM2::ActionState<Agent>
 {
 public:
-	ActTracker(int newID)
-		: ActionState<Agent>(newID)
-		, m_numTimesActed(0)
-		, m_numTimesOnEnter(0)
-		, m_numTimesOnExit(0)
-	{
-
-	}
-
-	virtual void act(Traversal<Agent>&)
-	{
-		printf("Num times act: %d\n", ++m_numTimesActed);
-	}
-	
 protected:
-	virtual void onEnter(Traversal<Agent>&) 
-	{ 
-		printf("Num times onEnter: %d\n", ++m_numTimesOnEnter);
-	}
-
-	virtual void onExit(Traversal<Agent>&) 
-	{ 
-		printf("Num times onExit: %d\n", ++m_numTimesOnExit);
-	}
-
 private:
-	int m_numTimesActed;
-	int m_numTimesOnEnter;
-	int m_numTimesOnExit;
-};
+}; // class RunTimeAuthorTime
 
-class TimesEvaluated
-	: public Condition<Agent>
+class AuthorTime
+	: public HFSM2::ActionState<Agent>
 {
 public:
-	TimesEvaluated(int numTimesToEvaluate=0)
-		: Condition<Agent>(numTimesToEvaluate)
-		, requiredEvaluations(numTimesToEvaluate)
-		, m_numTimesIsSatisfied(0)
-	{
-		/* empty */
-	}
-
 protected:
-	virtual bool isSatisfied(Agent*)
-	{
-		printf("Num times isSatisfied: %d\n", ++m_numTimesIsSatisfied);
-		return m_numTimesIsSatisfied >= requiredEvaluations;
-	}
-	
 private:
-	int requiredEvaluations;
-	int m_numTimesIsSatisfied;
-};
+}; // class AuthorTime
+
+class RunTime
+	: public HFSM2::ActionState<Agent>
+{
+public:
+protected:
+private:
+}; // class RunTime
+
+class PureState
+	: public HFSM2::ActionState<Agent>
+{
+public:
+protected:
+private:
+}; // class PureState
 
 void HFSM2::test(void)
 {
-	
-
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
 
@@ -126,7 +102,9 @@ void HFSM2::test(void)
 		//stateMachine3->connect(key9, *condition7, key7, transitionFX3);
 	}
 
-	alpha.start(*stateMachine1);
+	StateMachine<Agent>* stateMachineRun = Factory< StateMachine<Agent>>::getRunTimeCopy(*stateMachine1);
+
+	alpha.start(*stateMachineRun);
 
 	for (int i = 0; i < 12; ++i)
 	{
@@ -143,6 +121,11 @@ void HFSM2::test(void)
 		Factory< StateMachine<Agent>>::recycle( *stateMachine3 );
 		Factory< ActionState<Agent>>::recycle( *state1 );
 	}
+
+	Factory< TransitionFX<Agent>>::destroyObjects();
+	Factory< ConditionTrue<Agent>>::destroyObjects();
+	Factory< StateMachine<Agent>>::destroyObjects();
+	Factory< ActionState<Agent>>::destroyObjects();
 
 	BREAKPOINT(0x0);
 }
