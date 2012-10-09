@@ -119,7 +119,7 @@ public:
 		*/
 		if (object.hasRunTimeState())
 		{
-			return object.duplicate();
+			return OBJECT::duplicate(object);
 		}
 		else
 		{
@@ -189,10 +189,7 @@ public:
 		onExit(agent);
 	}
 
-	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0
-	{
-		return Factory<ActionState<Agent>>::getRunTimeCopy(*this);
-	}
+	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0;
 
 	virtual bool isCompletable(Traversal<AGENT>& /*agent*/) const
 	{
@@ -209,6 +206,7 @@ public:
 		return this == &other;
 	}
 
+	virtual void recycle(void)=0;
 
 protected:
 	static bool hasAuthoringTimeState(void)
@@ -225,12 +223,7 @@ protected:
 	{
 		/* empty */
 	}
-
-	virtual ActionState<AGENT>* duplicate(void) const=0
-	{
-		return NULL;
-	}
-
+	
 	virtual void onEnter(Traversal<AGENT>& /*agent*/) 
 	{ 
 		/* empty */ 
@@ -253,10 +246,7 @@ class Condition
 	friend class Factory< Condition<AGENT>>;
 
 public:
-	virtual Condition<AGENT>* getRunTimeCopy(void) const=0
-	{
-		return Factory<Condition<Agent>>::getRunTimeCopy(*this);
-	}
+	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
 
 	bool operator()(AGENT* agent)
 	{
@@ -268,6 +258,8 @@ public:
 	{
 		return this == &other;
 	}
+	
+	virtual void recycle(void)=0;
 
 protected:
 	static bool hasAuthoringTimeState(void)
@@ -284,8 +276,6 @@ protected:
 	{
 		/* empty */
 	}
-
-	virtual Condition<AGENT>* duplicate(void) const=0;
 
 	virtual bool hasRunTimeState(void) const=0
 	{
@@ -313,7 +303,14 @@ public:
 		return this == &other;
 	}
 
+	virtual void recycle(void)=0;
+
 protected:
+	static ConditionFalse<AGENT>* duplicate(const ConditionFalse<AGENT>& source)
+	{
+		return new ConditionFalse<AGENT>(source);
+	}
+	
 	static bool hasAuthoringTimeState(void)
 	{
 		return true;
@@ -354,7 +351,17 @@ public:
 		return this == &other;
 	}
 
+	virtual void recycle(void)
+	{
+		Factory<ConditionTrue<AGENT>>::recycle(*this);
+	}
+
 protected:
+	static ConditionTrue<AGENT>* duplicate(const ConditionTrue<AGENT>& source)
+	{
+		return new ConditionTrue<AGENT>(source);
+	}
+	
 	static bool hasAuthoringTimeState(void)
 	{
 		return true;
@@ -363,11 +370,6 @@ protected:
 	ConditionTrue(void)
 	{
 		/* empty */
-	}
-
-	virtual ConditionTrue<AGENT>* duplicate(void) const
-	{
-		return new ConditionTrue<AGENT>;
 	}
 
 	virtual bool hasRunTimeState(void) const
@@ -450,6 +452,11 @@ public:
 		return this == &other;
 	}
 
+	virtual void recycle(void)
+	{
+		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());		
+	}
+
 protected:
 	template<typename AGENT>
 	class Connection
@@ -481,18 +488,43 @@ protected:
 			/* empty */
 		}
 
-		~State(void)
+		void recycle(void)
 		{
-			/* empty release all of the conditions, transitionFX, and states */
+			std::for_each(connections.begin(), connections.end(), RecycleConnection<AGENT>());		
+			state.recycle();
 		}
 		
-		std::vector< Connection<AGENT> > connections;
+		std::vector<Connection<AGENT>> connections;
 		ActionState<AGENT>& state;
 	
 	private:
 		State<AGENT>& operator=(const State<AGENT>&);
 	}; // class ActionTuple
 	
+	template<typename AGENT>
+	struct RecycleConnection
+	{
+		inline void operator()(Connection<AGENT>& connection)
+		{
+			if (connection.fx)
+			{
+				connection.fx->recycle();
+			}
+
+			connection.condition.recycle();
+		}
+	}; // struct RecycleConnection
+
+
+	template<typename AGENT>
+	struct RecycleState
+	{
+		inline void operator()(State<AGENT>* state)
+		{
+			state->recycle();
+		}
+	}; // struct RecycleState
+
 	static bool hasAuthoringTimeState(void)
 	{
 		return true;
@@ -506,6 +538,11 @@ protected:
 			ActionState<AGENT>& nextAction(getState(connection.next)->state);
 			connection.fx->effect(agent, *this, current.state, nextAction);
 		}
+	}
+
+	static StateMachine<AGENT>* duplicate(const StateMachine<AGENT>& source)
+	{	// todo reword this with the code below
+		return source.duplicate();
 	}
 
 	virtual StateMachine<AGENT>* duplicate(void) const
@@ -662,17 +699,15 @@ class TransitionFX
 	friend class StateMachine<AGENT>;
 
 public:
-	virtual void effect(AGENT* /*agent*/, ActionState<AGENT>& /*master*/, ActionState<AGENT>& /*from*/, ActionState<AGENT>& /*to*/)=0
-	{
-		/* empty */
-		printf("effecting on transition!\n");
-	}
+	virtual void effect(AGENT* /*agent*/, ActionState<AGENT>& /*master*/, ActionState<AGENT>& /*from*/, ActionState<AGENT>& /*to*/)=0;
 
 	bool operator==(const TransitionFX<AGENT>& other)
 	{
 		return this == &other;
 	}
-		
+
+	virtual void recycle(void)=0;
+
 protected:
 	static bool hasAuthoringTimeState(void)
 	{
@@ -689,20 +724,9 @@ protected:
 		/* empty */
 	}
 
-	virtual TransitionFX<AGENT>* duplicate(void) const=0
-	{
-		return new TransitionFX<AGENT>;
-	}
+	virtual TransitionFX<AGENT>* getRunTimeCopy(void) const=0;
 
-	virtual TransitionFX<AGENT>* getRunTimeCopy(void) const=0
-	{
-		return Factory<TransitionFX<Agent>>::getRunTimeCopy(*this);
-	}
-
-	virtual bool hasRunTimeState(void) const=0
-	{
-		return false;
-	}
+	virtual bool hasRunTimeState(void) const=0;
 
 private:
 	int id;

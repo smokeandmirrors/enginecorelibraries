@@ -17,8 +17,9 @@ class Agent
 class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	friend class Factory<RunTimeAuthorTimeState>;
+
 public:
-	
 protected:
 	static bool hasAuthoringTimeState(void)
 	{
@@ -31,6 +32,8 @@ private:
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	friend class Factory<AuthorTimeState>;
+
 public:
 protected:
 	static bool hasAuthoringTimeState(void)
@@ -44,6 +47,8 @@ private:
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	friend class Factory<RunTimeState>;
+
 public:
 protected:
 	static bool hasAuthoringTimeState(void)
@@ -57,8 +62,38 @@ private:
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
+	friend class Factory<PureState>;
+
 public:
+	PureState(void)
+		: ActionState<Agent>()
+	{
+		static int pureStateCount(0);
+		++pureStateCount;
+		assert(pureStateCount == 1);
+	}
+
+	ActionState<Agent>* getRunTimeCopy(void) const
+	{
+		return Factory<PureState>::getRunTimeCopy(*this);
+	}
+
+	bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+
+	void recycle(void)
+	{
+		Factory<PureState>::recycle(*this);
+	}
+
 protected:
+	static PureState* duplicate(const PureState& source)
+	{
+		return new PureState(source);
+	}
+	
 	static bool hasAuthoringTimeState(void)
 	{
 		return false;
@@ -67,16 +102,54 @@ protected:
 private:
 }; // class PureState
 
+class PureTransitionFX
+	: public TransitionFX<Agent>
+{
+	friend class Factory<PureTransitionFX>;
+
+public:
+	virtual void effect(Agent* /*agent*/, ActionState<Agent>& /*master*/, ActionState<Agent>& /*from*/, ActionState<Agent>& /*to*/)
+	{
+		printf("effecting on transition!\n");
+	}
+
+	virtual void recycle(void)
+	{
+		Factory<PureTransitionFX>::recycle(*this);
+	}
+
+protected:
+	static PureTransitionFX* duplicate(const PureTransitionFX& source) 
+	{
+		return new PureTransitionFX(source);
+	}
+
+	static bool hasAuthoringTimeState(void)
+	{
+		return false;
+	}
+
+	virtual TransitionFX<Agent>* getRunTimeCopy(void) const
+	{
+		return Factory<PureTransitionFX>::getRunTimeCopy(*this);
+	}
+
+	virtual bool hasRunTimeState(void) const
+	{
+		return false;
+	}
+}; // class PureTransitionFX
+
 void HFSM2::test(void)
 {
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
 
-	TransitionFX<Agent>* transitionFX1 = Factory< TransitionFX<Agent>>::getAuthorCopy(); // ("transition fx");
+	TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); // ("transition fx");
 	TransitionFX<Agent>* transitionFX2 = transitionFX1;
 	// TransitionFX<Agent>* transitionFX3 = transitionFX1;
 
-	ConditionTrue<Agent>* condition1 = Factory< ConditionTrue<Agent>>::getAuthorCopy(); // ("condition");
+	ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::getAuthorCopy(); // ("condition");
 	ConditionTrue<Agent>* condition2 = condition1;
 	ConditionTrue<Agent>* condition3 = condition1;
 	ConditionTrue<Agent>* condition4 = condition1;
@@ -84,19 +157,19 @@ void HFSM2::test(void)
 	ConditionTrue<Agent>* condition6 = condition1;
 //	ConditionTrue<Agent>* condition7 = condition1;
 
-	StateMachine<Agent>* stateMachine1 = Factory< StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 0/x");
+	StateMachine<Agent>* stateMachine1 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 0/x");
 
 	PureState* state1 = Factory<PureState>::getAuthorCopy(); // ("state");
-	ActionState<Agent>* state2 = state1;
-	StateMachine<Agent>* stateMachine2 = Factory< StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 3/1");
+	ActionState<Agent>* state2 = Factory<PureState>::getAuthorCopy();
+	StateMachine<Agent>* stateMachine2 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 3/1");
 
-	ActionState<Agent>* state4 = state1;
-	ActionState<Agent>* state5 = state1;
-	StateMachine<Agent>* stateMachine3 = Factory< StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 6/2");		
+	ActionState<Agent>* state4 = Factory<PureState>::getAuthorCopy();
+	ActionState<Agent>* state5 = Factory<PureState>::getAuthorCopy();
+	StateMachine<Agent>* stateMachine3 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 6/2");		
 
-	ActionState<Agent>* state7 = state1;
-	ActionState<Agent>* state8 = state1;
-	ActionState<Agent>* state9 = state1;
+	ActionState<Agent>* state7 = Factory<PureState>::getAuthorCopy();
+	ActionState<Agent>* state8 = Factory<PureState>::getAuthorCopy();
+	ActionState<Agent>* state9 = Factory<PureState>::getAuthorCopy();
 
 	{
 		StateKey key1 = stateMachine1->add(*state1);
@@ -123,7 +196,7 @@ void HFSM2::test(void)
 		//stateMachine3->connect(key9, *condition7, key7, transitionFX3);
 	}
 
-	StateMachine<Agent>* stateMachineRun = Factory< StateMachine<Agent>>::getRunTimeCopy(*stateMachine1);
+	StateMachine<Agent>* stateMachineRun = Factory<StateMachine<Agent>>::getRunTimeCopy(*stateMachine1);
 
 	alpha.start(*stateMachineRun);
 
@@ -133,20 +206,13 @@ void HFSM2::test(void)
 	}
 
 	alpha.stop();	
-
-	{
-		Factory< TransitionFX<Agent>>::recycle( *transitionFX1);
-		Factory< ConditionTrue<Agent>>::recycle( *condition1 );
-		Factory< StateMachine<Agent>>::recycle( *stateMachine1 );
-		Factory< StateMachine<Agent>>::recycle( *stateMachine2 );
-		Factory< StateMachine<Agent>>::recycle( *stateMachine3 );
-		Factory< ActionState<Agent>>::recycle( *state1 );
-	}
-
-	Factory< TransitionFX<Agent>>::destroyObjects();
-	Factory< ConditionTrue<Agent>>::destroyObjects();
-	Factory< StateMachine<Agent>>::destroyObjects();
-	Factory< ActionState<Agent>>::destroyObjects();
+	
+	stateMachine1->recycle();
+	
+	Factory<PureTransitionFX>::destroyObjects();
+	Factory<ConditionTrue<Agent>>::destroyObjects();
+	Factory<StateMachine<Agent>>::destroyObjects();
+	Factory<ActionState<Agent>>::destroyObjects();
 
 	BREAKPOINT(0x0);
 }
