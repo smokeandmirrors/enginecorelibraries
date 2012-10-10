@@ -9,60 +9,28 @@ class Agent
 {
 };
 
-#define RUN_TIME_AUTHOR_TIME_DEFAULTS
-#define RUN_TIME_DEFAULTS
-#define AUTHOR_TIME_DEFAULTS
-#define PURE_CLASS_DEFAULTS
-
 class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	friend class Factory<RunTimeAuthorTimeState>;
-
-public:
-protected:
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-
-private:
+	STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 }; // class RunTimeAuthorTimeState
 
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	friend class Factory<AuthorTimeState>;
-
-public:
-protected:
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-
-private:
+	STATE_WITH_AUTHOR_STATE(AuthorTimeState, Agent)
 }; // class AuthorTimeState
 
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	friend class Factory<RunTimeState>;
-
-public:
-protected:
-	static bool hasAuthoringTimeState(void)
-	{
-		return false;
-	}
-
-private:
+	STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
 }; // class RunTimeState
 
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
-	friend class Factory<PureState>;
+	PURE_STATE(PureState, Agent)
 
 public:
 	PureState(void)
@@ -73,70 +41,17 @@ public:
 		assert(pureStateCount == 1);
 	}
 
-	ActionState<Agent>* getRunTimeCopy(void) const
-	{
-		return Factory<PureState>::getRunTimeCopy(*this);
-	}
-
-	bool hasRunTimeState(void) const
-	{
-		return false;
-	}
-
-	void recycle(void)
-	{
-		Factory<PureState>::recycle(*this);
-	}
-
-protected:
-	static PureState* duplicate(const PureState& source)
-	{
-		return new PureState(source);
-	}
-	
-	static bool hasAuthoringTimeState(void)
-	{
-		return false;
-	}
-
-private:
 }; // class PureState
 
 class PureTransitionFX
 	: public TransitionFX<Agent>
 {
-	friend class Factory<PureTransitionFX>;
+	PURE_TRANSITION_FX(PureTransitionFX, Agent)
 
 public:
 	virtual void effect(Agent* /*agent*/, ActionState<Agent>& /*master*/, ActionState<Agent>& /*from*/, ActionState<Agent>& /*to*/)
 	{
 		printf("effecting on transition!\n");
-	}
-
-	virtual void recycle(void)
-	{
-		Factory<PureTransitionFX>::recycle(*this);
-	}
-
-protected:
-	static PureTransitionFX* duplicate(const PureTransitionFX& source) 
-	{
-		return new PureTransitionFX(source);
-	}
-
-	static bool hasAuthoringTimeState(void)
-	{
-		return false;
-	}
-
-	virtual TransitionFX<Agent>* getRunTimeCopy(void) const
-	{
-		return Factory<PureTransitionFX>::getRunTimeCopy(*this);
-	}
-
-	virtual bool hasRunTimeState(void) const
-	{
-		return false;
 	}
 }; // class PureTransitionFX
 
@@ -160,6 +75,9 @@ void HFSM2::test(void)
 	StateMachine<Agent>* stateMachine1 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 0/x");
 
 	PureState* state1 = Factory<PureState>::getAuthorCopy(); // ("state");
+	AuthorTimeState* authorTimeState(Factory<AuthorTimeState>::getAuthorCopy());
+	RunTimeState* runTimeState(Factory<RunTimeState>::getAuthorCopy());
+	RunTimeAuthorTimeState* authorTimeRunTimeState(Factory<RunTimeAuthorTimeState>::getAuthorCopy());
 	ActionState<Agent>* state2 = Factory<PureState>::getAuthorCopy();
 	StateMachine<Agent>* stateMachine2 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 3/1");
 
@@ -216,3 +134,5 @@ void HFSM2::test(void)
 
 	BREAKPOINT(0x0);
 }
+
+

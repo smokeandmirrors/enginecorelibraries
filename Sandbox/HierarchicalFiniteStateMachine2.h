@@ -11,6 +11,75 @@
 #include <algorithm>
 #include <vector>
 
+
+#define HAS_AUTHOR_TIME_STATE(VALUE) \
+	static bool hasAuthoringTimeState(void) { return VALUE ; } 
+
+#define HAS_RUN_TIME_STATE(VALUE) \
+	virtual bool hasRunTimeState(void) const { return VALUE; } 
+
+#define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
+	private: \
+	friend class Factory< CLASS_NAME >; \
+	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
+	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
+	virtual void recycle(void) { Factory< CLASS_NAME >::recycle(*this); } \
+	HAS_AUTHOR_TIME_STATE(AUTHOR_TIME) \
+	HAS_RUN_TIME_STATE(RUN_TIME)
+
+#define AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, true, true)
+
+#define AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, true, false)
+
+#define PURE_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, false, false)
+
+#define RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, false, true)
+
+// author and run time state
+#define CONDITION_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+#define STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+#define TRANSITION_FX_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+// author time state
+#define CONDITION_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+#define STATE_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+#define TRANSITION_FX_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+// run time state
+#define CONDITION_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+#define STATE_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+#define TRANSITION_FX_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+// pure classes
+#define PURE_CONDITION(CLASS_NAME, TYPE_NAME) \
+	PURE_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+#define PURE_STATE(CLASS_NAME, TYPE_NAME) \
+	PURE_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+#define PURE_TRANSITION_FX(CLASS_NAME, TYPE_NAME) \
+	PURE_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+
 namespace HFSM2
 {
 typedef signed int StateKey;
@@ -293,7 +362,7 @@ class ConditionFalse
 	friend class Factory< ConditionFalse<AGENT> >;
 
 public:
-	virtual ConditionFalse<AGENT>* getRunTimeCopy(void) const
+	virtual Condition<AGENT>* getRunTimeCopy(void) const
 	{
 		return Factory<ConditionFalse<Agent>>::getRunTimeCopy(*this);
 	}
@@ -341,7 +410,7 @@ class ConditionTrue
 	friend class Factory< ConditionTrue<AGENT> >;
 
 public:
-	virtual ConditionTrue<AGENT>* getRunTimeCopy(void) const
+	virtual Condition<AGENT>* getRunTimeCopy(void) const
 	{
 		return Factory<ConditionTrue<Agent>>::getRunTimeCopy(*this);
 	}
