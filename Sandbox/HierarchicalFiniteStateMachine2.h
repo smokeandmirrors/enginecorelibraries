@@ -7,33 +7,33 @@
 */
 
 #include "Platform.h"
+#include "AuthorTimeRunTimeFactory.h"
 
 #include <algorithm>
 #include <vector>
 
 #define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
 	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
-	static bool hasAuthoringTimeState(void) { return false; } 
+	static const bool hasAuthorTimeState = false;
 
 #define HAS_AUTHOR_TIME_STATE_true(CLASS_NAME) \
 	bool isEqualToAtAuthorTime(const CLASS_NAME##& other) const; \
-	static bool hasAuthoringTimeState(void) { return true; } 
-/*
-#define HAS_AUTHOR_TIME_STATE(VALUE) \
-	static bool hasAuthoringTimeState(void) { return VALUE ; } 
-*/
+	static const bool hasAuthorTimeState = true;
+
 #define HAS_RUN_TIME_STATE(VALUE) \
 	virtual bool hasRunTimeState(void) const { return VALUE; } 
 
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
-	private: \
-	friend class Factory< CLASS_NAME >; \
-	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
-	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
-	virtual void recycle(void) { Factory< CLASS_NAME >::recycle(*this); } \
+	public:\
 	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
-	HAS_RUN_TIME_STATE(RUN_TIME)
-
+	HAS_RUN_TIME_STATE(RUN_TIME) \
+	private:\
+	friend class Factory< AUTHOR_TIME >::Internal< CLASS_NAME >; \
+	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
+	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return NewRunTimeCopy< CLASS_NAME >(*this); } \
+	virtual void recycle(void) { RecycleRunTimeCopy< CLASS_NAME >(*this); } \
+	CLASS_NAME& operator=(const CLASS_NAME&); 
+	
 #define AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, true, true)
 
@@ -107,137 +107,15 @@ class TraversalEntry;
 
 void test(void);
 
-template<typename OBJECT>
-class Factory
-{
-	typedef std::vector<OBJECT*> Objects;
-
-public:
-	static void destroyObjects(void)
-	{
-		for (Objects::iterator i(objects.begin()), sentinel(objects.end())
-			; i != sentinel
-			; ++i)
-		{
-			delete *i;
-		}
-	}
-
-	static OBJECT* getAuthorCopy(void)
-	{
-		// COMPILE_IF(OBJECT::DoesNotHaveAuthorTimeState)
-		int objectIndex(0);
-
-		if (!OBJECT::hasAuthoringTimeState())
-		{
-			if (objects.empty())
-			{
-				objects.push_back(new OBJECT);
-			}
-		}
-		else
-		{
-			OBJECT candidate;
-
-			if (!has(candidate, objectIndex))
-			{
-				objectIndex = objects.size();
-				objects.push_back(new OBJECT);
-			}
-		}			
-
-		return objects[objectIndex];
-	}
-	
-	template<typename CONSTRUCTION_ARGS>
-	static OBJECT* getAuthorCopy(const CONSTRUCTION_ARGS& args)
-	{
-		int objectIndex(0);
-
-		if (!OBJECT::hasAuthoringTimeState())
-		{
-			if (objects.empty())
-			{
-				objects.push_back(new OBJECT(args));
-			}
-		}
-		else
-		{
-			OBJECT candidate(args);
-			
-			if (!has(candidate, objectIndex))
-			{
-				objectIndex = objects.size();
-				objects.push_back(new OBJECT(args));
-			}
-		}			
-		
-		return objects[objectIndex];
-	}
-
-	static OBJECT* getRunTimeCopy(const OBJECT& object)
-	{
-		/**
-		Does the state have run-time state?
-		Return a new copy, every time.
-
-		Does the state have author-time state?
-		Return a single copy on a per author-time basis.
-
-		Return a single copy.
-
-		The get run time copy will make a new GetRunTimeCopy for each state, every time.  (Unless the while tree is stateless. At run time.)
-		*/
-		if (object.hasRunTimeState())
-		{
-			return OBJECT::duplicate(object);
-		}
-		else
-		{
-			return const_cast<OBJECT*>(&object);
-		}
-	}
-
-	static void recycle(OBJECT& object)
-	{
-		if (object.hasRunTimeState())
-		{
-			delete &object;
-		}
-	}
-
-protected:
-	static int has(const OBJECT& object, int& objectIndex)
-	{
-		objectIndex = -1;
-
-		for (int i(0), sentinel(objects.size()); i < sentinel; ++i)
-		{
-			if (objects[i]->isEqualToAtAuthorTime(object))
-			{
-				objectIndex = i;
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-private:
-	static Objects objects;
-};
-
-template<typename OBJECT> 
-std::vector<OBJECT*> Factory<OBJECT>::objects;
-
 template<typename AGENT>
 class ActionState
 {	
-	friend class Factory<ActionState<AGENT>>;
+	friend class Factory<false>::Internal< ActionState<AGENT> >;
 	friend class StateMachine<AGENT>;
 
 public:
-	
+	static const bool hasAuthorTimeState = false;
+
 	virtual void act(Traversal<AGENT>& agent) 
 	{
 		printf("act! "); agent.printState();
@@ -275,11 +153,6 @@ public:
 	virtual void recycle(void)=0;
 
 protected:
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-	
 	ActionState(void)
 	{
 		/* empty */
@@ -306,7 +179,8 @@ protected:
 template<typename AGENT>
 class Condition
 {
-	friend class Factory< Condition<AGENT>>;
+	// friend class Factory< Condition<AGENT>>;
+	friend class Factory<false>::Internal< Condition<AGENT> >;
 
 public:
 	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
@@ -345,6 +219,11 @@ class ConditionFalse
 	: public Condition<AGENT>
 {
 	PURE_CONDITION(ConditionFalse, AGENT)
+	
+	ConditionFalse(void)
+	{
+		/* empty */
+	}
 
 protected:
 	bool isSatisfied(AGENT*) { return false; };
@@ -356,6 +235,11 @@ class ConditionTrue
 {
 	PURE_CONDITION(ConditionTrue, AGENT)
 	
+	ConditionTrue(void)
+	{
+		/* empty */
+	}
+
 protected:
 	bool isSatisfied(AGENT*) { return true; };
 }; // ConditionTrue
@@ -368,9 +252,12 @@ class StateMachine
 	: public ActionState<AGENT>
 {
 	template<typename AGENT> class State;
-	friend class Factory< StateMachine<AGENT>>;
-
+	// friend class Factory< StateMachine<AGENT>>;
+	friend class Factory<true>::Internal< StateMachine<AGENT> >;
+	
 public:
+	static const bool hasAuthorTimeState = true;
+
 	virtual void act(Traversal<AGENT>& traversal)
 	{
 		traversal.incrementDepth();
@@ -499,12 +386,7 @@ protected:
 			state->recycle();
 		}
 	}; // struct RecycleState
-
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-	
+		
 	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
 	{
 		if (connection.fx)
@@ -613,7 +495,7 @@ protected:
 
 	virtual StateMachine<AGENT>* getRunTimeCopy(void) const
 	{
-		return Factory<StateMachine<Agent>>::getRunTimeCopy(*this);
+		return NewRunTimeCopy<StateMachine<Agent>>(*this);
 	}
 
 	inline State<AGENT>* getState(StateKey key) const
@@ -675,7 +557,8 @@ private:
 template<typename AGENT>
 class TransitionFX
 {
-	friend class Factory< TransitionFX<AGENT>>;
+	// friend class Factory< TransitionFX<AGENT>>;
+	friend class Factory<false>::Internal< TransitionFX<AGENT> >;
 	friend class StateMachine<AGENT>;
 
 public:
@@ -684,10 +567,7 @@ public:
 	virtual void recycle(void)=0;
 
 protected:
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
+	static const bool hasAuthorTimeState = false;
 	
 	TransitionFX()
 	{
