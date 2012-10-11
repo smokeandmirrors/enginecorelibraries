@@ -4,6 +4,127 @@
 using namespace HFSM2;
 using namespace designPatterns;
 
+
+template<typename TRAIT>
+struct HasAuthorTimeState
+{
+	static const bool value = true;
+};
+
+template<> 
+struct HasAuthorTimeState<void>
+{
+	static const bool value = false;
+};
+
+
+template<bool HAS_AUTHOR_TIME_STATE>
+struct AuthorGeneratorSelector
+{
+	template<typename OBJECT>
+	static OBJECT* generate(void)
+	{
+		printf("has author time version!");
+		return new OBJECT;
+	}
+};
+
+template<>
+struct AuthorGeneratorSelector<false>
+{
+	template<typename OBJECT>
+	static OBJECT* generate(void)
+	{
+		static OBJECT object;
+		printf("has NOT author time version!");
+		return &object;
+	}
+};
+
+template<typename OBJECT>
+OBJECT* GenerateAuthorCopy(void)
+{
+	// return AuthorGeneratorSelector< HasAuthorTimeState< OBJECT >::value >::generate<OBJECT>();
+	return AuthorGeneratorSelector< OBJECT::hasAuthorTimeState >::generate<OBJECT>();
+};
+
+
+template<bool HAS_AUTHOR_TIME_STATE>
+struct AuthorGeneratorSelectorWithArgs
+{
+	template<typename OBJECT, typename ARGS>
+	static OBJECT* generate(const ARGS& args)
+	{
+		printf("has author time version with args!\n");
+		return new OBJECT(args);
+	}
+
+	template<typename OBJECT>
+	static OBJECT* generate(void)
+	{
+		printf("has author time version without args!\n");
+		return new OBJECT;
+	}
+};
+
+template<>
+struct AuthorGeneratorSelectorWithArgs<false>
+{
+	template<typename OBJECT, typename ARGS>
+	static OBJECT* generate(const ARGS& args)
+	{
+		static OBJECT object(args);
+		printf("has NOT author time version with args!\n");
+		return &object;
+	}
+
+	template<typename OBJECT>
+	static OBJECT* generate(void)
+	{
+		static OBJECT object;
+		printf("has NOT author time version with no args!\n");
+		return &object;;
+	}
+};
+
+template<typename OBJECT, typename ARGS>
+OBJECT* GenerateAuthorCopyWithArgs(const ARGS& args)
+{
+	// return AuthorGeneratorSelector< HasAuthorTimeState< OBJECT >::value >::generate<OBJECT>();
+	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT, ARGS>(args);
+};
+
+template<typename OBJECT>
+OBJECT* GenerateAuthorCopyWithArgs(void)
+{
+	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT>();
+}
+
+
+class AuthorCopyA 
+{
+public:
+	static const bool hasAuthorTimeState = true;
+
+	AuthorCopyA() {}
+	AuthorCopyA(int i) {}
+};
+
+class AuthorCopyB 
+{
+public:
+	static const bool hasAuthorTimeState = false;
+
+	AuthorCopyB() {}
+	AuthorCopyB(int i) {}
+};
+
+template<>
+struct HasAuthorTimeState<AuthorCopyB>
+{
+	static const bool value = false;
+};
+
 class Agent
 	: public Composite<Agent>
 {
@@ -13,18 +134,70 @@ class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
 	STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
+
+public:
+	RunTimeAuthorTimeState(int i)
+		: ActionState<Agent>()
+	{
+		static int runTimeAuthorState(0);
+		++runTimeAuthorState;
+		// assert(runTimeAuthorState == 1);
+		m_authorVariable = i;
+	}
+
+private:
+	int m_authorVariable;
+	int m_runTimeVariable;
 }; // class RunTimeAuthorTimeState
+
+bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState& other) const
+{
+	return m_authorVariable == other.m_authorVariable;
+}
 
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
 	STATE_WITH_AUTHOR_STATE(AuthorTimeState, Agent)
+public:
+
+	static int authorTimeState;
+
+	AuthorTimeState(int i)
+		: ActionState<Agent>()
+	{
+		++authorTimeState;
+		m_authorVariable = i;
+	}
+
+	~AuthorTimeState(void)
+	{
+		--authorTimeState;
+	}
+
+private:
+	int m_authorVariable;
 }; // class AuthorTimeState
+
+int AuthorTimeState::authorTimeState = 0;
+
+bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
+{
+	return m_authorVariable == other.m_authorVariable;
+}
 
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
 	STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
+public:
+	RunTimeState(void)
+		: ActionState<Agent>()
+	{
+		static int runTimeState(0);
+		++runTimeState;
+		// assert(runTimeState  1);
+	}
 }; // class RunTimeState
 
 class PureState
@@ -57,6 +230,12 @@ public:
 
 void HFSM2::test(void)
 {
+
+	AuthorCopyB* bcbw = GenerateAuthorCopyWithArgs<AuthorCopyB, int>(2);
+	AuthorCopyA* acbw = GenerateAuthorCopyWithArgs<AuthorCopyA, int>(2);
+	AuthorCopyB* bcbwo = GenerateAuthorCopyWithArgs<AuthorCopyB>();
+	AuthorCopyA* acbwo = GenerateAuthorCopyWithArgs<AuthorCopyA>();
+
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
 
@@ -74,13 +253,14 @@ void HFSM2::test(void)
 
 	StateMachine<Agent>* stateMachine1 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 0/x");
 
-	PureState* state1 = Factory<PureState>::getAuthorCopy(); // ("state");
-	AuthorTimeState* authorTimeState(Factory<AuthorTimeState>::getAuthorCopy());
+	PureState* pureState = Factory<PureState>::getAuthorCopy(); // ("state");
+	AuthorTimeState* authorTimeState(Factory<AuthorTimeState>::getAuthorCopy<int>(5));
 	RunTimeState* runTimeState(Factory<RunTimeState>::getAuthorCopy());
-	RunTimeAuthorTimeState* authorTimeRunTimeState(Factory<RunTimeAuthorTimeState>::getAuthorCopy());
+	RunTimeAuthorTimeState* authorTimeRunTimeState(Factory<RunTimeAuthorTimeState>::getAuthorCopy<int>(3));
+	
+	ActionState<Agent>* state1 = runTimeState;
 	ActionState<Agent>* state2 = Factory<PureState>::getAuthorCopy();
 	StateMachine<Agent>* stateMachine2 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 3/1");
-
 	ActionState<Agent>* state4 = Factory<PureState>::getAuthorCopy();
 	ActionState<Agent>* state5 = Factory<PureState>::getAuthorCopy();
 	StateMachine<Agent>* stateMachine3 = Factory<StateMachine<Agent>>::getAuthorCopy(); // ("state/machine 6/2");		

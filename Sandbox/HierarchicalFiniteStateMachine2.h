@@ -11,10 +11,17 @@
 #include <algorithm>
 #include <vector>
 
+#define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
+	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
+	static bool hasAuthoringTimeState(void) { return false; } 
 
+#define HAS_AUTHOR_TIME_STATE_true(CLASS_NAME) \
+	bool isEqualToAtAuthorTime(const CLASS_NAME##& other) const; \
+	static bool hasAuthoringTimeState(void) { return true; } 
+/*
 #define HAS_AUTHOR_TIME_STATE(VALUE) \
 	static bool hasAuthoringTimeState(void) { return VALUE ; } 
-
+*/
 #define HAS_RUN_TIME_STATE(VALUE) \
 	virtual bool hasRunTimeState(void) const { return VALUE; } 
 
@@ -24,7 +31,7 @@
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
 	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycle(*this); } \
-	HAS_AUTHOR_TIME_STATE(AUTHOR_TIME) \
+	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
 	HAS_RUN_TIME_STATE(RUN_TIME)
 
 #define AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
@@ -100,12 +107,6 @@ class TraversalEntry;
 
 void test(void);
 
-struct EmptyStruct 
-{
-	bool operator==(const EmptyStruct&) const { return true; }
-	bool operator!=(const EmptyStruct&) const { return false; }
-}; // struct EmptyStruct 
-
 template<typename OBJECT>
 class Factory
 {
@@ -124,6 +125,7 @@ public:
 
 	static OBJECT* getAuthorCopy(void)
 	{
+		// COMPILE_IF(OBJECT::DoesNotHaveAuthorTimeState)
 		int objectIndex(0);
 
 		if (!OBJECT::hasAuthoringTimeState())
@@ -211,7 +213,7 @@ protected:
 
 		for (int i(0), sentinel(objects.size()); i < sentinel; ++i)
 		{
-			if (*objects[i] == object)
+			if (objects[i]->isEqualToAtAuthorTime(object))
 			{
 				objectIndex = i;
 				return true;
@@ -270,11 +272,6 @@ public:
 		return isCompletable(agent) && false;
 	}
 
-	bool operator==(const ActionState<AGENT>& other)
-	{
-		return this == &other;
-	}
-
 	virtual void recycle(void)=0;
 
 protected:
@@ -303,10 +300,7 @@ protected:
 		/* empty */ 
 	}
 
-	virtual bool hasRunTimeState(void) const=0
-	{
-		return false;
-	}
+	virtual bool hasRunTimeState(void) const=0;
 }; // class ActionState
 
 template<typename AGENT>
@@ -323,11 +317,6 @@ public:
 		return isSatisfied(agent);
 	}
 
-	bool operator==(const Condition<AGENT>& other)
-	{
-		return this == &other;
-	}
-	
 	virtual void recycle(void)=0;
 
 protected:
@@ -346,10 +335,7 @@ protected:
 		/* empty */
 	}
 
-	virtual bool hasRunTimeState(void) const=0
-	{
-		return false;
-	}
+	virtual bool hasRunTimeState(void) const=0;
 
 	virtual bool isSatisfied(AGENT* /*agent*/)=0;
 }; // Condition
@@ -358,48 +344,9 @@ template<typename AGENT>
 class ConditionFalse
 	: public Condition<AGENT>
 {
-
-	friend class Factory< ConditionFalse<AGENT> >;
-
-public:
-	virtual Condition<AGENT>* getRunTimeCopy(void) const
-	{
-		return Factory<ConditionFalse<Agent>>::getRunTimeCopy(*this);
-	}
-
-	bool operator==(const ConditionFalse<AGENT>& other)
-	{
-		return this == &other;
-	}
-
-	virtual void recycle(void)=0;
+	PURE_CONDITION(ConditionFalse, AGENT)
 
 protected:
-	static ConditionFalse<AGENT>* duplicate(const ConditionFalse<AGENT>& source)
-	{
-		return new ConditionFalse<AGENT>(source);
-	}
-	
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-
-	ConditionFalse(void)
-	{
-		/* empty */
-	}
-
-	virtual ConditionFalse<AGENT>* duplicate(void) const
-	{
-		return new ConditionFalse<AGENT>;
-	}
-
-	virtual bool hasRunTimeState(void) const
-	{
-		return false;
-	}
-
 	bool isSatisfied(AGENT*) { return false; };
 }; // ConditionFalse
 
@@ -407,45 +354,9 @@ template<typename AGENT>
 class ConditionTrue
 	: public Condition<AGENT>
 {
-	friend class Factory< ConditionTrue<AGENT> >;
-
-public:
-	virtual Condition<AGENT>* getRunTimeCopy(void) const
-	{
-		return Factory<ConditionTrue<Agent>>::getRunTimeCopy(*this);
-	}
-
-	bool operator==(const ConditionTrue<AGENT>& other)
-	{
-		return this == &other;
-	}
-
-	virtual void recycle(void)
-	{
-		Factory<ConditionTrue<AGENT>>::recycle(*this);
-	}
-
-protected:
-	static ConditionTrue<AGENT>* duplicate(const ConditionTrue<AGENT>& source)
-	{
-		return new ConditionTrue<AGENT>(source);
-	}
+	PURE_CONDITION(ConditionTrue, AGENT)
 	
-	static bool hasAuthoringTimeState(void)
-	{
-		return true;
-	}
-
-	ConditionTrue(void)
-	{
-		/* empty */
-	}
-
-	virtual bool hasRunTimeState(void) const
-	{
-		return false;
-	}
-
+protected:
 	bool isSatisfied(AGENT*) { return true; };
 }; // ConditionTrue
 
@@ -515,12 +426,7 @@ public:
 		assert(states[to] != NULL);
 		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
 	}
-
-	bool operator==(const StateMachine<AGENT>& other)
-	{
-		return this == &other;
-	}
-
+	
 	virtual void recycle(void)
 	{
 		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());		
@@ -734,6 +640,11 @@ protected:
 		return false;
 	}
 
+	bool isEqualToAtAuthorTime(const StateMachine<AGENT>& other) const
+	{	// \todo make sure this is correct
+		return this == &other;
+	}
+
 	virtual void onEnter(Traversal<AGENT>& traversal)
 	{	
 		traversal.enter(InitialCauseKey, 0);
@@ -769,11 +680,6 @@ class TransitionFX
 
 public:
 	virtual void effect(AGENT* /*agent*/, ActionState<AGENT>& /*master*/, ActionState<AGENT>& /*from*/, ActionState<AGENT>& /*to*/)=0;
-
-	bool operator==(const TransitionFX<AGENT>& other)
-	{
-		return this == &other;
-	}
 
 	virtual void recycle(void)=0;
 
