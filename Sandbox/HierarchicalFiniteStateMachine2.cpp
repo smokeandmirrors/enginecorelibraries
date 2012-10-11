@@ -4,110 +4,178 @@
 using namespace HFSM2;
 using namespace designPatterns;
 
-
-template<typename TRAIT>
-struct HasAuthorTimeState
+template<bool HAS_AUTHOR_TIME_STATE>
+class AuthorGeneratorSelectorWithArgs
 {
-	static const bool value = true;
-};
+public:
+	template<typename OBJECT>
+	class Generator
+	{
+		// typedef  Objects;
 
-template<> 
-struct HasAuthorTimeState<void>
-{
-	static const bool value = false;
-};
+	public:
+		template<typename ARGS>
+		static OBJECT* generate(const ARGS& args)
+		{
+			printf("has author time version with args!\n");
+			OBJECT candidate(args);
+			int objectIndex(0);
 
+			if (!has(candidate, objectIndex))
+			{
+				objectIndex = m_objects.size();
+				m_objects.push_back(new OBJECT(args));
+			}
+
+			return m_objects[objectIndex];
+		}
+		
+		static OBJECT* generate(void)
+		{
+			printf("has author time version without args!\n");
+			OBJECT candidate;
+			int objectIndex(0);
+
+			if (!has(candidate, objectIndex))
+			{
+				objectIndex = m_objects.size();
+				m_objects.push_back(new OBJECT);
+			}
+
+			return m_objects[objectIndex];
+		}
+
+	protected:
+		static int has(const OBJECT& object, int& objectIndex)
+		{
+			objectIndex = -1;
+
+			for (int i(0), sentinel(m_objects.size()); i < sentinel; ++i)
+			{
+				if (m_objects[i]->isEqualToAtAuthorTime(object))
+				{
+					objectIndex = i;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+	private:
+		static std::vector<OBJECT*> m_objects;
+	}; // class Generator
+};
 
 template<bool HAS_AUTHOR_TIME_STATE>
-struct AuthorGeneratorSelector
-{
-	template<typename OBJECT>
-	static OBJECT* generate(void)
-	{
-		printf("has author time version!");
-		return new OBJECT;
-	}
-};
-
-template<>
-struct AuthorGeneratorSelector<false>
-{
-	template<typename OBJECT>
-	static OBJECT* generate(void)
-	{
-		static OBJECT object;
-		printf("has NOT author time version!");
-		return &object;
-	}
-};
-
 template<typename OBJECT>
-OBJECT* GenerateAuthorCopy(void)
-{
-	// return AuthorGeneratorSelector< HasAuthorTimeState< OBJECT >::value >::generate<OBJECT>();
-	return AuthorGeneratorSelector< OBJECT::hasAuthorTimeState >::generate<OBJECT>();
-};
+std::vector<OBJECT*> AuthorGeneratorSelectorWithArgs<HAS_AUTHOR_TIME_STATE>::Generator<OBJECT>::m_objects;
 
-
-template<bool HAS_AUTHOR_TIME_STATE>
-struct AuthorGeneratorSelectorWithArgs
+template<> /* template specialization for no author time state */
+class AuthorGeneratorSelectorWithArgs<false>
 {
+public:
+	template<typename OBJECT>
+	class Generator
+	{
+	public:
+		/* IF NOT AUTHOR TIME STATE THAN THERE MUST ONLY BE A NO-ARGS CONSTRUCTOR */
+		static OBJECT* generate(void)
+		{	printf("has NOT author time version with no args!\n");
+			static OBJECT* object(NULL);
+
+			if (object == NULL)
+			{
+				object = new OBJECT;
+			}
+
+			return object;
+		}
+	}; 
+	/*
 	template<typename OBJECT, typename ARGS>
 	static OBJECT* generate(const ARGS& args)
-	{
-		printf("has author time version with args!\n");
-		return new OBJECT(args);
+	{	// IF NOT AUTHOR TIME STATE THAN THERE MUST ONLY BE A NO-ARGS CONSTRUCTOR 
+		PREVENT_COMPILE
 	}
 
 	template<typename OBJECT>
 	static OBJECT* generate(void)
-	{
-		printf("has author time version without args!\n");
-		return new OBJECT;
-	}
-};
+	{	printf("has NOT author time version with no args!\n");
+		static OBJECT* object(NULL);
+		
+		if (object == NULL)
+		{
+			object = new OBJECT;
+		}
 
-template<>
-struct AuthorGeneratorSelectorWithArgs<false>
-{
-	template<typename OBJECT, typename ARGS>
-	static OBJECT* generate(const ARGS& args)
-	{
-		static OBJECT object(args);
-		printf("has NOT author time version with args!\n");
-		return &object;
+		return object;
 	}
-
-	template<typename OBJECT>
-	static OBJECT* generate(void)
-	{
-		static OBJECT object;
-		printf("has NOT author time version with no args!\n");
-		return &object;;
-	}
+	*/
 };
 
 template<typename OBJECT, typename ARGS>
 OBJECT* GenerateAuthorCopyWithArgs(const ARGS& args)
 {
-	// return AuthorGeneratorSelector< HasAuthorTimeState< OBJECT >::value >::generate<OBJECT>();
-	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT, ARGS>(args);
+	// return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT, ARGS>(args);
+	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::Generator<OBJECT>::generate<ARGS>(args);
 };
 
 template<typename OBJECT>
 OBJECT* GenerateAuthorCopyWithArgs(void)
 {
-	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT>();
+	// return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::generate<OBJECT>();
+	return AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::Generator<OBJECT>::generate();
 }
 
+template<typename OBJECT>
+class NewFactory
+{
+	typedef std::vector<OBJECT*> Objects;
+
+public:
+
+protected:
+	static int has(const OBJECT& object, int& objectIndex)
+	{
+		objectIndex = -1;
+
+		for (int i(0), sentinel(objects.size()); i < sentinel; ++i)
+		{
+			if (objects[i]->isEqualToAtAuthorTime(object))
+			{
+				objectIndex = i;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+private:
+	static Objects objects;
+};
 
 class AuthorCopyA 
 {
 public:
 	static const bool hasAuthorTimeState = true;
 
-	AuthorCopyA() {}
-	AuthorCopyA(int i) {}
+	AuthorCopyA()
+	: m_authorTimeVariable(0)
+	{
+
+	}
+
+	AuthorCopyA(int i)
+	: m_authorTimeVariable (i)
+	{
+	
+	}
+
+	const int m_authorTimeVariable;
+
+	bool isEqualToAtAuthorTime(const AuthorCopyA& other) { return m_authorTimeVariable == other.m_authorTimeVariable; }
 };
 
 class AuthorCopyB 
@@ -117,12 +185,6 @@ public:
 
 	AuthorCopyB() {}
 	AuthorCopyB(int i) {}
-};
-
-template<>
-struct HasAuthorTimeState<AuthorCopyB>
-{
-	static const bool value = false;
 };
 
 class Agent
@@ -231,10 +293,12 @@ public:
 void HFSM2::test(void)
 {
 
-	AuthorCopyB* bcbw = GenerateAuthorCopyWithArgs<AuthorCopyB, int>(2);
+	AuthorCopyB* bcbw = GenerateAuthorCopyWithArgs<AuthorCopyB>();
 	AuthorCopyA* acbw = GenerateAuthorCopyWithArgs<AuthorCopyA, int>(2);
+	AuthorCopyA* acbw2 = GenerateAuthorCopyWithArgs<AuthorCopyA, int>(2);
 	AuthorCopyB* bcbwo = GenerateAuthorCopyWithArgs<AuthorCopyB>();
 	AuthorCopyA* acbwo = GenerateAuthorCopyWithArgs<AuthorCopyA>();
+	AuthorCopyA* acbwo2 = GenerateAuthorCopyWithArgs<AuthorCopyA>();
 
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
