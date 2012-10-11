@@ -11,8 +11,6 @@ public:
 	template<typename OBJECT>
 	class Generator
 	{
-		// typedef  Objects;
-
 	public:
 		template<typename ARGS>
 		static OBJECT* generate(const ARGS& args)
@@ -45,6 +43,16 @@ public:
 			return m_objects[objectIndex];
 		}
 
+		static void destroyObjects(void)
+		{
+			for (std::vector<OBJECT*>::iterator i(m_objects.begin()), sentinel(m_objects.end())
+				; i != sentinel
+				; ++i)
+			{
+				delete *i;
+			}
+		}
+
 	protected:
 		static int has(const OBJECT& object, int& objectIndex)
 		{
@@ -67,10 +75,6 @@ public:
 	}; // class Generator
 };
 
-template<bool HAS_AUTHOR_TIME_STATE>
-template<typename OBJECT>
-std::vector<OBJECT*> AuthorGeneratorSelectorWithArgs<HAS_AUTHOR_TIME_STATE>::Generator<OBJECT>::m_objects;
-
 template<> /* template specialization for no author time state */
 class AuthorGeneratorSelectorWithArgs<false>
 {
@@ -79,40 +83,36 @@ public:
 	class Generator
 	{
 	public:
+		static void destroyObjects(void)
+		{
+			delete m_object;
+			m_object = NULL;
+		}
+
 		/* IF NOT AUTHOR TIME STATE THAN THERE MUST ONLY BE A NO-ARGS CONSTRUCTOR */
 		static OBJECT* generate(void)
-		{	printf("has NOT author time version with no args!\n");
-			static OBJECT* object(NULL);
-
-			if (object == NULL)
+		{	
+			printf("has NOT author time version with no args!\n");
+			if (m_object == NULL)
 			{
-				object = new OBJECT;
+				m_object = new OBJECT;
 			}
 
-			return object;
+			return m_object;
 		}
+	
+	private:
+		static OBJECT* m_object;
 	}; 
-	/*
-	template<typename OBJECT, typename ARGS>
-	static OBJECT* generate(const ARGS& args)
-	{	// IF NOT AUTHOR TIME STATE THAN THERE MUST ONLY BE A NO-ARGS CONSTRUCTOR 
-		PREVENT_COMPILE
-	}
-
-	template<typename OBJECT>
-	static OBJECT* generate(void)
-	{	printf("has NOT author time version with no args!\n");
-		static OBJECT* object(NULL);
-		
-		if (object == NULL)
-		{
-			object = new OBJECT;
-		}
-
-		return object;
-	}
-	*/
 };
+
+template<bool HAS_AUTHOR_TIME_STATE>
+template<typename OBJECT>
+std::vector<OBJECT*> AuthorGeneratorSelectorWithArgs<HAS_AUTHOR_TIME_STATE>::Generator<OBJECT>::m_objects;
+
+// template<>
+template<typename OBJECT>
+OBJECT* AuthorGeneratorSelectorWithArgs<false>::Generator<OBJECT>::m_object;
 
 template<typename OBJECT, typename ARGS>
 OBJECT* GenerateAuthorCopyWithArgs(const ARGS& args)
@@ -129,32 +129,10 @@ OBJECT* GenerateAuthorCopyWithArgs(void)
 }
 
 template<typename OBJECT>
-class NewFactory
+void DestroyAuthorCopies(void)
 {
-	typedef std::vector<OBJECT*> Objects;
-
-public:
-
-protected:
-	static int has(const OBJECT& object, int& objectIndex)
-	{
-		objectIndex = -1;
-
-		for (int i(0), sentinel(objects.size()); i < sentinel; ++i)
-		{
-			if (objects[i]->isEqualToAtAuthorTime(object))
-			{
-				objectIndex = i;
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-private:
-	static Objects objects;
-};
+	AuthorGeneratorSelectorWithArgs< OBJECT::hasAuthorTimeState >::Generator<OBJECT>::destroyObjects();
+}
 
 class AuthorCopyA 
 {
@@ -176,6 +154,9 @@ public:
 	const int m_authorTimeVariable;
 
 	bool isEqualToAtAuthorTime(const AuthorCopyA& other) { return m_authorTimeVariable == other.m_authorTimeVariable; }
+
+private:
+	AuthorCopyA& operator=(const AuthorCopyA&);
 };
 
 class AuthorCopyB 
@@ -299,6 +280,10 @@ void HFSM2::test(void)
 	AuthorCopyB* bcbwo = GenerateAuthorCopyWithArgs<AuthorCopyB>();
 	AuthorCopyA* acbwo = GenerateAuthorCopyWithArgs<AuthorCopyA>();
 	AuthorCopyA* acbwo2 = GenerateAuthorCopyWithArgs<AuthorCopyA>();
+
+	DestroyAuthorCopies<AuthorCopyA>();
+	DestroyAuthorCopies<AuthorCopyB>();
+
 
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
