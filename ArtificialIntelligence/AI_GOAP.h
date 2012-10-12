@@ -7,10 +7,6 @@
 
 namespace AI
 {
-	class Planner
-	{
-
-	};
 /* 
  * a general note on ai behavior:
  * instead of planning every last step of of a plan in relationship
@@ -21,10 +17,17 @@ namespace AI
  * each step of the golden plan
  */
 
-
 /************************************************************************/
 /* goals, actions [action effects], keys/conditions						*/
 /************************************************************************/
+
+	class Planner
+	{
+	public:
+		class Conditions;
+		class Action;
+		class Plan;
+	};
 
 } // namespace AI
 
