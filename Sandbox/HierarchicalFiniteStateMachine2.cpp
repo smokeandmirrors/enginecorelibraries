@@ -51,6 +51,7 @@ class Agent
 class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 
 public:
@@ -68,6 +69,8 @@ private:
 	int m_runTimeVariable;
 }; // class RunTimeAuthorTimeState
 
+DERIVED_RUN_TIME_TYPE_DEFINITION(RunTimeAuthorTimeState, ActionState<Agent>, NULL)
+
 bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState& other) const
 {
 	return m_authorVariable == other.m_authorVariable;
@@ -76,6 +79,7 @@ bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState&
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_AUTHOR_STATE(AuthorTimeState, Agent)
 public:
 
@@ -97,6 +101,8 @@ private:
 	int m_authorVariable;
 }; // class AuthorTimeState
 
+DERIVED_RUN_TIME_TYPE_DEFINITION(AuthorTimeState, ActionState<Agent>, NULL)
+
 int AuthorTimeState::authorTimeState = 0;
 
 bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
@@ -107,6 +113,7 @@ bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
+	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
 public:
 	RunTimeState(void)
@@ -118,23 +125,13 @@ public:
 	}
 }; // class RunTimeState
 
+DERIVED_RUN_TIME_TYPE_DEFINITION(RunTimeState, ActionState<Agent>, NULL)
+
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
 	RUN_TIME_TYPE_DECLARATION
-
 	PURE_STATE(PureState, Agent)
-		/*
-private: 
-	friend class Factory< false >::Internal< PureState >; 
-	static PureState * duplicate(const PureState & source) { return new PureState (source);  } 
-	virtual ActionState < Agent > * getRunTimeCopy(void) const { return NewRunTimeCopy< PureState >(*this); } 
-	virtual void recycle(void) { RecycleRunTimeCopy< PureState >(*this); } 
-	HAS_AUTHOR_TIME_STATE_false( PureState ) 
-	HAS_RUN_TIME_STATE(false) 
-	PureState& operator=(const PureState&); 
-	PureState(const PureState&);
-	*/
 public:
 	PureState(void)
 		: ActionState<Agent>()
@@ -152,7 +149,6 @@ class PureTransitionFX
 	: public TransitionFX<Agent>
 {
 	PURE_TRANSITION_FX(PureTransitionFX, Agent)
-
 public:
 	PureTransitionFX(void)
 	{
@@ -195,10 +191,18 @@ void HFSM2::test(void)
 	StateMachine<Agent>* stateMachine1 = NewAuthorCopy<StateMachine<Agent>>(); // ("state/machine 0/x");
 
 	PureState* pureState = NewAuthorCopy<PureState>(); // ("state");
+	PureState* pureState2 = NewAuthorCopy<PureState>(); // ("state");
+	PureState* pureState3 = NewAuthorCopy<PureState>(); // ("state");
 	AuthorTimeState* authorTimeState(NewAuthorCopy<AuthorTimeState, int>(5));
+	AuthorTimeState* authorTimeState2(NewAuthorCopy<AuthorTimeState, int>(5));
+	AuthorTimeState* authorTimeState3(NewAuthorCopy<AuthorTimeState, int>(5));
 	RunTimeState* runTimeState(NewAuthorCopy<RunTimeState>());
+	RunTimeState* runTimeState2(NewAuthorCopy<RunTimeState>());
+	RunTimeState* runTimeState3(NewAuthorCopy<RunTimeState>());
 	RunTimeAuthorTimeState* authorTimeRunTimeState(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
-	
+	RunTimeAuthorTimeState* authorTimeRunTimeState2(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
+	RunTimeAuthorTimeState* authorTimeRunTimeState3(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
+
 	ActionState<Agent>* state1 = runTimeState;
 	ActionState<Agent>* state2 = NewAuthorCopy<PureState>();
 	StateMachine<Agent>* stateMachine2 = NewAuthorCopy< StateMachine<Agent> >(); // ("state/machine 3/1");
