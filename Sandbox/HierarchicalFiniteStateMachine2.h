@@ -26,13 +26,13 @@
 
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
 	public:\
+	virtual void recycle(void) { Factory< CLASS_NAME >::RecycleRunTimeCopy(*this); } \
 	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
 	HAS_RUN_TIME_STATE(RUN_TIME) \
 	private:\
-	friend class Factory< AUTHOR_TIME >::Internal< CLASS_NAME >; \
+	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
-	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return NewRunTimeCopy< CLASS_NAME >(*this); } \
-	virtual void recycle(void) { RecycleRunTimeCopy< CLASS_NAME >(*this); } \
+	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::NewRunTimeCopy(*this); } \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
 	
 #define AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
@@ -52,6 +52,8 @@
 	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
 #define STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	private:\
+	RUN_TIME_TYPE_DECLARATION \
 	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
 #define TRANSITION_FX_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
@@ -62,6 +64,8 @@
 	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
 #define STATE_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
+	private:\
+	RUN_TIME_TYPE_DECLARATION \
 	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
 #define TRANSITION_FX_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
@@ -72,6 +76,8 @@
 	RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
 #define STATE_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	private:\
+	RUN_TIME_TYPE_DECLARATION \
 	RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
 #define TRANSITION_FX_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
@@ -82,6 +88,8 @@
 	PURE_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
 #define PURE_STATE(CLASS_NAME, TYPE_NAME) \
+	private:\
+	RUN_TIME_TYPE_DECLARATION \
 	PURE_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
 #define PURE_TRANSITION_FX(CLASS_NAME, TYPE_NAME) \
@@ -113,7 +121,7 @@ class ActionState
 {	
 	RUN_TIME_TYPE_DECLARATION
 
-	friend class Factory<false>::Internal< ActionState<AGENT> >;
+	friend class FactorySelector<false>::Internal< ActionState<AGENT> >;
 	friend class StateMachine<AGENT>;
 		
 public:
@@ -182,15 +190,13 @@ protected:
 template<typename AGENT>
 class Condition
 {
-	// friend class Factory< Condition<AGENT>>;
-	friend class Factory<false>::Internal< Condition<AGENT> >;
+	friend class FactorySelector<false>::Internal< Condition<AGENT> >;
 
 public:
 	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
 
 	bool operator()(AGENT* agent)
 	{
-		// printf("isSatisfied() %s\n", name);
 		return isSatisfied(agent);
 	}
 
@@ -255,12 +261,15 @@ class StateMachine
 	: public ActionState<AGENT>
 {
 	template<typename AGENT> class State;
-	// friend class Factory< StateMachine<AGENT>>;
-	friend class Factory<true>::Internal< StateMachine<AGENT> >;
+	friend class FactorySelector<true>::Internal< StateMachine<AGENT> >;
 	
 	RUN_TIME_TYPE_DECLARATION
 
 public:
+	/** 
+	ALL STATE MACHINES HAVE AUTHOR TIME STATE BY DEFINITION.
+	LEAVE THIS VALUE ALONE 
+	*/
 	static const bool hasAuthorTimeState = true;
 
 	virtual void act(Traversal<AGENT>& traversal)
@@ -412,27 +421,12 @@ protected:
 			state->recycle();
 		}
 	}; // struct RecycleState
-		
-	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
-	{
-		if (connection.fx)
-		{	
-			assert(getState(connection.next));
-			ActionState<AGENT>& nextAction(getState(connection.next)->state);
-			connection.fx->effect(agent, *this, current.state, nextAction);
-		}
-	}
-
-	static StateMachine<AGENT>* duplicate(const StateMachine<AGENT>& source)
-	{	// todo reword this with the code below
-		return source.duplicate();
-	}
-
-	virtual StateMachine<AGENT>* duplicate(void) const
-	{
+	
+	static StateMachine<AGENT>* duplicate(const StateMachine<AGENT>& source) 
+	{	
 		StateMachine<AGENT>& master(*(new StateMachine<AGENT>));
-		
-		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), i_sentinel(states.end())
+
+		for (std::vector< State<AGENT>* >::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
 			; i != i_sentinel
 			; ++i)
 		{
@@ -441,12 +435,12 @@ protected:
 			master.add(*actionState);
 		}
 
-		for (StateKey from(0), sentinel(states.size())
+		for (StateKey from(0), sentinel(source.states.size())
 			; from < sentinel
 			; ++from)
 		{
-			const State<AGENT>& state(*states[from]);
-			
+			const State<AGENT>& state(*source.states[from]);
+
 			for (std::vector< Connection<AGENT> >::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
 				; j != j_sentinel
 				; ++j)
@@ -462,6 +456,27 @@ protected:
 		}
 
 		return &master;
+	}
+
+	StateMachine()
+		: ActionState()
+	{
+		/* empty */
+	}
+
+	~StateMachine(void)
+	{
+		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
+	}
+
+	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
+	{
+		if (connection.fx)
+		{	
+			assert(getState(connection.next));
+			ActionState<AGENT>& nextAction(getState(connection.next)->state);
+			connection.fx->effect(agent, *this, current.state, nextAction);
+		}
 	}
 
 	void enterCurrent(Traversal<AGENT>& traversal)
@@ -519,11 +534,11 @@ protected:
 		return getState(traversal.getState());
 	}
 
-	virtual StateMachine<AGENT>* getRunTimeCopy(void) const
-	{
-		return NewRunTimeCopy<StateMachine<Agent>>(*this);
+	virtual ActionState<AGENT>* getRunTimeCopy(void) const
+	{	/// \todo remove this
+		return NULL;
 	}
-
+	
 	inline State<AGENT>* getState(StateKey key) const
 	{
 		assert(key < static_cast<StateKey>(states.size()));
@@ -549,7 +564,7 @@ protected:
 	}
 
 	bool isEqualToAtAuthorTime(const StateMachine<AGENT>& other) const
-	{	// \todo make sure this is correct
+	{	
 		return this == &other;
 	}
 
@@ -566,25 +581,14 @@ protected:
 	}
 	
 private:
-	StateMachine()
-		: ActionState()
-	{
-		/* empty */
-	}
-
-	~StateMachine(void)
-	{
-		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
-	}
-
 	std::vector< State<AGENT>* > states;
 }; // class StateMachine
 
 template<typename AGENT>
 class TransitionFX
 {
-	// friend class Factory< TransitionFX<AGENT>>;
-	friend class Factory<false>::Internal< TransitionFX<AGENT> >;
+	// friend class FactorySelector< TransitionFX<AGENT>>;
+	friend class FactorySelector<false>::Internal< TransitionFX<AGENT> >;
 	friend class StateMachine<AGENT>;
 
 public:
@@ -618,7 +622,7 @@ class Traversal
 {	
 	friend class ActionState<AGENT>;
 	friend class StateMachine<AGENT>;
-	// keeps the agent, current path through the tree (and the required state?)
+	
 public:
 	AGENT& agent;
 

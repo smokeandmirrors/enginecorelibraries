@@ -2,8 +2,13 @@
 #ifndef AUTHOR_TIME_RUN_TIME_FACTORY_H
 #define AUTHOR_TIME_RUN_TIME_FACTORY_H
 
+/*
+ \todo make these singeltons so that all of their 
+ destroy functions can get called at once
+*/
+
 template<bool HAS_AUTHOR_TIME_STATE>
-class Factory
+class FactorySelector
 {
 public:
 	template<typename OBJECT>
@@ -101,14 +106,14 @@ public:
 	private:
 		static std::vector<OBJECT*> m_objects;
 	}; // Internal
-}; // Factory
+}; // FactorySelector
 
 template<bool HAS_AUTHOR_TIME_STATE>
 template<typename OBJECT>
-std::vector<OBJECT*> Factory<HAS_AUTHOR_TIME_STATE>::Internal<OBJECT>::m_objects;
+std::vector<OBJECT*> FactorySelector<HAS_AUTHOR_TIME_STATE>::Internal<OBJECT>::m_objects;
 
 template<> /* template specialization for no author time state */
-class Factory<false>
+class FactorySelector<false>
 {
 public:
 	template<typename OBJECT>
@@ -169,36 +174,37 @@ public:
 };
 
 template<typename OBJECT>
-OBJECT* Factory<false>::Internal<OBJECT>::m_object;
-
-template<typename OBJECT, typename ARGS>
-OBJECT* NewAuthorCopy(const ARGS& args)
-{
-	return Factory< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);
-};
+OBJECT* FactorySelector<false>::Internal<OBJECT>::m_object;
 
 template<typename OBJECT>
-OBJECT* NewAuthorCopy(void)
+class Factory
 {
-	return Factory< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy();
-}
+public:
+	template<typename ARGS>
+	static OBJECT* NewAuthorCopy(const ARGS& args)
+	{
+		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);
+	}; 
 
-template<typename OBJECT>
-OBJECT* NewRunTimeCopy(const OBJECT& object)
-{
-	return Factory< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getRunTimeCopy(object);
-}
+	static OBJECT* NewAuthorCopy(void)
+	{
+		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy();
+	}
 
-template<typename OBJECT>
-void RecycleRunTimeCopy(OBJECT& object)
-{
-	Factory< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::recycle(object);
-}
+	static OBJECT* NewRunTimeCopy(const OBJECT& object)
+	{
+		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getRunTimeCopy(object);
+	}
 
-template<typename OBJECT>
-void DestroyAuthorCopies(void)
-{
-	Factory< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyObjects();
-}
+	static void RecycleRunTimeCopy(OBJECT& object)
+	{
+		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::recycle(object);
+	}
+
+	static void DestroyAuthorCopies(void)
+	{
+		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyObjects();
+	}
+}; // Factory
 
 #endif//AUTHOR_TIME_RUN_TIME_FACTORY_H

@@ -51,7 +51,6 @@ class Agent
 class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 
 public:
@@ -79,7 +78,6 @@ bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState&
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_AUTHOR_STATE(AuthorTimeState, Agent)
 public:
 
@@ -113,7 +111,6 @@ bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	RUN_TIME_TYPE_DECLARATION
 	STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
 public:
 	RunTimeState(void)
@@ -130,7 +127,7 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(RunTimeState, ActionState<Agent>, NULL)
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
-	RUN_TIME_TYPE_DECLARATION
+	
 	PURE_STATE(PureState, Agent)
 public:
 	PureState(void)
@@ -161,101 +158,108 @@ public:
 	}
 }; // class PureTransitionFX
 
+class StateMachineThree
+	: public StateMachine<Agent>
+{
+	STATE_WITH_RUN_TIME_STATE(StateMachineThree, Agent)
+
+protected:
+	StateMachineThree()
+	{
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+		
+		ActionState<Agent>* state7 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state8 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state9 = Factory<PureState>::NewAuthorCopy();
+
+		StateKey key7 = add(*state7);
+		StateKey key8 = add(*state8);
+		StateKey key9 = add(*state9);
+
+		connect(key7, *condition1, key8, transitionFX1);
+		connect(key8, *condition1, key9, transitionFX1);
+	}
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineThree, StateMachine<Agent>, NULL)
+
+class StateMachineTwo
+	: public StateMachine<Agent>
+{
+	STATE_WITH_RUN_TIME_STATE(StateMachineTwo, Agent)
+
+protected:
+	StateMachineTwo()
+	{
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+
+		ActionState<Agent>* state4 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state5 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state6 = Factory<StateMachineThree>::NewAuthorCopy();
+
+		StateKey key7 = add(*state4);
+		StateKey key8 = add(*state5);
+		StateKey key9 = add(*state6);
+
+		connect(key7, *condition1, key8, transitionFX1);
+		connect(key8, *condition1, key9, transitionFX1);
+	}
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineTwo, StateMachine<Agent>, NULL)
+	
+class StateMachineOne
+	: public StateMachine<Agent>
+{
+	STATE_WITH_RUN_TIME_STATE(StateMachineOne, Agent)
+
+protected:
+	StateMachineOne()
+	{
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+
+		ActionState<Agent>* state1 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state2 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state3 = Factory<StateMachineTwo>::NewAuthorCopy();
+
+		StateKey key7 = add(*state1);
+		StateKey key8 = add(*state2);
+		StateKey key9 = add(*state3);
+
+		connect(key7, *condition1, key8, transitionFX1);
+		connect(key8, *condition1, key9, transitionFX1);
+	}
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineOne, StateMachine<Agent>, NULL)
+
 void HFSM2::test(void)
 {
-	AuthorCopyB* bcbw = NewAuthorCopy<AuthorCopyB>();
-	AuthorCopyA* acbw = NewAuthorCopy<AuthorCopyA, int>(2);
-	AuthorCopyA* acbw2 = NewAuthorCopy<AuthorCopyA, int>(2);
-	AuthorCopyB* bcbwo = NewAuthorCopy<AuthorCopyB>();
-	AuthorCopyA* acbwo = NewAuthorCopy<AuthorCopyA>();
-	AuthorCopyA* acbwo2 = NewAuthorCopy<AuthorCopyA>();
-
-	DestroyAuthorCopies<AuthorCopyA>();
-	DestroyAuthorCopies<AuthorCopyB>();
-	
 	Agent gamma;
 	Traversal<Agent> alpha(gamma);
-
-	TransitionFX<Agent>* transitionFX1 = NewAuthorCopy<PureTransitionFX>(); // ("transition fx");
-	TransitionFX<Agent>* transitionFX2 = transitionFX1;
-	// TransitionFX<Agent>* transitionFX3 = transitionFX1;
-
-	ConditionTrue<Agent>* condition1 = NewAuthorCopy<ConditionTrue<Agent>>(); // ("condition");
-	ConditionTrue<Agent>* condition2 = condition1;
-	ConditionTrue<Agent>* condition3 = condition1;
-	ConditionTrue<Agent>* condition4 = condition1;
-	ConditionTrue<Agent>* condition5 = condition1;
-	ConditionTrue<Agent>* condition6 = condition1;
-//	ConditionTrue<Agent>* condition7 = condition1;
-
-	StateMachine<Agent>* stateMachine1 = NewAuthorCopy<StateMachine<Agent>>(); // ("state/machine 0/x");
-
-	PureState* pureState = NewAuthorCopy<PureState>(); // ("state");
-	PureState* pureState2 = NewAuthorCopy<PureState>(); // ("state");
-	PureState* pureState3 = NewAuthorCopy<PureState>(); // ("state");
-	AuthorTimeState* authorTimeState(NewAuthorCopy<AuthorTimeState, int>(5));
-	AuthorTimeState* authorTimeState2(NewAuthorCopy<AuthorTimeState, int>(5));
-	AuthorTimeState* authorTimeState3(NewAuthorCopy<AuthorTimeState, int>(5));
-	RunTimeState* runTimeState(NewAuthorCopy<RunTimeState>());
-	RunTimeState* runTimeState2(NewAuthorCopy<RunTimeState>());
-	RunTimeState* runTimeState3(NewAuthorCopy<RunTimeState>());
-	RunTimeAuthorTimeState* authorTimeRunTimeState(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
-	RunTimeAuthorTimeState* authorTimeRunTimeState2(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
-	RunTimeAuthorTimeState* authorTimeRunTimeState3(NewAuthorCopy<RunTimeAuthorTimeState, int>(3));
-
-	ActionState<Agent>* state1 = runTimeState;
-	ActionState<Agent>* state2 = NewAuthorCopy<PureState>();
-	StateMachine<Agent>* stateMachine2 = NewAuthorCopy< StateMachine<Agent> >(); // ("state/machine 3/1");
-	ActionState<Agent>* state4 = NewAuthorCopy<PureState>();
-	ActionState<Agent>* state5 = NewAuthorCopy<PureState>();
-	StateMachine<Agent>* stateMachine3 = NewAuthorCopy<StateMachine<Agent>>(); // ("state/machine 6/2");		
-
-	ActionState<Agent>* state7 = NewAuthorCopy<PureState>();
-	ActionState<Agent>* state8 = NewAuthorCopy<PureState>();
-	ActionState<Agent>* state9 = NewAuthorCopy<PureState>();
-
-	{
-		StateKey key1 = stateMachine1->add(*state1);
-		StateKey key2 = stateMachine1->add(*state2);
-		StateKey key3 = stateMachine1->add(*stateMachine2);
-		stateMachine1->connect(key1, *condition1, key2, transitionFX1);
-		stateMachine1->connect(key2, *condition2, key3, transitionFX2);
-	}
-
-	{
-		StateKey key4 = stateMachine2->add(*state4);
-		StateKey key5 = stateMachine2->add(*state5);
-		StateKey key6 = stateMachine2->add(*stateMachine3);
-		stateMachine2->connect(key4, *condition3, key5, transitionFX1);
-		stateMachine2->connect(key5, *condition4, key6, transitionFX2);
-	}
-
-	{
-		StateKey key7 = stateMachine3->add(*state7);
-		StateKey key8 = stateMachine3->add(*state8);
-		StateKey key9 = stateMachine3->add(*state9);
-		stateMachine3->connect(key7, *condition5, key8, transitionFX1);
-		stateMachine3->connect(key8, *condition6, key9, transitionFX2);
-		//stateMachine3->connect(key9, *condition7, key7, transitionFX3);
-	}
-
-	StateMachine<Agent>* stateMachineRun = NewRunTimeCopy<StateMachine<Agent>>(*stateMachine1);
-
-	alpha.start(*stateMachineRun);
+	StateMachineOne* stateMachineOne(Factory<StateMachineOne>::NewAuthorCopy());
+	StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::NewRunTimeCopy(*stateMachineOne));
+	alpha.start(*stateMachineOneRun);
 
 	for (int i = 0; i < 12; ++i)
 	{
 		alpha.act();
 	}
-	
+
 	bool is_in_state = alpha.isInState(PureState::runTimeType);
 	alpha.stop();		
-	stateMachine1->recycle();
 	
-	DestroyAuthorCopies<PureTransitionFX>();
-	DestroyAuthorCopies<ConditionTrue<Agent>>();
-	DestroyAuthorCopies<StateMachine<Agent>>();
-	DestroyAuthorCopies<ActionState<Agent>>();
+	stateMachineOneRun->recycle();
+	
+	Factory<PureTransitionFX>::DestroyAuthorCopies();
+	Factory<ConditionTrue<Agent>>::DestroyAuthorCopies();
+	Factory<StateMachine<Agent>>::DestroyAuthorCopies();
+	Factory<ActionState<Agent>>::DestroyAuthorCopies();
+	Factory<PureState>::DestroyAuthorCopies();
+	Factory<StateMachineOne>::DestroyAuthorCopies();
+	Factory<StateMachineTwo>::DestroyAuthorCopies();
+	Factory<StateMachineThree>::DestroyAuthorCopies();
+
 
 	BREAKPOINT(0x0);
 }
