@@ -8,6 +8,7 @@
 
 #include "Platform.h"
 #include "AuthorTimeRunTimeFactory.h"
+#include "Composition.h"
 
 #include <algorithm>
 #include <vector>
@@ -110,9 +111,11 @@ void test(void);
 template<typename AGENT>
 class ActionState
 {	
+	RUN_TIME_TYPE_DECLARATION
+
 	friend class Factory<false>::Internal< ActionState<AGENT> >;
 	friend class StateMachine<AGENT>;
-
+		
 public:
 	static const bool hasAuthorTimeState = false;
 
@@ -255,6 +258,8 @@ class StateMachine
 	// friend class Factory< StateMachine<AGENT>>;
 	friend class Factory<true>::Internal< StateMachine<AGENT> >;
 	
+	RUN_TIME_TYPE_DECLARATION
+
 public:
 	static const bool hasAuthorTimeState = true;
 
@@ -312,6 +317,27 @@ public:
 		assert(fromState != NULL);
 		assert(states[to] != NULL);
 		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
+	}
+
+	virtual bool isInState(const Traversal<AGENT>& traversal, const designPatterns::RunTimeType& type) const
+	{
+		if (this->getRunTimeType().IS_A(type))
+			return true;
+
+		const StateMachine<AGENT>* machine(this);
+		Depth depth(0);
+
+		while (depth < traversal.getDepth())
+		{
+			machine = static_cast<const StateMachine<AGENT>*>(&machine->states[traversal.getState(depth)]->state);
+			
+			if (machine->getRunTimeType().IS_A(type))
+				return true;
+
+			++depth;
+		}
+
+		return machine->states[traversal.getState()]->state.getRunTimeType().IS_A(type);
 	}
 	
 	virtual void recycle(void)
@@ -633,6 +659,11 @@ public:
 		return traversal[depth].state;
 	}
 
+	bool isInState(const designPatterns::RunTimeType& type) const
+	{
+		return stateMachine && stateMachine->isInState(*this, type);
+	}
+
 	void start(StateMachine<AGENT>& machine)
 	{
 		if (stateMachine && (&machine) != stateMachine)
@@ -664,7 +695,7 @@ public:
 		}
 	}
 
-public: // protected:	
+protected: 
 	void enter(ConnectionKey cause, StateKey state)
 	{
 		++currentDepth;
@@ -736,6 +767,10 @@ public:
 		state = s;
 	}
 }; // TraversalEntry
+
+DEFINE_TEMPLATE_BASE_RUN_TIME_TYPE(AGENT, ActionState, NULL)
+
+DEFINE_TEMPLATE_DERIVED_RUN_TIME_TYPE(AGENT, StateMachine, ActionState<AGENT>, NULL)
 
 } // namespace HFSM
 

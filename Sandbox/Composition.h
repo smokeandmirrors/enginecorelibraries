@@ -36,20 +36,28 @@ Tested in the field	:	NO
 #include "Synchronization.h"
 #include "Singleton.h"
 
-#define DEFINE_BASE_RUN_TIME_TYPE(CLASS_NAME, ...) \
+#define DEFINE_TEMPLATE_BASE_RUN_TIME_TYPE(TEMPLATE, CLASS_NAME, ...) \
+	template<typename TEMPLATE> const designPatterns::RunTimeType* const CLASS_NAME <TEMPLATE>::interfaces[] = { __VA_ARGS__ }; \
+	template<typename TEMPLATE> const designPatterns::RunTimeType CLASS_NAME <TEMPLATE>::runTimeType(NULL, CLASS_NAME <TEMPLATE>::interfaces);
+
+#define DEFINE_TEMPLATE_DERIVED_RUN_TIME_TYPE(TEMPLATE, CLASS_NAME, SUPER_CLASS_NAME, ...) \
+	template<typename TEMPLATE> const designPatterns::RunTimeType* const CLASS_NAME <TEMPLATE>::interfaces[] = { __VA_ARGS__ }; \
+	template<typename TEMPLATE> const designPatterns::RunTimeType CLASS_NAME <TEMPLATE>::runTimeType(& SUPER_CLASS_NAME::runTimeType, CLASS_NAME <TEMPLATE>::interfaces);
+
+#define BASE_RUN_TIME_TYPE_DEFINITION(CLASS_NAME, ...) \
 	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
 	const designPatterns::RunTimeType CLASS_NAME::runTimeType(NULL, CLASS_NAME::interfaces);
 
-#define DEFINE_DERIVED_RUN_TIME_TYPE(CLASS_NAME, SUPER_CLASS_NAME, ...) \
+#define DERIVED_RUN_TIME_TYPE_DEFINITION(CLASS_NAME, SUPER_CLASS_NAME, ...) \
 	const designPatterns::RunTimeType* const CLASS_NAME::interfaces[] = { __VA_ARGS__ }; \
 	const designPatterns::RunTimeType CLASS_NAME::runTimeType(& SUPER_CLASS_NAME::runTimeType, CLASS_NAME::interfaces);
 
-#define DECLARE_RUN_TIME_TYPE \
+#define RUN_TIME_TYPE_DECLARATION \
 	public: \
 		static const designPatterns::RunTimeType runTimeType; \
-		const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; } \
+		virtual const designPatterns::RunTimeType& getRunTimeType(void) const { return runTimeType; } \
 	private: \
-		static const RunTimeType* const interfaces[];
+		static const designPatterns::RunTimeType* const interfaces[];
 
 namespace designPatterns
 {

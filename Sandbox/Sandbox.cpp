@@ -42,9 +42,9 @@ class Movement
 	: public Component<Agent>
 {
 public:
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 };
-DEFINE_BASE_RUN_TIME_TYPE(Movement, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Movement, NULL);
 
 
 typedef enum AttackInhibition
@@ -65,7 +65,7 @@ public:
 class Attack
 	: public Component<Agent>
 {
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 public:
 	void update(void)
 	{
@@ -80,49 +80,49 @@ public:
 private:
 	std::vector<AttackImplementation*> m_inhibitors;
 };
-DEFINE_BASE_RUN_TIME_TYPE(Attack, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Attack, NULL);
 
 class Defense
 	: public Component<Agent>
 {
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 public:
 };
-DEFINE_BASE_RUN_TIME_TYPE(Defense, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Defense, NULL);
 
 class Damageable
 {
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 public:
 	virtual ~Damageable(void)=0 {}
 };
-DEFINE_BASE_RUN_TIME_TYPE(Damageable, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Damageable, NULL);
 
 class Healable
 {
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 public:
 	virtual ~Healable(void)=0 {}
 };
-DEFINE_BASE_RUN_TIME_TYPE(Healable, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Healable, NULL);
 
 class Patchable
 {
-	DECLARE_RUN_TIME_TYPE
+	RUN_TIME_TYPE_DECLARATION
 public:
 	virtual ~Patchable(void)=0 {}
 };
-DEFINE_BASE_RUN_TIME_TYPE(Patchable, NULL);
+BASE_RUN_TIME_TYPE_DEFINITION(Patchable, NULL);
 
 class ActiveCover
 	: public Defense
 	, public Damageable
 	, public Healable
 {
-	DECLARE_RUN_TIME_TYPE;
+	RUN_TIME_TYPE_DECLARATION;
 };
 
-DEFINE_DERIVED_RUN_TIME_TYPE(ActiveCover, Defense, &Healable::runTimeType, &Damageable::runTimeType, NULL);
+DERIVED_RUN_TIME_TYPE_DEFINITION(ActiveCover, Defense, &Healable::runTimeType, &Damageable::runTimeType, NULL);
 
 class Shadows
 	: public Component<VisualFX>

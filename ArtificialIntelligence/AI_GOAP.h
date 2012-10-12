@@ -7,7 +7,10 @@
 
 namespace AI
 {
+	class Planner
+	{
 
+	};
 /* 
  * a general note on ai behavior:
  * instead of planning every last step of of a plan in relationship

@@ -4,6 +4,11 @@
 using namespace HFSM2;
 using namespace designPatterns;
 
+// typedef ActionState<Agent> AgentActionState;
+
+// BASE_RUN_TIME_TYPE_DEFINITION(AgentActionState, NULL)
+// DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachine<Agent>, ActionState<Agent>, NULL)
+
 class AuthorCopyA 
 {
 public:
@@ -116,6 +121,8 @@ public:
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
+	RUN_TIME_TYPE_DECLARATION
+
 	PURE_STATE(PureState, Agent)
 		/*
 private: 
@@ -138,6 +145,8 @@ public:
 	}
 
 }; // class PureState
+
+DERIVED_RUN_TIME_TYPE_DEFINITION(PureState, ActionState<Agent>, NULL)
 
 class PureTransitionFX
 	: public TransitionFX<Agent>
@@ -234,9 +243,9 @@ void HFSM2::test(void)
 	{
 		alpha.act();
 	}
-
-	alpha.stop();	
 	
+	bool is_in_state = alpha.isInState(PureState::runTimeType);
+	alpha.stop();		
 	stateMachine1->recycle();
 	
 	DestroyAuthorCopies<PureTransitionFX>();
