@@ -478,6 +478,10 @@ void onPlay(void)
 
 	testHFSM2();
 
+	bool shouldQuit(true);
+	if (shouldQuit)
+		return;
+
 	/*
 	for (int i = 4; i < 10; ++i)
 	{

@@ -3,7 +3,7 @@
 #define AUTHOR_TIME_RUN_TIME_FACTORY_H
 
 /*
- \todo make these singeltons so that all of their 
+ \todo make these singletons so that all of their 
  destroy functions can get called at once
 */
 
@@ -173,6 +173,34 @@ public:
 	}; 
 };
 
+extern class FactoryDestroyer* factoryDestroyers;
+
+class FactoryDestroyer
+{
+public:
+	virtual ~FactoryDestroyer(void) {};
+	virtual void destroy(void) const=0;
+	FactoryDestroyer* next;
+}; // class FactoryDestroyer
+
+template<typename T>
+class CustomFactoryDestroyer : public FactoryDestroyer
+{
+public:
+	CustomFactoryDestroyer()
+	{
+		next = factoryDestroyers;
+		factoryDestroyers = this;
+	}
+	
+	virtual void destroy(void) const
+	{
+		T::destroyObjects();
+	}
+}; // class CustomFactoryDestroyer
+
+inline void destroyFactoryObjects(void);
+
 template<typename OBJECT>
 OBJECT* FactorySelector<false>::Internal<OBJECT>::m_object;
 
@@ -183,11 +211,13 @@ public:
 	template<typename ARGS>
 	static OBJECT* NewAuthorCopy(const ARGS& args)
 	{
+		initializeDestroyer();
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);
 	}; 
 
 	static OBJECT* NewAuthorCopy(void)
 	{
+		initializeDestroyer();
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy();
 	}
 
@@ -201,10 +231,41 @@ public:
 		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::recycle(object);
 	}
 
-	static void DestroyAuthorCopies(void)
+	static void destroyObjects(void)
 	{
 		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyObjects();
 	}
+
+protected:
+	static inline void initializeDestroyer(void)
+	{
+		if (!m_objectDestroyer)
+		{
+			m_objectDestroyer = new CustomFactoryDestroyer< Factory<OBJECT> >;
+		}
+	}
+
+private:
+	static CustomFactoryDestroyer< Factory<OBJECT> >* m_objectDestroyer;
 }; // Factory
+
+template<typename OBJECT> CustomFactoryDestroyer< Factory<OBJECT> >* Factory<OBJECT>::m_objectDestroyer;
+
+/*
+template<OBJECT>
+template<> Factory<OBJECT>* Singleton< Factory<OBJECT> >::singleton(NULL); \
+	static CustomSingletonController< Factory<OBJECT> > BASE_CLASS##Initializer; \
+	*/
+
+void destroyFactoryObjects(void)
+{
+	FactoryDestroyer* destroyer(factoryDestroyers);
+
+	while (destroyer)
+	{
+		destroyer->destroy();
+		destroyer = destroyer->next;
+	}
+}
 
 #endif//AUTHOR_TIME_RUN_TIME_FACTORY_H

@@ -30,8 +30,6 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
-#include "Platform.h"
-
 namespace designPatterns
 {
 
@@ -121,12 +119,9 @@ private:
 	/** 
 	the single, static instance of T 
 	*/
-	static T* singleton;	
+	static T* singleton;
 }; // class Singleton
 
-// static initialization
-// template<typename T> T* Singleton<T>::single(NULL); 
-// template<typename T> CustomSingletonController<T> Singleton<T>::initializer;
 } // namespace designPatterns
 
 // for template singletons, typedef the namespace first

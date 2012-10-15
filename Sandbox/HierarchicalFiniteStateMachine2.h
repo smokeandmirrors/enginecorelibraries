@@ -351,7 +351,8 @@ public:
 	
 	virtual void recycle(void)
 	{
-		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());		
+		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());
+		delete this;
 	}
 
 protected:
@@ -422,17 +423,21 @@ protected:
 		}
 	}; // struct RecycleState
 	
-	static StateMachine<AGENT>* duplicate(const StateMachine<AGENT>& source) 
+	StateMachine()
+		: ActionState()
+	{
+		/* empty */
+	}
+	
+	StateMachine(const StateMachine<AGENT>& source)
 	{	
-		StateMachine<AGENT>& master(*(new StateMachine<AGENT>));
-
 		for (std::vector< State<AGENT>* >::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
 			; i != i_sentinel
 			; ++i)
 		{
 			ActionState<AGENT>* actionState((*i)->state.getRunTimeCopy());
 			assert(actionState);
-			master.add(*actionState);
+			add(*actionState);
 		}
 
 		for (StateKey from(0), sentinel(source.states.size())
@@ -451,17 +456,9 @@ protected:
 				Condition<AGENT>& cause(*duplicateCause); 
 				TransitionFX<AGENT>* fx(connection.fx ? connection.fx->getRunTimeCopy() : NULL);
 				const StateKey to(connection.next);
-				master.connect(from, cause, to, fx);
+				connect(from, cause, to, fx);
 			}
 		}
-
-		return &master;
-	}
-
-	StateMachine()
-		: ActionState()
-	{
-		/* empty */
 	}
 
 	~StateMachine(void)

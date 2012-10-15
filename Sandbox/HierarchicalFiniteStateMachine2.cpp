@@ -233,6 +233,8 @@ protected:
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineOne, StateMachine<Agent>, NULL)
 
+FactoryDestroyer* factoryDestroyers(NULL);
+
 void HFSM2::test(void)
 {
 	Agent gamma;
@@ -251,15 +253,18 @@ void HFSM2::test(void)
 	
 	stateMachineOneRun->recycle();
 	
-	Factory<PureTransitionFX>::DestroyAuthorCopies();
-	Factory<ConditionTrue<Agent>>::DestroyAuthorCopies();
-	Factory<StateMachine<Agent>>::DestroyAuthorCopies();
-	Factory<ActionState<Agent>>::DestroyAuthorCopies();
-	Factory<PureState>::DestroyAuthorCopies();
-	Factory<StateMachineOne>::DestroyAuthorCopies();
-	Factory<StateMachineTwo>::DestroyAuthorCopies();
-	Factory<StateMachineThree>::DestroyAuthorCopies();
-
+	
+	// Factory<StateMachine<Agent>>::destroyObjects();
+	/*
+	Factory<StateMachineOne>::destroyObjects();
+	Factory<StateMachineTwo>::destroyObjects();
+	Factory<StateMachineThree>::destroyObjects();
+	Factory<PureTransitionFX>::destroyObjects();
+	Factory<ConditionTrue<Agent>>::destroyObjects();
+	Factory<ActionState<Agent>>::destroyObjects();
+	Factory<PureState>::destroyObjects();
+	*/
+	destroyFactoryObjects();
 
 	BREAKPOINT(0x0);
 }

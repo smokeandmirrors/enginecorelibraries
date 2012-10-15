@@ -1,5 +1,11 @@
-#include "Singleton.h"
+#include "Platform.h"
+#include <assert.h>
 #include <vector>
+#include "Singleton.h"
+
+#ifndef IF_DEBUG
+#define IF_DEBUG(code) 
+#endif//IF_DEBUG
 
 namespace designPatterns
 {
