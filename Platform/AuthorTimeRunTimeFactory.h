@@ -10,12 +10,22 @@
 template<bool HAS_AUTHOR_TIME_STATE>
 class FactorySelector
 {
+	/**
+	does the state have run-time state?
+		return a new copy, every time.
+
+	does the state have author-time state?
+		return a single copy on a per author-time basis.
+
+	else
+		return a single copy.
+	*/			
 public:
 	template<typename OBJECT>
 	class Internal
 	{
 	public:
-		static void destroyObjects(void)
+		static void destroyAuthorCopies(void)
 		{
 			for (std::vector<OBJECT*>::iterator i(m_objects.begin()), sentinel(m_objects.end())
 				; i != sentinel
@@ -23,6 +33,8 @@ public:
 			{
 				delete *i;
 			}
+
+			m_objects.resize(0);
 		}
 
 		template<typename ARGS>
@@ -58,16 +70,6 @@ public:
 
 		static OBJECT* getRunTimeCopy(const OBJECT& object)
 		{
-			/**
-			does the state have run-time state?
-				return a new copy, every time.
-
-			does the state have author-time state?
-				return a single copy on a per author-time basis.
-
-			else
-				return a single copy.
-			*/
 			if (object.hasRunTimeState())
 			{
 				return OBJECT::duplicate(object);
@@ -82,7 +84,7 @@ public:
 		{
 			if (object.hasRunTimeState())
 			{
-				delete &object;
+				object.recycleRunTimeCopy();
 			}
 		}
 
@@ -120,7 +122,7 @@ public:
 	class Internal
 	{
 	public:
-		static void destroyObjects(void)
+		static void destroyAuthorCopies(void)
 		{
 			delete m_object;
 			m_object = NULL;
@@ -140,16 +142,6 @@ public:
 
 		static OBJECT* getRunTimeCopy(const OBJECT& object)
 		{
-			/**
-			does the state have run-time state?
-				return a new copy, every time.
-
-			does the state have author-time state?
-				return a single copy on a per author-time basis.
-
-			else
-				return a single copy.
-			*/
 			if (object.hasRunTimeState())
 			{
 				return OBJECT::duplicate(object);
@@ -164,7 +156,7 @@ public:
 		{
 			if (object.hasRunTimeState())
 			{
-				delete &object;
+				object.recycleRunTimeCopy();
 			}
 		}
 
@@ -195,11 +187,11 @@ public:
 	
 	virtual void destroy(void) const
 	{
-		T::destroyObjects();
+		T::destroyAuthorCopies();
 	}
 }; // class CustomFactoryDestroyer
 
-inline void destroyFactoryObjects(void);
+inline void destroyAllAuthorTimeFactoryObjects(void);
 
 template<typename OBJECT>
 OBJECT* FactorySelector<false>::Internal<OBJECT>::m_object;
@@ -209,31 +201,31 @@ class Factory
 {
 public:
 	template<typename ARGS>
-	static OBJECT* NewAuthorCopy(const ARGS& args)
+	static OBJECT* getAuthorCopy(const ARGS& args)
 	{
 		initializeDestroyer();
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);
 	}; 
 
-	static OBJECT* NewAuthorCopy(void)
+	static OBJECT* getAuthorCopy(void)
 	{
 		initializeDestroyer();
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy();
 	}
 
-	static OBJECT* NewRunTimeCopy(const OBJECT& object)
+	static OBJECT* getRunTimeCopy(const OBJECT& object)
 	{
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getRunTimeCopy(object);
 	}
 
-	static void RecycleRunTimeCopy(OBJECT& object)
+	static void recycleRunTimeCopy(OBJECT& object)
 	{
 		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::recycle(object);
 	}
 
-	static void destroyObjects(void)
+	static void destroyAuthorCopies(void)
 	{
-		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyObjects();
+		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyAuthorCopies();
 	}
 
 protected:
@@ -257,7 +249,7 @@ template<> Factory<OBJECT>* Singleton< Factory<OBJECT> >::singleton(NULL); \
 	static CustomSingletonController< Factory<OBJECT> > BASE_CLASS##Initializer; \
 	*/
 
-void destroyFactoryObjects(void)
+void destroyAllAuthorTimeFactoryObjects(void)
 {
 	FactoryDestroyer* destroyer(factoryDestroyers);
 
@@ -266,6 +258,8 @@ void destroyFactoryObjects(void)
 		destroyer->destroy();
 		destroyer = destroyer->next;
 	}
+
+	factoryDestroyers = NULL;
 }
 
 #endif//AUTHOR_TIME_RUN_TIME_FACTORY_H

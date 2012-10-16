@@ -4,11 +4,6 @@
 using namespace HFSM2;
 using namespace designPatterns;
 
-// typedef ActionState<Agent> AgentActionState;
-
-// BASE_RUN_TIME_TYPE_DEFINITION(AgentActionState, NULL)
-// DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachine<Agent>, ActionState<Agent>, NULL)
-
 class AuthorCopyA 
 {
 public:
@@ -135,7 +130,7 @@ public:
 	{
 		static int pureStateCount(0);
 		++pureStateCount;
-		assert(pureStateCount == 1);
+		// assert(pureStateCount == 1);
 	}
 
 }; // class PureState
@@ -166,12 +161,12 @@ class StateMachineThree
 protected:
 	StateMachineThree()
 	{
-		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
-		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::getAuthorCopy(); 
 		
-		ActionState<Agent>* state7 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state8 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state9 = Factory<PureState>::NewAuthorCopy();
+		ActionState<Agent>* state7 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state8 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state9 = Factory<PureState>::getAuthorCopy();
 
 		StateKey key7 = add(*state7);
 		StateKey key8 = add(*state8);
@@ -180,6 +175,8 @@ protected:
 		connect(key7, *condition1, key8, transitionFX1);
 		connect(key8, *condition1, key9, transitionFX1);
 	}
+
+	int memoryTest[20480];
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineThree, StateMachine<Agent>, NULL)
 
@@ -191,12 +188,12 @@ class StateMachineTwo
 protected:
 	StateMachineTwo()
 	{
-		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
-		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::getAuthorCopy(); 
 
-		ActionState<Agent>* state4 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state5 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state6 = Factory<StateMachineThree>::NewAuthorCopy();
+		ActionState<Agent>* state4 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state5 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state6 = Factory<StateMachineThree>::getAuthorCopy();
 
 		StateKey key7 = add(*state4);
 		StateKey key8 = add(*state5);
@@ -205,6 +202,9 @@ protected:
 		connect(key7, *condition1, key8, transitionFX1);
 		connect(key8, *condition1, key9, transitionFX1);
 	}
+
+	int memoryTest[20480];
+
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineTwo, StateMachine<Agent>, NULL)
 	
@@ -216,12 +216,12 @@ class StateMachineOne
 protected:
 	StateMachineOne()
 	{
-		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::NewAuthorCopy(); 
-		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::NewAuthorCopy(); 
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
+		ConditionTrue<Agent>* condition1 = Factory<ConditionTrue<Agent>>::getAuthorCopy(); 
 
-		ActionState<Agent>* state1 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state2 = Factory<PureState>::NewAuthorCopy();
-		ActionState<Agent>* state3 = Factory<StateMachineTwo>::NewAuthorCopy();
+		ActionState<Agent>* state1 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state2 = Factory<PureState>::getAuthorCopy();
+		ActionState<Agent>* state3 = Factory<StateMachineTwo>::getAuthorCopy();
 
 		StateKey key7 = add(*state1);
 		StateKey key8 = add(*state2);
@@ -237,34 +237,29 @@ FactoryDestroyer* factoryDestroyers(NULL);
 
 void HFSM2::test(void)
 {
-	Agent gamma;
-	Traversal<Agent> alpha(gamma);
-	StateMachineOne* stateMachineOne(Factory<StateMachineOne>::NewAuthorCopy());
-	StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::NewRunTimeCopy(*stateMachineOne));
-	alpha.start(*stateMachineOneRun);
-
-	for (int i = 0; i < 12; ++i)
+	for(;;)
 	{
-		alpha.act();
-	}
+		Agent gamma;
+		Traversal<Agent> alpha(gamma);
+		StateMachineOne* stateMachineOne(Factory<StateMachineOne>::getAuthorCopy());
+		StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::getRunTimeCopy(*stateMachineOne));
+		// StateMachineThree* stateMachineOne(Factory<StateMachineThree>::getAuthorCopy());
+		// StateMachineThree* stateMachineOneRun(Factory<StateMachineThree>::getRunTimeCopy(*stateMachineOne));
+		alpha.start(*stateMachineOneRun);
+		// just test for memory leaks
+		for (int i(0), sentinel(12); i < sentinel; ++i)
+		{
+			alpha.act();
+		}
 
-	bool is_in_state = alpha.isInState(PureState::runTimeType);
-	alpha.stop();		
+		bool is_in_state = alpha.isInState(PureState::runTimeType);
+		alpha.stop();		
+
+		stateMachineOneRun->recycle();
+
+		destroyAllAuthorTimeFactoryObjects();
+	}
 	
-	stateMachineOneRun->recycle();
-	
-	
-	// Factory<StateMachine<Agent>>::destroyObjects();
-	/*
-	Factory<StateMachineOne>::destroyObjects();
-	Factory<StateMachineTwo>::destroyObjects();
-	Factory<StateMachineThree>::destroyObjects();
-	Factory<PureTransitionFX>::destroyObjects();
-	Factory<ConditionTrue<Agent>>::destroyObjects();
-	Factory<ActionState<Agent>>::destroyObjects();
-	Factory<PureState>::destroyObjects();
-	*/
-	destroyFactoryObjects();
 
 	BREAKPOINT(0x0);
 }

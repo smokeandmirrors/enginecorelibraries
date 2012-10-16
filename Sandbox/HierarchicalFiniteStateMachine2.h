@@ -25,14 +25,14 @@
 	virtual bool hasRunTimeState(void) const { return VALUE; } 
 
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
-	public:\
-	virtual void recycle(void) { Factory< CLASS_NAME >::RecycleRunTimeCopy(*this); } \
+	public: \
+	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
 	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
 	HAS_RUN_TIME_STATE(RUN_TIME) \
-	private:\
+	private: \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
-	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::NewRunTimeCopy(*this); } \
+	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
 	
 #define AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
@@ -185,6 +185,7 @@ protected:
 	}
 
 	virtual bool hasRunTimeState(void) const=0;
+	virtual void recycleRunTimeCopy(void) { delete this; }
 }; // class ActionState
 
 template<typename AGENT>
@@ -221,6 +222,7 @@ protected:
 	virtual bool hasRunTimeState(void) const=0;
 
 	virtual bool isSatisfied(AGENT* /*agent*/)=0;
+	virtual void recycleRunTimeCopy(void) { delete this; }
 }; // Condition
 
 template<typename AGENT>
@@ -349,12 +351,6 @@ public:
 		return machine->states[traversal.getState()]->state.getRunTimeType().IS_A(type);
 	}
 	
-	virtual void recycle(void)
-	{
-		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());
-		delete this;
-	}
-
 protected:
 	template<typename AGENT>
 	class Connection
@@ -382,6 +378,11 @@ protected:
 	public:
 		State(ActionState<AGENT>& newState) 
 			: state(newState)
+		{
+			/* empty */
+		}
+
+		~State()
 		{
 			/* empty */
 		}
@@ -462,10 +463,11 @@ protected:
 	}
 
 	~StateMachine(void)
-	{
+	{	// a distinction has to be made between deleting the runtime copies of StateMachines
+		// and deleting the authoring copies of StateMachines
 		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
 	}
-
+	
 	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
 	{
 		if (connection.fx)
@@ -576,6 +578,12 @@ protected:
 		State<AGENT>* current(getCurrentState(traversal));
 		current->state.exit(traversal);
 	}
+
+	virtual void recycleRunTimeCopy(void)
+	{
+		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());
+		delete this;
+	}
 	
 private:
 	std::vector< State<AGENT>* > states;
@@ -609,6 +617,11 @@ protected:
 	virtual TransitionFX<AGENT>* getRunTimeCopy(void) const=0;
 
 	virtual bool hasRunTimeState(void) const=0;
+	
+	virtual void recycleRunTimeCopy(void)
+	{
+		delete this;
+	}
 
 private:
 	int id;
