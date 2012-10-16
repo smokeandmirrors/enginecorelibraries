@@ -3,6 +3,16 @@
 #define HierarchicalFiniteStateMachine2
 
 /**
+HierarchicalFiniateStateMachine2.h
+
+A much better version than the original!
+
+
+\note if leaks are suspected in the AuthorTimeRunTimeFactory.h system
+add the lines below to #define IMPLEMENTATION, and create and destroy a ton of 
+machine systems.  the leak should reveal itself very quickly
+virtual void recycle(void) { memoryTest[0] += 1; printf("%d : memtest\n", memoryTest[0]); Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
+int memoryTest[20480]; 
 
 */
 
@@ -127,11 +137,8 @@ class ActionState
 public:
 	static const bool hasAuthorTimeState = false;
 
-	virtual void act(Traversal<AGENT>& agent) 
-	{
-		printf("act! "); agent.printState();
-	}
-
+	virtual void act(Traversal<AGENT>& agent)=0; 
+	
 	virtual Depth calculateDepth(void) const
 	{
 		return 0;
@@ -139,18 +146,14 @@ public:
 
 	void enter(Traversal<AGENT>& agent) 
 	{	
-		printf("enter! "); agent.printState();
 		onEnter(agent); 
 	}
 
 	void exit(Traversal<AGENT>& agent)
 	{	
-		printf("exit! "); agent.printState();
 		onExit(agent);
 	}
-
-	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0;
-
+	
 	virtual bool isCompletable(Traversal<AGENT>& /*agent*/) const
 	{
 		return false;
@@ -174,6 +177,10 @@ protected:
 		/* empty */
 	}
 	
+	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0;
+	
+	virtual bool hasRunTimeState(void) const=0;
+	
 	virtual void onEnter(Traversal<AGENT>& /*agent*/) 
 	{ 
 		/* empty */ 
@@ -184,7 +191,6 @@ protected:
 		/* empty */ 
 	}
 
-	virtual bool hasRunTimeState(void) const=0;
 	virtual void recycleRunTimeCopy(void) { delete this; }
 }; // class ActionState
 
@@ -276,6 +282,7 @@ public:
 
 	virtual void act(Traversal<AGENT>& traversal)
 	{
+		onMachineAct(traversal.agent);
 		traversal.incrementDepth();
 		// printf("acting on %s\n", name);
 		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
@@ -532,11 +539,6 @@ protected:
 	{
 		return getState(traversal.getState());
 	}
-
-	virtual ActionState<AGENT>* getRunTimeCopy(void) const
-	{	/// \todo remove this
-		return NULL;
-	}
 	
 	inline State<AGENT>* getState(StateKey key) const
 	{
@@ -567,14 +569,31 @@ protected:
 		return this == &other;
 	}
 
+	virtual void onMachineAct(AGENT& /*agent*/)
+	{
+		// empty, override in case of StateMachine
+	}
+
+	virtual void onMachineEnter(AGENT& /*agent*/)
+	{
+		// empty, override in case of StateMachine
+	}
+	
+	virtual void onMachineExit(AGENT& /*agent*/) 
+	{
+		// empty, override in case of StateMachine
+	}
+
 	virtual void onEnter(Traversal<AGENT>& traversal)
 	{	
+		onMachineEnter(traversal.agent);
 		traversal.enter(InitialCauseKey, 0);
 		enterCurrent(traversal);
 	}
 
 	virtual void onExit(Traversal<AGENT>& traversal)
 	{	
+		onMachineExit(traversal.agent);
 		State<AGENT>* current(getCurrentState(traversal));
 		current->state.exit(traversal);
 	}
@@ -630,7 +649,6 @@ private:
 template<typename AGENT>
 class Traversal
 {	
-	friend class ActionState<AGENT>;
 	friend class StateMachine<AGENT>;
 	
 public:
@@ -676,6 +694,11 @@ public:
 	bool isInState(const designPatterns::RunTimeType& type) const
 	{
 		return stateMachine && stateMachine->isInState(*this, type);
+	}
+
+	bool isLeafState(const designPatterns::RunTimeType& type) const
+	{
+
 	}
 
 	void start(StateMachine<AGENT>& machine)

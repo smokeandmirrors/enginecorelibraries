@@ -2,11 +2,6 @@
 #ifndef AUTHOR_TIME_RUN_TIME_FACTORY_H
 #define AUTHOR_TIME_RUN_TIME_FACTORY_H
 
-/*
- \todo make these singletons so that all of their 
- destroy functions can get called at once
-*/
-
 template<bool HAS_AUTHOR_TIME_STATE>
 class FactorySelector
 {
@@ -19,6 +14,11 @@ class FactorySelector
 
 	else
 		return a single copy.
+
+
+	run time state status must be available at run-time
+	for objects that might be deleted through a 
+	virtual interface
 	*/			
 public:
 	template<typename OBJECT>
@@ -40,7 +40,6 @@ public:
 		template<typename ARGS>
 		static OBJECT* getAuthorCopy(const ARGS& args)
 		{
-			printf("has author time version with args!\n");
 			OBJECT candidate(args);
 			int objectIndex(0);
 
@@ -55,7 +54,6 @@ public:
 
 		static OBJECT* getAuthorCopy(void)
 		{
-			printf("has author time version without args!\n");
 			OBJECT candidate;
 			int objectIndex(0);
 
@@ -139,7 +137,7 @@ public:
 
 			return m_object;
 		}
-
+		
 		static OBJECT* getRunTimeCopy(const OBJECT& object)
 		{
 			if (object.hasRunTimeState())
@@ -153,7 +151,9 @@ public:
 		}
 
 		static void recycle(OBJECT& object)
-		{
+		{	// this must be handled at run time since 
+			// run-time objects might get recycled through 
+			// a virtual object
 			if (object.hasRunTimeState())
 			{
 				object.recycleRunTimeCopy();
