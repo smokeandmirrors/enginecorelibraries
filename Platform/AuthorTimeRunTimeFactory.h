@@ -48,6 +48,23 @@ public:
 // or true, if there is differing state at author time (any constructor arguments)
 static const bool hasAuthorTimeState = EXAMPLE_HAS_AUTHOR_TIME_STATE;
 
+Example()
+: m_configureValue(-1)
+{
+	// empty
+}
+
+Example(int configureValue)
+: m_configureValue(configureValue)
+{
+	// empty
+}
+
+int getConfiguration(void) const
+{
+	return m_configureValue;
+}
+
 // this only has to be virtual if you will be doing this through polymorphic references
 virtual void recycle(void) { Factory<Example>::recycleRunTimeCopy(*this); }
 
@@ -70,6 +87,26 @@ Example& operator=(cost Example&);
 };
 \endcode
 
+To use the objects:
+\code
+// the template arguments to getAuthorCopy correspond to the constructor arguments for the 
+// object you are creating
+Example* noArgsAuthor = Factory<Example>::getAuthorCopy();
+Example* argsAuthor = Factory<Example>::getAuthorCopy<int>(2);
+// returns the same object as argsAuthor
+Example* argsAuthor2 = Factory<Example>::getAuthorCopy<int>(2); 
+// executionVersion will only be a new object if Example::hasRunTimeState() returns true
+Example* executionVersion = Factory<Example>::getRunTimeCopy(*noArgsAuthor);
+// returns -1
+executionVersion->getConfiguration(); 
+// deletes (or manages memory according to your implementation) executionVersion 
+// if Example::hasRunTimeState() returns true
+executionVersion->recycle();
+// destroys all the authorTimeFactoryObjects created by the Factory system
+// regardless of the template type.  Do this only when no more authoring
+// or run time use remains.
+FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
+\endcode
 
 
 <DEVELOPMENT STATUS>
@@ -249,10 +286,31 @@ extern class FactoryDestroyer* factoryDestroyers;
 class FactoryDestroyer
 {
 public:
+	static void destroyAllAuthorTimeAndStatelessObjects(void)
+	{
+		FactoryDestroyer* destroyer(factoryDestroyers);
+
+		while (destroyer)
+		{
+			destroyer->destroy();
+			FactoryDestroyer* oldDestroyer(destroyer);
+			destroyer = destroyer->next;
+			oldDestroyer->clearDestroyer();
+			delete oldDestroyer;
+		}
+
+		factoryDestroyers = NULL;
+	}
+
+protected:
 	virtual ~FactoryDestroyer(void) {};
 	virtual void destroy(void) const=0;
+	virtual void clearDestroyer(void)=0;
 	FactoryDestroyer* next;
 }; // class FactoryDestroyer
+
+template<typename OBJECT>
+class Factory;
 
 template<typename T>
 class CustomFactoryDestroyer : public FactoryDestroyer
@@ -268,9 +326,12 @@ public:
 	{
 		T::destroyAuthorCopies();
 	}
-}; // class CustomFactoryDestroyer
 
-inline void destroyAllAuthorTimeFactoryObjects(void);
+	virtual void clearDestroyer(void)
+	{
+		Factory<T>::clearDestroyer();
+	}
+}; // class CustomFactoryDestroyer
 
 template<typename OBJECT>
 OBJECT* FactorySelector<false>::Internal<OBJECT>::m_object;
@@ -278,6 +339,8 @@ OBJECT* FactorySelector<false>::Internal<OBJECT>::m_object;
 template<typename OBJECT>
 class Factory
 {
+	friend class CustomFactoryDestroyer<OBJECT>;
+
 public:
 	template<typename ARGS>
 	static OBJECT* getAuthorCopy(const ARGS& args)
@@ -315,6 +378,11 @@ protected:
 			m_objectDestroyer = new CustomFactoryDestroyer< Factory<OBJECT> >;
 		}
 	}
+	
+	static inline void clearDestroyer(void)
+	{
+		m_objectDestroyer = NULL;
+	}
 
 private:
 	static CustomFactoryDestroyer< Factory<OBJECT> >* m_objectDestroyer;
@@ -322,17 +390,6 @@ private:
 
 template<typename OBJECT> CustomFactoryDestroyer< Factory<OBJECT> >* Factory<OBJECT>::m_objectDestroyer;
 
-void destroyAllAuthorTimeFactoryObjects(void)
-{
-	FactoryDestroyer* destroyer(factoryDestroyers);
 
-	while (destroyer)
-	{
-		destroyer->destroy();
-		destroyer = destroyer->next;
-	}
-
-	factoryDestroyers = NULL;
-}
 
 #endif//AUTHOR_TIME_RUN_TIME_FACTORY_H
