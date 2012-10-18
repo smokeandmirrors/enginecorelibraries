@@ -22,7 +22,6 @@ typedef std::string TestStringType; // String::Immutable
 using namespace designPatterns;
 using namespace containers;
 using namespace embeddedLua;
-using namespace HFSM;
 using namespace HFSM2;
 using namespace xronos;
 
