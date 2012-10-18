@@ -73,6 +73,7 @@ virtual void recycle(void) { Factory<Example>::recycleRunTimeCopy(*this); }
 virtual bool hasRunTimeState(void) const { return false; }
 
 private:
+friend class Factory<Example>;
 friend class FactorSelector<EXAMPLE_HAS_AUTHOR_TIME_STATE>::Internal<Example>;
 
 // return an exact copy, through whichever means you desire, a copy constructor isn't 
