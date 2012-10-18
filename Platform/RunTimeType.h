@@ -2,6 +2,30 @@
 #ifndef RUN_TIME_TYPE_H
 #define RUN_TIME_TYPE_H
 
+/**
+\file RunTimeType.h
+\author Smoke and Mirrors Development
+\htmlonly
+<A HREF="smokeandmirrorsdevelopment@gmail.com">
+smokeandmirrorsdevelopment@gmail.com</A>
+<BR>
+&copy;2009-2012 Smoke and Mirrors Development
+<BR>
+\endhtmlonly
+
+This is a an alternative to RTTI that can be 
+used on a per-class basis.
+
+<DEVELOPMENT STATUS>
+Current Draft		:	0.0
+Current Phase		:   FIELD TESTING
+Purpose				:	DEPLOYMENT
+Unit Tested			:	NO
+Used in development	:	YES
+Used in experiments :	YES
+Tested in the field	:	NO
+*/
+
 #include "Platform.h"
 
 #define DEFINE_TEMPLATE_BASE_RUN_TIME_TYPE(TEMPLATE, CLASS_NAME, ...) \

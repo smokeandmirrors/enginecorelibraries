@@ -454,7 +454,6 @@ private:
 template<typename AGENT>
 class Traversal
 {	
-	friend class ActionState<AGENT>;
 	friend class StateMachine<AGENT>;
 	// keeps the agent, current path through the tree (and the required state?)
 public:

@@ -162,7 +162,7 @@ public:
 		/* empty */
 	}
 
-	virtual void effect(Agent* /*agent*/, ActionState<Agent>& /*master*/, ActionState<Agent>& /*from*/, ActionState<Agent>& /*to*/)
+	virtual void effect(Agent* /*agent*/, const ActionState<Agent>& /*master*/, const ActionState<Agent>& /*from*/, const ActionState<Agent>& /*to*/)
 	{
 		printf("effecting on transition!\n");
 	}
@@ -270,14 +270,16 @@ FactoryDestroyer* factoryDestroyers(NULL);
 
 void HFSM2::test(void)
 {
-	for(;;)
+	for(;;) // test for memory leaks
 	{
 		Agent gamma;
 		Traversal<Agent> alpha(gamma);
-		StateMachineOne* stateMachineOne(Factory<StateMachineOne>::getAuthorCopy());
-		StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::getRunTimeCopy(*stateMachineOne));
+		
+		StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::getRunTimeCopy(*Factory<StateMachineOne>::getAuthorCopy()));
+		
 		// StateMachineThree* stateMachineOne(Factory<StateMachineThree>::getAuthorCopy());
 		// StateMachineThree* stateMachineOneRun(Factory<StateMachineThree>::getRunTimeCopy(*stateMachineOne));
+		
 		alpha.start(*stateMachineOneRun);
 		// just test for memory leaks
 		for (int i(0), sentinel(13); i < sentinel; ++i)
