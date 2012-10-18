@@ -9,11 +9,39 @@ class Agent
 {
 };
 
+
+class AuthorTimeCondition
+	: public HFSM2::Condition<Agent>
+{
+	CONDITION_WITH_AUTHOR_TIME_STATE(AuthorTimeCondition, Agent)
+
+public:
+	AuthorTimeCondition(int authorTime)
+		: Condition<Agent>()
+		, m_authorVariable(authorTime)
+	{
+		/* empty */
+	}
+
+protected:
+	bool isSatisfied(Agent*)
+	{
+		return true;
+	}
+
+private:
+	const int m_authorVariable;
+}; // AuthorTimeCondition
+
+bool AuthorTimeCondition::isEqualToAtAuthorTime(const AuthorTimeCondition& other) const
+{
+	return m_authorVariable == other.m_authorVariable;
+}
+
 class RunTimeAuthorTimeCondition
 	: public HFSM2::Condition<Agent>
 {
-
-	CONDITION_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeCondition, Agent)
+	CONDITION_WITH_AUTHOR_TIME_AND_RUN_TIME_STATE(RunTimeAuthorTimeCondition, Agent)
 
 public:
 	RunTimeAuthorTimeCondition(int authorTime)
@@ -43,7 +71,7 @@ bool RunTimeAuthorTimeCondition::isEqualToAtAuthorTime(const RunTimeAuthorTimeCo
 class RunTimeAuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
+	ACTION_STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 
 public:
 	RunTimeAuthorTimeState(int authorTime)
@@ -76,7 +104,7 @@ bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState&
 class AuthorTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	STATE_WITH_AUTHOR_STATE(AuthorTimeState, Agent)
+	ACTION_STATE_WITH_AUTHOR_TIME_STATE(AuthorTimeState, Agent)
 
 public:
 	AuthorTimeState(int authorTime)
@@ -107,7 +135,8 @@ bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
 class RunTimeState
 	: public HFSM2::ActionState<Agent>
 {
-	STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
+	ACTION_STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
+
 public:
 	RunTimeState(void)
 		: ActionState<Agent>()
@@ -132,8 +161,8 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(RunTimeState, ActionState<Agent>, NULL)
 class PureState
 	: public HFSM2::ActionState<Agent>
 {
-	
-	PURE_STATE(PureState, Agent)
+	ACTION_STATE_PURE(PureState, Agent)
+
 public:
 	PureState(void)
 		: ActionState<Agent>()
@@ -155,7 +184,8 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(PureState, ActionState<Agent>, NULL)
 class PureTransitionFX
 	: public TransitionFX<Agent>
 {
-	PURE_TRANSITION_FX(PureTransitionFX, Agent)
+	TRANSITION_FX_PURE(PureTransitionFX, Agent)
+
 public:
 	PureTransitionFX(void)
 	{
@@ -168,10 +198,51 @@ public:
 	}
 }; // class PureTransitionFX
 
+class StateMachineWithAuthorState
+	: public StateMachine<Agent>
+{
+	STATE_MACHINE_WITH_AUTHOR_TIME_STATE(StateMachineWithAuthorState, Agent)
+
+
+protected:
+	StateMachineWithAuthorState(int seven)
+	{
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
+		AuthorTimeCondition* condition1 = Factory<AuthorTimeCondition>::getAuthorCopy<int>(1); 
+		AuthorTimeCondition* condition2 = Factory<AuthorTimeCondition>::getAuthorCopy<int>(1); 
+
+		ActionState<Agent>* state7 = Factory<AuthorTimeState>::getAuthorCopy<int>(seven);
+		ActionState<Agent>* state8 = Factory<AuthorTimeState>::getAuthorCopy<int>(++seven);
+		ActionState<Agent>* state9 = Factory<AuthorTimeState>::getAuthorCopy<int>(++seven);
+
+		StateKey key7 = add(*state7);
+		StateKey key8 = add(*state8);
+		StateKey key9 = add(*state9);
+
+		connect(key7, *condition1, key8, transitionFX1);
+		connect(key8, *condition2, key9, transitionFX1);
+	}
+
+	virtual void onMachineEnter(Agent&)
+	{
+		printf("StateMachineWith author state: 3\n");
+	}
+
+};
+
+bool StateMachineWithAuthorState::isEqualToAtAuthorTime(const StateMachineWithAuthorState& other) const
+{
+	const AuthorTimeState* myATS(static_cast<const AuthorTimeState*>(&getState(0)->state));
+	const AuthorTimeState* otherATS(static_cast<const AuthorTimeState*>(&other.getState(0)->state));
+	return myATS == otherATS;
+}
+
+DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineWithAuthorState, StateMachine<Agent>, NULL)
+
 class StateMachineThree
 	: public StateMachine<Agent>
 {
-	STATE_WITH_RUN_TIME_STATE(StateMachineThree, Agent)
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(StateMachineThree, Agent)
 
 protected:
 	StateMachineThree()
@@ -197,14 +268,14 @@ protected:
 		printf("StateMachine: 3\n");
 	}
 
-	// int memoryTest[20480];
+	int memoryTest[20480];
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineThree, StateMachine<Agent>, NULL)
 
 class StateMachineTwo
 	: public StateMachine<Agent>
 {
-	STATE_WITH_RUN_TIME_STATE(StateMachineTwo, Agent)
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(StateMachineTwo, Agent)
 
 protected:
 	StateMachineTwo()
@@ -238,7 +309,7 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineTwo, StateMachine<Agent>, NULL)
 class StateMachineOne
 	: public StateMachine<Agent>
 {
-	STATE_WITH_RUN_TIME_STATE(StateMachineOne, Agent)
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(StateMachineOne, Agent)
 
 protected:
 	StateMachineOne()
@@ -275,12 +346,22 @@ void HFSM2::test(void)
 		Agent gamma;
 		Traversal<Agent> alpha(gamma);
 		
-		StateMachineOne* stateMachineOneRun(Factory<StateMachineOne>::getRunTimeCopy(*Factory<StateMachineOne>::getAuthorCopy()));
-		
+
+		StateMachineOne* smOneAuthor1(Factory<StateMachineOne>::getAuthorCopy());
+		StateMachineOne* smOneAuthor2(Factory<StateMachineOne>::getAuthorCopy());
+		StateMachineOne* smOneRun1(Factory<StateMachineOne>::getRunTimeCopy(*smOneAuthor1));
+		StateMachineOne* smOneRun2(Factory<StateMachineOne>::getRunTimeCopy(*smOneAuthor2));
+
+		StateMachineWithAuthorState* authorAuthor(Factory<StateMachineWithAuthorState>::getAuthorCopy<int>(7));
+		StateMachineWithAuthorState* authorAuthor2(Factory<StateMachineWithAuthorState>::getAuthorCopy<int>(7));
+		StateMachineWithAuthorState* authorAuthor3(Factory<StateMachineWithAuthorState>::getAuthorCopy<int>(8));
+		StateMachineWithAuthorState* authorRun(Factory<StateMachineWithAuthorState>::getRunTimeCopy(*authorAuthor));
+		StateMachineWithAuthorState* authorRun2(Factory<StateMachineWithAuthorState>::getRunTimeCopy(*authorAuthor2));
+
 		// StateMachineThree* stateMachineOne(Factory<StateMachineThree>::getAuthorCopy());
 		// StateMachineThree* stateMachineOneRun(Factory<StateMachineThree>::getRunTimeCopy(*stateMachineOne));
 		
-		alpha.start(*stateMachineOneRun);
+		alpha.start(*smOneRun1);
 		// just test for memory leaks
 		for (int i(0), sentinel(13); i < sentinel; ++i)
 		{
@@ -290,9 +371,10 @@ void HFSM2::test(void)
 		assert(alpha.isInState(AuthorTimeState::runTimeType));
 		alpha.stop();		
 
-		stateMachineOneRun->recycle();
+		smOneRun1->recycle();
+		smOneRun2->recycle();
 
-		destroyAllAuthorTimeFactoryObjects();
+		FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
 	}
 	
 

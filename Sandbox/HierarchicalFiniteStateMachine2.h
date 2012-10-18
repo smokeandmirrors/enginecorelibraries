@@ -60,6 +60,26 @@ Tested in the field	:	NO
 #include <vector>
 
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define GET_RUN_TIME_COPY_GENERIC(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } 
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define GET_RUN_TIME_COPY_ActionState(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	GET_RUN_TIME_COPY_GENERIC(CLASS_NAME, FSM_TYPE, TYPE_NAME)
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define GET_RUN_TIME_COPY_Condition(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	GET_RUN_TIME_COPY_GENERIC(CLASS_NAME, FSM_TYPE, TYPE_NAME)
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define GET_RUN_TIME_COPY_StateMachine(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	virtual ActionState< TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } 
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define GET_RUN_TIME_COPY_TransitionFX(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	GET_RUN_TIME_COPY_GENERIC(CLASS_NAME, FSM_TYPE, TYPE_NAME)
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
 #define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
 	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
 	static const bool hasAuthorTimeState = false;
@@ -70,19 +90,35 @@ Tested in the field	:	NO
 	static const bool hasAuthorTimeState = true;
 
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
-#define HAS_RUN_TIME_STATE(VALUE) \
+#define HAS_RUN_TIME_STATE_GENERIC(VALUE) \
 	virtual bool hasRunTimeState(void) const { return VALUE; } 
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define HAS_RUN_TIME_STATE_ActionState(VALUE) \
+	HAS_RUN_TIME_STATE_GENERIC(VALUE)
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define HAS_RUN_TIME_STATE_Condition(VALUE) \
+	HAS_RUN_TIME_STATE_GENERIC(VALUE)
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define HAS_RUN_TIME_STATE_StateMachine(VALUE) 
+	// virtual bool hasRunTimeState(void) const { return StateMachine<Agent>::hasRunTimeState(); }
+
+/** support macro for the declaration of HFSM objects on a author/run time state basis */
+#define HAS_RUN_TIME_STATE_TransitionFX(VALUE) \
+	HAS_RUN_TIME_STATE_GENERIC(VALUE)
 
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
 	public: \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
 	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
-	HAS_RUN_TIME_STATE(RUN_TIME) \
+	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
 	private: \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
-	virtual FSM_TYPE < TYPE_NAME > * getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
+	GET_RUN_TIME_COPY_##FSM_TYPE##(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
 	
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
@@ -101,61 +137,67 @@ Tested in the field	:	NO
 #define RUN_TIME_IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, false, true)
 
-/** Use this macro in the class declaration of a Condition with author & run time state */
-#define CONDITION_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
-	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a ActionState with author & run time state */
-#define STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
-	private:\
+/** Use this macro in the class declaration of a ActionState with no author or run time state */
+#define ACTION_STATE_PURE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_TYPE_DECLARATION \
-	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a TransitionFX with author & run time state */
-#define TRANSITION_FX_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
-	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a Condition with author time state */
-#define CONDITION_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
-	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+	PURE_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
 /** Use this macro in the class declaration of a ActionState with author time state */
-#define STATE_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
-	private:\
+#define ACTION_STATE_WITH_AUTHOR_TIME_STATE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_TYPE_DECLARATION \
 	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
 
-/** Use this macro in the class declaration of a TransitionFX with author time state */
-#define TRANSITION_FX_WITH_AUTHOR_STATE(CLASS_NAME, TYPE_NAME) \
-	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+/** Use this macro in the class declaration of a ActionState with author & run time state */
+#define ACTION_STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_TYPE_DECLARATION \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a ActionState with run time state */
+#define ACTION_STATE_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_TYPE_DECLARATION \
+	RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a Condition with no author or run time state */
+#define CONDITION_PURE(CLASS_NAME, TYPE_NAME) \
+	PURE_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a Condition with author time state */
+#define CONDITION_WITH_AUTHOR_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a Condition with author & run time state */
+#define CONDITION_WITH_AUTHOR_TIME_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
 /** Use this macro in the class declaration of a Condition with run time state */
 #define CONDITION_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
 
-/** Use this macro in the class declaration of a ActionState with run time state */
-#define STATE_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
-	private:\
+/** Use this macro in the class declaration of a StateMachine with no author or run time state */
+#define STATE_MACHINE_WITH_AUTHOR_TIME_STATE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_TYPE_DECLARATION \
-	RUN_TIME_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, StateMachine, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a StateMachine with no author or run time state */
+#define STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	RUN_TIME_TYPE_DECLARATION \
+	RUN_TIME_IMPLEMENTATION(CLASS_NAME, StateMachine, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a TransitionFX with no author or run time state */
+#define TRANSITION_FX_PURE(CLASS_NAME, TYPE_NAME) \
+	PURE_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a TransitionFX with author time state */
+#define TRANSITION_FX_WITH_AUTHOR_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
+
+/** Use this macro in the class declaration of a TransitionFX with author & run time state */
+#define TRANSITION_FX_WITH_AUTHOR_TIME_AND_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
+	AUTHOR_AND_RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
 
 /** Use this macro in the class declaration of a TransitionFX with run time state */
 #define TRANSITION_FX_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a Condition with no author or run time state */
-#define PURE_CONDITION(CLASS_NAME, TYPE_NAME) \
-	PURE_IMPLEMENTATION(CLASS_NAME, Condition, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a ActionState with no author or run time state */
-#define PURE_STATE(CLASS_NAME, TYPE_NAME) \
-	private:\
-	RUN_TIME_TYPE_DECLARATION \
-	PURE_IMPLEMENTATION(CLASS_NAME, ActionState, TYPE_NAME) 
-
-/** Use this macro in the class declaration of a TransitionFX with no author or run time state */
-#define PURE_TRANSITION_FX(CLASS_NAME, TYPE_NAME) \
-	PURE_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
 
 namespace HFSM2
 {
@@ -324,16 +366,9 @@ template<typename AGENT>
 class Condition
 {
 	friend class FactorySelector<false>::Internal< Condition<AGENT> >;
+	friend class StateMachine<AGENT>;
 
 public:
-	/** 
-	Factory system compatibility.  
-	Override this function for traversal time copies.
-	Override or use the Factory system macros.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
-
 	/** returns true if the Condition is satisfied */
 	inline bool operator()(AGENT* agent)
 	{
@@ -368,6 +403,14 @@ protected:
 	{
 		/* empty */
 	}
+	
+	/** 
+	Factory system compatibility.  
+	Override this function for traversal time copies.
+	Override or use the Factory system macros.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
 
 	/** 
 	Factory system compatibility.  
@@ -398,7 +441,7 @@ template<typename AGENT>
 class ConditionFalse
 	: public Condition<AGENT>
 {
-	PURE_CONDITION(ConditionFalse, AGENT)
+	CONDITION_PURE(ConditionFalse, AGENT)
 	
 	ConditionFalse(void)
 	{
@@ -418,7 +461,7 @@ template<typename AGENT>
 class ConditionTrue
 	: public Condition<AGENT>
 {
-	PURE_CONDITION(ConditionTrue, AGENT)
+	CONDITION_PURE(ConditionTrue, AGENT)
 	
 	ConditionTrue(void)
 	{
@@ -430,12 +473,17 @@ protected:
 }; // ConditionTrue
 
 /**
-Be very careful to override only the appropriate functions
+The StateMachine handles the connections and transition
+effects between states.
+
+\note Custom StateMachines are created solely be deriving from
+StateMachine and adding ActionStates, and connecting them with
+Conditions and [optional] TransitionFX.
+
+\warning Be very careful to override only the appropriate functions
 when deriving from StateMachine.  That is, DO NOT override
 act(), onEnter(), or onExit(), instead override
 onMachineAct(), onMachineEnter(), and onMachineExit().
-
-\note custom state machines are entirely defined in their constructors 
 */
 template<typename AGENT>
 class StateMachine 
@@ -443,7 +491,7 @@ class StateMachine
 {
 	template<typename AGENT> class State;
 	template<typename AGENT> class Connection;
-	friend class FactorySelector<true>::Internal< StateMachine<AGENT> >;
+	// friend class FactorySelector<true>::Internal< StateMachine<AGENT> >;
 	// friend class FactorySelector<false>::Internal< StateMachine<AGENT> >;
 	friend class Traversal<AGENT>;
 	
@@ -566,7 +614,7 @@ protected:
 		delete this;
 	}
 
-private:
+protected:
 	template<typename AGENT>
 	class Connection
 	{
@@ -578,11 +626,11 @@ private:
 		{
 			/* empty */
 		}
-		
+
 		Condition<AGENT>& condition;
 		StateKey next;
 		TransitionFX<AGENT>* fx;
-		
+
 	private:
 		Connection<AGENT>& operator=(const Connection<AGENT>&);
 	}; // struct Connection
@@ -600,7 +648,7 @@ private:
 			connection.condition.recycle();
 		}
 	}; // struct RecycleConnection
-	
+
 	template<typename AGENT>
 	struct RecycleState
 	{
@@ -624,20 +672,86 @@ private:
 		{
 			/* empty */
 		}
-
+		
 		void recycle(void)
 		{
 			std::for_each(connections.begin(), connections.end(), RecycleConnection<AGENT>());		
 			state.recycle();
 		}
-		
+
 		std::vector<Connection<AGENT>> connections;
 		ActionState<AGENT>& state;
-	
+
 	private:
 		State<AGENT>& operator=(const State<AGENT>&);
 	}; // class State
-		
+	
+	inline StateKey getNumStates(void) const
+	{
+		return states.size();
+	}
+
+	inline State<AGENT>* getState(StateKey key) const
+	{
+		assert(key < static_cast<StateKey>(states.size()));
+		assert(key >= 0);
+		return states[key];
+	}
+
+	/** 
+	Factory system compatibility.  
+	There should be no reason to override this, just derive from the StateMachine,
+	and author your desired machine using the factory methods in your constructor.
+	Whether a StateMachine has state at run time is entirely determined by the 
+	child states that it governs.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual bool hasRunTimeState(void) const
+	{
+		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), sentinel(states.end())
+			; i != sentinel
+			; ++i)
+		{
+			const State<AGENT>& state(*(*i));
+
+			if (state.state.hasRunTimeState())
+			{
+				return true;
+			}
+			else
+			{
+				const std::vector<Connection<AGENT>>& connections(state.connections);
+
+				for (int i(0), sentinel(connections.size()); i < sentinel; ++i)
+				{
+					const Connection<AGENT>& connection(connections[i]);
+
+					if (connection.condition.hasRunTimeState()
+					|| (connection.fx && connection.fx->hasRunTimeState()))
+					{
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
+	}
+	
+	/** 
+	Factory system compatibility.  
+	There should be no reason to override this, just derive from the StateMachine,
+	and author your desired machine using the factory methods in your constructor.
+	Whether a StateMachine has state at run time is entirely determined by the 
+	child states that it governs.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	bool isEqualToAtAuthorTime(const StateMachine<AGENT>& other) const
+	{	
+		return this == &other;
+	}
+
+private:
 	virtual void act(Traversal<AGENT>& traversal)
 	{
 		onMachineAct(traversal.agent);
@@ -744,42 +858,6 @@ private:
 		return getState(traversal.getState());
 	}
 	
-	inline State<AGENT>* getState(StateKey key) const
-	{
-		assert(key < static_cast<StateKey>(states.size()));
-		assert(key >= 0);
-		return states[key];
-	}
-	
-	/** 
-	Factory system compatibility.  
-	There should be no reason to override this, just derive from the StateMachine,
-	and author your desired machine using the factory methods in
-	your constructor.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	virtual bool hasRunTimeState(void) const
-	{
-		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), sentinel(states.end())
-			; i != sentinel
-			; ++i)
-		{
-			const State<AGENT>& state(*(*i));
-
-			if (state.state.hasRunTimeState())
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool isEqualToAtAuthorTime(const StateMachine<AGENT>& other) const
-	{	
-		return this == &other;
-	}
-
 	virtual bool isInState(const Traversal<AGENT>& traversal, const designPatterns::RunTimeType& type) const
 	{
 		const StateMachine<AGENT>* machine(this);
