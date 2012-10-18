@@ -213,7 +213,7 @@ protected:
 
 		ActionState<Agent>* state7 = Factory<AuthorTimeState>::getAuthorCopy<int>(seven);
 		ActionState<Agent>* state8 = Factory<AuthorTimeState>::getAuthorCopy<int>(++seven);
-		ActionState<Agent>* state9 = Factory<AuthorTimeState>::getAuthorCopy<int>(++seven);
+		ActionState<Agent>* state9 = Factory<PureState>::getAuthorCopy();
 
 		StateKey key7 = add(*state7);
 		StateKey key8 = add(*state8);
@@ -373,6 +373,8 @@ void HFSM2::test(void)
 
 		smOneRun1->recycle();
 		smOneRun2->recycle();
+		authorRun2->recycle();
+		authorRun->recycle();
 
 		FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
 	}

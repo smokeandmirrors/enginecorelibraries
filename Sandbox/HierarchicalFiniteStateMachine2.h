@@ -113,10 +113,11 @@ Tested in the field	:	NO
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
 	public: \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
+	private: \
+	friend class Factory< CLASS_NAME >; \
+	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
 	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
-	private: \
-	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
 	GET_RUN_TIME_COPY_##FSM_TYPE##(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
@@ -236,7 +237,6 @@ class ActionState
 	*/
 	RUN_TIME_TYPE_DECLARATION
 
-	friend class FactorySelector<false>::Internal< ActionState<AGENT> >;
 	friend class StateMachine<AGENT>;
 		
 public:
@@ -365,7 +365,6 @@ connection.
 template<typename AGENT>
 class Condition
 {
-	friend class FactorySelector<false>::Internal< Condition<AGENT> >;
 	friend class StateMachine<AGENT>;
 
 public:
@@ -489,12 +488,10 @@ template<typename AGENT>
 class StateMachine 
 	: public ActionState<AGENT>
 {
-	template<typename AGENT> class State;
 	template<typename AGENT> class Connection;
-	// friend class FactorySelector<true>::Internal< StateMachine<AGENT> >;
-	// friend class FactorySelector<false>::Internal< StateMachine<AGENT> >;
+	template<typename AGENT> class State;
 	friend class Traversal<AGENT>;
-	
+
 	RUN_TIME_TYPE_DECLARATION
 	/** all state machines have author time state */
 	static const bool hasAuthorTimeState = true;
@@ -738,19 +735,6 @@ protected:
 		return false;
 	}
 	
-	/** 
-	Factory system compatibility.  
-	There should be no reason to override this, just derive from the StateMachine,
-	and author your desired machine using the factory methods in your constructor.
-	Whether a StateMachine has state at run time is entirely determined by the 
-	child states that it governs.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	bool isEqualToAtAuthorTime(const StateMachine<AGENT>& other) const
-	{	
-		return this == &other;
-	}
-
 private:
 	virtual void act(Traversal<AGENT>& traversal)
 	{
@@ -922,8 +906,6 @@ ActionStates that differ only by onEnter()/onExit() functionality.
 template<typename AGENT>
 class TransitionFX
 {
-	// friend class FactorySelector< TransitionFX<AGENT>>;
-	friend class FactorySelector<false>::Internal< TransitionFX<AGENT> >;
 	friend class StateMachine<AGENT>;
 
 public:
