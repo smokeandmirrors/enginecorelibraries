@@ -21,6 +21,34 @@ will be created.  2) run time state means that the objects
 have state that can be modified when the object is actually
 getting used by whatever client requested use of it.
 
+The motivation for the systems has been the fact that I
+have repeatedly run into situations where I have 
+a small set of recipes (constructor arguments) on a 
+set of objects.  This what I consider "author time"
+situation.  Additionally, I have needed access to some
+of these objects, but only occasionally to some 
+of them need differentiating state when executed, "run
+time state".  This factory system makes it much easier
+control the unecessary creation of objects with any 
+combination of author-time and run-time state.
+
+"Author time" copies are entirely distinguished from
+each other in their constructors. 
+
+"Run time" copies are created by calling getRunTimeCopy()
+and passing in an author copy as an argument.
+
+Calling destroyAllAuthorTimeFactoryObjects() will destroy
+all of the "author time" copies, which, would include any
+"run time" copies that have no run time state.  Be careful
+to call recycle() on any run time copies, it will do nothing
+to run-time-stateless objects but will help maintain memory
+management if the code changes at a later time.  Make sure
+to never use any of the objects after 
+destroyAllAuthorTimeFactoryObjects() has been called.  All
+such objects should have been deleted.  To use more,
+simply call the factory create methods again.
+
 A primary example of this is HFSM systems.  An ActionState
 could have no author time state (that is, no variable arguments 
 in its constructor).  Only one of these objects will ever
@@ -28,15 +56,9 @@ be created to author different state machines.  If it did
 have author time state, say a string name, only one author 
 time copy will get created for each different string.
 
-"Run time" copies are created by calling getRunTimeCopy()
-and passing in an author copy as an argument.  They are
-destroyed by calling recycle() on the run time copy,
-and the Author copies are destroyed 
-by calling destroyAllAuthorTimeFactoryObjects();
-
 To allow your class to be controlled by the Factory
-system, you will have to have the folling 
-member variables and methods:
+system, you will have to have the following 
+member variables and methods (unless marked not required):
 
 \code
 // this macro just makes consistency a bit easier for your class
@@ -44,51 +66,55 @@ member variables and methods:
 
 class Example
 {
+// the Factory classes need access to construction and traits
+friend class Factory<Example>;
+friend class FactorSelector<EXAMPLE_HAS_AUTHOR_TIME_STATE>::Internal<Example>;
+
 public:
+// this only has to be virtual if you will be doing this through polymorphic references
+virtual void recycle(void) { Factory<Example>::recycleRunTimeCopy(*this); }
+
+private:
 // or true, if there is differing state at author time (any constructor arguments)
 static const bool hasAuthorTimeState = EXAMPLE_HAS_AUTHOR_TIME_STATE;
 
+// return an exact copy, through whichever means you desire, a copy constructor isn't 
+// required for the factory system
+static Example* duplicate(const Example& source) { return new Example(source); }
+
+// not required, used as an example
 Example()
 : m_configureValue(-1)
 {
 	// empty
 }
 
+// not required, used as an example
 Example(int configureValue)
 : m_configureValue(configureValue)
 {
 	// empty
 }
 
-int getConfiguration(void) const
-{
-	return m_configureValue;
-}
+// not required, used as an example
+int getConfiguration(void) const { return m_configureValue; }
 
-// this only has to be virtual if you will be doing this through polymorphic references
-virtual void recycle(void) { Factory<Example>::recycleRunTimeCopy(*this); }
+// doesn't have to be virtual, but the implementation would be the same
+virtual Example* getRunTimeCopy(void) const { return Factory<Example>::getRunTimeCopy(*this); }
 
 // or true, if there is run time state
 // this only has to be virtual if you will be doing this through polymorphic references
 virtual bool hasRunTimeState(void) const { return false; }
 
-private:
-friend class Factory<Example>;
-friend class FactorSelector<EXAMPLE_HAS_AUTHOR_TIME_STATE>::Internal<Example>;
-
-// return an exact copy, through whichever means you desire, a copy constructor isn't 
-// required for this function
-static Example* duplicate(const Example& source) { return new Example(source); }
-
-// doesn't have to be virtual, but the implementation would be the same
-virtual Example* getRunTimeCopy(void) const { return Factory<Example>::getRunTimeCopy(*this); }
+// this is used to determine how many author time objects to keep "live"
+bool isEqualToAtAuthorTime(const Example& other) const { return getConfiguration() == other.getConfiguration(); } 
 
 // if you do not forbid the copy assignment operator, you can subvert the factory system
 Example& operator=(cost Example&);
-};
 \endcode
 
-To use the objects:
+To use the objects after they have been authored.
+
 \code
 // the template arguments to getAuthorCopy correspond to the constructor arguments for the 
 // object you are creating
@@ -109,6 +135,11 @@ executionVersion->recycle();
 FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
 \endcode
 
+\note This functionality is intentionally not thread-safe.  As long
+as the author-time objects are created from a single thread, run time execution
+should be perfectly fine.   If specific optimizations of run-time copies
+are desired, changes would have to be made to the recycle() methods here 
+and on client classes.
 
 <DEVELOPMENT STATUS>
 Current Draft		:	1.0

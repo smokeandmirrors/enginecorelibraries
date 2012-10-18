@@ -42,6 +42,22 @@ machine systems.  the leak should reveal itself very quickly
 virtual void recycle(void) { memoryTest[0] += 1; printf("%d : memtest\n", memoryTest[0]); Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
 int memoryTest[20480]; 
 
+The motivation for this implementation is as follows.  I have several
+times needed various forms of high performance run time state machines
+that are powerful (expressive and easy to change).  I have written
+and worked with several version, and most, if not all, have been 
+had one or more problems.  Many involved too much casting, or 
+ignoring more powerful C++, O-O features.  This led to problems creating
+and properly executing the states at run time.  Additionally, most
+implementations required that each agent have entirely its own copy
+of a state.  This version solves most issues I have ever run into.
+
+\note This functionality is intentionally not thread-safe.  As long
+as the author-time states are created from a single thread, run time execution
+should be perfectly fine.   If specific optimizations of run-time copies
+are desired, changes would have to be made to the recycle() methods here,
+and in AuthorTimeRunTimeFactory.h.
+
 <DEVELOPMENT STATUS>
 Current Draft		:	3.0
 Current Phase		:   FIELD TESTING
