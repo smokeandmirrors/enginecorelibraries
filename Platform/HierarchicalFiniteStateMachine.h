@@ -1,9 +1,9 @@
 #pragma once
-#ifndef HierarchicalFiniteStateMachine2
-#define HierarchicalFiniteStateMachine2
+#ifndef HIERARCHICAL_FSM
+#define HIERARCHICAL_FSM
 
 /**
-\file HierarchicalFiniteStateMachine2.h 
+\file HierarchicalFiniteStateMachine.h 
 \brief Contains the code for a high performance, low-memory consumption, 
 easy to use finite state machine system.  The primary feature is 
 that any full state machine can be added to another machine as single state.
@@ -875,7 +875,7 @@ private:
 	{
 		current.state.recordExit(traversal);
 		current.exit(traversal.agent);
-		traversal.exit();
+		traversal.exit(); // this will become unecessary...I think
 	}
 	
 	inline ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State<AGENT>* current)
@@ -979,7 +979,7 @@ private:
 
 	/**
 	entering a state machine enters all initial states of child
-	state machines until a leave state is entered
+	state machines until a leaf state is entered
 	*/
 	virtual void recordEntry(Traversal<AGENT>& traversal)
 	{	
@@ -988,11 +988,17 @@ private:
 		enterCurrent(traversal);
 	}
 
+	/**
+	exiting a state machines exits all current states of 
+	on the traversal from the current level
+	*/
 	virtual void recordExit(Traversal<AGENT>& traversal)
 	{	
-		exit(traversal.agent);
-		State<AGENT>* current(getCurrentState(traversal));
+		traversal.incrementDepth();
+		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
 		current->state.recordExit(traversal);
+		traversal.exit();
+		exit(traversal.agent);
 	}
 		
 private:
@@ -1162,6 +1168,7 @@ public:
 	{
 		if (isInActiveState)
 		{
+			currentDepth = -1;
 			stateMachine->recordExit(*this);
 			isInActiveState = false;
 		}	
@@ -1465,4 +1472,4 @@ void runAlarmExample()
 \endcode
 */
 
-#endif//HierarchicalFiniteStateMachine2
+#endif//HIERARCHICAL_FSM

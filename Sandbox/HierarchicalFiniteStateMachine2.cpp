@@ -9,6 +9,9 @@ class Agent
 {
 };
 
+static const bool doPrintEnter(true);
+static const bool doPrintExit(true);
+static const bool doPrintAct(false);
 
 class AuthorTimeCondition
 	: public HFSM::Condition<Agent>
@@ -86,7 +89,7 @@ public:
 
 	virtual void enter(Agent& /*agent*/)
 	{
-		printf("RunTimeAuthorState: %2d %2d\n", ++m_runTimeVariable, m_authorVariable);
+		 if (doPrintEnter) printf("RunTimeAuthorState: %2d %2d\n", ++m_runTimeVariable, m_authorVariable);
 	}
 
 private:
@@ -114,11 +117,19 @@ public:
 		/* empty */
 	}
 
-	virtual void act(Agent& /*agent*/) {}
+	virtual void act(Agent& /*agent*/) 
+	{
+		if (doPrintAct) printf("act AuthorTimeState: %2d\n", m_authorVariable);
+	}
 
 	virtual void enter(Agent& /*agent*/)
 	{
-		printf("AuthorTimeState: %2d\n", m_authorVariable);
+		if (doPrintEnter) printf("enter AuthorTimeState: %2d\n", m_authorVariable);
+	}
+
+	virtual void exit(Agent& /*agent*/)
+	{
+		if (doPrintExit) printf("exit AuthorTimeState: %2d\n", m_authorVariable);
 	}
 
 private:
@@ -194,7 +205,7 @@ public:
 
 	virtual void effect(Agent& /*agent*/, const ActionState<Agent>& /*master*/, const ActionState<Agent>& /*from*/, const ActionState<Agent>& /*to*/)
 	{
-		printf("effecting on transition!\n");
+		// printf("effecting on transition!\n");
 	}
 }; // class PureTransitionFX
 
@@ -225,9 +236,18 @@ protected:
 
 	virtual void enter(Agent&)
 	{
-		printf("StateMachineWith author state: 3\n");
+		if (doPrintEnter) printf("enter StateMachineWith author state: 3\n");
+	}
+	
+	virtual void exit(Agent&)
+	{
+		if (doPrintExit) printf("exit StateMachineWith author state: 3\n");
 	}
 
+	virtual void act(Agent&)
+	{
+		if (doPrintAct) printf("act StateMachineWith author state: 3\n");
+	}
 };
 
 bool StateMachineWithAuthorState::isEqualToAtAuthorTime(const StateMachineWithAuthorState& other) const
@@ -266,12 +286,66 @@ protected:
 
 	virtual void enter(Agent&)
 	{
-		printf("StateMachine: 6\n");
+		if (doPrintEnter) printf("enter StateMachine: 6\n");
+	}
+
+	virtual void exit(Agent&)
+	{
+		if (doPrintExit) printf("exit StateMachine: 6\n");
+	}
+
+	virtual void act(Agent&)
+	{
+		if (doPrintAct) printf("act StateMachine: 6\n");
 	}
 
 	int memoryTest[20480];
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineThree, StateMachine<Agent>, NULL)
+	
+class StateMachineFour
+	: public StateMachine<Agent>
+{
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(StateMachineFour, Agent)
+
+protected:
+	StateMachineFour()
+	{
+		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
+		RunTimeAuthorTimeCondition* condition1 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
+		RunTimeAuthorTimeCondition* condition2 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
+
+		ActionState<Agent>* state7 = Factory<AuthorTimeState>::getAuthorCopy<int>(11);
+		ActionState<Agent>* state8 = Factory<AuthorTimeState>::getAuthorCopy<int>(12);
+		ActionState<Agent>* state9 = Factory<AuthorTimeState>::getAuthorCopy<int>(13);
+
+		StateKey key7 = add(*state7);
+		StateKey key8 = add(*state8);
+		StateKey key9 = add(*state9);
+
+		connect(key7, *condition1, key8, transitionFX1);
+		connect(key8, *condition2, key9, transitionFX1);
+		// connect(key9, *condition2, key7, transitionFX1);
+	}
+
+	virtual void enter(Agent&)
+	{
+		if (doPrintEnter) printf("enter StateMachine: 10\n");
+	}
+
+	virtual void exit(Agent&)
+	{
+		if (doPrintExit) printf("exit StateMachine: 10\n");
+	}
+
+	virtual void act(Agent&)
+	{
+		if (doPrintAct) printf("act StateMachine: 10\n");
+	}
+
+	int memoryTest[20480];
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineFour, StateMachine<Agent>, NULL)
 
 class StateMachineTwo
 	: public StateMachine<Agent>
@@ -284,22 +358,37 @@ protected:
 		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
 		RunTimeAuthorTimeCondition* condition1 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
 		RunTimeAuthorTimeCondition* condition2 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
+		RunTimeAuthorTimeCondition* condition3x = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(5);
 
 		ActionState<Agent>* state4 = Factory<AuthorTimeState>::getAuthorCopy<int>(4);
 		ActionState<Agent>* state5 = Factory<AuthorTimeState>::getAuthorCopy<int>(5);
 		ActionState<Agent>* state6 = Factory<StateMachineThree>::getAuthorCopy();
+		ActionState<Agent>* state10 = Factory<StateMachineFour>::getAuthorCopy();
 
-		StateKey key7 = add(*state4);
-		StateKey key8 = add(*state5);
-		StateKey key9 = add(*state6);
 
-		connect(key7, *condition1, key8, transitionFX1);
-		connect(key8, *condition2, key9, transitionFX1);
+		StateKey key4 = add(*state4);
+		StateKey key5 = add(*state5);
+		StateKey key6 = add(*state6);
+		StateKey key10 = add(*state10);
+
+		connect(key4, *condition1, key5, transitionFX1);
+		connect(key5, *condition2, key6, transitionFX1);
+		connect(key6, *condition3x, key10);
 	}
 
 	virtual void enter(Agent&)
 	{
-		printf("StateMachine: 3\n");
+		if (doPrintEnter) printf("enter StateMachine: 3\n");
+	}
+
+	virtual void exit(Agent&)
+	{
+		if (doPrintExit) printf("exit StateMachine: 3\n");
+	}
+
+	virtual void act(Agent&)
+	{
+		if (doPrintAct) printf("act StateMachine: 3\n");
 	}
 
 	// int memoryTest[20480];
@@ -333,7 +422,17 @@ protected:
 
 	virtual void enter(Agent&)
 	{
-		printf("StateMachine: 0\n");
+		if (doPrintEnter) printf("enter StateMachine: 0\n");
+	}
+
+	virtual void exit(Agent&)
+	{
+		if (doPrintExit) printf("exit StateMachine: 0\n");
+	}
+
+	virtual void act(Agent&)
+	{
+		if (doPrintAct) printf("act StateMachine: 0\n");
 	}
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineOne, StateMachine<Agent>, NULL)
@@ -384,7 +483,7 @@ public:
 protected:
 	void enter(Alarm& alarm)
 	{
-		printf("entering alarm beep FX\n");
+		if (doPrintEnter) printf("entering alarm beep FX\n");
 		++m_timesExecuted;
 	}
 	
@@ -400,13 +499,13 @@ class IsAlarmSilenced: public Condition<Alarm>
 protected:
 	void enter(Alarm& alarm)
 	{
-		printf("enter is alarm silenced condition\n");
+		if (doPrintEnter) printf("enter is alarm silenced condition\n");
 		m_timesExecuted = 0;
 	}
 
 	void exit(Alarm& alarm)
 	{
-		printf("exiting is alarm silenced condition\n");
+		if (doPrintExit) printf("exiting is alarm silenced condition\n");
 	}
 	
 	bool isSatisfied(Alarm& alarm)
@@ -426,13 +525,13 @@ class IsSmokePresent : public Condition<Alarm>
 protected:
 	void enter(Alarm& alarm)
 	{
-		printf("enter is smoke present condition\n");
+		if (doPrintEnter) printf("enter is smoke present condition\n");
 		m_timesExecuted = 0;
 	}
 
 	void exit(Alarm& alarm)
 	{
-		printf("exiting is smoke present condition\n");
+		if (doPrintExit) printf("exiting is smoke present condition\n");
 	}
 
 	bool isSatisfied(Alarm& alarm)
@@ -495,6 +594,7 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(AlarmState, StateMachine<Alarm>, NULL)
 void HFSM::test(void)
 {
 	// this the alarm
+	if (false)
 	{
 		Alarm alarm;
 		Traversal<Alarm> traversal(alarm);
@@ -536,7 +636,7 @@ void HFSM::test(void)
 		
 		alpha.start(*smOneRun1);
 		// just test for memory leaks
-		for (int i(0), sentinel(19); i < sentinel; ++i)
+		for (int i(0), sentinel(30); i < sentinel; ++i)
 		{
 			alpha.act();
 		}
