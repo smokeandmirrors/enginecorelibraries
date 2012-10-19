@@ -256,32 +256,31 @@ class ActionState
 	friend class StateMachine<AGENT>;
 		
 public:
-	/** by default, ActionStates have no author time state */
-	static const bool hasAuthorTimeState = false;
-	
 	/** override this to perform an action with the agent */
-	virtual void act(Traversal<AGENT>& agent)=0; 
-	
-	/** a helper function for the traversal */
-	virtual Depth calculateDepth(void) const
-	{
-		return 0;
+	virtual void act(AGENT&)=0; 
+
+	/**
+	This is called every time a state is entered by the
+	agent during traversal. Afterwards only act() is called.
+	Override this for custom functionality.
+	*/
+	virtual void enter(AGENT&) 
+	{ 
+		/* empty */ 
 	}
 
-	/** called every time the state is entered in a state machine */
-	void enter(Traversal<AGENT>& agent) 
-	{	
-		onEnter(agent); 
+	/**
+	This is called every time a state is exited by the
+	agent during traversal. 
+	Override this for custom functionality.
+	*/
+	virtual void exit(AGENT&) 
+	{ 
+		/* empty */ 
 	}
 
-	/** called every time the state is exited in a state machine */
-	void exit(Traversal<AGENT>& agent)
-	{	
-		onExit(agent);
-	}
-	
 	/** override this if the action is completable */
-	virtual bool isCompletable(Traversal<AGENT>& /*agent*/) const
+	virtual bool isCompletable(Traversal<AGENT>& /*traversal*/) const
 	{
 		return false;
 	}
@@ -290,9 +289,9 @@ public:
 	override this when the action is completed, and make sure to
 	override isCompletable() as well
 	*/
-	virtual bool isComplete(Traversal<AGENT>& agent) const
+	virtual bool isComplete(Traversal<AGENT>& traversal) const
 	{
-		return isCompletable(agent) && false;
+		return isCompletable(traversal) && false;
 	}
 
 	/** 
@@ -304,6 +303,10 @@ public:
 	virtual void recycle(void)=0;
 
 protected:
+	/** by default, ActionStates have no author time state */
+	// static const bool hasAuthorTimeState = false;
+
+
 	/** 
 	Factory system compatibility.  
 	Only the Factory can create/destroy these objects.
@@ -323,7 +326,13 @@ protected:
 	{
 		/* empty */
 	}
-	
+
+	/** a helper function for the traversal */
+	virtual Depth calculateDepth(void) const
+	{
+		return 0;
+	}
+
 	/** 
 	Factory system compatibility.  
 	Override this function for traversal time copies.
@@ -340,24 +349,22 @@ protected:
 	*/
 	virtual bool hasRunTimeState(void) const=0;
 	
-	/**
-	This is called every time a state is entered by the
-	agent during traversal. Afterwards only act() is called.
-	Override this for custom functionality.
-	*/
-	virtual void onEnter(Traversal<AGENT>& /*agent*/) 
-	{ 
-		/* empty */ 
+	/** allows the traveral object to record the action */
+	virtual void recordAction(Traversal<AGENT>& traversal)
+	{
+		act(traversal.agent);
 	}
 
-	/**
-	This is called every time a state is exited by the
-	agent during traversal. 
-	Override this for custom functionality.
-	*/
-	virtual void onExit(Traversal<AGENT>& /*agent*/) 
-	{ 
-		/* empty */ 
+	/** called every time the state is entered in a state machine */
+	virtual void recordEntry(Traversal<AGENT>& traversal) 
+	{	
+		enter(traversal.agent);
+	}
+
+	/** called every time the state is exited in a state machine */
+	virtual void recordExit(Traversal<AGENT>& traversal)
+	{	
+		exit(traversal.agent);
 	}
 
 	/** 
@@ -397,7 +404,7 @@ public:
 	\see AuthorTimeRunTimeFactory.h for more info.
 	*/
 	virtual void recycle(void)=0;
-
+	
 protected:
 	/** 
 	Factory system compatibility.  
@@ -418,7 +425,19 @@ protected:
 	{
 		/* empty */
 	}
-	
+
+	/** called when an agent enters a state from which this Condition is connected */
+	virtual void enter(AGENT& /*agent*/)
+	{
+		// empty
+	}
+
+	/** called when an agent exits a state from which this Condition is connected */
+	virtual void exit(AGENT& /*agent*/)
+	{
+		// empty
+	}
+
 	/** 
 	Factory system compatibility.  
 	Override this function for traversal time copies.
@@ -495,14 +514,8 @@ effects between states.
 StateMachine and adding ActionStates, and connecting them with
 Conditions and [optional] TransitionFX.
 
-example:
-\code
-
-
-
-
-
-\endcode
+\see a silly example of full authorship and use at the bottom
+of this file.
 
 \warning Be very careful to override only the appropriate functions
 when deriving from StateMachine.  That is, DO NOT override
@@ -582,8 +595,15 @@ protected:
 		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
 	}
 
+	/** override to perform a custom action at the state-machine (non-leaf state) level */
+	virtual void act(AGENT&)
+	{
+		// empty
+	}
+
 	/** 
 	adds an ActionState to the state machine, and returns a key
+	the first state added is the initial state
 	to allow connection the state to another (previously added state) via a Condition 
 	*/
 	StateKey add(ActionState<AGENT>& actionState) 
@@ -607,25 +627,7 @@ protected:
 		assert(states[to] != NULL);
 		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
 	}
-
-	/** override in case of custom StateMachine act() behavior */
-	virtual void onMachineAct(AGENT& /*agent*/)
-	{
-		// empty
-	}
-
-	/** override in case of custom StateMachine onEnter() behavior*/
-	virtual void onMachineEnter(AGENT& /*agent*/)
-	{
-		// empty
-	}
-
-	/** override in case of custom StateMachine onExit() behavior */
-	virtual void onMachineExit(AGENT& /*agent*/) 
-	{
-		// empty
-	}
-		
+			
 	/** 
 	Factory system compatibility.  
 	Override this function for alternative memory management.
@@ -643,12 +645,32 @@ protected:
 	class Connection
 	{
 	public:
-		Connection(Condition<AGENT>& cause, TransitionFX<AGENT>* transFX, StateKey nextState)
+		inline Connection(Condition<AGENT>& cause, TransitionFX<AGENT>* transFX, StateKey nextState)
 			: condition(cause)
 			, fx(transFX)
 			, next(nextState)
 		{
 			/* empty */
+		}
+
+		inline void enter(AGENT& agent)
+		{
+			condition.enter(agent);	
+			
+			if (fx)
+			{
+				fx->enter(agent);
+			}
+		}
+
+		inline void exit(AGENT& agent)
+		{
+			condition.exit(agent);
+			
+			if (fx)
+			{
+				fx->exit(agent);
+			}
 		}
 
 		Condition<AGENT>& condition;
@@ -658,6 +680,39 @@ protected:
 	private:
 		Connection<AGENT>& operator=(const Connection<AGENT>&);
 	}; // struct Connection
+
+
+	template<typename AGENT>
+	struct EnterConnection
+	{
+		AGENT& agent;
+
+		inline EnterConnection(AGENT& a) : agent(a) {}
+
+		inline void operator()(Connection<AGENT>& connection)
+		{
+			connection.enter(agent);
+		}
+
+	private:
+		EnterConnection& operator=(const EnterConnection&);
+	}; // struct EnterConnection
+
+
+	template<typename AGENT>
+	struct ExitConnection
+	{
+		AGENT& agent;
+
+		inline ExitConnection(AGENT& a) : agent(a) {}
+
+		inline void operator()(Connection<AGENT>& connection)
+		{
+			connection.exit(agent);
+		}
+	private:
+		ExitConnection& operator=(const ExitConnection&);
+	}; // struct ExitConnection
 
 	template<typename AGENT>
 	struct RecycleConnection
@@ -686,7 +741,7 @@ protected:
 	class State
 	{
 	public:
-		State(ActionState<AGENT>& newState) 
+		inline State(ActionState<AGENT>& newState) 
 			: state(newState)
 		{
 			/* empty */
@@ -696,8 +751,18 @@ protected:
 		{
 			/* empty */
 		}
+
+		inline void enter(AGENT& agent)
+		{
+			std::for_each(connections.begin(), connections.end(), EnterConnection<AGENT>(agent));	
+		}
+
+		inline void exit(AGENT& agent)
+		{
+			std::for_each(connections.begin(), connections.end(), ExitConnection<AGENT>(agent));	
+		}
 		
-		void recycle(void)
+		inline void recycle(void)
 		{
 			std::for_each(connections.begin(), connections.end(), RecycleConnection<AGENT>());		
 			state.recycle();
@@ -763,28 +828,6 @@ protected:
 	}
 	
 private:
-	virtual void act(Traversal<AGENT>& traversal)
-	{
-		onMachineAct(traversal.agent);
-		traversal.incrementDepth();
-		// printf("acting on %s\n", name);
-		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
-		assert(current);
-		ConnectionKey causeKey(evaluateConditions(traversal, current));
-		
-		if (causeKey == NoSatisfiedCondition)
-		{	// no reason to transfer to another state, so act on the current state
-			current->state.act(traversal);
-		}
-		else
-		{	// a condition is satisfied
-			Connection<AGENT>& connection(current->connections[causeKey]);
-			exitPreviousState(traversal, *current);
-			causeTransitionFX(connection, *current, traversal.agent);
-			enterNextState(traversal, causeKey, connection);
-		}	
-	}
-	
 	virtual Depth calculateDepth(void) const
 	{
 		Depth maxChildDepth(0);
@@ -814,11 +857,12 @@ private:
 		}
 	}
 		
-	void enterCurrent(Traversal<AGENT>& traversal)
+	inline void enterCurrent(Traversal<AGENT>& traversal)
 	{	
 		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
 		assert(current);
-		current->state.enter(traversal);
+		current->enter(traversal.agent);
+		current->state.recordEntry(traversal);
 	}
 
 	inline void enterNextState(Traversal<AGENT>& traversal, ConnectionKey causeKey, Connection<AGENT>& connection)
@@ -829,11 +873,12 @@ private:
 
 	inline void exitPreviousState(Traversal<AGENT>& traversal, State<AGENT>& current)
 	{
-		current.state.exit(traversal);
+		current.state.recordExit(traversal);
+		current.exit(traversal.agent);
 		traversal.exit();
 	}
 	
-	ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State<AGENT>* current)
+	inline ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State<AGENT>* current)
 	{
 		std::vector< Connection<AGENT> >& connections(current->connections);
 		
@@ -904,19 +949,50 @@ private:
 
 		return &(machine->states[traversal.getState()]->state) == &state;
 	}
+	
+	/**
+	calls derived act() if there is one
+	then, evaluates conditions on the current state in order of connection
+	if a satisfied condition is found, it plays the transitionfx and moves to the next state
+	*/
+	virtual void recordAction(Traversal<AGENT>& traversal)
+	{
+		act(traversal.agent);
+		traversal.incrementDepth();
+		// printf("acting on %s\n", name);
+		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
+		assert(current);
+		ConnectionKey causeKey(evaluateConditions(traversal, current));
 
-	virtual void onEnter(Traversal<AGENT>& traversal)
+		if (causeKey == NoSatisfiedCondition)
+		{	// no reason to transfer to another state, so act on the current state
+			current->state.recordAction(traversal);
+		}
+		else
+		{	// a condition is satisfied
+			Connection<AGENT>& connection(current->connections[causeKey]);
+			exitPreviousState(traversal, *current);
+			causeTransitionFX(connection, *current, traversal.agent);
+			enterNextState(traversal, causeKey, connection);
+		}	
+	}
+
+	/**
+	entering a state machine enters all initial states of child
+	state machines until a leave state is entered
+	*/
+	virtual void recordEntry(Traversal<AGENT>& traversal)
 	{	
-		onMachineEnter(traversal.agent);
+		enter(traversal.agent);
 		traversal.enter(InitialCauseKey, 0);
 		enterCurrent(traversal);
 	}
 
-	virtual void onExit(Traversal<AGENT>& traversal)
+	virtual void recordExit(Traversal<AGENT>& traversal)
 	{	
-		onMachineExit(traversal.agent);
+		exit(traversal.agent);
 		State<AGENT>* current(getCurrentState(traversal));
-		current->state.exit(traversal);
+		current->state.recordExit(traversal);
 	}
 		
 private:
@@ -942,7 +1018,7 @@ public:
 		const ActionState<AGENT>& /*master*/, 
 		const ActionState<AGENT>& /*from*/, 
 		const ActionState<AGENT>& /*to*/)=0;
-
+	
 	/** 
 	Factory system compatibility.  
 	Override this function for traversal time memory management.
@@ -970,6 +1046,18 @@ protected:
 	virtual ~TransitionFX(void)
 	{
 		/* empty */
+	}
+
+	/** called when an agent enters a state from which this TransitionFX is connected */
+	virtual void enter(AGENT& /*agent*/)
+	{
+		// empty
+	}
+
+	/** called when an agent exits a state from which this TransitionFX is connected */
+	virtual void exit(AGENT& /*agent*/)
+	{
+		// empty
 	}
 
 	/** 
@@ -1032,7 +1120,7 @@ public:
 		if (isInActiveState)
 		{
 			currentDepth = -1; 
-			stateMachine->act(*this);
+			stateMachine->recordAction(*this);
 		}
 	}
 	
@@ -1074,7 +1162,7 @@ public:
 	{
 		if (isInActiveState)
 		{
-			stateMachine->exit(*this);
+			stateMachine->recordExit(*this);
 			isInActiveState = false;
 		}	
 	}
@@ -1093,38 +1181,38 @@ public:
 	}
 
 protected: 
-	void enter(ConnectionKey cause, StateKey state)
+	inline void enter(ConnectionKey cause, StateKey state)
 	{
 		++currentDepth;
 		assert(isValidDepth(currentDepth));
 		traversal[currentDepth].set(cause, state);
 	}
 
-	void exit(void)
+	inline void exit(void)
 	{
 		assert(isValid());
 		traversal[currentDepth].state = InvalidStateKey;
 		--currentDepth;
 	}
 
-	ConnectionKey getCause(void) const
+	inline ConnectionKey getCause(void) const
 	{
 		assert(isValid());
 		return traversal[currentDepth].cause;
 	}
 
-	Depth getDepth(void) const
+	inline Depth getDepth(void) const
 	{
 		return currentDepth;
 	}
 
-	StateKey getState(void) const
+	inline StateKey getState(void) const
 	{
 		assert(isValid());
 		return traversal[currentDepth].state;
 	}
 
-	StateKey getState(Depth depth) const
+	inline StateKey getState(Depth depth) const
 	{
 		assert(isValidDepth(depth));
 		return traversal[depth].state;
@@ -1146,18 +1234,18 @@ protected:
 			&& depth < static_cast<Depth>(traversal.size()); 
 	}
 				
-	void setMaxDepth(Depth depth)
+	inline void setMaxDepth(Depth depth)
 	{
 		traversal.resize(depth);
 	}
 
-	void startTraversal(void)
+	inline void startTraversal(void)
 	{	// initialize capacity
 		setMaxDepth(stateMachine->calculateDepth());
 		// initialize traversal information
 		currentDepth = -1;
 		// enter the machine for the first time
-		stateMachine->enter(*this);
+		stateMachine->recordEntry(*this);
 	}
 		
 private:
@@ -1178,14 +1266,14 @@ struct TraversalEntry
 	StateKey state;
 	ConnectionKey cause; 
 
-	TraversalEntry(void) 
+	inline TraversalEntry(void) 
 		: state(InvalidStateKey)
 		, cause(InitialCauseKey)
 	{
 		/* empty */
 	}
 
-	void set(ConnectionKey c, StateKey s) 
+	inline void set(ConnectionKey c, StateKey s) 
 	{
 		cause = c;
 		state = s;
@@ -1196,5 +1284,185 @@ DEFINE_TEMPLATE_BASE_RUN_TIME_TYPE(AGENT, ActionState, NULL)
 DEFINE_TEMPLATE_DERIVED_RUN_TIME_TYPE(AGENT, StateMachine, ActionState<AGENT>, NULL)
 
 } // namespace HFSM
+
+/**
+\code
+class Alarm
+{
+	public:
+	void detectSmoke(void)
+	{
+		printf("looking for smoke\n");
+	}
+
+	void initialBeep(void)
+	{
+		printf("initial alarm beep!\n");
+	}
+
+	void sound(void) 
+	{
+		printf("BEEP BEEP BEEP!\n");
+	}
+}; // Alarm
+
+class InitialAlarmBeep : public TransitionFX<Alarm>
+{
+	TRANSITION_FX_WITH_RUN_TIME_STATE(InitialAlarmBeep, Alarm);
+
+	InitialAlarmBeep()
+	{
+		m_timesExecuted = 0;
+	}
+
+	public:
+	void effect(Alarm& alarm, const ActionState<Alarm>& , const ActionState<Alarm>& , const ActionState<Alarm>&)
+	{
+		if (m_timesExecuted < 2)
+		{
+			alarm.initialBeep();
+		}
+		else
+		{
+			printf("alarm beep FX has reached its limit\n");
+		}
+	}
+
+protected:
+	void enter(Alarm& alarm)
+	{
+		printf("entering alarm beep FX\n");
+		++m_timesExecuted;
+	}
+
+private:
+	int m_timesExecuted;
+}; // 
+
+
+class IsAlarmSilenced: public Condition<Alarm>
+{
+CONDITION_WITH_RUN_TIME_STATE(IsAlarmSilenced, Alarm);
+
+protected:
+void enter(Alarm& alarm)
+{
+printf("enter is alarm silenced condition\n");
+m_timesExecuted = 0;
+}
+
+void exit(Alarm& alarm)
+{
+printf("exiting is alarm silenced condition\n");
+}
+
+bool isSatisfied(Alarm& alarm)
+{
+++m_timesExecuted;
+return m_timesExecuted > 3;	
+}
+
+private:
+int m_timesExecuted;
+};
+
+class IsSmokePresent : public Condition<Alarm>
+{
+CONDITION_WITH_RUN_TIME_STATE(IsSmokePresent, Alarm);
+
+protected:
+void enter(Alarm& alarm)
+{
+printf("enter is smoke present condition\n");
+m_timesExecuted = 0;
+}
+
+void exit(Alarm& alarm)
+{
+printf("exiting is smoke present condition\n");
+}
+
+bool isSatisfied(Alarm& alarm)
+{
+++m_timesExecuted;
+return m_timesExecuted > 2;	
+}
+
+private:
+int m_timesExecuted;
+};
+
+class SoundAlarm : public ActionState<Alarm>
+{
+ACTION_STATE_PURE(SoundAlarm, Alarm)
+
+public:
+void act(Alarm& agent)
+{
+agent.sound();
+}
+}; 
+DERIVED_RUN_TIME_TYPE_DEFINITION(SoundAlarm, ActionState<Alarm>, NULL)
+
+class DetectSmoke : public ActionState<Alarm>
+{
+ACTION_STATE_PURE(DetectSmoke, Alarm)
+
+public:
+void act(Alarm& alarm)
+{
+alarm.detectSmoke();
+}
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(DetectSmoke, ActionState<Alarm>, NULL)
+
+// definition
+class AlarmState : public StateMachine<Alarm>
+{
+STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(AlarmState, Alarm);
+
+protected:
+AlarmState()
+{	// get the author objects
+ActionState<Alarm>* soundAlarm = Factory<SoundAlarm>::getAuthorCopy();
+ActionState<Alarm>* detectSmoke = Factory<DetectSmoke>::getAuthorCopy();
+TransitionFX<Alarm>* initialBeep = Factory<InitialAlarmBeep>::getAuthorCopy();
+Condition<Alarm>* isSilenced = Factory<IsAlarmSilenced>::getAuthorCopy();
+Condition<Alarm>* isSmokePresent = Factory<IsSmokePresent>::getAuthorCopy();
+// add the states to the machine
+StateKey detectSmokeKey(add(*detectSmoke));
+StateKey soundAlarmKey(add(*soundAlarm));
+// define the connections
+connect(detectSmokeKey, *isSmokePresent, soundAlarmKey, initialBeep);
+connect(soundAlarmKey, *isSilenced, detectSmokeKey);
+}
+}; // AlarmState
+DERIVED_RUN_TIME_TYPE_DEFINITION(AlarmState, StateMachine<Alarm>, NULL)
+
+// at runtime somewhere:
+void runAlarmExample()
+{
+	Alarm alarm;
+	Traversal<Alarm> traversal(alarm);
+
+	AlarmState* alarmAuthor = Factory<AlarmState>::getAuthorCopy();
+	AlarmState* alarmRunTime = Factory<AlarmState>::getRunTimeCopy(*alarmAuthor);
+	traversal.start(*alarmRunTime);
+
+	for (int i = 0; i < 20; ++i)
+	{
+		traversal.act();
+	}
+
+	traversal.stop();
+	alarmRunTime->recycle();
+
+	// later
+	FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
+}
+
+
+\endcode
+*/
 
 #endif//HierarchicalFiniteStateMachine2
