@@ -124,7 +124,7 @@ private:
 
 } // namespace designPatterns
 
-// for template singletons, typedef the namespace first
+// for template singletons, typedef the name first
 
 #define DEFINE_SINGLETON_NS(BASE_CLASS, NAMESPACE) \
 namespace designPatterns \

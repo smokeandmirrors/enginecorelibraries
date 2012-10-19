@@ -216,7 +216,7 @@ Tested in the field	:	NO
 #define TRANSITION_FX_WITH_RUN_TIME_STATE(CLASS_NAME, TYPE_NAME) \
 	RUN_TIME_IMPLEMENTATION(CLASS_NAME, TransitionFX, TYPE_NAME) 
 
-namespace HFSM2
+namespace HFSM
 {
 
 typedef signed int StateKey;
@@ -385,7 +385,7 @@ class Condition
 
 public:
 	/** returns true if the Condition is satisfied */
-	inline bool operator()(AGENT* agent)
+	inline bool operator()(AGENT& agent)
 	{
 		return isSatisfied(agent);
 	}
@@ -436,7 +436,7 @@ protected:
 	virtual bool hasRunTimeState(void) const=0;
 
 	/** override this for your custom functionality */
-	virtual bool isSatisfied(AGENT* /*agent*/)=0;
+	virtual bool isSatisfied(AGENT& /*agent*/)=0;
 	
 	/** 
 	Factory system compatibility.  
@@ -464,7 +464,7 @@ class ConditionFalse
 	}
 
 protected:
-	bool isSatisfied(AGENT*) { return false; };
+	bool isSatisfied(AGENT&) { return false; };
 }; // ConditionFalse
 
 /**
@@ -484,7 +484,7 @@ class ConditionTrue
 	}
 
 protected:
-	bool isSatisfied(AGENT*) { return true; };
+	bool isSatisfied(AGENT&) { return true; };
 }; // ConditionTrue
 
 /**
@@ -494,6 +494,15 @@ effects between states.
 \note Custom StateMachines are created solely be deriving from
 StateMachine and adding ActionStates, and connecting them with
 Conditions and [optional] TransitionFX.
+
+example:
+\code
+
+
+
+
+
+\endcode
 
 \warning Be very careful to override only the appropriate functions
 when deriving from StateMachine.  That is, DO NOT override
@@ -588,6 +597,8 @@ protected:
 	/**
 	creates a connection between to states.  If the cause condition is satisfied during a traversal
 	the agent will exit the from state, cause the TransitionFX, and enter the to state.
+
+	conditions are evaluated in order of calls to connect()
 	*/
 	void connect(StateKey from, Condition<AGENT>& cause, StateKey to, TransitionFX<AGENT>* fx=NULL)
 	{
@@ -769,7 +780,7 @@ private:
 		{	// a condition is satisfied
 			Connection<AGENT>& connection(current->connections[causeKey]);
 			exitPreviousState(traversal, *current);
-			causeTransitionFX(connection, *current, &traversal.agent);
+			causeTransitionFX(connection, *current, traversal.agent);
 			enterNextState(traversal, causeKey, connection);
 		}	
 	}
@@ -793,7 +804,7 @@ private:
 		return maxChildDepth + 1;
 	}
 
-	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT* agent)
+	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT& agent)
 	{
 		if (connection.fx)
 		{	
@@ -830,7 +841,7 @@ private:
 		{
 			Connection<AGENT>& connection(connections[connectionKey]);
 
-			if (connection.condition(&traversal.agent))
+			if (connection.condition(traversal.agent))
 			{
 				return connectionKey;
 			}
@@ -927,7 +938,7 @@ class TransitionFX
 public:
 	/** called when an agent travels between one state an another */
 	virtual void effect(
-		AGENT* /*agent*/, 
+		AGENT& /*agent*/, 
 		const ActionState<AGENT>& /*master*/, 
 		const ActionState<AGENT>& /*from*/, 
 		const ActionState<AGENT>& /*to*/)=0;

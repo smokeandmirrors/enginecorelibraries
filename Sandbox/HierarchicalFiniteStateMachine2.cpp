@@ -1,7 +1,7 @@
 #include "Composition.h"
-#include "HierarchicalFiniteStateMachine2.h"
+#include "HierarchicalFiniteStateMachine.h"
 
-using namespace HFSM2;
+using namespace HFSM;
 using namespace designPatterns;
 
 class Agent
@@ -11,7 +11,7 @@ class Agent
 
 
 class AuthorTimeCondition
-	: public HFSM2::Condition<Agent>
+	: public HFSM::Condition<Agent>
 {
 	CONDITION_WITH_AUTHOR_TIME_STATE(AuthorTimeCondition, Agent)
 
@@ -24,7 +24,7 @@ public:
 	}
 
 protected:
-	bool isSatisfied(Agent*)
+	bool isSatisfied(Agent&)
 	{
 		return true;
 	}
@@ -39,7 +39,7 @@ bool AuthorTimeCondition::isEqualToAtAuthorTime(const AuthorTimeCondition& other
 }
 
 class RunTimeAuthorTimeCondition
-	: public HFSM2::Condition<Agent>
+	: public HFSM::Condition<Agent>
 {
 	CONDITION_WITH_AUTHOR_TIME_AND_RUN_TIME_STATE(RunTimeAuthorTimeCondition, Agent)
 
@@ -53,7 +53,7 @@ public:
 	}
 
 protected:
-	bool isSatisfied(Agent*)
+	bool isSatisfied(Agent&)
 	{
 		return (++m_runTimeVariable) > m_authorVariable;
 	}
@@ -69,7 +69,7 @@ bool RunTimeAuthorTimeCondition::isEqualToAtAuthorTime(const RunTimeAuthorTimeCo
 }
 
 class RunTimeAuthorTimeState
-	: public HFSM2::ActionState<Agent>
+	: public HFSM::ActionState<Agent>
 {
 	ACTION_STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 
@@ -102,7 +102,7 @@ bool RunTimeAuthorTimeState::isEqualToAtAuthorTime(const RunTimeAuthorTimeState&
 }
 
 class AuthorTimeState
-	: public HFSM2::ActionState<Agent>
+	: public HFSM::ActionState<Agent>
 {
 	ACTION_STATE_WITH_AUTHOR_TIME_STATE(AuthorTimeState, Agent)
 
@@ -133,7 +133,7 @@ bool AuthorTimeState::isEqualToAtAuthorTime(const AuthorTimeState& other) const
 }
 
 class RunTimeState
-	: public HFSM2::ActionState<Agent>
+	: public HFSM::ActionState<Agent>
 {
 	ACTION_STATE_WITH_RUN_TIME_STATE(RunTimeState, Agent)
 
@@ -159,7 +159,7 @@ private:
 DERIVED_RUN_TIME_TYPE_DEFINITION(RunTimeState, ActionState<Agent>, NULL)
 
 class PureState
-	: public HFSM2::ActionState<Agent>
+	: public HFSM::ActionState<Agent>
 {
 	ACTION_STATE_PURE(PureState, Agent)
 
@@ -192,7 +192,7 @@ public:
 		/* empty */
 	}
 
-	virtual void effect(Agent* /*agent*/, const ActionState<Agent>& /*master*/, const ActionState<Agent>& /*from*/, const ActionState<Agent>& /*to*/)
+	virtual void effect(Agent& /*agent*/, const ActionState<Agent>& /*master*/, const ActionState<Agent>& /*from*/, const ActionState<Agent>& /*to*/)
 	{
 		printf("effecting on transition!\n");
 	}
@@ -339,7 +339,127 @@ DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineOne, StateMachine<Agent>, NULL)
 
 FactoryDestroyer* factoryDestroyers(NULL);
 
-void HFSM2::test(void)
+class Alarm
+{
+public:
+
+	int getNumSignalActions(void) const
+	{
+		return m_numSignalActions;
+	}
+
+	int getMaxSignalActions(void) const
+	{
+		return m_maxSignalActions;
+	}
+
+	void initialBeep(void)
+	{
+		printf("initial alarm beep!\n");
+	}
+
+	void isSignaled(void) const
+	{
+
+	}
+
+	bool isSmokePresent(void) 
+	{
+		return --m_numIsSmokePresent > 0;
+	}
+
+	void isSounding(void) const
+	{
+
+	}
+
+	void sound(void) const
+	{
+		printf("BEEP BEEP BEEP!\n");
+	}
+
+private:
+	bool m_isSignaled;
+	int m_numSignalActions;
+	int m_maxSignalActions;
+	int m_numIsSmokePresent;
+}; // Alarm
+
+class InitialAlarmBeep : public TransitionFX<Alarm>
+{
+	TRANSITION_FX_PURE(InitialAlarmBeep, Alarm);
+public:
+	void effect(Alarm& alarm, const ActionState<Alarm>& , const ActionState<Alarm>& , const ActionState<Alarm>&)
+	{
+		alarm.initialBeep();
+	};
+}; // 
+
+
+class IsAlarmSignaled : public Condition<Alarm>
+{
+	CONDITION_PURE(IsAlarmSignaled, Alarm);
+protected:
+	bool isSatisfied(Alarm& alarm)
+	{
+		return alarm.getNumSignalActions() < alarm.getMaxSignalActions();
+	}
+};
+
+class IsSmokePresent : public Condition<Alarm>
+{
+	CONDITION_PURE(IsSmokePresent, Alarm);
+
+protected:
+	bool isSatisfied(Alarm& alarm)
+	{
+		return alarm.isSmokePresent();
+	}
+};
+
+class SoundAlarm : public ActionState<Alarm>
+{
+	ACTION_STATE_PURE(SoundAlarm, Alarm)
+public:
+	void act(Traversal<Alarm>& agent)
+	{
+		agent.agent.sound();
+	}
+}; 
+DERIVED_RUN_TIME_TYPE_DEFINITION(SoundAlarm, ActionState<Alarm>, NULL)
+
+class DetectSmoke : public ActionState<Alarm>
+{
+	ACTION_STATE_PURE(DetectSmoke, Alarm)
+public:
+	void act(Traversal<Alarm>& agent)
+	{
+		// agent.agent.
+	}
+};
+DERIVED_RUN_TIME_TYPE_DEFINITION(DetectSmoke, ActionState<Alarm>, NULL)
+
+// definition
+class AlarmState : public StateMachine<Alarm>
+{
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(AlarmState, Alarm);
+
+protected:
+	AlarmState()
+	{
+		TransitionFX<Alarm>* initialBeep = Factory<InitialAlarmBeep>::getAuthorCopy();
+		Condition<Alarm>* isSignaled = Factory<IsAlarmSignaled>::getAuthorCopy();
+		Condition<Alarm>* isSmokePresent = Factory<IsSmokePresent>::getAuthorCopy();
+
+		ActionState<Alarm>* soundAlarm = Factory<SoundAlarm>::getAuthorCopy();
+		ActionState<Alarm>* detectSmoke = Factory<DetectSmoke>::getAuthorCopy();
+
+		
+	}
+}; // AlarmState
+DERIVED_RUN_TIME_TYPE_DEFINITION(AlarmState, StateMachine<Alarm>, NULL)
+
+void HFSM::test(void)
 {
 	for(;;) // test for memory leaks
 	{
