@@ -1,5 +1,6 @@
 #include "Composition.h"
 #include "HierarchicalFiniteStateMachine.h"
+#include "GenericConditions.h"
 
 using namespace HFSM;
 using namespace designPatterns;
@@ -19,9 +20,14 @@ class AuthorTimeCondition
 	CONDITION_WITH_AUTHOR_TIME_STATE(AuthorTimeCondition, Agent)
 
 public:
+	AuthorTimeCondition()
+		: m_authorVariable(1)
+	{
+		// empty
+	}
+
 	AuthorTimeCondition(int authorTime)
-		: Condition<Agent>()
-		, m_authorVariable(authorTime)
+		: m_authorVariable(authorTime)
 	{
 		/* empty */
 	}
@@ -77,6 +83,13 @@ class RunTimeAuthorTimeState
 	ACTION_STATE_WITH_AUTHOR_AND_RUN_TIME_STATE(RunTimeAuthorTimeState, Agent)
 
 public:
+	RunTimeAuthorTimeState()
+		: m_authorVariable(1)
+		, m_runTimeVariable(0)
+	{
+		/* empty */
+	}
+	
 	RunTimeAuthorTimeState(int authorTime)
 		: ActionState<Agent>()
 		, m_authorVariable(authorTime)
@@ -220,7 +233,8 @@ protected:
 	{
 		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
 		AuthorTimeCondition* condition1 = Factory<AuthorTimeCondition>::getAuthorCopy<int>(1); 
-		AuthorTimeCondition* condition2 = Factory<AuthorTimeCondition>::getAuthorCopy<int>(1); 
+		// AuthorTimeCondition* condition2 = Factory<AuthorTimeCondition>::getAuthorCopy<int>(1); 
+		AuthorTimeCondition* condition2 = Factory<AuthorTimeCondition>::getAuthorCopy(1); 
 
 		ActionState<Agent>* state7 = Factory<AuthorTimeState>::getAuthorCopy<int>(seven);
 		ActionState<Agent>* state8 = Factory<AuthorTimeState>::getAuthorCopy<int>(++seven);
@@ -396,6 +410,12 @@ protected:
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(StateMachineTwo, StateMachine<Agent>, NULL)
 	
+typedef ConditionBinary< Agent, ConditionOperatorAnd<Agent>, ConditionTrue<Agent>, ConditionFalse<Agent> > FirstBinary;
+typedef ConditionBinary< Agent, ConditionOperatorAnd<Agent>, AuthorTimeCondition, RunTimeAuthorTimeCondition > SecondBinary;
+typedef ConditionBinary< Agent, ConditionOperatorOr<Agent>, AuthorTimeCondition, RunTimeAuthorTimeCondition > BinaryOr;
+typedef ConditionBinary< Agent, ConditionOperatorXor<Agent>, ConditionTrue<Agent>, ConditionTrue<Agent> > BinaryXor;
+typedef ConditionNot< Agent, ConditionFalse<Agent> > NotCondition;
+
 class StateMachineOne
 	: public StateMachine<Agent>
 {
@@ -407,6 +427,13 @@ protected:
 		TransitionFX<Agent>* transitionFX1 = Factory<PureTransitionFX>::getAuthorCopy(); 
 		RunTimeAuthorTimeCondition* condition1 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
 		RunTimeAuthorTimeCondition* condition2 = Factory<RunTimeAuthorTimeCondition>::getAuthorCopy<int>(1); 
+		
+		Condition<Agent>* notCondition = Factory<NotCondition>::getAuthorCopy();
+		Condition<Agent>* conditionBinary = Factory< FirstBinary >::getAuthorCopy();
+		Condition<Agent>* conditionBinary2 = Factory< BinaryXor > ::getAuthorCopy();
+		// Condition<Agent>* conditionBinary3 = Factory< SecondBinary > ::getAuthorCopy<int>(1);
+		Condition<Agent>* conditionBinary4 = Factory< SecondBinary > ::getAuthorCopy<int, int>(1, 2);
+		Condition<Agent>* conditionBinary5 = Factory< SecondBinary > ::getAuthorCopy<int, int>(1, 3);
 
 		ActionState<Agent>* state1 = Factory<AuthorTimeState>::getAuthorCopy<int>(1);
 		ActionState<Agent>* state2 = Factory<AuthorTimeState>::getAuthorCopy<int>(2);
@@ -416,7 +443,7 @@ protected:
 		StateKey key8 = add(*state2);
 		StateKey key9 = add(*state3);
 
-		connect(key7, *condition1, key8, transitionFX1);
+		connect(key7, *notCondition, key8, transitionFX1);
 		connect(key8, *condition2, key9, transitionFX1);
 	}
 

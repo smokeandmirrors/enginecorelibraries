@@ -58,6 +58,8 @@ should be perfectly fine.   If specific optimizations of run-time copies
 are desired, changes would have to be made to the recycle() methods here,
 and in AuthorTimeRunTimeFactory.h.
 
+\see GenericConditions.h for some helpful template Condition classes
+
 <DEVELOPMENT STATUS>
 Current Draft		:	3.0
 Current Phase		:   FIELD TESTING
@@ -129,11 +131,11 @@ Tested in the field	:	NO
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
 	public: \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
+	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
+	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
 	private: \
 	friend class Factory< CLASS_NAME >; \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
-	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
-	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
 	GET_RUN_TIME_COPY_##FSM_TYPE##(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
@@ -391,6 +393,22 @@ class Condition
 	friend class StateMachine<AGENT>;
 
 public:
+	/** 
+	Factory system compatibility.  
+	Override this function for traversal time copies.
+	Override or use the Factory system macros.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
+
+	/** 
+	Factory system compatibility.  
+	Override this function for traversal time state.
+	Override or use the Factory system macros.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual bool hasRunTimeState(void) const=0;
+
 	/** returns true if the Condition is satisfied */
 	inline bool operator()(AGENT& agent)
 	{
@@ -437,23 +455,7 @@ protected:
 	{
 		// empty
 	}
-
-	/** 
-	Factory system compatibility.  
-	Override this function for traversal time copies.
-	Override or use the Factory system macros.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
-
-	/** 
-	Factory system compatibility.  
-	Override this function for traversal time state.
-	Override or use the Factory system macros.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	virtual bool hasRunTimeState(void) const=0;
-
+	
 	/** override this for your custom functionality */
 	virtual bool isSatisfied(AGENT& /*agent*/)=0;
 	
@@ -464,47 +466,44 @@ protected:
 	\see AuthorTimeRunTimeFactory.h for more info.
 	*/
 	virtual void recycleRunTimeCopy(void) { delete this; }
+
+public:	
+	inline bool and(AGENT& agent, bool rhs) 
+	{
+		return rhs && isSatisfied(agent);
+	}
+
+	inline bool and(AGENT& agent, Condition<AGENT>& rhs)
+	{
+		return isSatisfied(agent) && rhs.isSatisfied(agent);
+	}
+
+	inline bool not(AGENT& agent)
+	{
+		return !isSatisfied(agent);
+	}
+
+	inline bool or(AGENT& agent, bool rhs) 
+	{
+		return rhs || isSatisfied(agent);
+	}
+
+	inline bool or(AGENT& agent, Condition<AGENT>& rhs)
+	{
+		return isSatisfied(agent) || rhs.isSatisfied(agent);
+	}
+
+	inline bool xor(AGENT& agent, bool rhs) 
+	{
+		return isSatisfied(agent) ^ rhs;
+	}
+
+	inline bool xor(AGENT& agent, Condition<AGENT>& rhs)
+	{
+		return isSatisfied(agent) ^ rhs.isSatisfied(agent);
+	}
+
 }; // Condition
-
-/**
-A Condition that always is never satisfied
-which is a need that comes up frequently 
-during iteration & debugging.
-*/
-template<typename AGENT>
-class ConditionFalse
-	: public Condition<AGENT>
-{
-	CONDITION_PURE(ConditionFalse, AGENT)
-	
-	ConditionFalse(void)
-	{
-		/* empty */
-	}
-
-protected:
-	bool isSatisfied(AGENT&) { return false; };
-}; // ConditionFalse
-
-/**
-A Condition that always is always satisfied,
-which is a need that comes up frequently 
-during iteration & debugging.
-*/
-template<typename AGENT>
-class ConditionTrue
-	: public Condition<AGENT>
-{
-	CONDITION_PURE(ConditionTrue, AGENT)
-	
-	ConditionTrue(void)
-	{
-		/* empty */
-	}
-
-protected:
-	bool isSatisfied(AGENT&) { return true; };
-}; // ConditionTrue
 
 /**
 The StateMachine handles the connections and transition
@@ -1289,7 +1288,6 @@ struct TraversalEntry
 
 DEFINE_TEMPLATE_BASE_RUN_TIME_TYPE(AGENT, ActionState, NULL)
 DEFINE_TEMPLATE_DERIVED_RUN_TIME_TYPE(AGENT, StateMachine, ActionState<AGENT>, NULL)
-
 } // namespace HFSM
 
 /**

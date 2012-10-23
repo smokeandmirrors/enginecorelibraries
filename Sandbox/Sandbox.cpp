@@ -448,14 +448,33 @@ void testHFSM2(void)
 void onPlay(void)
 {
 	{
-		Millisecond two(2.0);
-		Millisecond four(4.0);
+		{
+			Millisecond two(2.0);
+			Millisecond four(4.0);
 
-		Millisecond six = four + two;
-		six++;
-		++six;
-		six += two + four + two + four;
+			Millisecond six = four + two;
+			six++;
+			++six;
+			six += two + four + two + four;
+		}
 
+		{
+			Second two(2.0);
+			Second four(4.0);
+
+			Second six = four + two;
+			six++;
+			++six;
+			six += two + four + two + four;
+		}
+ 
+		{
+			Millisecond two(2000.0);
+			Second four(4.0);
+
+			Second six = four + two;
+			six += 4.0;
+		}
 
 		float pi(3.14f);
 		--pi;

@@ -185,8 +185,23 @@ public:
 			m_objects.resize(0);
 		}
 
+		template<typename LHS_ARGS, typename RHS_ARGS>
+		static OBJECT* getAuthorCopy(LHS_ARGS lhsArgs, RHS_ARGS rhsArgs)
+		{
+			OBJECT candidate(lhsArgs, rhsArgs);
+			int objectIndex(0);
+
+			if (!has(candidate, objectIndex))
+			{
+				objectIndex = m_objects.size();
+				m_objects.push_back(new OBJECT(lhsArgs, rhsArgs));
+			}
+
+			return m_objects[objectIndex];
+		}
+
 		template<typename ARGS>
-		static OBJECT* getAuthorCopy(const ARGS& args)
+		static OBJECT* getAuthorCopy(ARGS args)
 		{
 			OBJECT candidate(args);
 			int objectIndex(0);
@@ -374,8 +389,16 @@ class Factory
 	friend class CustomFactoryDestroyer<OBJECT>;
 
 public:
+	// temporary until we get the variadic templates in C++11
+	template<typename LHS_ARGS, typename RHS_ARGS>
+	static OBJECT* getAuthorCopy(LHS_ARGS lhsArgs, RHS_ARGS rhsArgs)
+	{
+		initializeDestroyer();
+		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<LHS_ARGS, RHS_ARGS>(lhsArgs, rhsArgs);
+	}; 
+	
 	template<typename ARGS>
-	static OBJECT* getAuthorCopy(const ARGS& args)
+	static OBJECT* getAuthorCopy(ARGS args)
 	{
 		initializeDestroyer();
 		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);

@@ -53,6 +53,20 @@ public:
 	inline Millisecond operator++();
 	inline Millisecond operator++(int);
 	inline Millisecond& operator+=(const Millisecond&);
+
+	inline Millisecond operator-(const Millisecond&) const;
+	inline Millisecond operator--();
+	inline Millisecond operator--(int);
+	inline Millisecond& operator-=(const Millisecond&);
+
+	inline Millisecond operator/(const Millisecond&) const;
+	inline Millisecond& operator/=(const Millisecond&);
+
+	inline Millisecond operator*(const Millisecond&) const;
+	inline Millisecond& operator*=(const Millisecond&);
+
+	inline Millisecond operator-(void);
+
 	
 private:
 	millisecond value;
@@ -66,6 +80,15 @@ public:
 	inline Second(const Millisecond&);
 	inline Second(const second&);
 
+	inline Second operator+(const Second&) const;
+	inline Second operator++();
+	inline Second operator++(int);
+	inline Second& operator+=(const Second&);
+
+	inline Second operator-(void);
+
+	inline Millisecond operator+(void);
+	
 private:
 	second value;
 }; // class Second
@@ -449,6 +472,43 @@ inline second seconds(void) { return SystemClock::single().seconds(); }
 
 } // namespace xronos
 
+
+Second::Second(const second& source)
+	: value(source)
+{
+	/* empty */
+}
+
+Second::Second(const Millisecond& source)
+	: value(source.value * 0.001)
+{
+	/* empty */
+}
+
+Second Second::operator+(const Second& other) const
+{
+	return Second(value + other.value);
+}
+
+Second Second::operator++()
+{
+	++value;
+	return value;
+}
+
+Second Second::operator++(int)
+{
+	Second suffix(value);
+	++value;
+	return Second(suffix);
+}
+
+Second& Second::operator+=(const Second& other)
+{
+	value += other.value;
+	return *this;
+}
+
 Millisecond::Millisecond(const millisecond& source)
 	: value(source)
 {
@@ -456,7 +516,7 @@ Millisecond::Millisecond(const millisecond& source)
 }
 
 Millisecond::Millisecond(const Second& source)
-	: value(source.value * 0.001)
+	: value(source.value * 1000)
 {
 	/* empty */
 }
