@@ -280,6 +280,14 @@ public:
 	{ 
 		/* empty */ 
 	}
+	
+	/** 
+	Factory system compatibility.  
+	Override this function for traversal time state.
+	Override or use the Factory system macros.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual bool hasRunTimeState(void) const=0;
 
 	/** override this if the action is completable */
 	virtual bool isCompletable(Traversal<AGENT>& /*traversal*/) const
@@ -305,10 +313,6 @@ public:
 	virtual void recycle(void)=0;
 
 protected:
-	/** by default, ActionStates have no author time state */
-	// static const bool hasAuthorTimeState = false;
-
-
 	/** 
 	Factory system compatibility.  
 	Only the Factory can create/destroy these objects.
@@ -342,28 +346,29 @@ protected:
 	\see AuthorTimeRunTimeFactory.h for more info.
 	*/
 	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0;
-	
+		
 	/** 
-	Factory system compatibility.  
-	Override this function for traversal time state.
-	Override or use the Factory system macros.
-	\see AuthorTimeRunTimeFactory.h for more info.
+	Traversal accounting function
+	\warning Do not override this!
 	*/
-	virtual bool hasRunTimeState(void) const=0;
-	
-	/** allows the traveral object to record the action */
 	virtual void recordAction(Traversal<AGENT>& traversal)
 	{
 		act(traversal.agent);
 	}
 
-	/** called every time the state is entered in a state machine */
+	/** 
+	Traversal accounting function
+	\warning Do not override this!
+	*/
 	virtual void recordEntry(Traversal<AGENT>& traversal) 
 	{	
 		enter(traversal.agent);
 	}
 
-	/** called every time the state is exited in a state machine */
+	/** 
+	Traversal accounting function
+	\warning Do not override this!
+	*/
 	virtual void recordExit(Traversal<AGENT>& traversal)
 	{	
 		exit(traversal.agent);
@@ -393,14 +398,7 @@ class Condition
 	friend class StateMachine<AGENT>;
 
 public:
-	/** 
-	Factory system compatibility.  
-	Override this function for traversal time copies.
-	Override or use the Factory system macros.
-	\see AuthorTimeRunTimeFactory.h for more info.
-	*/
-	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
-
+	
 	/** 
 	Factory system compatibility.  
 	Override this function for traversal time state.
@@ -456,6 +454,14 @@ protected:
 		// empty
 	}
 	
+	/** 
+	Factory system compatibility.  
+	Override this function for traversal time copies.
+	Override or use the Factory system macros.
+	\see AuthorTimeRunTimeFactory.h for more info.
+	*/
+	virtual Condition<AGENT>* getRunTimeCopy(void) const=0;
+
 	/** override this for your custom functionality */
 	virtual bool isSatisfied(AGENT& /*agent*/)=0;
 	
@@ -1347,100 +1353,100 @@ private:
 
 class IsAlarmSilenced: public Condition<Alarm>
 {
-CONDITION_WITH_RUN_TIME_STATE(IsAlarmSilenced, Alarm);
+	CONDITION_WITH_RUN_TIME_STATE(IsAlarmSilenced, Alarm);
 
-protected:
-void enter(Alarm& alarm)
-{
-printf("enter is alarm silenced condition\n");
-m_timesExecuted = 0;
-}
+	protected:
+	void enter(Alarm& alarm)
+	{
+		printf("enter is alarm silenced condition\n");
+		m_timesExecuted = 0;
+	}
 
-void exit(Alarm& alarm)
-{
-printf("exiting is alarm silenced condition\n");
-}
+	void exit(Alarm& alarm)
+	{
+		printf("exiting is alarm silenced condition\n");
+	}
 
-bool isSatisfied(Alarm& alarm)
-{
-++m_timesExecuted;
-return m_timesExecuted > 3;	
-}
+	bool isSatisfied(Alarm& alarm)
+	{
+		++m_timesExecuted;
+		return m_timesExecuted > 3;	
+	}
 
-private:
-int m_timesExecuted;
+	private:
+	int m_timesExecuted;
 };
 
 class IsSmokePresent : public Condition<Alarm>
 {
-CONDITION_WITH_RUN_TIME_STATE(IsSmokePresent, Alarm);
+	CONDITION_WITH_RUN_TIME_STATE(IsSmokePresent, Alarm);
 
 protected:
-void enter(Alarm& alarm)
-{
-printf("enter is smoke present condition\n");
-m_timesExecuted = 0;
-}
+	void enter(Alarm& alarm)
+	{
+		printf("enter is smoke present condition\n");
+		m_timesExecuted = 0;
+	}
 
-void exit(Alarm& alarm)
-{
-printf("exiting is smoke present condition\n");
-}
+	void exit(Alarm& alarm)
+	{
+		printf("exiting is smoke present condition\n");
+	}
 
-bool isSatisfied(Alarm& alarm)
-{
-++m_timesExecuted;
-return m_timesExecuted > 2;	
-}
+	bool isSatisfied(Alarm& alarm)
+	{
+		++m_timesExecuted;
+		return m_timesExecuted > 2;	
+	}
 
 private:
-int m_timesExecuted;
+	int m_timesExecuted;
 };
 
 class SoundAlarm : public ActionState<Alarm>
 {
-ACTION_STATE_PURE(SoundAlarm, Alarm)
+	ACTION_STATE_PURE(SoundAlarm, Alarm)
 
 public:
-void act(Alarm& agent)
-{
-agent.sound();
-}
+	void act(Alarm& agent)
+	{
+		agent.sound();
+	}
 }; 
 DERIVED_RUN_TIME_TYPE_DEFINITION(SoundAlarm, ActionState<Alarm>, NULL)
 
 class DetectSmoke : public ActionState<Alarm>
 {
-ACTION_STATE_PURE(DetectSmoke, Alarm)
+	ACTION_STATE_PURE(DetectSmoke, Alarm)
 
 public:
-void act(Alarm& alarm)
-{
-alarm.detectSmoke();
-}
+	void act(Alarm& alarm)
+	{
+		alarm.detectSmoke();
+	}
 };
 DERIVED_RUN_TIME_TYPE_DEFINITION(DetectSmoke, ActionState<Alarm>, NULL)
 
 // definition
 class AlarmState : public StateMachine<Alarm>
 {
-STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(AlarmState, Alarm);
+	STATE_MACHINE_WITHOUT_AUTHOR_TIME_STATE(AlarmState, Alarm);
 
 protected:
-AlarmState()
-{	// get the author objects
-ActionState<Alarm>* soundAlarm = Factory<SoundAlarm>::getAuthorCopy();
-ActionState<Alarm>* detectSmoke = Factory<DetectSmoke>::getAuthorCopy();
-TransitionFX<Alarm>* initialBeep = Factory<InitialAlarmBeep>::getAuthorCopy();
-Condition<Alarm>* isSilenced = Factory<IsAlarmSilenced>::getAuthorCopy();
-Condition<Alarm>* isSmokePresent = Factory<IsSmokePresent>::getAuthorCopy();
-// add the states to the machine
-StateKey detectSmokeKey(add(*detectSmoke));
-StateKey soundAlarmKey(add(*soundAlarm));
-// define the connections
-connect(detectSmokeKey, *isSmokePresent, soundAlarmKey, initialBeep);
-connect(soundAlarmKey, *isSilenced, detectSmokeKey);
-}
+	AlarmState()
+	{	// get the author objects
+		ActionState<Alarm>* soundAlarm = Factory<SoundAlarm>::getAuthorCopy();
+		ActionState<Alarm>* detectSmoke = Factory<DetectSmoke>::getAuthorCopy();
+		TransitionFX<Alarm>* initialBeep = Factory<InitialAlarmBeep>::getAuthorCopy();
+		Condition<Alarm>* isSilenced = Factory<IsAlarmSilenced>::getAuthorCopy();
+		Condition<Alarm>* isSmokePresent = Factory<IsSmokePresent>::getAuthorCopy();
+		// add the states to the machine
+		StateKey detectSmokeKey(add(*detectSmoke));
+		StateKey soundAlarmKey(add(*soundAlarm));
+		// define the connections
+		connect(detectSmokeKey, *isSmokePresent, soundAlarmKey, initialBeep);
+		connect(soundAlarmKey, *isSilenced, detectSmokeKey);
+	}
 }; // AlarmState
 DERIVED_RUN_TIME_TYPE_DEFINITION(AlarmState, StateMachine<Alarm>, NULL)
 
@@ -1465,8 +1471,6 @@ void runAlarmExample()
 	// later
 	FactoryDestroyer::destroyAllAuthorTimeAndStatelessObjects();
 }
-
-
 \endcode
 */
 

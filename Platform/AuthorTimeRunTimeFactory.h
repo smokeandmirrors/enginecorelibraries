@@ -214,7 +214,7 @@ public:
 
 			return m_objects[objectIndex];
 		}
-
+		/*
 		static OBJECT* getAuthorCopy(void)
 		{
 			OBJECT candidate;
@@ -228,6 +228,7 @@ public:
 
 			return m_objects[objectIndex];
 		}
+		*/
 
 		static OBJECT* getRunTimeCopy(const OBJECT& object)
 		{

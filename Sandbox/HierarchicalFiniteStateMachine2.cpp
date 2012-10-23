@@ -10,9 +10,9 @@ class Agent
 {
 };
 
-static const bool doPrintEnter(true);
-static const bool doPrintExit(true);
-static const bool doPrintAct(false);
+static bool doPrintEnter(true);
+static bool doPrintExit(true);
+static bool doPrintAct(false);
 
 class AuthorTimeCondition
 	: public HFSM::Condition<Agent>

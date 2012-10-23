@@ -4,12 +4,6 @@
 
 #include "HierarchicalFiniteStateMachine.h"
 
-// template<typename AGENT, typename OPERATOR, typename UNO, typename UNO_ARGS>
-// class ConditionUnary
-
-// template<typename AGENT, typename OPERATOR, typename UNO>
-// class ConditionUnary
-
 namespace HFSM 
 {
 	
@@ -39,7 +33,7 @@ private:
 		lhs = Factory< LHS >::getAuthorCopy();
 		rhs = Factory< RHS >::getAuthorCopy();
 	}
-
+		
 	template<typename LHS_ARGS, typename RHS_ARGS>
 	ConditionBinary(LHS_ARGS lhsArgs, RHS_ARGS rhsArgs)
 	{
@@ -69,9 +63,9 @@ private:
 
 	static ConditionBinary< AGENT, OPERATOR, LHS, RHS > * duplicate(const ConditionBinary< AGENT, OPERATOR, LHS, RHS > & source) 
 	{ 
-		ConditionBinary< AGENT, OPERATOR, LHS, RHS >* dupe(new ConditionBinary< AGENT, OPERATOR, LHS, RHS > (source));
-		dupe->lhs = source.lhs->getRunTimeCopy();
-		dupe->rhs = source.rhs->getRunTimeCopy();
+		ConditionBinary< AGENT, OPERATOR, LHS, RHS >* dupe(new ConditionBinary< AGENT, OPERATOR, LHS, RHS >(source));
+		dupe->lhs = Factory<LHS>::getRunTimeCopy(*static_cast<LHS*>(source.lhs));
+		dupe->rhs = Factory<RHS>::getRunTimeCopy(*static_cast<RHS*>(source.rhs));
 		return dupe;  
 	} 
 	
@@ -151,8 +145,8 @@ private:
 
 	static ConditionNot< AGENT, OPERAND > * duplicate(const ConditionNot< AGENT, OPERAND > & source) 
 	{ 
-		ConditionNot< AGENT, OPERAND >* dupe(new ConditionNot< AGENT, OPERAND > (source));
-		dupe->operand = source.operand->getRunTimeCopy();
+		ConditionNot< AGENT, OPERAND >* dupe(new ConditionNot< AGENT, OPERAND >(source));
+		dupe->operand = Factory<OPERAND>::getRunTimeCopy(*static_cast<OPERAND*>(source.operand));
 		return dupe;  
 	} 
 	
