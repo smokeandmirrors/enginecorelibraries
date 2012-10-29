@@ -535,6 +535,10 @@ class StateMachine
 	template<typename AGENT> class State;
 	friend class Traversal<AGENT>;
 
+	typedef std::vector< State<AGENT>* > States;
+	typedef std::vector< Connection<AGENT> > Connections;
+
+
 	RUN_TIME_TYPE_DECLARATION
 	/** all state machines have author time state */
 	static const bool hasAuthorTimeState = true;
@@ -559,7 +563,7 @@ protected:
 	*/
 	StateMachine(const StateMachine<AGENT>& source)
 	{	
-		for (std::vector< State<AGENT>* >::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
+		for (States::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
 			; i != i_sentinel
 			; ++i)
 		{
@@ -574,7 +578,7 @@ protected:
 		{
 			const State<AGENT>& state(*source.states[from]);
 
-			for (std::vector< Connection<AGENT> >::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
+			for (Connections::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
 				; j != j_sentinel
 				; ++j)
 			{
@@ -745,6 +749,7 @@ protected:
 	template<typename AGENT>
 	class State
 	{
+	
 	public:
 		inline State(ActionState<AGENT>& newState) 
 			: state(newState)
@@ -773,7 +778,7 @@ protected:
 			state.recycle();
 		}
 
-		std::vector<Connection<AGENT>> connections;
+		Connections connections;
 		ActionState<AGENT>& state;
 
 	private:
@@ -802,7 +807,7 @@ protected:
 	*/
 	virtual bool hasRunTimeState(void) const
 	{
-		for (std::vector< State<AGENT>* >::const_iterator i(states.begin()), sentinel(states.end())
+		for (States::const_iterator i(states.begin()), sentinel(states.end())
 			; i != sentinel
 			; ++i)
 		{
@@ -814,7 +819,7 @@ protected:
 			}
 			else
 			{
-				const std::vector<Connection<AGENT>>& connections(state.connections);
+				const Connections& connections(state.connections);
 
 				for (int i(0), sentinel(connections.size()); i < sentinel; ++i)
 				{
@@ -837,7 +842,7 @@ private:
 	{
 		Depth maxChildDepth(0);
 
-		for (std::vector< State<AGENT>* >::const_iterator iter(states.begin()), sentinel(states.end()); 
+		for (States::const_iterator iter(states.begin()), sentinel(states.end()); 
 			iter != sentinel; 
 			++iter)
 		{	
@@ -885,7 +890,7 @@ private:
 	
 	inline ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State<AGENT>* current)
 	{
-		std::vector< Connection<AGENT> >& connections(current->connections);
+		Connections& connections(current->connections);
 		
 		for (ConnectionKey connectionKey(0), sentinel(connections.size()); connectionKey < sentinel; ++connectionKey)
 		{
@@ -1007,7 +1012,8 @@ private:
 	}
 		
 private:
-	std::vector< State<AGENT>* > states;
+	typedef States States;
+	States states;
 }; // class StateMachine
 
 /**
@@ -1112,7 +1118,8 @@ template<typename AGENT>
 class Traversal
 {	
 	friend class StateMachine<AGENT>;
-	
+	typedef std::vector<TraversalEntry> TraversalEntries;
+
 public:
 	AGENT& agent;
 
@@ -1263,7 +1270,7 @@ protected:
 private:
 	Traversal<AGENT>& operator=(const Traversal<AGENT>&);
 
-	std::vector<TraversalEntry> traversal;
+	TraversalEntries traversal;
 	StateMachine<AGENT>* stateMachine;
 	Depth currentDepth;
 	bool isInActiveState;
