@@ -49,7 +49,7 @@ destroyAllAuthorTimeFactoryObjects() has been called.  All
 such objects should have been deleted.  To use more,
 simply call the factory create methods again.
 
-A primary example of this is HFSM systems.  An ActionState
+A primary example of this (and original motivation) is the HFSM system. An ActionState
 could have no author time state (that is, no variable arguments 
 in its constructor).  Only one of these objects will ever
 be created to author different state machines.  If it did
@@ -151,23 +151,41 @@ Used in experiments :	YES
 Tested in the field	:	NO
 */
 
+/** support macro for the declaration of author/run time factory classes */
+#define HAS_RUN_TIME_STATE_GENERIC(VALUE) \
+	virtual bool hasRunTimeState(void) const { return VALUE; } 
+
+/** support macro for the declaration of author/run time factory classes */
+#define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
+	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
+	static const bool hasAuthorTimeState = false;
+
+/** support macro for the declaration of author/run time factory classes */
+#define HAS_AUTHOR_TIME_STATE_true(CLASS_NAME) \
+	bool isEqualToAtAuthorTime(const CLASS_NAME##& other) const; \
+	static const bool hasAuthorTimeState = true;
+
+/** support macro for the declaration of author/run time factory classes */
+#define RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, AUTHOR_TIME, RUN_TIME) \
+	public: \
+	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
+	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
+	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
+	private: \
+	friend class Factory< CLASS_NAME >; \
+	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
+	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
+	virtual BASE_CLASS* getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
+	CLASS_NAME& operator=(const CLASS_NAME&); 
+
+#define PURE_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, false, false)
+#define AUTHOR_TIME_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, true, false)
+#define AUTHOR_AND_RUN_TIME_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, true, true)
+#define RUN_TIME_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, false, true)
+
 template<bool HAS_AUTHOR_TIME_STATE>
 class FactorySelector
 {
-	/**
-	does the state have run-time state?
-		return a new copy, every time.
-
-	does the state have author-time state?
-		return a single copy on a per author-time basis.
-
-	else
-		return a single copy.
-
-	run time state status must be available at run-time
-	for objects that might be deleted through a 
-	virtual interface
-	*/			
 public:
 	template<typename OBJECT>
 	class Internal
@@ -214,22 +232,7 @@ public:
 
 			return m_objects[objectIndex];
 		}
-		/*
-		static OBJECT* getAuthorCopy(void)
-		{
-			OBJECT candidate;
-			int objectIndex(0);
-
-			if (!has(candidate, objectIndex))
-			{
-				objectIndex = m_objects.size();
-				m_objects.push_back(new OBJECT);
-			}
-
-			return m_objects[objectIndex];
-		}
-		*/
-
+		
 		static OBJECT* getRunTimeCopy(const OBJECT& object)
 		{
 			if (object.hasRunTimeState())

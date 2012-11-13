@@ -98,20 +98,6 @@ Tested in the field	:	NO
 	GET_RUN_TIME_COPY_GENERIC(CLASS_NAME, FSM_TYPE, TYPE_NAME)
 
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
-#define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
-	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
-	static const bool hasAuthorTimeState = false;
-
-/** support macro for the declaration of HFSM objects on a author/run time state basis */
-#define HAS_AUTHOR_TIME_STATE_true(CLASS_NAME) \
-	bool isEqualToAtAuthorTime(const CLASS_NAME##& other) const; \
-	static const bool hasAuthorTimeState = true;
-
-/** support macro for the declaration of HFSM objects on a author/run time state basis */
-#define HAS_RUN_TIME_STATE_GENERIC(VALUE) \
-	virtual bool hasRunTimeState(void) const { return VALUE; } 
-
-/** support macro for the declaration of HFSM objects on a author/run time state basis */
 #define HAS_RUN_TIME_STATE_ActionState(VALUE) \
 	HAS_RUN_TIME_STATE_GENERIC(VALUE)
 

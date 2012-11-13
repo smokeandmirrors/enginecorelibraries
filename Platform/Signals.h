@@ -54,7 +54,6 @@ Tested in the field	:	NO
 #include <set>
 
 #include "Synchronization.h"
-#include "TemplateArguments.h"
 
 namespace signals
 {

@@ -34,7 +34,6 @@ Tested in the field	:	NO
 #include "LuaExtensibility.h"
 #include "LuaInclusions.h"
 #include "LuaStateInteraction.h"
-#include "TemplateArguments.h"
 
 namespace embeddedLua
 {

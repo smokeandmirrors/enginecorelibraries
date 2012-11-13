@@ -21,13 +21,20 @@ namespace AI
 /* goals, actions [action effects], keys/conditions						*/
 /************************************************************************/
 
-	class Planner
+class Planner
+{
+public:
+	typedef enum KeyStatus 
 	{
-	public:
-		class Conditions;
-		class Action;
-		class Plan;
-	};
+		Unknown,
+		True,
+		False
+	}; // 
+
+	class Conditions;
+	class Action;
+	class Plan;
+};
 
 } // namespace AI
 
