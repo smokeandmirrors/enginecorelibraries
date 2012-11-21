@@ -447,6 +447,8 @@ void testHFSM2(void)
 
 void onPlay(void)
 {
+	sandbox::schedulingRnD();
+
 	{
 		{
 			Millisecond two(2.0);
@@ -630,7 +632,7 @@ void onPlay(void)
 //  #endif//EXTENDED_BY_LUA	
 
 	// sandbox::verifyUnitTests();
-	sandbox::schedulingRnD();
+	
 	sandbox::tableRnD();
 	
 	//	6,	0, e0
