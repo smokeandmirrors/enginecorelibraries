@@ -169,14 +169,14 @@ Tested in the field	:	NO
 #define RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, AUTHOR_TIME, RUN_TIME) \
 	public: \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
-	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
-	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
+	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME ( CLASS_NAME ) \
+	HAS_RUN_TIME_STATE_GENERIC ( RUN_TIME ) \
 	private: \
 	friend class Factory< CLASS_NAME >; \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
 	virtual BASE_CLASS* getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
-	CLASS_NAME& operator=(const CLASS_NAME&); 
+	CLASS_NAME & operator=(const CLASS_NAME &); 
 
 #define PURE_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, false, false)
 #define AUTHOR_TIME_FACTORY_OBJECT(CLASS_NAME, BASE_CLASS_NAME) RUN_AND_AUTHOR_TIME_FACTORY_IMPLEMENTATION(CLASS_NAME, BASE_CLASS, true, false)
