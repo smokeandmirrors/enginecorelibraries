@@ -156,8 +156,8 @@ Tested in the field	:	NO
 	virtual bool hasRunTimeState(void) const { return VALUE; } 
 
 /** support macro for the declaration of author/run time factory classes */
-#define HAS_AUTHOR_TIME_STATE_false(CLASS_NAME) \
-	bool isEqualToAtAuthorTime(const CLASS_NAME##&) const { return true; } \
+#define HAS_AUTHOR_TIME_STATE_false( CLASS_NAME ) \
+	bool isEqualToAtAuthorTime(const CLASS_NAME##& ) const { return true; } \
 	static const bool hasAuthorTimeState = false;
 
 /** support macro for the declaration of author/run time factory classes */
@@ -174,7 +174,7 @@ Tested in the field	:	NO
 	private: \
 	friend class Factory< CLASS_NAME >; \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
-	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
+	static CLASS_NAME * duplicate(const CLASS_NAME##& source) { return new CLASS_NAME (source);  } \
 	virtual BASE_CLASS* getRunTimeCopy(void) const { return Factory< CLASS_NAME >::getRunTimeCopy(*this); } \
 	CLASS_NAME & operator=(const CLASS_NAME &); 
 
@@ -193,7 +193,7 @@ public:
 	public:
 		static void destroyAuthorCopies(void)
 		{
-			for (std::vector<OBJECT*>::iterator i(m_objects.begin()), sentinel(m_objects.end())
+			for (typename std::vector<OBJECT*>::iterator i(m_objects.begin()), sentinel(m_objects.end())
 				; i != sentinel
 				; ++i)
 			{
@@ -398,35 +398,35 @@ public:
 	static OBJECT* getAuthorCopy(LHS_ARGS lhsArgs, RHS_ARGS rhsArgs)
 	{
 		initializeDestroyer();
-		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<LHS_ARGS, RHS_ARGS>(lhsArgs, rhsArgs);
+		return FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::template getAuthorCopy<LHS_ARGS, RHS_ARGS>(lhsArgs, rhsArgs);
 	}; 
 	
 	template<typename ARGS>
 	static OBJECT* getAuthorCopy(ARGS args)
 	{
 		initializeDestroyer();
-		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy<ARGS>(args);
+		return FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::getAuthorCopy<ARGS>(args);
 	}; 
 
 	static OBJECT* getAuthorCopy(void)
 	{
 		initializeDestroyer();
-		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getAuthorCopy();
+		return FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::getAuthorCopy();
 	}
 
 	static OBJECT* getRunTimeCopy(const OBJECT& object)
 	{
-		return FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::getRunTimeCopy(object);
+		return FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::getRunTimeCopy(object);
 	}
 
 	static void recycleRunTimeCopy(OBJECT& object)
 	{
-		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::recycle(object);
+		FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::recycle(object);
 	}
 
 	static void destroyAuthorCopies(void)
 	{
-		FactorySelector< OBJECT::hasAuthorTimeState >::Internal<OBJECT>::destroyAuthorCopies();
+		FactorySelector< OBJECT::hasAuthorTimeState >::template Internal<OBJECT>::destroyAuthorCopies();
 	}
 
 protected:

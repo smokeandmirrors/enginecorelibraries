@@ -117,13 +117,13 @@ Tested in the field	:	NO
 #define IMPLEMENTATION(CLASS_NAME, FSM_TYPE, TYPE_NAME, AUTHOR_TIME, RUN_TIME) \
 	public: \
 	virtual void recycle(void) { Factory< CLASS_NAME >::recycleRunTimeCopy(*this); } \
-	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME##( CLASS_NAME ) \
-	HAS_RUN_TIME_STATE_##FSM_TYPE##(RUN_TIME) \
+	HAS_AUTHOR_TIME_STATE_##AUTHOR_TIME ( CLASS_NAME ) \
+	HAS_RUN_TIME_STATE_##FSM_TYPE ( RUN_TIME ) \
 	private: \
 	friend class Factory< CLASS_NAME >; \
 	friend class FactorySelector< AUTHOR_TIME >::Internal< CLASS_NAME >; \
 	static CLASS_NAME * duplicate(const CLASS_NAME & source) { return new CLASS_NAME (source);  } \
-	GET_RUN_TIME_COPY_##FSM_TYPE##(CLASS_NAME, FSM_TYPE, TYPE_NAME) \
+	GET_RUN_TIME_COPY_##FSM_TYPE ( CLASS_NAME, FSM_TYPE, TYPE_NAME) \
 	CLASS_NAME& operator=(const CLASS_NAME&); 
 	
 /** support macro for the declaration of HFSM objects on a author/run time state basis */
@@ -331,7 +331,7 @@ protected:
 	Override or use the Factory system macros.
 	\see AuthorTimeRunTimeFactory.h for more info.
 	*/
-	virtual ActionState<AGENT>* getRunTimeCopy(void) const=0;
+	virtual ActionState* getRunTimeCopy(void) const=0;
 		
 	/** 
 	Traversal accounting function
@@ -465,7 +465,7 @@ public:
 		return rhs && isSatisfied(agent);
 	}
 
-	inline bool and(AGENT& agent, Condition<AGENT>& rhs)
+	inline bool and(AGENT& agent, Condition& rhs)
 	{
 		return isSatisfied(agent) && rhs.isSatisfied(agent);
 	}
@@ -480,7 +480,7 @@ public:
 		return rhs || isSatisfied(agent);
 	}
 
-	inline bool or(AGENT& agent, Condition<AGENT>& rhs)
+	inline bool or(AGENT& agent, Condition& rhs)
 	{
 		return isSatisfied(agent) || rhs.isSatisfied(agent);
 	}
@@ -490,7 +490,7 @@ public:
 		return isSatisfied(agent) ^ rhs;
 	}
 
-	inline bool xor(AGENT& agent, Condition<AGENT>& rhs)
+	inline bool xor(AGENT& agent, Condition& rhs)
 	{
 		return isSatisfied(agent) ^ rhs.isSatisfied(agent);
 	}
@@ -517,20 +517,148 @@ template<typename AGENT>
 class StateMachine 
 	: public ActionState<AGENT>
 {
-	template<typename AGENT> class Connection;
-	template<typename AGENT> class State;
+	class Connection;
+	class State;
 	friend class Traversal<AGENT>;
 
-	typedef std::vector< State<AGENT>* > States;
-	typedef std::vector< Connection<AGENT> > Connections;
-
-
+	typedef std::vector< State* > States;
+	
 	RUN_TIME_TYPE_DECLARATION
 	/** all state machines have author time state */
 	static const bool hasAuthorTimeState = true;
 
 protected:
+	class Connection
+	{
+	public:
+		inline Connection(Condition<AGENT>& cause, TransitionFX<AGENT>* transFX, StateKey nextState)
+			: condition(cause)
+			, fx(transFX)
+			, next(nextState)
+		{
+			/* empty */
+		}
+
+		inline void enter(AGENT& agent)
+		{
+			condition.enter(agent);	
+
+			if (fx)
+			{
+				fx->enter(agent);
+			}
+		}
+
+		inline void exit(AGENT& agent)
+		{
+			condition.exit(agent);
+
+			if (fx)
+			{
+				fx->exit(agent);
+			}
+		}
+
+		Condition<AGENT>& condition;
+		StateKey next;
+		TransitionFX<AGENT>* fx;
+
+	private:
+		Connection& operator=(const Connection&);
+	}; // struct Connection
+
+	typedef std::vector< Connection > Connections;
+
+	struct EnterConnection
+	{
+		AGENT& agent;
+
+		inline EnterConnection(AGENT& a) : agent(a) {}
+
+		inline void operator()(Connection& connection)
+		{
+			connection.enter(agent);
+		}
+
+	private:
+		EnterConnection& operator=(const EnterConnection&);
+	}; // struct EnterConnection
+
+	struct ExitConnection
+	{
+		AGENT& agent;
+
+		inline ExitConnection(AGENT& a) : agent(a) {}
+
+		inline void operator()(Connection& connection)
+		{
+			connection.exit(agent);
+		}
+	private:
+		ExitConnection& operator=(const ExitConnection&);
+	}; // struct ExitConnection
+
+	struct RecycleConnection
+	{
+		inline void operator()(Connection& connection)
+		{
+			if (connection.fx)
+			{
+				connection.fx->recycle();
+			}
+
+			connection.condition.recycle();
+		}
+	}; // struct RecycleConnection
+
+	struct RecycleState
+	{
+		inline void operator()(State* state)
+		{
+			state->recycle();
+		}
+	}; // struct RecycleState
+
+	class State
+	{
+
+	public:
+		inline State(ActionState<AGENT>& newState) 
+			: state(newState)
+		{
+			/* empty */
+		}
+
+		~State()
+		{
+			/* empty */
+		}
+
+		inline void enter(AGENT& agent)
+		{
+			std::for_each(connections.begin(), connections.end(), EnterConnection(agent));	
+		}
+
+		inline void exit(AGENT& agent)
+		{
+			std::for_each(connections.begin(), connections.end(), ExitConnection(agent));	
+		}
+
+		inline void recycle(void)
+		{
+			std::for_each(connections.begin(), connections.end(), RecycleConnection());		
+			state.recycle();
+		}
+
+		Connections connections;
+		ActionState<AGENT>& state;
+
+	private:
+		State& operator=(const State&);
+	}; // class State
+
 	
+
 	/** 
 	Factory system compatibility.  
 	Only the Factory can create/destroy these objects.
@@ -549,7 +677,7 @@ protected:
 	*/
 	StateMachine(const StateMachine<AGENT>& source)
 	{	
-		for (States::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
+		for (typename States::const_iterator i(source.states.begin()), i_sentinel(source.states.end())
 			; i != i_sentinel
 			; ++i)
 		{
@@ -562,13 +690,13 @@ protected:
 			; from < sentinel
 			; ++from)
 		{
-			const State<AGENT>& state(*source.states[from]);
+			const State& state(*source.states[from]);
 
-			for (Connections::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
+			for (typename Connections::const_iterator j(state.connections.begin()), j_sentinel(state.connections.end())
 				; j != j_sentinel
 				; ++j)
 			{
-				const Connection<AGENT>& connection(*j);
+				const Connection& connection(*j);
 				Condition<AGENT>* duplicateCause(connection.condition.getRunTimeCopy());
 				assert(duplicateCause);
 				Condition<AGENT>& cause(*duplicateCause); 
@@ -587,7 +715,7 @@ protected:
 	~StateMachine(void)
 	{	// a distinction has to be made between deleting the runtime copies of StateMachines
 		// and deleting the authoring copies of StateMachines
-		std::for_each(states.begin(), states.end(), &deleteObject< State<AGENT> >);
+		std::for_each(states.begin(), states.end(), &deleteObject< State >);
 	}
 
 	/** override to perform a custom action at the state-machine (non-leaf state) level */
@@ -603,7 +731,7 @@ protected:
 	*/
 	StateKey add(ActionState<AGENT>& actionState) 
 	{
-		State<AGENT>* state(new State<AGENT>(actionState));
+		State* state(new State(actionState));
 		StateKey actionKey(states.size());
 		states.push_back(state);
 		return actionKey;
@@ -617,10 +745,10 @@ protected:
 	*/
 	void connect(StateKey from, Condition<AGENT>& cause, StateKey to, TransitionFX<AGENT>* fx=NULL)
 	{
-		State<AGENT>* fromState = states[from];
+		State* fromState = states[from];
 		assert(fromState != NULL);
 		assert(states[to] != NULL);
-		fromState->connections.push_back(Connection<AGENT>(cause, fx, to));
+		fromState->connections.push_back(Connection(cause, fx, to));
 	}
 			
 	/** 
@@ -631,152 +759,18 @@ protected:
 	*/
 	virtual void recycleRunTimeCopy(void)
 	{
-		std::for_each(states.begin(), states.end(), RecycleState<AGENT>());
+		std::for_each(states.begin(), states.end(), RecycleState());
 		delete this;
 	}
 
-protected:
-	template<typename AGENT>
-	class Connection
-	{
-	public:
-		inline Connection(Condition<AGENT>& cause, TransitionFX<AGENT>* transFX, StateKey nextState)
-			: condition(cause)
-			, fx(transFX)
-			, next(nextState)
-		{
-			/* empty */
-		}
-
-		inline void enter(AGENT& agent)
-		{
-			condition.enter(agent);	
-			
-			if (fx)
-			{
-				fx->enter(agent);
-			}
-		}
-
-		inline void exit(AGENT& agent)
-		{
-			condition.exit(agent);
-			
-			if (fx)
-			{
-				fx->exit(agent);
-			}
-		}
-
-		Condition<AGENT>& condition;
-		StateKey next;
-		TransitionFX<AGENT>* fx;
-
-	private:
-		Connection<AGENT>& operator=(const Connection<AGENT>&);
-	}; // struct Connection
-
-
-	template<typename AGENT>
-	struct EnterConnection
-	{
-		AGENT& agent;
-
-		inline EnterConnection(AGENT& a) : agent(a) {}
-
-		inline void operator()(Connection<AGENT>& connection)
-		{
-			connection.enter(agent);
-		}
-
-	private:
-		EnterConnection& operator=(const EnterConnection&);
-	}; // struct EnterConnection
-
-
-	template<typename AGENT>
-	struct ExitConnection
-	{
-		AGENT& agent;
-
-		inline ExitConnection(AGENT& a) : agent(a) {}
-
-		inline void operator()(Connection<AGENT>& connection)
-		{
-			connection.exit(agent);
-		}
-	private:
-		ExitConnection& operator=(const ExitConnection&);
-	}; // struct ExitConnection
-
-	template<typename AGENT>
-	struct RecycleConnection
-	{
-		inline void operator()(Connection<AGENT>& connection)
-		{
-			if (connection.fx)
-			{
-				connection.fx->recycle();
-			}
-
-			connection.condition.recycle();
-		}
-	}; // struct RecycleConnection
-
-	template<typename AGENT>
-	struct RecycleState
-	{
-		inline void operator()(State<AGENT>* state)
-		{
-			state->recycle();
-		}
-	}; // struct RecycleState
-
-	template<typename AGENT>
-	class State
-	{
 	
-	public:
-		inline State(ActionState<AGENT>& newState) 
-			: state(newState)
-		{
-			/* empty */
-		}
-
-		~State()
-		{
-			/* empty */
-		}
-
-		inline void enter(AGENT& agent)
-		{
-			std::for_each(connections.begin(), connections.end(), EnterConnection<AGENT>(agent));	
-		}
-
-		inline void exit(AGENT& agent)
-		{
-			std::for_each(connections.begin(), connections.end(), ExitConnection<AGENT>(agent));	
-		}
-		
-		inline void recycle(void)
-		{
-			std::for_each(connections.begin(), connections.end(), RecycleConnection<AGENT>());		
-			state.recycle();
-		}
-
-		Connections connections;
-		ActionState<AGENT>& state;
-
-	private:
-		State<AGENT>& operator=(const State<AGENT>&);
-	}; // class State
 	
 	inline StateKey getNumStates(void) const
 	{
 		return states.size();
 	}
 
-	inline State<AGENT>* getState(StateKey key) const
+	inline State* getState(StateKey key) const
 	{
 		assert(key < static_cast<StateKey>(states.size()));
 		assert(key >= 0);
@@ -793,11 +787,11 @@ protected:
 	*/
 	virtual bool hasRunTimeState(void) const
 	{
-		for (States::const_iterator i(states.begin()), sentinel(states.end())
+		for (typename States::const_iterator i(states.begin()), sentinel(states.end())
 			; i != sentinel
 			; ++i)
 		{
-			const State<AGENT>& state(*(*i));
+			const State& state(*(*i));
 
 			if (state.state.hasRunTimeState())
 			{
@@ -809,7 +803,7 @@ protected:
 
 				for (int i(0), sentinel(connections.size()); i < sentinel; ++i)
 				{
-					const Connection<AGENT>& connection(connections[i]);
+					const Connection& connection(connections[i]);
 
 					if (connection.condition.hasRunTimeState()
 					|| (connection.fx && connection.fx->hasRunTimeState()))
@@ -828,7 +822,7 @@ private:
 	{
 		Depth maxChildDepth(0);
 
-		for (States::const_iterator iter(states.begin()), sentinel(states.end()); 
+		for (typename States::const_iterator iter(states.begin()), sentinel(states.end()); 
 			iter != sentinel; 
 			++iter)
 		{	
@@ -843,7 +837,7 @@ private:
 		return maxChildDepth + 1;
 	}
 
-	inline void causeTransitionFX(Connection<AGENT>& connection, State<AGENT>& current, AGENT& agent)
+	inline void causeTransitionFX(Connection& connection, State& current, AGENT& agent)
 	{
 		if (connection.fx)
 		{	
@@ -855,32 +849,32 @@ private:
 		
 	inline void enterCurrent(Traversal<AGENT>& traversal)
 	{	
-		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
+		State* current(getCurrentStateAtThisDepth(traversal));
 		assert(current);
 		current->enter(traversal.agent);
 		current->state.recordEntry(traversal);
 	}
 
-	inline void enterNextState(Traversal<AGENT>& traversal, ConnectionKey causeKey, Connection<AGENT>& connection)
+	inline void enterNextState(Traversal<AGENT>& traversal, ConnectionKey causeKey, Connection& connection)
 	{
 		traversal.enter(causeKey, connection.next);
 		enterCurrent(traversal);
 	}
 
-	inline void exitPreviousState(Traversal<AGENT>& traversal, State<AGENT>& current)
+	inline void exitPreviousState(Traversal<AGENT>& traversal, State& current)
 	{
 		current.state.recordExit(traversal);
 		current.exit(traversal.agent);
-		traversal.exit(); // this will become unecessary...I think
+		traversal.exit(); // this will become unnecessary...I think
 	}
 	
-	inline ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State<AGENT>* current)
+	inline ConnectionKey evaluateConditions(Traversal<AGENT>& traversal, State* current)
 	{
 		Connections& connections(current->connections);
 		
 		for (ConnectionKey connectionKey(0), sentinel(connections.size()); connectionKey < sentinel; ++connectionKey)
 		{
-			Connection<AGENT>& connection(connections[connectionKey]);
+			Connection& connection(connections[connectionKey]);
 
 			if (connection.condition(traversal.agent))
 			{
@@ -891,7 +885,7 @@ private:
 		return NoSatisfiedCondition;
 	}
 	
-	inline State<AGENT>* getCurrentState(Traversal<AGENT>& traversal) const
+	inline State* getCurrentState(Traversal<AGENT>& traversal) const
 	{
 		const StateMachine<AGENT>* machine(this);
 		Depth depth(0);
@@ -905,7 +899,7 @@ private:
 		return machine->states[traversal.getState()];
 	}
 
-	inline State<AGENT>* getCurrentStateAtThisDepth(Traversal<AGENT>& traversal) const
+	inline State* getCurrentStateAtThisDepth(Traversal<AGENT>& traversal) const
 	{
 		return getState(traversal.getState());
 	}
@@ -956,7 +950,7 @@ private:
 		act(traversal.agent);
 		traversal.incrementDepth();
 		// printf("acting on %s\n", name);
-		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
+		State* current(getCurrentStateAtThisDepth(traversal));
 		assert(current);
 		ConnectionKey causeKey(evaluateConditions(traversal, current));
 
@@ -966,7 +960,7 @@ private:
 		}
 		else
 		{	// a condition is satisfied
-			Connection<AGENT>& connection(current->connections[causeKey]);
+			Connection& connection(current->connections[causeKey]);
 			exitPreviousState(traversal, *current);
 			causeTransitionFX(connection, *current, traversal.agent);
 			enterNextState(traversal, causeKey, connection);
@@ -991,14 +985,13 @@ private:
 	virtual void recordExit(Traversal<AGENT>& traversal)
 	{	
 		traversal.incrementDepth();
-		State<AGENT>* current(getCurrentStateAtThisDepth(traversal));
+		State* current(getCurrentStateAtThisDepth(traversal));
 		current->state.recordExit(traversal);
 		traversal.exit();
 		exit(traversal.agent);
 	}
 		
 private:
-	typedef States States;
 	States states;
 }; // class StateMachine
 
