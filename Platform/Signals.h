@@ -1,7 +1,6 @@
 #pragma once
 #ifndef SIGNALS_H
 #define SIGNALS_H
-
 /**
 \file Signals.h
 This files implements a type safe Signal/Slot delegate system.  It owes all of its
@@ -51,6 +50,7 @@ Tested in the field	:	NO
 */
 
 #include <set>
+// #include <functional> this might just replace all the mess below
 #include "Synchronization.h"
 
 namespace signals
@@ -301,7 +301,8 @@ private:
 class Transmitter0 
 : public Transmitter
 {
-private:
+	typedef void StaticFunction(void);
+		
 	/** abstraction for all of the receivers that have registered with this transmitter */
 	class Connection
 	{
@@ -315,23 +316,21 @@ private:
 		virtual ~Connection(void)=0 {};
 		virtual Connection*	clone(void)=0;
 		virtual Connection*	duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(void)=0;
 		Connection* m_next;
 	};
 	/** 
-	templated abstraction for receivers that registered non-const 
+	template abstraction for receivers that registered non-const 
 	member functions with this transmitter
 	*/
 	template<class RECEIVER>
 	class volatile0 : public Connection
 	{
 	public:
-		volatile0(void)
-		: m_object(NULL)
-		, m_function(NULL)
-		{ /* empty */ }
-
 		volatile0(RECEIVER* object, void (RECEIVER::* function)(void))
 		: m_object(object)
 		, m_function(function)
@@ -339,7 +338,7 @@ private:
 
 		virtual Connection* clone(void)
 		{
-			return new volatile0<RECEIVER>(*this);
+			return new volatile0<RECEIVER>(static_cast<RECEIVER*>(m_object), m_function);
 		}
 
 		virtual Connection* duplicate(Receiver* receiver)
@@ -347,9 +346,24 @@ private:
 			return new volatile0<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
 
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction*) const
 		{
-			return m_object;
+			return false;
+		}
+
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 
 		virtual void transmit(void) 
@@ -363,18 +377,13 @@ private:
 	};
 
 	/** 
-	templated abstraction for receivers that registered const 
+	template abstraction for receivers that registered const 
 	member functions with this transmitter
 	*/
 	template<class RECEIVER>
 	class const0 : public Connection
 	{
 	public:
-		const0(void)
-		: m_object(NULL)
-		, m_function(NULL)
-		{ /* empty */ }
-
 		const0(RECEIVER* object, void (RECEIVER::* function)(void) const)
 		: m_object(object)
 		, m_function(function)
@@ -382,7 +391,7 @@ private:
 
 		virtual Connection* clone(void)
 		{
-			return new const0<RECEIVER>(*this);
+			return new const0<RECEIVER>(static_cast<RECEIVER*>(m_object), m_function);
 		}
 
 		virtual Connection* duplicate(Receiver* receiver)
@@ -390,11 +399,26 @@ private:
 			return new const0<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
 
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction*) const
 		{
-			return m_object;
+			return false;
 		}
 
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<RECEIVER*>(receiver);
+		}
+
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
+		}
+		
 		virtual void transmit(void) 
 		{
 			(m_object->*m_function)();
@@ -404,6 +428,52 @@ private:
 		RECEIVER*			m_object;
 		void (RECEIVER::*	m_function)(void) const;
 	};
+
+	class static0 : public Connection
+	{
+	public:
+		static0(StaticFunction& function)
+			: m_function(function)
+		{ /* empty */ }
+
+		virtual Connection* clone(void)
+		{
+			return new static0(m_function);
+		}
+
+		virtual Connection* duplicate(Receiver*)
+		{
+			return clone();
+		}
+
+		virtual bool isFunction(StaticFunction* function) const
+		{
+			return function == &m_function;
+		}
+
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+
+		virtual void onConnect(Transmitter&)
+		{
+			/* empty */
+		}
+
+		virtual void onDisconnect(Transmitter&)
+		{
+			/* empty */
+		}
+
+		virtual void transmit(void)
+		{
+			m_function();
+		}
+
+	private:
+		StaticFunction& m_function;
+	}; // 
 
 public:
 	Transmitter0(void)
@@ -423,19 +493,18 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(s.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 			
 			if (previous)
 			{	
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 			
-			previous = destinationIter;
+			previous = *destinationIter;
 			iter = iter->m_next;
 		}
 	}
@@ -468,7 +537,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -494,7 +563,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -509,47 +578,35 @@ public:
 		}
 	}
 
-	/** disconnect all methods the receiver has registered */
+	/** connect a raw function */
+	void connect(StaticFunction& function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static0(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
+	}
+
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-			
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)
-				{	
-					receiver->onDisconnect(this);
-					
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-										
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
+		disconnect(receiver, NULL);
+	}
 
-					delete iter;
-					break;
-				}
-				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+	void disconnect(StaticFunction& function)
+	{
+		disconnect(NULL, function);
 	}
 
 	/** call each method registered by all receivers */
@@ -592,8 +649,8 @@ public:
 	}
 
 protected:
-	/** called by the disconnection process, removes the receiver from the list */
-	void onDisconnect(Receiver* receiver)
+	
+	void disconnect(Receiver* receiver, StaticFunction* function)
 	{
 		SYNC(m_mutex);
 		Connection* iter(m_receivers);
@@ -601,15 +658,36 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
 			{
+				receiver->onDisconnect(this);
+				isFound = true;	
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{	
 				if (previous)
-				{
+				{	
 					previous->m_next = iter->m_next;
 				}
-				else
+				else 
 				{
 					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
 				}
 
 				delete iter;
@@ -629,7 +707,7 @@ protected:
 		
 		while (iter)
 		{
-			iter->getReceiver()->onDisconnect(this);
+			iter->onDisconnect(*this);
 			Connection* stale(iter);
 			iter = iter->m_next;
 			delete stale;
@@ -638,15 +716,44 @@ protected:
 		m_receivers = NULL;
 	}
 	
-	/** helps with copy constructors */
+	/** called by the be receivers that are disconnecting of their own accord */
+	void onDisconnect(Receiver* receiver)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			if (iter->isReceiver(receiver))
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else
+				{
+					m_receivers = iter->m_next;
+				}
+
+				delete iter;
+				break;
+			}
+
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+
+	/** helps with copy constructors of receivers */
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
 		Connection* iter(m_receivers);
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
-			{
+			if (iter->isReceiver(receiver))
+			{	/** the new reiver will be registered with all transmitters of receiver*/
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
 				m_receivers = connection;
@@ -664,19 +771,22 @@ private:
 }; // Transmitter0
 
 /* begin auto generated code */
-
 template<typename ARG_1>
 class Transmitter1 : public Transmitter
 {
-private:
+	typedef void StaticFunction1(ARG_1);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction1*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -685,14 +795,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile1(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile1(RECEIVER* object, void (RECEIVER::* function)(ARG_1))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile1<RECEIVER>(*this);
@@ -701,9 +807,21 @@ private:
 		{
 			return new volatile1<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction1*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1)
 		{
@@ -718,14 +836,10 @@ private:
 		: public Connection
 	{
 	public:
-		const1(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const1(RECEIVER* object, void (RECEIVER::* function)(ARG_1) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const1<RECEIVER>(*this);
@@ -734,9 +848,21 @@ private:
 		{
 			return new const1<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction1*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1)
 		{
@@ -746,13 +872,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1) const;
 	}; // class const1
+	class static1
+		: public Connection
+	{
+	public:
+		static1(StaticFunction1& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const1<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const1<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction1* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1)
+		{
+			m_function(arg1);
+		}
+	private:
+		StaticFunction1& m_function;
+	}; // class static1
 public:
 	Transmitter1(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter1(const Transmitter1& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -763,24 +927,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter1(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1))
@@ -792,7 +964,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -816,7 +988,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -830,52 +1002,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction1& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static1(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction1& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1)
 	{
@@ -913,6 +1065,68 @@ public:
 		transmit(arg1);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction1* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -921,7 +1135,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -940,20 +1154,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -961,7 +1161,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -981,15 +1181,19 @@ private:
 template<typename ARG_1, typename ARG_2>
 class Transmitter2 : public Transmitter
 {
-private:
+	typedef void StaticFunction2(ARG_1, ARG_2);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction2*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -998,14 +1202,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile2(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile2(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile2<RECEIVER>(*this);
@@ -1014,9 +1214,21 @@ private:
 		{
 			return new volatile2<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction2*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2)
 		{
@@ -1031,14 +1243,10 @@ private:
 		: public Connection
 	{
 	public:
-		const2(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const2(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const2<RECEIVER>(*this);
@@ -1047,9 +1255,21 @@ private:
 		{
 			return new const2<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction2*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2)
 		{
@@ -1059,13 +1279,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2) const;
 	}; // class const2
+	class static2
+		: public Connection
+	{
+	public:
+		static2(StaticFunction2& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const2<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const2<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction2* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2)
+		{
+			m_function(arg1, arg2);
+		}
+	private:
+		StaticFunction2& m_function;
+	}; // class static2
 public:
 	Transmitter2(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter2(const Transmitter2& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -1076,24 +1334,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter2(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2))
@@ -1105,7 +1371,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1129,7 +1395,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1143,52 +1409,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction2& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static2(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction2& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2)
 	{
@@ -1226,6 +1472,68 @@ public:
 		transmit(arg1, arg2);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction2* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -1234,7 +1542,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -1253,20 +1561,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -1274,7 +1568,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -1294,15 +1588,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3>
 class Transmitter3 : public Transmitter
 {
-private:
+	typedef void StaticFunction3(ARG_1, ARG_2, ARG_3);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction3*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -1311,14 +1609,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile3(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile3(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile3<RECEIVER>(*this);
@@ -1327,9 +1621,21 @@ private:
 		{
 			return new volatile3<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction3*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3)
 		{
@@ -1344,14 +1650,10 @@ private:
 		: public Connection
 	{
 	public:
-		const3(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const3(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const3<RECEIVER>(*this);
@@ -1360,9 +1662,21 @@ private:
 		{
 			return new const3<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction3*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3)
 		{
@@ -1372,13 +1686,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3) const;
 	}; // class const3
+	class static3
+		: public Connection
+	{
+	public:
+		static3(StaticFunction3& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const3<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const3<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction3* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3)
+		{
+			m_function(arg1, arg2, arg3);
+		}
+	private:
+		StaticFunction3& m_function;
+	}; // class static3
 public:
 	Transmitter3(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter3(const Transmitter3& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -1389,24 +1741,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter3(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3))
@@ -1418,7 +1778,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1442,7 +1802,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1456,52 +1816,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction3& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static3(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction3& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3)
 	{
@@ -1539,6 +1879,68 @@ public:
 		transmit(arg1, arg2, arg3);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction3* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -1547,7 +1949,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -1566,20 +1968,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -1587,7 +1975,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -1607,15 +1995,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4>
 class Transmitter4 : public Transmitter
 {
-private:
+	typedef void StaticFunction4(ARG_1, ARG_2, ARG_3, ARG_4);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction4*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -1624,14 +2016,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile4(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile4(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile4<RECEIVER>(*this);
@@ -1640,9 +2028,21 @@ private:
 		{
 			return new volatile4<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction4*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4)
 		{
@@ -1657,14 +2057,10 @@ private:
 		: public Connection
 	{
 	public:
-		const4(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const4(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const4<RECEIVER>(*this);
@@ -1673,9 +2069,21 @@ private:
 		{
 			return new const4<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction4*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4)
 		{
@@ -1685,13 +2093,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4) const;
 	}; // class const4
+	class static4
+		: public Connection
+	{
+	public:
+		static4(StaticFunction4& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const4<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const4<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction4* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4)
+		{
+			m_function(arg1, arg2, arg3, arg4);
+		}
+	private:
+		StaticFunction4& m_function;
+	}; // class static4
 public:
 	Transmitter4(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter4(const Transmitter4& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -1702,24 +2148,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter4(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4))
@@ -1731,7 +2185,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1755,7 +2209,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -1769,52 +2223,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction4& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static4(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction4& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4)
 	{
@@ -1852,6 +2286,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction4* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -1860,7 +2356,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -1879,20 +2375,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -1900,7 +2382,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -1920,15 +2402,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5>
 class Transmitter5 : public Transmitter
 {
-private:
+	typedef void StaticFunction5(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction5*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -1937,14 +2423,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile5(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile5(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile5<RECEIVER>(*this);
@@ -1953,9 +2435,21 @@ private:
 		{
 			return new volatile5<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction5*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5)
 		{
@@ -1970,14 +2464,10 @@ private:
 		: public Connection
 	{
 	public:
-		const5(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const5(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const5<RECEIVER>(*this);
@@ -1986,9 +2476,21 @@ private:
 		{
 			return new const5<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction5*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5)
 		{
@@ -1998,13 +2500,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5) const;
 	}; // class const5
+	class static5
+		: public Connection
+	{
+	public:
+		static5(StaticFunction5& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const5<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const5<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction5* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5);
+		}
+	private:
+		StaticFunction5& m_function;
+	}; // class static5
 public:
 	Transmitter5(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter5(const Transmitter5& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -2015,24 +2555,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter5(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5))
@@ -2044,7 +2592,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2068,7 +2616,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2082,52 +2630,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction5& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static5(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction5& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5)
 	{
@@ -2165,6 +2693,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction5* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -2173,7 +2763,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -2192,20 +2782,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -2213,7 +2789,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -2233,15 +2809,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6>
 class Transmitter6 : public Transmitter
 {
-private:
+	typedef void StaticFunction6(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction6*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -2250,14 +2830,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile6(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile6(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile6<RECEIVER>(*this);
@@ -2266,9 +2842,21 @@ private:
 		{
 			return new volatile6<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction6*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6)
 		{
@@ -2283,14 +2871,10 @@ private:
 		: public Connection
 	{
 	public:
-		const6(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const6(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const6<RECEIVER>(*this);
@@ -2299,9 +2883,21 @@ private:
 		{
 			return new const6<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction6*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6)
 		{
@@ -2311,13 +2907,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6) const;
 	}; // class const6
+	class static6
+		: public Connection
+	{
+	public:
+		static6(StaticFunction6& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const6<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const6<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction6* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5, arg6);
+		}
+	private:
+		StaticFunction6& m_function;
+	}; // class static6
 public:
 	Transmitter6(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter6(const Transmitter6& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -2328,24 +2962,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter6(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6))
@@ -2357,7 +2999,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2381,7 +3023,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2395,52 +3037,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction6& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static6(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction6& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6)
 	{
@@ -2478,6 +3100,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5, arg6);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction6* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -2486,7 +3170,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -2505,20 +3189,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -2526,7 +3196,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -2546,15 +3216,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7>
 class Transmitter7 : public Transmitter
 {
-private:
+	typedef void StaticFunction7(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction7*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -2563,14 +3237,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile7(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile7(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile7<RECEIVER>(*this);
@@ -2579,9 +3249,21 @@ private:
 		{
 			return new volatile7<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction7*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7)
 		{
@@ -2596,14 +3278,10 @@ private:
 		: public Connection
 	{
 	public:
-		const7(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const7(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const7<RECEIVER>(*this);
@@ -2612,9 +3290,21 @@ private:
 		{
 			return new const7<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction7*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7)
 		{
@@ -2624,13 +3314,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7) const;
 	}; // class const7
+	class static7
+		: public Connection
+	{
+	public:
+		static7(StaticFunction7& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const7<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const7<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction7* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+		}
+	private:
+		StaticFunction7& m_function;
+	}; // class static7
 public:
 	Transmitter7(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter7(const Transmitter7& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -2641,24 +3369,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter7(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7))
@@ -2670,7 +3406,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2694,7 +3430,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -2708,52 +3444,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction7& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static7(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction7& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7)
 	{
@@ -2791,6 +3507,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction7* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -2799,7 +3577,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -2818,20 +3596,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -2839,7 +3603,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -2859,15 +3623,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8>
 class Transmitter8 : public Transmitter
 {
-private:
+	typedef void StaticFunction8(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction8*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -2876,14 +3644,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile8(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile8(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile8<RECEIVER>(*this);
@@ -2892,9 +3656,21 @@ private:
 		{
 			return new volatile8<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction8*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8)
 		{
@@ -2909,14 +3685,10 @@ private:
 		: public Connection
 	{
 	public:
-		const8(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const8(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const8<RECEIVER>(*this);
@@ -2925,9 +3697,21 @@ private:
 		{
 			return new const8<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction8*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8)
 		{
@@ -2937,13 +3721,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8) const;
 	}; // class const8
+	class static8
+		: public Connection
+	{
+	public:
+		static8(StaticFunction8& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const8<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const8<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction8* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+		}
+	private:
+		StaticFunction8& m_function;
+	}; // class static8
 public:
 	Transmitter8(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter8(const Transmitter8& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -2954,24 +3776,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter8(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8))
@@ -2983,7 +3813,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3007,7 +3837,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3021,52 +3851,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction8& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static8(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction8& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8)
 	{
@@ -3104,6 +3914,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction8* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -3112,7 +3984,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -3131,20 +4003,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -3152,7 +4010,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -3172,15 +4030,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9>
 class Transmitter9 : public Transmitter
 {
-private:
+	typedef void StaticFunction9(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction9*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -3189,14 +4051,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile9(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile9(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile9<RECEIVER>(*this);
@@ -3205,9 +4063,21 @@ private:
 		{
 			return new volatile9<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction9*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9)
 		{
@@ -3222,14 +4092,10 @@ private:
 		: public Connection
 	{
 	public:
-		const9(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const9(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const9<RECEIVER>(*this);
@@ -3238,9 +4104,21 @@ private:
 		{
 			return new const9<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction9*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9)
 		{
@@ -3250,13 +4128,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9) const;
 	}; // class const9
+	class static9
+		: public Connection
+	{
+	public:
+		static9(StaticFunction9& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const9<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const9<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction9* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
+		}
+	private:
+		StaticFunction9& m_function;
+	}; // class static9
 public:
 	Transmitter9(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter9(const Transmitter9& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -3267,24 +4183,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter9(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9))
@@ -3296,7 +4220,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3320,7 +4244,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3334,52 +4258,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction9& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static9(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction9& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9)
 	{
@@ -3417,6 +4321,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction9* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -3425,7 +4391,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -3444,20 +4410,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -3465,7 +4417,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;
@@ -3485,15 +4437,19 @@ private:
 template<typename ARG_1, typename ARG_2, typename ARG_3, typename ARG_4, typename ARG_5, typename ARG_6, typename ARG_7, typename ARG_8, typename ARG_9, typename ARG_10>
 class Transmitter10 : public Transmitter
 {
-private:
+	typedef void StaticFunction10(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10);
+
 	class Connection
 	{
 	public:
 		Connection(void) : m_next(NULL) { /* empty */ };
-		virtual ~Connection(void)=0 {};
+		virtual ~Connection(void)=0 { /* empty */ };
 		virtual Connection* clone(void)=0;
 		virtual Connection* duplicate(Receiver* receiver)=0;
-		virtual Receiver* getReceiver(void) const=0;
+		virtual bool isFunction(StaticFunction10*) const=0;
+		virtual bool isReceiver(const Receiver*) const=0;
+		virtual void onConnect(Transmitter&)=0;
+		virtual void onDisconnect(Transmitter&)=0;
 		virtual void transmit(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10)=0;
 		Connection* m_next;
 	}; // class Connection
@@ -3502,14 +4458,10 @@ private:
 		: public Connection
 	{
 	public:
-		volatile10(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		volatile10(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10))
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new volatile10<RECEIVER>(*this);
@@ -3518,9 +4470,21 @@ private:
 		{
 			return new volatile10<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction10*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9, ARG_10 arg10)
 		{
@@ -3535,14 +4499,10 @@ private:
 		: public Connection
 	{
 	public:
-		const10(void)
-			: m_object(NULL)
-			, m_function(NULL)
-		{}
 		const10(RECEIVER* object, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10) const)
 			: m_object(object)
 			, m_function(function)
-		{}
+		{ /* empty */ }
 		virtual Connection* clone(void)
 		{
 			return new const10<RECEIVER>(*this);
@@ -3551,9 +4511,21 @@ private:
 		{
 			return new const10<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
 		}
-		virtual Receiver* getReceiver(void) const
+		virtual bool isFunction(StaticFunction10*) const
 		{
-			return m_object;
+			return false;
+		}
+		virtual bool isReceiver(const Receiver* receiver) const
+		{
+			return m_object == static_cast<const RECEIVER*>(receiver);
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			m_object->onConnect(&transmitter);
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			m_object->onDisconnect(&transmitter);
 		}
 		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9, ARG_10 arg10)
 		{
@@ -3563,13 +4535,51 @@ private:
 		RECEIVER* m_object;
 		void (RECEIVER::* m_function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10) const;
 	}; // class const10
+	class static10
+		: public Connection
+	{
+	public:
+		static10(StaticFunction10& function)
+			: m_function(function)
+		{ /* empty */ }
+		virtual Connection* clone(void)
+		{
+			return new const10<RECEIVER>(*this);
+		}
+		virtual Connection* duplicate(Receiver* receiver)
+		{
+			return new const10<RECEIVER>(static_cast<RECEIVER*>(receiver), m_function);
+		}
+		virtual bool isFunction(StaticFunction10* function) const
+		{
+			return &m_function == function;
+		}
+		virtual bool isReceiver(const Receiver*) const
+		{
+			return false;
+		}
+		virtual void onConnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void onDisconnect(Transmitter& transmitter)
+		{
+			/* empty */;
+		}
+		virtual void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9, ARG_10 arg10)
+		{
+			m_function(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+		}
+	private:
+		StaticFunction10& m_function;
+	}; // class static10
 public:
 	Transmitter10(void)
 		: m_receivers(NULL)
 		, m_transmissionIter(NULL)
 		, m_isRepeatTransmissionRequired(false)
 		, m_isTransmitting(false)
-	{ /* empty */}
+	{ /* empty */ }
 	Transmitter10(const Transmitter10& source)
 		: Transmitter(source)
 		, m_receivers(NULL)
@@ -3580,24 +4590,32 @@ public:
 		SYNC(m_mutex);
 		Connection* iter(source.m_receivers);
 		Connection* previous(NULL);
-		Connection* destinationIter = m_receivers;
+		Connection** destinationIter = &m_receivers;
 		while (iter)
 		{
-			iter->getReceiver()->onConnect(this);
-			destinationIter = iter->clone();
+			iter->onConnect(*this);
+			*destinationIter = iter->clone();
 
 			if (previous)
 			{
-				previous->m_next = destinationIter;
+				previous->m_next = *destinationIter;
 			}
 
-			previous = destinationIter
+			previous = *destinationIter
 				iter = iter->m_next;
 		}
 	}
 	virtual ~Transmitter10(void)
 	{
 		disconnectAll();
+	}
+	void ceaseTransmission(void)
+	{
+		SYNC(m_mutex);
+		disconnectAll();
+		m_isTransmitting = false;
+		m_transmissionIter = NULL;
+		m_receivers = NULL;
 	}
 	template<class RECEIVER>
 	void connect(RECEIVER* receiver, void (RECEIVER::* function)(ARG_1, ARG_2, ARG_3, ARG_4, ARG_5, ARG_6, ARG_7, ARG_8, ARG_9, ARG_10))
@@ -3609,7 +4627,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3633,7 +4651,7 @@ public:
 
 			while (iter)
 			{
-				if (iter->getReceiver() == static_cast<Receiver*>(receiver))
+				if (iter->isReceiver(receiver))
 				{
 					return;
 				}
@@ -3647,52 +4665,32 @@ public:
 			receiver->onConnect(this);
 		}
 	}
-	void ceaseTransmission(void)
+	void connect(StaticFunction10& function)
 	{
 		SYNC(m_mutex);
-		disconnectAll();
-		m_isTransmitting = false;
-		m_transmissionIter = NULL;
-		m_receivers = NULL;
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			if (iter->isFunction(&function))
+			{
+				return;
+			}
+
+			iter = iter->m_next;
+		}
+
+		Connection* connection(new static10(function));
+		connection->m_next = m_receivers;
+		m_receivers = connection;
 	}
 	void disconnect(Receiver* receiver)
 	{
-		if (receiver)
-		{
-			SYNC(m_mutex);
-			Connection* iter(m_receivers);
-			Connection* previous(NULL);
-
-			while (iter)
-			{
-				if (iter->getReceiver() == receiver)				{
-					receiver->onDisconnect(this);
-
-					if (previous)
-					{	
-						previous->m_next = iter->m_next;
-					}
-					else 
-					{
-						m_receivers = iter->m_next;
-					}
-
-					// if transmitting...	
-					if (m_isTransmitting)
-					{	// ... and we just removed the transmission iter ...
-						if (m_transmissionIter == iter)
-						{	// .. set the iterator back one to preserve the transmission iteration
-							m_transmissionIter = previous;
-						}
-					}
-
-					delete iter;
-					break;
-				}				
-				previous = iter;
-				iter = iter->m_next;
-			}
-		}
+		disconnect(receiver, NULL);
+	}
+	void disconnect(StaticFunction10& function)
+	{
+		disconnect(NULL, function);
 	}
 	void transmit(ARG_1 arg1, ARG_2 arg2, ARG_3 arg3, ARG_4 arg4, ARG_5 arg5, ARG_6 arg6, ARG_7 arg7, ARG_8 arg8, ARG_9 arg9, ARG_10 arg10)
 	{
@@ -3730,6 +4728,68 @@ public:
 		transmit(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
 	}
 protected:
+	void disconnect(Receiver* receiver, StaticFunction10* function)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+		Connection* previous(NULL);
+
+		while (iter)
+		{
+			bool isFound;
+
+			if (iter->isReceiver(receiver))
+			{
+				receiver->onDisconnect(this);
+				isFound = true;
+			}
+			else
+			{
+				isFound = iter->isFunction(function);
+			}
+
+			if (isFound)
+			{
+				if (previous)
+				{
+					previous->m_next = iter->m_next;
+				}
+				else 
+				{
+					m_receivers = iter->m_next;
+				}
+
+				// if transmitting...	
+				if (m_isTransmitting)
+				{	// ... and we just removed the transmission iter ...
+					if (m_transmissionIter == iter)
+					{	// .. set the iterator back one to preserve the transmission iteration
+						m_transmissionIter = previous;
+					}
+				}
+
+				delete iter;
+				break;
+			}				
+			previous = iter;
+			iter = iter->m_next;
+		}
+	}
+	void disconnectAll(void)
+	{
+		SYNC(m_mutex);
+		Connection* iter(m_receivers);
+
+		while (iter)
+		{
+			iter->onDisconnect(*this);
+			Connection* stale(iter);
+			iter = iter->m_next;
+			delete stale;
+		}
+
+		m_receivers = NULL;
+	}
 	void onDisconnect(Receiver* receiver)
 	{
 		SYNC(m_mutex);
@@ -3738,7 +4798,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				if (previous)
 				{
@@ -3757,20 +4817,6 @@ protected:
 			iter = iter->m_next;
 		}
 	}
-	void disconnectAll(void)
-	{
-		SYNC(m_mutex);
-		Connection* iter(m_receivers);
-
-		while (iter)
-		{
-			iter->getReceiver()->onDisconnect(this);
-			Connection* stale(iter);
-			iter = iter->m_next;
-			delete stale;
-		}
-
-		m_receivers = NULL;	}
 	void replicate(const Receiver* receiver, Receiver* new_receiver)
 	{
 		SYNC(m_mutex);
@@ -3778,7 +4824,7 @@ protected:
 
 		while (iter)
 		{
-			if (iter->getReceiver() == receiver)
+			if (iter->isReceiver(receiver))
 			{
 				Connection* connection = iter->duplicate(new_receiver);
 				connection->m_next = m_receivers;

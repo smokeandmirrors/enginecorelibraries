@@ -1,5 +1,7 @@
 #include "Sandbox.h"
 
+#include <functional>
+
 #include "BinaryHeap.h"
 #include "A_Star.h"
 #include "Composition.h"
@@ -445,8 +447,31 @@ void testHFSM2(void)
 	HFSM::test();
 }
 
+
+void connectMe(void)
+{
+	printf("I'm connected!\n");
+}
+
 void onPlay(void)
 {
+	if (true)
+	{
+		signals::Transmitter0 transmitter;
+		transmitter.connect(connectMe);
+		transmitter.transmit();
+
+		signals::Transmitter0 transmitter1(transmitter);
+		transmitter1.transmit();
+
+		transmitter.disconnect(connectMe);
+		transmitter.transmit();
+
+		signals::Transmitter0 transmitter2(transmitter);
+		transmitter2.transmit();
+
+	}
+	
 	sandbox::schedulingRnD();
 
 	{
