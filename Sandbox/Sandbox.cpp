@@ -448,31 +448,100 @@ void testHFSM2(void)
 }
 
 
+class MyClass
+{
+public:
+	void MyMethod(void) const
+	{
+		printf("Hello, world!\n");
+	}
+};
+
+signals::Transmitter0* transmitterZero;
+
+void connectMe(void);
+void connectMeToo(void);
+void connectMeFour(void);
+void connectMeThree(void);
+
 void connectMe(void)
 {
 	printf("I'm connected!\n");
+	// transmitterZero->disconnect(connectMe);
+	// transmitterZero->disconnect(connectMeToo);
+	transmitterZero->disconnect(connectMeThree);
+	transmitterZero->disconnect(connectMeToo);
+	transmitterZero->disconnect(connectMe);
+}
+
+void connectMeToo(void)
+{
+	printf("I'm connected, too!\n");
+}
+
+void connectMeThree(void)
+{
+	printf("I'm connected, three!\n");
+	// transmitterZero->disconnect(connectMeFour);
+	// transmitterZero->disconnect(connectMeThree);
+	// transmitterZero->disconnect(connectMeToo);
+	// transmitterZero->disconnect(connectMe);
+	// transmitterZero->transmit();
+}
+
+class ConnectMe
+	: public signals::ReceiverBase
+{
+public:
+	void connectMeConst(void) const
+	{
+		printf("Connect me const!\n");
+	}
+
+	void connectMe(void) 
+	{
+		printf("Connect me!\n");
+	}
+};
+
+
+void connectMeFour(void)
+{
+	printf("I'm connected, four!\n");
 }
 
 void onPlay(void)
 {
-	if (true)
+	// if (true)
 	{
-		signals::Transmitter0 transmitter;
-		transmitter.connect(connectMe);
-		transmitter.transmit();
+		transmitterZero = new signals::Transmitter0();
 
-		signals::Transmitter0 transmitter1(transmitter);
-		transmitter1.transmit();
+		ConnectMe object;
+		ConnectMe objectConst;
 
+		signals::Transmitter0& transmitter(*transmitterZero);
+		transmitter.connect<ConnectMe>(&object, &ConnectMe::connectMe);
+		transmitter.connect<ConnectMe>(&objectConst, &ConnectMe::connectMeConst);
+
+		transmitter.disconnect(connectMeToo);
+		assert(!transmitter.isConnected(connectMeToo));
+
+		transmitter();
 		transmitter.disconnect(connectMe);
 		transmitter.transmit();
 
+		{
+			signals::Transmitter0 transmitter1(transmitter);
+			transmitter1.transmit();
+		}
+		
 		signals::Transmitter0 transmitter2(transmitter);
 		transmitter2.transmit();
-
+		
+		delete transmitterZero;
 	}
 	
-	sandbox::schedulingRnD();
+	// sandbox::schedulingRnD();
 
 	{
 		{
