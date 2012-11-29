@@ -259,7 +259,7 @@ void Thread::closeHardware()
 	}	
 }
 
-void Thread::disconnect(signals::Receiver* receiver)
+void Thread::disconnect(signals::Receiver& receiver)
 {
 	m_onComplete.disconnect(receiver);
 }

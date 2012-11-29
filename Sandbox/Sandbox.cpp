@@ -526,13 +526,13 @@ public:
 	}
 
 // protected:
-	void onConnect(signals::Transmitter* transmitter)
+	void onConnect(signals::Transmitter& transmitter)
 	{
 		m_receiver.onConnect(transmitter);
 	}
 
 // protected:
-	void onDisconnect(signals::Transmitter* transmitter)
+	void onDisconnect(signals::Transmitter& transmitter)
 	{
 		m_receiver.onDisconnect(transmitter);
 	}
@@ -568,13 +568,13 @@ public:
 	}
 
 	// protected:
-	void onConnect(signals::Transmitter* transmitter)
+	void onConnect(signals::Transmitter& transmitter)
 	{
 		m_receiver.onConnect(transmitter);
 	}
 
 	// protected:
-	void onDisconnect(signals::Transmitter* transmitter)
+	void onDisconnect(signals::Transmitter& transmitter)
 	{
 		m_receiver.onDisconnect(transmitter);
 	}
@@ -599,8 +599,8 @@ void onPlay(void)
 		ConnectMe objectConst;
 
 		signals::Transmitter0& transmitter(*transmitterZero);
-		transmitter.connect<ConnectMe>(&object, &ConnectMe::connectMe);
-		transmitter.connect<ConnectMe>(&objectConst, &ConnectMe::connectMeConst);
+		transmitter.connect<ConnectMe>(object, &ConnectMe::connectMe);
+		transmitter.connect<ConnectMe>(objectConst, &ConnectMe::connectMeConst);
 
 		transmitter.disconnect(connectMeToo);
 		assert(!transmitter.isConnected(connectMeToo));
@@ -627,8 +627,8 @@ void onPlay(void)
 		ConnectMe1 objectConst;
 
 		signals::Transmitter1<int>& transmitter(*transmitterOne);
-		transmitter.connect<ConnectMe1>(&object, &ConnectMe1::connectMe);
-		transmitter.connect<ConnectMe1>(&objectConst, &ConnectMe1::connectMeConst);
+		transmitter.connect<ConnectMe1>(object, &ConnectMe1::connectMe);
+		transmitter.connect<ConnectMe1>(objectConst, &ConnectMe1::connectMeConst);
 
 		transmitter.disconnect(connectMeToo1);
 		assert(!transmitter.isConnected(connectMeToo1));

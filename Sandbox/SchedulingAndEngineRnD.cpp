@@ -229,28 +229,28 @@ public:
 	}
 
 	template<class RECEIVER>
-	void onCompleteConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
+	void onCompleteConnect(RECEIVER& receiver, void (RECEIVER::* function)(FrameRequirement*))
 	{
 		m_onComplete.connect(receiver, function);
 	}
 
 	template<class RECEIVER>
-	void onCompleteConnect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
+	void onCompleteConnect(RECEIVER& receiver, void (RECEIVER::* function)(FrameRequirement*) const)
 	{
 		m_onComplete.connect(receiver, function);
 	}
 
-	void onCompleteDisconnect(signals::Receiver* receiver)
+	void onCompleteDisconnect(signals::Receiver& receiver)
 	{
 		m_onComplete.disconnect(receiver);
 	}
 
-	void onConnect(signals::Transmitter* sender)
+	void onConnect(signals::Transmitter& sender)
 	{
 		m_receiver.onConnect(sender);
 	}
 
-	void onDisconnect(signals::Transmitter* sender)
+	void onDisconnect(signals::Transmitter& sender)
 	{
 		m_receiver.onDisconnect(sender);
 	}
@@ -297,8 +297,8 @@ public:
 	void addFrameRequirement(FrameRequirement* requirement)
 	{
 		SYNC(m_mutex);
-		m_onComplete.connect(requirement, &FrameRequirement::noticeNextFrame);
-		requirement->onCompleteConnect(this, &EngineLoop::noticeComplete);
+		m_onComplete.connect(*requirement, &FrameRequirement::noticeNextFrame);
+		requirement->onCompleteConnect(*this, &EngineLoop::noticeComplete);
 		m_incomplete.push_back(requirement);
 	}
 
@@ -313,18 +313,18 @@ public:
 	}
 
 	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*))
+	void connect(RECEIVER& receiver, void (RECEIVER::* function)(FrameRequirement*))
 	{
 		m_onComplete.connect(receiver, function);
 	}
 
 	template<class RECEIVER>
-	void connect(RECEIVER* receiver, void (RECEIVER::* function)(FrameRequirement*) const)
+	void connect(RECEIVER& receiver, void (RECEIVER::* function)(FrameRequirement*) const)
 	{
 		m_onComplete.connect(receiver, function);
 	}
 
-	void disconnect(signals::Receiver* receiver)
+	void disconnect(signals::Receiver& receiver)
 	{
 		m_onComplete.disconnect(receiver);
 	}
@@ -356,12 +356,12 @@ public:
 		}
 	}
 
-	void onConnect(signals::Transmitter* sender)
+	void onConnect(signals::Transmitter& sender)
 	{
 		m_receiver.onConnect(sender);
 	}
 
-	void onDisconnect(signals::Transmitter* sender)
+	void onDisconnect(signals::Transmitter& sender)
 	{
 		m_receiver.onDisconnect(sender);
 	}
@@ -369,7 +369,7 @@ public:
 	void removeFrameRequirement(FrameRequirement* requirement)
 	{
 		SYNC(m_mutex);
-		m_onComplete.disconnect(requirement);
+		m_onComplete.disconnect(*requirement);
 		removeFromList(requirement, m_completed, m_completeMutex);
 		removeFromList(requirement, m_incomplete, m_incompleteMutex);
 	}

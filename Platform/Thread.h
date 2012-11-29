@@ -76,10 +76,10 @@ public:
 	/// get the ID of the executing thread
 	static threadID getThisID(void);
 	
-	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*));
-	template<class RECEIVER> void connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const);
+	template<class RECEIVER> void connect(RECEIVER& receiver, void (RECEIVER::* function)(Thread*));
+	template<class RECEIVER> void connect(RECEIVER& receiver, void (RECEIVER::* function)(Thread*) const);
 	void addReference(void) const { ++m_referenceCount; }
-	void disconnect(signals::Receiver* receiver);
+	void disconnect(signals::Receiver& receiver);
 	void execute(cpuID preferredCPU);
 	inline bool getID(threadID& id) const;
 	cpuID getPreferredCPU(void) const;
@@ -276,13 +276,13 @@ public:
 };
 
 template<class RECEIVER> 
-void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*))
+void Thread::connect(RECEIVER& receiver, void (RECEIVER::* function)(Thread*))
 {
 	m_onComplete.connect(receiver, function);
 }
 
 template<class RECEIVER> 
-void Thread::connect(RECEIVER* receiver, void (RECEIVER::* function)(Thread*) const)
+void Thread::connect(RECEIVER& receiver, void (RECEIVER::* function)(Thread*) const)
 {
 	m_onComplete.connect(receiver, function);
 }

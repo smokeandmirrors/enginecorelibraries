@@ -88,7 +88,7 @@ public:
 	{
 		if (m_thread)
 		{
-			m_thread->disconnect(this);
+			m_thread->disconnect(*this);
 			m_thread->removeReference();
 		}
 
@@ -96,7 +96,7 @@ public:
 
 		if (m_thread)
 		{
-			m_thread->connect(this, &Job::onComplete);
+			m_thread->connect(*this, &Job::onComplete);
 			m_thread->addReference();
 			m_priority = newPriority;
 		}		
@@ -107,12 +107,12 @@ public:
 		Dispatcher::single().accountForFinish(this);
 	}
 
-	inline void onConnect(Transmitter* transmitter)
+	inline void onConnect(Transmitter& transmitter)
 	{
 		m_receiver.onConnect(transmitter);
 	}
 
-	inline void onDisconnect(Transmitter* transmitter)
+	inline void onDisconnect(Transmitter& transmitter)
 	{
 		m_receiver.onDisconnect(transmitter);
 	}
@@ -121,7 +121,7 @@ public:
 	{
 		if (m_thread)
 		{
-			m_thread->disconnect(this);
+			m_thread->disconnect(*this);
 			m_thread->removeReference();
 			m_thread = NULL;
 		}
