@@ -457,7 +457,18 @@ public:
 	}
 };
 
-signals::Transmitter0* transmitterZero;
+static signals::Transmitter0* transmitterZero(nullptr);
+static signals::Transmitter1<int>* transmitterOne(NULL);
+
+void connectMe1(int)
+{
+
+}
+
+void connectMeToo1(int)
+{
+
+}
 
 void connectMe(void);
 void connectMeToo(void);
@@ -490,9 +501,15 @@ void connectMeThree(void)
 }
 
 class ConnectMe
-	: public signals::ReceiverBase
+	: public signals::Receiver
 {
 public:
+
+	ConnectMe(void)
+	{
+		m_receiver.setReceiver(*this);
+	}
+
 	void connectMeConst(void) const
 	{
 		printf("Connect me const!\n");
@@ -502,6 +519,68 @@ public:
 	{
 		printf("Connect me!\n");
 	}
+
+	void ceaseReception(void)
+	{
+		m_receiver.ceaseReception();
+	}
+
+// protected:
+	void onConnect(signals::Transmitter* transmitter)
+	{
+		m_receiver.onConnect(transmitter);
+	}
+
+// protected:
+	void onDisconnect(signals::Transmitter* transmitter)
+	{
+		m_receiver.onDisconnect(transmitter);
+	}
+
+private:
+	signals::ReceiverMember m_receiver;
+};
+
+
+class ConnectMe1
+	: public signals::Receiver
+{
+public:
+
+	ConnectMe1(void)
+	{
+		m_receiver.setReceiver(*this);
+	}
+
+	void connectMeConst(int) const
+	{
+		printf("Connect me const!\n");
+	}
+
+	void connectMe(int) 
+	{
+		printf("Connect me!\n");
+	}
+
+	void ceaseReception(void)
+	{
+		m_receiver.ceaseReception();
+	}
+
+	// protected:
+	void onConnect(signals::Transmitter* transmitter)
+	{
+		m_receiver.onConnect(transmitter);
+	}
+
+	// protected:
+	void onDisconnect(signals::Transmitter* transmitter)
+	{
+		m_receiver.onDisconnect(transmitter);
+	}
+
+private:
+	signals::ReceiverMember m_receiver;
 };
 
 
@@ -512,7 +591,7 @@ void connectMeFour(void)
 
 void onPlay(void)
 {
-	// if (true)
+	if (false)
 	{
 		transmitterZero = new signals::Transmitter0();
 
@@ -540,6 +619,35 @@ void onPlay(void)
 		
 		delete transmitterZero;
 	}
+
+	{
+		transmitterOne = new signals::Transmitter1<int>();
+
+		ConnectMe1 object;
+		ConnectMe1 objectConst;
+
+		signals::Transmitter1<int>& transmitter(*transmitterOne);
+		transmitter.connect<ConnectMe1>(&object, &ConnectMe1::connectMe);
+		transmitter.connect<ConnectMe1>(&objectConst, &ConnectMe1::connectMeConst);
+
+		transmitter.disconnect(connectMeToo1);
+		assert(!transmitter.isConnected(connectMeToo1));
+
+		transmitter(2);
+		transmitter.disconnect(connectMe1);
+		transmitter.transmit(2);
+
+		{
+			signals::Transmitter1<int> transmitter1(transmitter);
+			transmitter1.transmit(2);
+		}
+
+		signals::Transmitter1<int> transmitter2(transmitter);
+		transmitter2.transmit(2);
+
+		delete transmitterOne;
+	}
+
 	
 	// sandbox::schedulingRnD();
 

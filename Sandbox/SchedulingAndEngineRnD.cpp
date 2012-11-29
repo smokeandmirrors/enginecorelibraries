@@ -205,7 +205,7 @@ class FrameRequirement
 public:
 	FrameRequirement(void)
 	{
-		m_receiver.setReceiver(this);
+		m_receiver.setReceiver(*this);
 	}
 
 	virtual ~FrameRequirement(void) 
@@ -286,7 +286,7 @@ public:
 		: m_isRunning(false)
 		, m_frameNumber(0)
 	{
-		m_receiver.setReceiver(this);
+		m_receiver.setReceiver(*this);
 	}
 
 	virtual ~EngineLoop(void) 
