@@ -392,10 +392,10 @@ public:
 	}
 
 protected:
-	void addToList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex& mutex)
+	void addToList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex<true>& mutex)
 	{
 		SYNC(mutex)
-			reqs_list.push_back(req);
+		reqs_list.push_back(req);
 	}
 
 	bool isFrameCompleted(void) const
@@ -418,24 +418,25 @@ protected:
 	void markRequirementsIncomplete(void)
 	{
 		SYNC(m_completeMutex)
-			SYNC(m_incompleteMutex)
-			assert(m_incomplete.empty());
+		SYNC(m_incompleteMutex)
+		assert(m_incomplete.empty());
 		m_incomplete = m_completed;
 		m_completed.resize(0);
 		assert(m_completed.empty());
 	}
 
-	void removeFromList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex& mutex)
+	
+	void removeFromList(FrameRequirement* req, requirements& reqs_list, concurrency::Mutex<true>& mutex)
 	{
 		SYNC(mutex)
-			for (requirements_iter iter = reqs_list.begin(); iter != reqs_list.end(); iter++)
+		for (requirements_iter iter = reqs_list.begin(); iter != reqs_list.end(); iter++)
+		{
+			if (*iter == req)
 			{
-				if (*iter == req)
-				{
-					reqs_list.erase(iter);
-					return;
-				}
+				reqs_list.erase(iter);
+				return;
 			}
+		}
 	}
 
 	void startFrame(void)

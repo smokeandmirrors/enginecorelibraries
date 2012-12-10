@@ -44,11 +44,40 @@ class C
 	virtual void hello(void) { printf("Hello, I'm C"); }
 };
 
+/*
+class InnerClassCheck
+{
+public:
+	class InnerA
+	{
+	public:
+		void method(void) const { printf("I'm Inner A!\n"); }
+	};
+
+	class InnerB
+	{
+	public:
+		void method(void) const { printf("I'm Inner B!\n"); }
+	};
+
+};
+
+template<typename INNER_CLASS>
+class OuterClass
+{
+public:
+	InnerClassCheck::INNER_CLASS m_innerClass;
+
+	void method(void) const { m_innerClass.method() };
+};
+*/
 
 namespace compilerChecks 
 {
 	void check(void)
 	{
+		// InnerClassCheck<InnerA> 
+		
 		EClass ec;
 		TClass<EClass>* ptc = &ec;
 		assert(ptc != NULL);

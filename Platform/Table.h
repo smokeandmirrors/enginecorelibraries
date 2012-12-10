@@ -1527,11 +1527,7 @@ private:
 		while (i--) 
 		{
 			Node *n = &(hashPart[i]);
-
-			if (n->value) 
-			{
-				totaluse++;
-			}
+			totaluse += n->value;
 		}
 
 		return totaluse;

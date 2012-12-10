@@ -60,6 +60,11 @@ and in AuthorTimeRunTimeFactory.h.
 
 \see GenericConditions.h for some helpful template Condition classes
 
+\note A useful addition for this class (and any type of blending decision tree like structure) would be
+properties that can be set on various conditions, as in (accept from parent, accept previous).  It comes
+up frequently in character control and animation, and different needs arise when lateral or top down moves
+are made between states, or when different actions of states are intended to be blended together.
+
 <DEVELOPMENT STATUS>
 Current Draft		:	3.0
 Current Phase		:   FIELD TESTING
