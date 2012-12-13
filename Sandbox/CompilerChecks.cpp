@@ -2,6 +2,10 @@
 
 #include "Platform.h"
 #include "CompilerChecks.h"
+#include "Synchronization.h"
+
+using namespace concurrency;
+
 
 template<typename CLASS>
 class TClass 
@@ -72,15 +76,34 @@ public:
 };
 */
 
+
+int globalAccess = 0;
+
 namespace compilerChecks 
 {
 	void check(void)
 	{
 		// InnerClassCheck<InnerA> 
 		
-		EClass ec;
-		TClass<EClass>* ptc = &ec;
-		assert(ptc != NULL);
+		Mutex<true> threadSafe;
+		Mutex<false> threadUnsafe;
+		Semaphore semaphore(2);
+
+		{
+			Synchronizer s(threadUnsafe);
+			globalAccess++;
+		}
+
+		{
+			Synchronizer s(threadSafe);
+			globalAccess++;
+		}
+
+		{
+			Synchronizer s(semaphore);
+			globalAccess++;
+		}
+
 
 		// neat!
 		// int int_version = Math<int>::ZERO_TOLERANCE;

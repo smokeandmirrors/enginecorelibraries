@@ -32,7 +32,7 @@ Tested in the field	:	NO
 #define GLOBAL_THREAD_SAFETY
 
 #ifdef GLOBAL_THREAD_SAFETY
-// globaly multithreaded
+// globally multithreaded
 #define DECLARE_MUTEX(INDENTIFIER) \
 	concurrency::Mutex<true> INDENTIFIER;
 
@@ -49,7 +49,7 @@ Tested in the field	:	NO
 	MUTEX.setSpinCount(SPIN_COUNT);
 
 #define SYNC(MUTEX) \
-	concurrency::SynchronizerMutex<true>	UNIQUE_SYNCHRONIZATION(SYNCHRONIZED)(MUTEX);
+	concurrency::Synchronizer UNIQUE_SYNCHRONIZATION(SYNCHRONIZED)(MUTEX);
 
 #else
 // globally single threaded
@@ -189,63 +189,34 @@ protected:
 	PlatformSemaphore semaphore;
 }; // class Semaphore
 
-template<bool IS_THREAD_SAFE>
-class SynchronizerMutex
-{
-public:
-	SynchronizerMutex(Mutex<IS_THREAD_SAFE>& m) 
-	: mutex(m)
-	{
-		mutex.acquire();
-	}
 
-	SynchronizerMutex(const Mutex<IS_THREAD_SAFE>& m)
-	: mutex(const_cast<Mutex<IS_THREAD_SAFE>&>(m))
+class Synchronizer
+{
+	enum SynchronizationObjectType
 	{
-		mutex.acquire();
-	}
+		NoSynchronization,
+		MutexType,
+		SemaphoreType
+	};
+
+public:
+	explicit Synchronizer(Mutex<false>&);
+	explicit Synchronizer(const Mutex<false>&);
+	explicit Synchronizer(Mutex<true>&);
+	explicit Synchronizer(const Mutex<true>&);
+	explicit Synchronizer(Semaphore&);
+	explicit Synchronizer(const Semaphore&);
 	
-	~SynchronizerMutex(void)
-	{
-		mutex.release();
-	}
-
+	~Synchronizer(void);
+	
 private:
-	SynchronizerMutex(void);
-	SynchronizerMutex(const SynchronizerMutex&);
-	SynchronizerMutex& operator=(const SynchronizerMutex&);
+	Synchronizer(void);
+	Synchronizer(const Synchronizer&);
+	Synchronizer& operator=(const Synchronizer&);
 
-	Mutex<IS_THREAD_SAFE>& mutex;
-}; // class SynchronizerMutex
-
-// template<bool IS_THREAD_SAFE>
-class SynchronizerSemaphore
-{
-public:
-	SynchronizerSemaphore(Semaphore& s) 
-	: semaphore(s)
-	{
-		semaphore.acquire();
-	}
-
-	SynchronizerSemaphore(const Semaphore& s)
-	: semaphore(const_cast<Semaphore&>(s))
-	{
-		semaphore.acquire();
-	}
-
-	~SynchronizerSemaphore(void)
-	{
-		semaphore.release();
-	}
-
-private:
-	SynchronizerSemaphore(void);
-	SynchronizerSemaphore(const SynchronizerSemaphore&);
-	SynchronizerSemaphore& operator=(const SynchronizerSemaphore&);
-
-	Semaphore& semaphore;
-}; // class SynchronizerSemaphore
+	SynchronizationObjectType type;
+	void* syncronizationObject;
+}; // Synchronizer
 
 } // namespace concurrency
 
