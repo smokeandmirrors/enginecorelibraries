@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Math">
+      <UniqueIdentifier>{63d55b46-4ae3-411e-ad36-1fffe50cebbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{85cd1760-3361-4943-b9a6-18162b1279a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EmbeddedLua">
+      <UniqueIdentifier>{f179cf1f-dd70-404d-83f7-72cf0a8aaf0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EmbeddedLua\UTLuaFiles">
+      <UniqueIdentifier>{e9ea6b17-e556-403e-b317-955be8760ba1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EmbeddedLua\UTLuaFiles\UTTests">
+      <UniqueIdentifier>{3ebc124f-d0a7-4906-8deb-511732b41118}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EmbeddedLua\UTLuaFiles\UTTests\UTMath">
+      <UniqueIdentifier>{b0a3bea2-75f8-4153-a23e-daf0087bd65e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EmbeddedLua\UTLuaFiles\UTSupport">
+      <UniqueIdentifier>{d4008d83-c05d-41f7-ace0-9f2f12ebd2c5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UTMath.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UTSignals.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="UTStrings.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="UTClassExtension.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTClassExtension2.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTExposeNativeToScript.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTExposeScriptToNative.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTLibraryExtension.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTLuaClass.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTLuaFiles.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTPublicMembersExtensions.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTTemplateExtension.cpp">
+      <Filter>EmbeddedLua</Filter>
+    </ClCompile>
+    <ClCompile Include="UTExample.cpp" />
+    <ClCompile Include="UTTools.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LuaFiles\UnitTestingFramework.lua">
+      <Filter>EmbeddedLua\UTLuaFiles</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLibraryFunctions.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTTests</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaExtendableClasses.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTTests</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaFiles\UTOOP.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTTests</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaFiles\UTProxyClasses.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTTests</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTVector.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTTests\UTMath</Filter>
+    </None>
+    <None Include="..\LuaFiles\Child.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\Grandparent.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\Parent.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaFiles\UTLuaExtendableClasses2.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTOne.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaFiles\UTOne2.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+    <None Include="..\LuaFiles\UTLuaFiles\UTProxyClasses2.lua">
+      <Filter>EmbeddedLua\UTLuaFiles\UTSupport</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="UTTools.h" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Application">
+      <UniqueIdentifier>{ac82d9e0-0a54-4523-9307-a3f51981891a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Lua Utilities">
+      <UniqueIdentifier>{79ec0f8a-9bf4-4f3b-92da-c9c92a1efe45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Application\Lua Math">
+      <UniqueIdentifier>{6a9e1db0-7566-426b-8871-837648c49fce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library">
+      <UniqueIdentifier>{b624e033-846f-4a91-a006-5f987b59a6ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lua Interface">
+      <UniqueIdentifier>{0fe5d608-59a4-4a93-b367-cc4fd8ec7e3a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\LuaFiles\ObjectOrientedParadigm.lua">
+      <Filter>Application\Lua Utilities</Filter>
+    </None>
+    <None Include="..\LuaFiles\ObjectPool.lua">
+      <Filter>Application\Lua Utilities</Filter>
+    </None>
+    <None Include="..\LuaFiles\User.lua">
+      <Filter>Application\Lua Utilities</Filter>
+    </None>
+    <None Include="..\LuaFiles\Utilities.lua">
+      <Filter>Application\Lua Utilities</Filter>
+    </None>
+    <None Include="..\LuaFiles\Vector2.lua">
+      <Filter>Application\Lua Math</Filter>
+    </None>
+    <None Include="..\LuaFiles\Vector2PureLua.lua">
+      <Filter>Application\Lua Math</Filter>
+    </None>
+    <None Include="..\LuaFiles\Vector3.lua">
+      <Filter>Application\Lua Math</Filter>
+    </None>
+    <None Include="..\LuaFiles\Vector3PureLua.lua">
+      <Filter>Application\Lua Math</Filter>
+    </None>
+    <None Include="..\LuaFiles\LuaExposeNativeToScript.lua">
+      <Filter>Library</Filter>
+    </None>
+    <None Include="..\LuaFiles\LuaExposeScriptToNative.lua">
+      <Filter>Library</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LuaExposeNativeToScript.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaExposeScriptToNative.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaExtensibility.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaStateInteraction.h">
+      <Filter>Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Lua.h">
+      <Filter>Lua Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaBuild.h">
+      <Filter>Lua Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaExtensionInclusions.h">
+      <Filter>Lua Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaInclusions.h">
+      <Filter>Lua Interface</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="LuaExtensibility.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaStateInteraction.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
+    <ClCompile Include="Lua.cpp">
+      <Filter>Lua Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaGlobalExtensions.cpp">
+      <Filter>Lua Interface</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

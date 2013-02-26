@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="TemplateMetaProgramming">
+      <UniqueIdentifier>{d442b7b0-e9aa-4f0b-bead-448399e3b1ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Templates">
+      <UniqueIdentifier>{9428a463-ebae-4d14-b718-56b9ddb13e37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compiler Standard">
+      <UniqueIdentifier>{c71b977b-ed45-4a8e-9beb-a48dfeda0f10}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit Test Verification">
+      <UniqueIdentifier>{8310c312-2b67-45d5-b098-d9f4e222fae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Research And Development">
+      <UniqueIdentifier>{3f110c26-3c1b-4c87-a559-b2dea106d7b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rejected">
+      <UniqueIdentifier>{9dee6664-6f90-4365-84a7-cdc720fc66e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CompilerChecks.cpp">
+      <Filter>Compiler Standard</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTestVerification.cpp">
+      <Filter>Unit Test Verification</Filter>
+    </ClCompile>
+    <ClCompile Include="SchedulingAndEngineRnD.cpp">
+      <Filter>Research And Development</Filter>
+    </ClCompile>
+    <ClCompile Include="TableRnD.cpp">
+      <Filter>Research And Development</Filter>
+    </ClCompile>
+    <ClCompile Include="Sandbox.cpp" />
+    <ClCompile Include="HierarchicalFiniteStateMachine2.cpp" />
+    <ClCompile Include="WorkSandbox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CompilerChecks.h">
+      <Filter>Compiler Standard</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTestVerification.h">
+      <Filter>Unit Test Verification</Filter>
+    </ClInclude>
+    <ClInclude Include="Composition.h">
+      <Filter>Rejected</Filter>
+    </ClInclude>
+    <ClInclude Include="Sandbox.h" />
+    <ClInclude Include="WorkSandbox.h" />
+  </ItemGroup>
+</Project>

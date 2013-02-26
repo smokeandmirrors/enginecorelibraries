@@ -8,17 +8,16 @@ inspiration, and much (if not most) of its implementation to Sarah Thompson
 and her work here: http://sigslot.sourceforge.net/
 
 usage:
-The signal::Transmitter* classes can be used to broadcast, that is call functions
-on objects that have connected to it.  The signal::Receiver defines the interfaces
+The signal::Transmitter* classes can be used to broadcast, that is call static or
+member functions that are connected to it.
+
+The signal::Receiver defines the interfaces
 for receiving the signal from the Transmitter* classes.  
 
 implementation:
-Transmitter0 is implemented explicitly below.  Transmitter1 through Transmitter5
-are implemented via the use of the SIGNALS_DECLARE_TRANSMITTER macro, and the
-macros defined in TemplateArguments.h.  If you need more than 5 arguments 
-to be passed into the receivers functions, it would be easiest to add the 
-necessary macros to TemplateArguments, and simply add entries to the SIGNALS_DECLARE_TRANSMITTER 
-uses below.
+Transmitter0 is implemented by hand below, the rest of the Transmitters
+are written by CodeWritingSignals.lua until support for C++11 variadic 
+templates is more widely supported.
 
 What should be considered the real public interface of the Transmitter class is
 as follows:
@@ -28,7 +27,7 @@ all other Transmitter functions should be considered protected, only to be calle
 by the owner of the Transmitter.    
 
 The receiver methods shouldn't be considered public at all, they should
-only be called by the Trasmitters with which it has registered.
+only be called by the Transmitters with which it has registered.
 
 \author Smoke and Mirrors Development
 \htmlonly
@@ -47,14 +46,18 @@ Unit Tested			:	PARTIALLY
 Used in development	:	NO
 Used in experiments :	YES
 Tested in the field	:	NO
+
+\todo make transmitter destruction protected, and use a Destroy() call
+if Destroy() is called during a call to transmit.  Queue that action.
+Make that functionality and the duplicate transmit calls configurable
 */
 
 #include <set>
-// #include <functional> this might just replace all the mess below
 #include "Synchronization.h"
 
 namespace signals
 {
+
 class Receiver;
 
 /**
@@ -221,8 +224,8 @@ private:
 };
 
 /**
-If you prefer a HAS-A relationship to receiver,
-add a RecieverMember to your class, and implement the following methods
+If you prefer or need a HAS-A relationship to receiver,
+add a ReceiverMember to your class, and implement the following methods
 by simply calling the same methods on your class' instance.  As in:
 
 // ...your class..
@@ -341,20 +344,6 @@ private:
 	transmitter_set m_transmitters;
 
 	ReceiverMember(const ReceiverMember& receiver);
-	/*	: m_receiver(NULL)
-	{
-		SYNC(m_mutex);
-		const_iterator iter = receiver.m_transmitters.begin();
-		const_iterator sentinel = receiver.m_transmitters.end();
-
-		while (iter != sentinel)
-		{
-			(*iter)->replicate(receiver, *m_receiver);
-			m_transmitters.insert(*iter);
-			++iter;
-		}
-	} 
-	*/
 };
 
 /** Transmits signals with no arguments */

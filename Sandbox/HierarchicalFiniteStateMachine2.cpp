@@ -1,6 +1,7 @@
 #include "Composition.h"
 #include "HierarchicalFiniteStateMachine.h"
 #include "GenericConditions.h"
+#include "Time.h"
 
 using namespace HFSM;
 using namespace designPatterns;
@@ -661,7 +662,8 @@ void HFSM::test(void)
 		// StateMachineThree* stateMachineOne(Factory<StateMachineThree>::getAuthorCopy());
 		// StateMachineThree* stateMachineOneRun(Factory<StateMachineThree>::getRunTimeCopy(*stateMachineOne));
 		
-		alpha.start(*smOneRun1);
+		// alpha.start(*smOneRun1); // works
+		alpha.start(*smOneRun2); // won't work
 		// just test for memory leaks
 		for (int i(0), sentinel(30); i < sentinel; ++i)
 		{
@@ -671,6 +673,8 @@ void HFSM::test(void)
 		assert(alpha.isInState(AuthorTimeState::runTimeType));
 		alpha.stop();		
 
+		xronos::SystemClock::single().cycles();
+		
 		smOneRun1->recycle();
 		smOneRun2->recycle();
 		authorRun2->recycle();

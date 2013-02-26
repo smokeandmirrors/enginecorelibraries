@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="DecisionMaking">
+      <UniqueIdentifier>{0052e0ad-fcef-4372-be71-e3cbeb37a585}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="A%2a">
+      <UniqueIdentifier>{8393995f-459a-4b8b-a655-89f57143aff0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AI_Behavior.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="AI_DecisionTree.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="AI_GOAP.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="AI_HSFM.h">
+      <Filter>DecisionMaking</Filter>
+    </ClInclude>
+    <ClInclude Include="A_Star.h">
+      <Filter>A%2a</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

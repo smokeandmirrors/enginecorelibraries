@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Concurrency">
+      <UniqueIdentifier>{fff19982-1c3e-43cd-bdcc-252a79104b62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{8bcc2aee-0d10-49f1-a88a-ade7f26a38bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility Library">
+      <UniqueIdentifier>{543b7678-b6d0-4ca3-a8f5-3b11fd1066ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Design Patterns">
+      <UniqueIdentifier>{7aada374-d7f3-4e18-96c5-1b433e035032}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Code Writing">
+      <UniqueIdentifier>{6b96edcf-beff-460e-841e-264e80f8e227}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Containers">
+      <UniqueIdentifier>{17130e7b-b749-40e8-a685-ee7db3dd74d3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Concurrency.h">
+      <Filter>Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Dispatcher.h">
+      <Filter>Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Synchronization.h">
+      <Filter>Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>Concurrency</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Strings.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Signals.h">
+      <Filter>Design Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="Singleton.h">
+      <Filter>Design Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="Constructors.h">
+      <Filter>Code Writing</Filter>
+    </ClInclude>
+    <ClInclude Include="TemplateArguments.h">
+      <Filter>Code Writing</Filter>
+    </ClInclude>
+    <ClInclude Include="Array.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="BinaryHeap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="RedBlackMap.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="RedBlackTree.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Table.h">
+      <Filter>Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="AuthorTimeRunTimeFactory.h">
+      <Filter>Utility Library</Filter>
+    </ClInclude>
+    <ClInclude Include="RunTimeType.h">
+      <Filter>Design Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="HierarchicalFiniteStateMachine.h">
+      <Filter>Design Patterns</Filter>
+    </ClInclude>
+    <ClInclude Include="GenericConditions.h">
+      <Filter>Design Patterns</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Dispatcher.cpp">
+      <Filter>Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Synchronization.cpp">
+      <Filter>Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp">
+      <Filter>Concurrency</Filter>
+    </ClCompile>
+    <ClCompile Include="Strings.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="Singleton.cpp">
+      <Filter>Design Patterns</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="3D Math">
+      <UniqueIdentifier>{89267511-f38c-4281-ab59-6428c17b22b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="LuaMathExtensions">
+      <UniqueIdentifier>{1fe2af0e-4bbd-4d75-b0c0-90f94fa36670}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3DMathFunctions.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Numbers.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NumericalFunctions.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Quaternion.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.h">
+      <Filter>3D Math</Filter>
+    </ClInclude>
+    <ClInclude Include="LuaMathExtensions.h">
+      <Filter>LuaMathExtensions</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Numbers.cpp">
+      <Filter>3D Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>3D Math</Filter>
+    </ClCompile>
+    <ClCompile Include="LuaMathExtensions.cpp">
+      <Filter>LuaMathExtensions</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

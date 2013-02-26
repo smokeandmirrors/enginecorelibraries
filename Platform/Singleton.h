@@ -45,7 +45,7 @@ public:
 	SingletonController* next;
 }; // class SingletonController
 
-template<typename T>
+template<typename SINGLETON>
 class CustomSingletonController : public SingletonController
 {
 public:
@@ -57,17 +57,17 @@ public:
 
 	virtual bool create(void) const
 	{
-		return T::create();	
+		return SINGLETON::create();	
 	}
 
 	virtual void destroy(void) const
 	{
-		T::destroy();
+		SINGLETON::destroy();
 	}
 
 	virtual bool isInitialized(void) const
 	{
-		return T::isInitialized();
+		return SINGLETON::isInitialized();
 	}
 }; // class CustomSingletonController
 

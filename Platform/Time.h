@@ -114,9 +114,9 @@ public:
 class SystemClock 
 	: public designPatterns::Singleton<SystemClock>
 {
-public:
-	static SystemClock* createSingleton(void) { return new SystemClock(); }
+	friend class designPatterns::Singleton<SystemClock>;
 
+public:	
 	/** cycles per second */
 	const cycle hertz; 
 	/** seconds per cycle */
@@ -131,7 +131,10 @@ public:
 	millisecond milliseconds(void) const;
 	void reset(void);
 	second seconds(void) const;
-	
+
+protected:
+	static SystemClock* createSingleton(void) { return new SystemClock(); }
+
 private:
 	cycle cycleZero;
 	

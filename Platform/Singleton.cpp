@@ -26,7 +26,7 @@ void createSingletons()
 
 	singletonInitializers = NULL;
 
-	while (initializationList.size() > 0)
+	while (!initializationList.empty())
 	{
 		IF_DEBUG(size_t originalSize = initializationList.size();)
 		
